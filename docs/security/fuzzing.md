@@ -259,3 +259,24 @@ FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test
   - `Cargo.lock`: additions only
   - `contracts/satchel/src/parse/mod.rs`: `#[cfg(test)] mod fuzz_tests;` appended at the end
   - `tools/package.json`: the `fuzz:corpus` script
+
+## 8. C4/C6 market accounting (property tests, 2026-10-29)
+
+Target: `contracts/satchel/src/{market,inside,offers}.rs` (docs/specs/C4-C6.md). There is no parser here; the risk is
+accounting, so the properties run random operation sequences against a reference model.
+
+| Property (`market_tests::…`) | Input | Checks after every step |
+|---|---|---|
+| `prop_accounting_matches_model` | 1–40 random ops over 3 tokens and 4 accounts: NEAR and USDC deposits, withdrawals (delivered or failed, re-credited by the callback), NEAR and USDC offers, cancels (by the offerer or a stranger; refund delivered or failed), accepts (payout delivered or failed), transfers, signatures, block-time jumps | per-token NEAR, USDC and `inside_epoch` equal the model; open offers per token and per offerer equal the model; `proceeds` equal the model; `market_totals()` equals the sums (I-M2); refused steps change nothing |
+| `prop_id_index_is_a_swap_remove_vec` | 1–80 pushes/removes over 3 keys | the O(1) offer index behaves exactly like `Vec::swap_remove`, and reports the entry that moved |
+| `prop_ft_msg_garbage_is_refused_cleanly` | arbitrary strings ≤ 120 chars as `ft_on_transfer` msg, any amount | only stable `ERR_*` panics (the FT then refunds) |
+
+The NEAR solvency invariant (I-M1) needs real balances, so it runs in the sandbox (`tests/tests/market.rs`
+`check_solvency`, after every step of most tests, including a contract drained to 0.05 NEAR of free balance).
+
+```bash
+cargo test -p satchel --lib market_tests                                     # fast: 64 / 48 / 256 cases
+PROPTEST_CASES=1000 cargo test -p satchel --lib --release market_tests::prop # deeper
+```
+Failure persistence is off (no files under `src/`). Each case starts on empty mocked storage (`wipe()`), since
+`testing_env!` carries storage over between cases.
