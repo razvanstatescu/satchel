@@ -134,3 +134,8 @@ it. Phase-2 UI work builds against those specs.
   - the `notCoveredList` copy says three networks.
 
   **Release gate:** these must be fixed before the web deploy switches to a contract that has C2, C3 or C7.
+- 18:05Z: the other agents hit the same refusals. The C2/C3/C7 nested agent, web-market and web-allowance all report Read/Edit/Write refused with "the user doesn't want to take this action … STOP", even after Razvan's "continue". All are paused pending Razvan's choice: allow agent file edits, orchestrator does the UI, or stop the UI work.
+  - `feat/ui-allowance`: 531557b, with a **merge of main in progress** (`sim.ts` and `mock-wallet.ts` still conflicted).
+  - `feat/ui-market`: 3999f22 (data layer, copy, server-rendered inside balances; typecheck and lint clean).
+  - `feat/ui-sign`: one uncommitted types change, plus fixture vectors in the agent's report.
+- 18:10Z: merged `docs/kb90-sprint` (kb/90 §2/§5.4/§5.5/§5.9/§5.17/§6.1/§7/§13/§14, README, judge-snippets) into main. **Corrected its inferred StorageKey order** to the real enum in `lib.rs`: Allowances 8, Inside…StorageCredit 9–16, EvmNonces 17 (eb1f1c6). Pushed.
