@@ -121,8 +121,9 @@ Expected: `[TBD: H]`, the same hash as in step 2. After the repo is public:
 curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"satchel.satchelhq.testnet","method_name":"config","args_base64":"e30="}}' | python3 -c 'import sys,json; c=json.loads(bytes(json.load(sys.stdin)["result"]["result"])); print("cooldown_blocks =", c["cooldown_blocks"], "mpc =", c["mpc_contract_id"], "evm_chain_ids =", c["evm_chain_ids"])'
 curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"v1.signer-prod.testnet","method_name":"version","args_base64":"e30="}}' | python3 -c 'import sys,json; print("mpc version =", json.loads(bytes(json.load(sys.stdin)["result"]["result"])))'
 ```
-Expected: `cooldown_blocks = 250 mpc = v1.signer-prod.testnet evm_chain_ids = [11155111]`, then `mpc version = 3.17.0`
-(the version was 3.17.0 on 2026-10-22).
+Expected: `cooldown_blocks = 250 mpc = v1.signer-prod.testnet evm_chain_ids = [11155111, 84532, 421614, 11155420]`,
+then `mpc version = 3.17.0` (the version was 3.17.0 on 2026-10-22; the four EVM testnets shipped in the
+2026-10-29 sprint, see `docs/specs/C1-C2-C3-C7.md`).
 
 **8. Balances of Satchel #1's addresses** (no NEAR involved)
 ```sh
@@ -184,8 +185,9 @@ They sign only with `--send` and a typed `yes`, using keys from `~/.near-credent
 ```
  owner's wallet ──sign_for(token, structured payload)──► satchel.satchelhq.testnet (keyless, NEP-171)
                                                             1. caller == owner?  token not listed?
-                                                            2. classify: Sepolia type-2 ETH transfer │ BTC BIP143
-                                                               P2WPKH preimages + outputs │ Solana legacy transfer
+                                                            2. classify: EVM type-2 transfer (4 testnets) or a USDC
+                                                               transfer │ BTC BIP143 preimages + outputs │ Solana
+                                                               legacy transfer │ an EIP-191 or Solana off-chain message
                                                             3. write SigRecord(s) + sign_requested event
                                                             4. MPC sign ×n ──► v1.signer-prod.testnet
  browser ◄── on_signed: one signature per request ◄──────────  (path satchel/{id}/{btc|evm|sol}, one receipt each)
@@ -247,7 +249,8 @@ It refuses everything else: raw hashes, messages, permits, EIP-7702 authorizatio
 Bitcoin sighash types other than ALL, and Solana durable nonces.
 
 **What "Clean history" means.** Your browser read every record and found that none can still move funds:
-- Ethereum: the nonce was used (3 confirmations on Sepolia).
+- Ethereum: the nonce was used (3 confirmations), on whichever of the four supported testnets the record names.
+- A signed message (EIP-191 or a Solana off-chain message) never blocks: it can never move funds on any chain.
 - Bitcoin: the coin was spent in a confirmed transaction, or it never existed. Coins that never existed are excluded
   from the balance you buy.
 - Solana: the blockhash expired.
@@ -285,9 +288,11 @@ This is the negative case of the clean-history check. The team will never send f
   Satchel could no longer sign. The contract forwards leftover gas and lets the caller raise the MPC deposit to
   soften this.
 - **Confirmation depth is testnet-grade**: BTC K = 1, a disclosed weakness. Mainnet would use K = 6 and EVM `finalized`.
-- **v1 scope**: native transfers only (no ERC-20/SPL), EVM Sepolia only, P2WPKH Bitcoin, Solana legacy messages
-  only. There are no NEP-178 approvals or delegates, and `nft_transfer_call` is disabled. The contract can sign Solana
-  transfers; the app shows Bitcoin, Ethereum and Solana, including the Solana send flow.
+- **v1 scope**: native transfers plus USDC ERC-20 transfers (no SPL), EVM on four testnets (Sepolia, Base Sepolia,
+  Arbitrum Sepolia, OP Sepolia), P2WPKH Bitcoin, Solana legacy messages only, and EIP-191/Solana off-chain message
+  signing. There are no NEP-178 approvals; delegated signing (allowances, capped and rolling-window) shipped in the
+  2026-10-29 sprint, and `nft_transfer_call` is still disabled. The contract can sign Solana transfers; the app shows
+  Bitcoin, Ethereum and Solana, including the Solana send flow.
 - **The contract is immutable** (keyless). A bug means a new contract with new addresses (`satchel-v2`), and old
   funds stay with v1.
 - Screening agents (Claude Code and Codex, Q-017) and `curl` see the server-rendered pages. Wallet flows (mint,
@@ -297,7 +302,7 @@ This is the negative case of the clean-history check. The team will never send f
 
 1. An external audit of the contract and the clean-history checker, then a mainnet deployment with K = 6 and
    finalized EVM reads.
-2. ERC-20 / SPL support with per-token classifiers. Each one needs its own "dead record" rule.
+2. SPL token support with its own classifier and "dead record" rule (ERC-20 shipped for USDC in the 2026-10-29 sprint).
 3. A read-only state view (signature count plus a hash of the log) so third-party NEAR marketplaces can bind orders
    to a Satchel's history, the same way `buy` does.
 4. Sustainability: a small fee on Satchel sales through the contract. `[TBD: team decision]`

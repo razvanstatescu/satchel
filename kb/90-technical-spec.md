@@ -65,6 +65,12 @@
 | Infra | Vercel (SSR + route handlers), browser-side reads, no DB | Indexer, relay worker, server-side demo signer | D-11, D-12 |
 | Mainnet | Nothing by default. The 1Click clip (S-12) is **cut** unless the human reverses H-16 by Oct 31; if kept, it runs on an unlocked mainnet deployment | Locked mainnet deployment (needs audit) | kb/51 §S-12; D-19 |
 
+**(sprint 2026-10-29).** This table is the original v1 scope and is kept verbatim for history. The merged `main`
+moved several "Out of v1" cells into scope: EVM now covers four testnets (not Sepolia only) and USDC ERC-20
+transfers (not native-only); Signing now has delegates (C5, capped and rolling-window, not unbounded); Sale gains
+offers (C4) and a NEAR/FT balance held inside the token (C6). P2TR, SPL tokens and other EVM chains are still out.
+See §5.17 for the full index and `docs/specs/*.md` for the normative detail.
+
 ---
 
 ## 3. System overview
@@ -1655,10 +1661,19 @@ A public CI run and its badge become the cheap "tests pass" proof for judges onc
 | A-18 | `export const instant = false` renders a route blocking, with no streamed fallback, under `cacheComponents`. This is known only from the build-error text (spike/web §3) | Day 2 (SAT-210) on a preview deploy, with WebFetch (SAT-215) | prerender ids 1–7; render other ids from the cached snapshot outside Suspense (§8.1 rule 4) |
 | A-19 | near-connect 0.11.4 accepts a self-hosted wallet manifest | Day 1 (read the source) | no snapshot: `monitor.sh` diffs the live manifest daily and the README names the tested wallets and date |
 | A-20 | FastNEAR `is_any_signer` also covers NEP-366 delegated signers (by name; kb/50 lists `is_delegated_signer` as a separate flag) and its index has no gap before a birth. **Partly verified 2026-10-21** on `lock1.satchel-spk-sdk-e9ea1a.testnet`: `{"desc":false}` lists its creation tx `6iehbD…` first; `is_any_signer` (like `is_signer`) returns exactly its deploy `AovRm6…` and delete-keys `8yEpkL…` txs. **On the keyless spike `kb1.satchel-spk-chain-e9ea1a.testnet`:** `is_any_signer` → `txs_count: 0`, and the unfiltered history = the birth tx only (`is_receiver: true`, every signer flag false). For a keyless account the delegated-signing question is moot: it never had a key that could sign a DelegateAction | Day 9 on rc: expect `[]` and oldest = the rc birth | show `is_signer` and `is_delegated_signer` separately. The keyless argument still stands on the birth tx plus INV-22 |
+| A-21 **(sprint 2026-10-29)** | `wrap.testnet` (wNEAR) is trusted as a deposit asset the same way the configured USDC is trusted for sales: a malicious upgrade of either FT could fake deposits of its own token into a Satchel, but could never touch NEAR or the other allowlisted token | Checked read-only on 2026-10-29 (`ft_metadata`, storage 0.00125 NEAR); re-check before the Day-10 birth that `wrap.testnet` is still the canonical testnet wNEAR and still a standard NEP-141 | if it changed behavior, drop it from the FT allowlist (compiled in, so this needs a new contract) and disclose |
+| A-22 **(sprint 2026-10-29)** | `history_digest(token_id)` stays within the 300 Tgas view-call limit up to roughly **2,500 records** (≈ 0.1 Tgas/record); a Satchel that signs far more than that in-event can't be digested in one view call | Measure the real per-record gas on the Day-9 reproducible build (SAT-081-equivalent) against `vectors/history.json`-sized histories | cross-contract callers page `sig_records` and hash client-side instead (the view is a convenience, not the only way to verify history, C1-C2-C3-C7.md §5.1) |
+| A-23 **(sprint 2026-10-29)** | The EVM chain allowlist (`EVM_CHAIN_IDS`, 4 testnets) and the ERC-20 token allowlist (USDC per chain, `erc20_tokens`) are correct and frozen at birth; both are compiled in and verified read-only on 2026-10-29 (`symbol()`/`decimals()` on two RPCs per chain) | Re-verify all four `symbol`/`decimals` reads on Day 9 immediately before the reproducible build is tagged | a wrong address ships permanently (new contract to fix); disclose which addresses were checked and when |
+| A-24 **(sprint 2026-10-29)** | A signed `evm_message` / `sol_message` has an off-chain meaning decided entirely outside the contract (a log-in, a proof of address control, a dapp account) — the contract and the clean-history checker have no opinion on it beyond "it can never move the coins you're buying" (INV-37) | None needed on-chain; the UI must keep showing the full decoded text and the "messages can't move coins" caveat so a buyer isn't misled about what a `message` item means | if a buyer-facing flow ever treats a message as proof of anything stronger, revisit the disclosure copy (`docs/specs/C1-C2-C3-C7.md` §3.4) |
+| A-25 **(sprint 2026-10-29)** | A malicious or careless delegate (C5) can grief a token's history by signing and never broadcasting, leaving `unused` records that block a sale until the owner settles them; the nonce-gap rule, the 32-debit rolling window and SOL's ≈36 s expiry bound the damage, and every record is rebuildable from the event log (§7.6) | Covered by `docs/specs/C5.md` §7 "Griefing a token's history"; re-confirm during the Day-9 sandbox pass that a worst-case delegate (max caps, max rate) can't produce an unsettleable token the way demo #4 is deliberately unsettleable (§7.6) | owners should grant allowances only to accounts they trust that much; the UI says so (C5.md §7) |
 
 ---
 
 ## Appendix A — Phase 3 designs kept out of v1 (so nobody re-litigates them mid-event)
+
+> **(sprint 2026-10-29).** The "Delegates (S-10)" and "ERC-20 `transfer`" rows below are superseded: both shipped
+> this sprint, as **C5** (allowances, a rolling-24h capped budget per asset — not quite the daily-cap sketch here)
+> and **C2** (USDC-only ERC-20 transfers on EVM), §5.17 and E-51. The rows stay for history.
 
 | Feature | Design if re-enabled | Ref |
 |---|---|---|
