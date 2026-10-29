@@ -112,3 +112,4 @@ it. Phase-2 UI work builds against those specs.
   - ui-allowance had no commits yet.
 
   The four agents were resumed from their transcripts, and the sandbox run on main was restarted. The finished web-share and contract-allowance worktrees were removed; their branches are merged.
+- 16:35Z: merged main (A1, A4, C5) verified: sandbox 91/91, wasm 329,320 B `e7ded724…`, INV-22 OK.

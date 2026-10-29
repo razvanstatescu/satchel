@@ -20,3 +20,6 @@
 - 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
 - 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
 - 2026-10-29T16:05Z [orchestrator] session restart #2: resumed contract-sign, contract-market, web-flows, web-allowance from their transcripts; sandbox on main restarted
+- 2026-10-29T16:05Z [C1,C2,C3,C7] wip: core TS tests added (379 green); next sandbox tests, deep fuzz, wasm build
+- 2026-10-29T16:05Z [A2,A3] progress: Playwright specs green (give->link->claim, empty-everything); fixed hashchange, fixture UTXO depletion, and a stale-closure bug in EmptyFlow
+- 2026-10-29T16:08Z [orchestrator] main (A1+A4+C5) verified: sandbox 91/91, wasm 329,320 B e7ded724…, INV-22 OK
