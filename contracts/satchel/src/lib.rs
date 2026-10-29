@@ -14,7 +14,10 @@ use near_sdk::{env, near, AccountId, BorshStorageKey, Gas, PanicOnDefault, Promi
 
 pub mod errors;
 pub mod events;
+pub mod inside;
+pub mod market;
 pub mod mpc;
+pub mod offers;
 pub mod parse;
 pub mod sale;
 pub mod sign;
@@ -59,6 +62,15 @@ pub enum StorageKey {
     SigLog,
     Listings,
     Proceeds,
+    // C4/C6 (market.rs); appended, never reorder
+    Inside,
+    InsideFt,
+    Offers,
+    OffersByToken,
+    OffersByTokenLen,
+    OffersByAccount,
+    OffersByAccountLen,
+    StorageCredit,
 }
 
 #[near(contract_state, contract_metadata(standard(standard = "nep171", version = "1.0.0"), standard(standard = "nep177", version = "2.0.0"), standard(standard = "nep181", version = "1.0.0"), standard(standard = "nep297", version = "1.0.0")))]
@@ -74,6 +86,8 @@ pub struct Contract {
     pub(crate) sig_log: LookupMap<(TokenId, u64), SigRecord>,
     pub(crate) listings: IterableSet<TokenId>,
     pub(crate) proceeds: LookupMap<(AccountId, Currency), u128>,
+    /// C4 offers + C6 inside assets (market.rs).
+    pub(crate) market: market::Market,
 }
 
 #[near]
@@ -110,6 +124,7 @@ impl Contract {
             sig_log: LookupMap::new(StorageKey::SigLog),
             listings: IterableSet::new(StorageKey::Listings),
             proceeds: LookupMap::new(StorageKey::Proceeds),
+            market: market::Market::new(),
         }
     }
 
@@ -156,6 +171,11 @@ impl Contract {
 
     /// R-18 receiver guard (S-06, S-09): a token owned by the contract itself, the MPC or the configured USDC contract
     /// can never call `sign_for`, so its funds would be stranded for good. Used by `nft_mint` and `nft_transfer`.
+    /// The single post-transfer hook. Called after EVERY ownership change, in the same receipt: `nft_transfer`,
+    /// `execute_sale` (`buy`, USDC `ft_on_transfer` buy) and `accept_offer`. Inside balances (C6) are keyed by token
+    /// and offers (C4) by token state, so neither needs anything here; C5 clears allowances here.
+    pub(crate) fn on_owner_change(&mut self, _token_id: &TokenId) {}
+
     pub(crate) fn ensure_receiver(&self, receiver_id: &AccountId) {
         ensure(
             *receiver_id != env::current_account_id() && *receiver_id != self.mpc && Some(receiver_id) != self.usdc.as_ref(),
@@ -221,7 +241,8 @@ impl NonFungibleTokenCore for Contract {
         ensure(env::predecessor_account_id() == owner, ERR_NOT_OWNER);
         ensure(self.token_state(&token_id).listing.is_none(), ERR_LISTED);
         self.ensure_receiver(&receiver_id);
-        self.tokens.nft_transfer(receiver_id, token_id, approval_id, memo);
+        self.tokens.nft_transfer(receiver_id, token_id.clone(), approval_id, memo);
+        self.on_owner_change(&token_id);
     }
 
     /// Disabled in v1 (D-07). Present so NEP-171 tooling gets a clear error instead of MethodNotFound.
@@ -275,3 +296,5 @@ impl NonFungibleTokenMetadataProvider for Contract {
 mod tests;
 #[cfg(test)]
 mod security_tests;
+#[cfg(test)]
+mod market_tests;
