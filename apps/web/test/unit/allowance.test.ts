@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { assetChain, assetTicker, capForChain, formatCapAmount } from "@/lib/allowanceView";
 import { errorCopy } from "@/lib/copy";
 import { prepareSend } from "@/lib/chains/send";
-import { FIXTURE_RECORDS } from "@/lib/data/fixtures";
+import { DANA, FIXTURE_RECORDS } from "@/lib/data/fixtures";
 import { satchelAddresses } from "@/lib/derive";
 import { NBSP } from "@/lib/format";
 import { simBuy, simDebitDelegated, simOverlay, simRevokeAllowance, simSetAllowance, simTransfer } from "@/lib/data/sim";
@@ -55,13 +55,14 @@ describe("sim.ts: set_allowance / revoke_allowance (the Add sheet's caps form va
   afterEach(() => restore());
 
   it("sets an allowance, and allowances_of/allowance return it as the contract view would", () => {
-    simSetAllowance("1", ALICE, BOB, [{ asset: "btc", limit: 50_000n }], undefined);
-    const rows = simOverlay().allowancesOf("1");
+    // #6 has no static demo allowance (fixtures.ts: only #1 does, DANA), so this starts from a clean slate.
+    simSetAllowance("6", ALICE, BOB, [{ asset: "btc", limit: 50_000n }], undefined);
+    const rows = simOverlay().allowancesOf("6");
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ token_id: "1", delegate: BOB, owner_id: ALICE, status: "active", expires_at_ms: null });
+    expect(rows[0]).toMatchObject({ token_id: "6", delegate: BOB, owner_id: ALICE, status: "active", expires_at_ms: null });
     expect(rows[0]!.caps).toEqual([{ asset: "btc", limit: "50000", spent: "0", remaining: "50000", spends: [] }]);
-    expect(simOverlay().allowanceOf("1", BOB)?.delegate).toBe(BOB);
-    expect(simOverlay().allowanceOf("1", CAROL)).toBeNull();
+    expect(simOverlay().allowanceOf("6", BOB)?.delegate).toBe(BOB);
+    expect(simOverlay().allowanceOf("6", CAROL)).toBeNull();
   });
 
   it("rejects what the contract rejects: self/contract/mpc, empty caps, a zero limit, a duplicate asset, a past expiry", () => {
@@ -85,16 +86,17 @@ describe("sim.ts: set_allowance / revoke_allowance (the Add sheet's caps form va
   });
 
   it("revoke: not found, and works once (ERR_ALLOWANCE_NOT_FOUND on the second try)", () => {
-    simSetAllowance("1", ALICE, BOB, [{ asset: "btc", limit: 1n }], undefined);
-    expect(() => simRevokeAllowance("1", ALICE, CAROL)).toThrow(/ERR_ALLOWANCE_NOT_FOUND/);
-    expect(() => simRevokeAllowance("1", ALICE, BOB)).not.toThrow();
-    expect(simOverlay().allowancesOf("1")).toHaveLength(0);
-    expect(() => simRevokeAllowance("1", ALICE, BOB)).toThrow(/ERR_ALLOWANCE_NOT_FOUND/);
+    simSetAllowance("6", ALICE, BOB, [{ asset: "btc", limit: 1n }], undefined);
+    expect(() => simRevokeAllowance("6", ALICE, CAROL)).toThrow(/ERR_ALLOWANCE_NOT_FOUND/);
+    expect(() => simRevokeAllowance("6", ALICE, BOB)).not.toThrow();
+    expect(simOverlay().allowancesOf("6")).toHaveLength(0);
+    expect(() => simRevokeAllowance("6", ALICE, BOB)).toThrow(/ERR_ALLOWANCE_NOT_FOUND/);
   });
 
   it("reset rule: a transfer or a sale clears every allowance on the token (spec §4)", () => {
+    // #1 already carries DANA's fixture-default row, so adding BOB makes two — and both must clear on transfer.
     simSetAllowance("1", ALICE, BOB, [{ asset: "btc", limit: 1n }], undefined);
-    expect(simOverlay().allowancesOf("1")).toHaveLength(1);
+    expect(simOverlay().allowancesOf("1")).toHaveLength(2);
     simTransfer("1", CAROL);
     expect(simOverlay().allowancesOf("1")).toHaveLength(0);
     // and the fixture demo delegation on #1 doesn't come back after a transfer away and (conceptually) back
@@ -102,10 +104,10 @@ describe("sim.ts: set_allowance / revoke_allowance (the Add sheet's caps form va
     expect(simOverlay().allowancesOf("1")).toHaveLength(0);
   });
 
-  it("the fixture demo: Satchel #1 (ALICE) already lets BOB spend a daily BTC and ETH cap", () => {
+  it("the fixture demo: Satchel #1 (ALICE) already lets DANA spend a daily BTC and ETH cap", () => {
     const rows = simOverlay().allowancesOf("1");
     expect(rows).toHaveLength(1);
-    expect(rows[0]!.delegate).toBe(BOB);
+    expect(rows[0]!.delegate).toBe(DANA);
     expect(rows[0]!.caps.map((c) => c.asset)).toEqual(["btc", EVM_ASSET]);
   });
 });

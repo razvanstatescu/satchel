@@ -12,6 +12,10 @@ export const ALICE = "alice.satchelhq.testnet";
 export const BOB = "bob.satchelhq.testnet";
 export const CAROL = "carol.satchelhq.testnet";
 
+/** C5's demo delegate (fixtures.ts only): kept separate from BOB/CAROL so existing "a stranger can't send" tests of
+ * those two personas on other tokens stay strangers everywhere. */
+export const DANA = "dana.satchelhq.testnet";
+
 export const FIXTURE_NOW = Date.UTC(2026, 9, 20, 12, 0, 0); // the frozen "now" of the fixture world
 export const FIXTURE_HEIGHT = 274_300_000;
 const BLOCK_MS = 560;
@@ -132,14 +136,14 @@ export const FIXTURE_TOKENS: Record<string, TokenFixture> = {
 export const FIXTURE_IDS = Object.keys(FIXTURE_TOKENS);
 
 /**
- * C5 (docs/specs/C5.md): the demo delegation on Satchel #1 (ALICE owns it) — BOB can sign BTC and ETH up to a daily
+ * C5 (docs/specs/C5.md): the demo delegation on Satchel #1 (ALICE owns it) — DANA can sign BTC and ETH up to a daily
  * cap, nothing spent yet, no expiry. `sim.ts` merges this with the in-browser mutations (set/revoke/spend) into the
  * same `AllowanceView` shape the real `allowance`/`allowances_of` views return.
  */
 export const FIXTURE_ALLOWANCES: Record<string, AllowanceRecord[]> = {
   "1": [
     {
-      delegate: BOB,
+      delegate: DANA,
       owner: ALICE,
       set_at_ms: tAt(hAgo(5_000)),
       expires_at_ms: null,
