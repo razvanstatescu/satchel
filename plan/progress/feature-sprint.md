@@ -30,13 +30,13 @@
 | A2 | Give by link (claim link) | web-flows | **merged + pushed** (94428ea) | `/s/[id]/give-link`, `/claim` (fragment-only secret, local signer); batch fund + nft_transfer with fallback. Needs a real-wallet test |
 | A3 | Empty the Satchel | web-flows | **merged + pushed** (94428ea) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
 | A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
-| C1 | `history_digest` view | contract-sign | in progress | spec `docs/specs/C1-C2-C3-C7.md` (15:07Z); contract + TS mirror + vectors + fuzz corpus committed (873ed43; Rust/TS 0 disagreements); sandbox and full suites next |
-| C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress | the UI comes in phase 2 |
-| C3 | More EVM testnets | contract-sign | in progress | the UI comes in phase 2 |
+| C1 | `history_digest` view | contract-sign | in progress: done on the branch; merging main | C1/C2/C3/C7 on `feat/contract-sign` (368d3f3): sandbox 88, core 379, fuzz 4.0M Rust + 400k differential + 400k TS (0 disagreements); branch wasm 309,266 B `1cac1e97…`; merging main (C4/C5/C6) next |
+| C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
+| C3 | More EVM testnets | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
 | C4 | Offers | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | `make_offer` takes an explicit `amount`; 20 open offers per offerer, 90-day max expiry; storage-credit methods for FT paths. Needs a security review |
 | C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract merged** into main 24a680b; UI in progress | 115 unit, 91 sandbox, 359 core, 55 vectors; wasm 329,320 B `e7ded724…`. Debits include fees; message signing refused for delegates; explicit clear on transfer and sale |
 | C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | USDC + wrap.testnet allowlist; withdraw blocked while listed; invariants I-M1..I-M8; 142 unit, 107 sandbox (on the branch), 371 core |
-| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress | the UI comes in phase 2 |
+| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
 
 ## Interface decisions fixed up front (so parallel branches agree)
 Each contract agent first commits `docs/specs/<id>.md` with its exact method signatures and JSON shapes, and logs
@@ -115,3 +115,9 @@ it. Phase-2 UI work builds against those specs.
 - 16:35Z: merged main (A1, A4, C5) verified: sandbox 91/91, wasm 329,320 B `e7ded724…`, INV-22 OK.
 - 16:55Z: merged `feat/web-flows` (A2, A3) into main (94428ea). One import conflict in ReceiveSheet was resolved; web unit 379, Playwright 161/161, typecheck and lint clean. Pushed.
 - 17:05Z: merged `feat/contract-market` (C4, C6) into main (a512d45), clean, since the branch had already merged C5: contract unit 142, core 371, tools 72. The branch-side wasm was 403,886 B `f5527f72…`; the sandbox run on main is in progress. Spawned web-market (Sonnet) for the C4/C6 UI from a512d45. Asked contract-sign to merge main into its branch and resolve the StorageKey order.
+- 16:40Z: session restart #3:
+  - contract-sign was mid-merge of main into `feat/contract-sign-on-main`;
+  - ui-allowance had its data layer committed (e002cc7) plus uncommitted copy;
+  - ui-market had no commits.
+
+  All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (4349840); a confirmation sandbox run is in progress.

@@ -31,3 +31,4 @@
 - 2026-10-29T16:18Z [C5-ui] in progress: data layer done (views/calls in near/contract.ts, snapshot+source+sim.ts fixture mirror of set/revoke/delegated debit, mock wallet, requester threaded through Activity); typecheck green; UI next
 - 2026-10-29T16:20Z [C2,C3,C7] fuzz: 4.0M Rust property cases + 400k Rust/TS differential (0 disagreements) + 400k TS self-check; docs/security/fuzzing.md §0b
 - 2026-10-29T16:24Z [orchestrator] merged A2+A3 (94428ea, pushed) and C4+C6 (a512d45); spawned web-market UI agent; contract-sign asked to merge main
+- 2026-10-29T16:40Z [orchestrator] restart #3: resumed contract-sign (mid-merge), web-allowance, web-market; main pushed (4349840)
