@@ -2,9 +2,11 @@ import type { ComponentProps, ReactNode } from "react";
 import { ChainRow } from "@/components/ChainRow";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
 import { Freshness, InsideAddCoins, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
+import { IncomingOffers, InsideNearActions, InsideNearAmount, MakeOfferEntry } from "@/components/client/Market";
 import { cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
 import type { SatchelSnapshot } from "@/lib/data/types";
+import type { OfferView } from "@/lib/near/types";
 import { UI_CHAINS } from "@/lib/view";
 
 /**
@@ -35,7 +37,7 @@ export function ObjMain({ className, children, ...rest }: { className?: string; 
  * Facts `dl`, both inside the main block, which is the page's one `[data-judge-facts]` (app-screens §1.3). The flows
  * (send, give, add coins) render it as their inert background.
  */
-export function WalletTab({ snap }: { snap: SatchelSnapshot }) {
+export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers?: OfferView[] }) {
   return (
     <>
       <ObjCol>
@@ -48,9 +50,25 @@ export function WalletTab({ snap }: { snap: SatchelSnapshot }) {
             {UI_CHAINS.map((c) => (
               <ChainRow key={c} snap={snap} chain={c} />
             ))}
+            {/* C6: NEAR held inside the contract for this token (docs/specs/C4-C6.md), server-rendered next to the
+                chain balances, no action required to see it. */}
+            <li data-chain-row="near" className="relative flex flex-col gap-2.5 p-4">
+              <span aria-hidden="true" className="absolute inset-x-4 top-0 h-px bg-line" />
+              <div className="flex min-w-0 items-center justify-between gap-3">
+                <h3 className="m-0 font-sans text-label text-ink">{copy.inside.title}</h3>
+                <InsideNearAmount snap={snap} />
+              </div>
+              <InsideNearActions snap={snap} />
+            </li>
           </ul>
           <Freshness snap={snap} />
         </section>
+        <IncomingOffers snap={snap} offers={offers} />
+        <VisitorOnly snap={snap}>
+          <div className="flex">
+            <MakeOfferEntry snap={snap} />
+          </div>
+        </VisitorOnly>
         <FactsGrid snap={snap} />
         <VerifyDisclosure snap={snap} />
         <VisitorOnly snap={snap}>
