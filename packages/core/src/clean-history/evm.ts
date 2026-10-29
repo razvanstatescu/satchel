@@ -20,6 +20,14 @@ const EXPLORERS: Readonly<Record<number, string>> = {
   11155420: 'https://sepolia-optimism.etherscan.io',
 }
 
+/**
+ * Confirmation depth (blocks) for `chainId` (review SR-01): `max(evmConfirmations, evmConfirmationsByChain[chainId])`,
+ * so a per-chain override can deepen the rule but never make it shallower than the global one.
+ */
+export function evmDepth(policy: Policy, chainId: number): number {
+  return Math.max(policy.evmConfirmations, policy.evmConfirmationsByChain?.[chainId] ?? 0)
+}
+
 export interface EvmCheckResult {
   items: ItemReport[]
   account: AccountReport
@@ -74,7 +82,7 @@ export async function checkEvm(
   const live = p1.filter((x) => x.ok) as { s: EvmSource; ok: true; head: bigint }[]
   const errors: Record<string, string> = Object.fromEntries(p1.filter((x) => !x.ok).map((x) => [x.s.name, (x as { error: string }).error]))
   const minHead = live.length ? live.reduce((m, x) => (x.head < m ? x.head : m), live[0]!.head) : 0n
-  const tag = minHead - BigInt(policy.evmConfirmations)
+  const tag = minHead - BigInt(evmDepth(policy, chainId))
 
   // phase 2: two counts + code per provider, at the common tag
   const answers: ProviderAnswer[] = []

@@ -9,7 +9,7 @@
  */
 import { deriveEd25519, deriveSatchelAddresses, deriveSecp256k1, nearKeyString, tokenPath } from '../derive'
 import { checkBtc, ownBtcScripts } from './btc'
-import { checkEvm, EVM_CHECK_CHAINS, SEPOLIA, type EvmCheckResult } from './evm'
+import { checkEvm, EVM_CHECK_CHAINS, evmDepth, SEPOLIA, type EvmCheckResult } from './evm'
 import { gate } from './gate'
 import { checkMessages, isMessageRecord } from './messages'
 import { checkSol } from './sol'
@@ -177,7 +177,16 @@ export async function checkCleanHistory(input: CheckInput, deps: CheckDeps): Pro
   return {
     token_id: input.tokenId,
     checked_at: new Date(input.now).toISOString(),
-    policy: { evm: `latest-${policy.evmConfirmations}`, btc_k: policy.btcK, sol_min_age_s: policy.solMinAgeMs / 1000, allow_single_source: policy.allowSingleSource },
+    policy: {
+      evm: `latest-${evmDepth(policy, SEPOLIA)}`,
+      // C3 (SR-01): only when records on other chains were judged, so the pre-C3 report shape is unchanged
+      ...(evmGroups.size > 1
+        ? { evm_by_chain: Object.fromEntries([...evmGroups.keys()].map((c) => [String(c), `latest-${evmDepth(policy, c)}`])) }
+        : {}),
+      btc_k: policy.btcK,
+      sol_min_age_s: policy.solMinAgeMs / 1000,
+      allow_single_source: policy.allowSingleSource,
+    },
     sig_count: near.ok && snap ? snap.sigCount : null,
     aggregate: g.aggregate,
     buy_enabled: g.buyEnabled,
