@@ -65,11 +65,11 @@ test.describe("C5: the owner adds, sees and revokes", () => {
 
   test("blocked past 4 live accounts", async ({ page }) => {
     await useMockWallet(page, ALICE);
-    await page.goto("/s/1");
-    const addAllowance = page.getByTestId("add-allowance").filter({ visible: true });
-    // Dana already holds one of the 4; add three more to reach the limit.
+    // Dana already holds one of the 4; add three more to reach the limit. A hard navigation (not the sheet's own
+    // Link) to each re-open: Next's client router cache can otherwise keep the previous submission's form state
+    // (phase, checked caps) alive across a quick re-visit of the same route.
     for (const who of ["frank.satchelhq.testnet", "grace.satchelhq.testnet", "henry.satchelhq.testnet"]) {
-      await addAllowance.click();
+      await page.goto("/s/1/allowance");
       const flow = page.getByTestId("allowance-flow");
       await flow.getByTestId("allowance-to").fill(who);
       await expect(flow.getByTestId("allowance-recipient-card")).toBeVisible();
@@ -79,7 +79,8 @@ test.describe("C5: the owner adds, sees and revokes", () => {
       await flow.getByTestId("allowance-submit").click();
       await expect(page).toHaveURL(/\/s\/1$/);
     }
-    await expect(addAllowance).toBeDisabled();
+    await page.goto("/s/1");
+    await expect(page.getByTestId("add-allowance").filter({ visible: true })).toBeDisabled();
   });
 });
 
