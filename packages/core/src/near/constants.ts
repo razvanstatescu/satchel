@@ -11,7 +11,17 @@ export const MILLINEAR = 10n ** 21n
 
 export const MPC_ACCOUNT_TESTNET = 'v1.signer-prod.testnet'
 export const USDC_TESTNET = '3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af'
-export const EVM_CHAIN_IDS = [11155111] as const
+/** Sepolia, Base Sepolia, Arbitrum Sepolia, OP Sepolia (C3), as `config().evm_chain_ids`. */
+export const EVM_CHAIN_IDS = [11155111, 84532, 421614, 11155420] as const
+/** C2: `config().erc20_tokens` (Circle testnet USDC per chain; lowercase hex without 0x, as the contract prints it). */
+export const ERC20_TOKENS = [
+  { chain_id: 11155111, token: '1c7d4b196cb0c7b01d743fbc6116a902379c7238' },
+  { chain_id: 84532, token: '036cbd53842c5426634e7929541ec2318f3dcf7e' },
+  { chain_id: 421614, token: '75faf114eafb1bdbe2f0316df893fd58ce46aa4d' },
+  { chain_id: 11155420, token: '5fd84259d66cd46123540766be93dfe6d43130d7' },
+] as const
+/** C7: `config().max_message_bytes`. */
+export const MAX_MESSAGE_BYTES = 1024
 
 export const COOLDOWN_BLOCKS = 250
 export const MAX_BTC_INPUTS = 10
@@ -56,6 +66,15 @@ export function signAttachDeposit(n: number, mpcDeposit?: bigint): bigint {
   return base + mpcDeposit * BigInt(n)
 }
 
+/**
+ * C7: a message record stores its body (≤ 1024 B), so its storage grows with the length: attach
+ * `0.005 NEAR + len × 1e19 yocto` (≤ 0.01524 NEAR). The contract charges the measured bytes and refunds the rest.
+ */
+export function messageSignAttachDeposit(len: number, mpcDeposit?: bigint): bigint {
+  if (!Number.isInteger(len) || len < 1 || len > MAX_MESSAGE_BYTES) throw new RangeError(`message length must be 1..${MAX_MESSAGE_BYTES}, got ${len}`)
+  return signAttachDeposit(1, mpcDeposit) + BigInt(len) * STORAGE_BYTE_COST
+}
+
 /** Fixed attachments for the other calls (spec §5.5). */
 export const ATTACH = {
   mint: { gas: 30n * TGAS, deposit: 20n * MILLINEAR },
@@ -81,6 +100,10 @@ export interface ContractConfigView {
   usdc_contract_id?: string | null
   cooldown_blocks: number
   evm_chain_ids: number[]
+  /** C2 (absent on pre-C2 contracts, which diffConfig then reports) */
+  erc20_tokens?: { chain_id: number; token: string }[]
+  /** C7 */
+  max_message_bytes?: number
   max_btc_inputs: number
   mpc_sign_gas_tgas: number
   on_signed_gas_tgas: { base: number; per_request: number }
@@ -99,6 +122,8 @@ export function diffConfig(cfg: ContractConfigView, expectMpc = MPC_ACCOUNT_TEST
   eq('mpc_contract_id', cfg.mpc_contract_id, expectMpc)
   eq('cooldown_blocks', cfg.cooldown_blocks, COOLDOWN_BLOCKS)
   eq('evm_chain_ids', cfg.evm_chain_ids, [...EVM_CHAIN_IDS])
+  eq('erc20_tokens', cfg.erc20_tokens, ERC20_TOKENS.map((t) => ({ ...t })))
+  eq('max_message_bytes', cfg.max_message_bytes, MAX_MESSAGE_BYTES)
   eq('max_btc_inputs', cfg.max_btc_inputs, MAX_BTC_INPUTS)
   eq('mpc_sign_gas_tgas', cfg.mpc_sign_gas_tgas, MPC_SIGN_STATIC_TGAS)
   eq('on_signed_gas_tgas', cfg.on_signed_gas_tgas, ON_SIGNED_TGAS)

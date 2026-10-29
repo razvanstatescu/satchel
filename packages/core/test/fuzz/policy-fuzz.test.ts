@@ -15,14 +15,27 @@ const N = Number(process.env.FUZZ_CASES ?? 2000)
 const SEED = Number(process.env.FUZZ_SEED ?? 1)
 
 const CODES: Record<Chain, string[]> = {
-  evm: ['ERR_EVM_TOO_LONG', 'ERR_EVM_TYPE', 'ERR_EVM_RLP', 'ERR_EVM_CHAIN_ID', 'ERR_EVM_INT_WIDTH', 'ERR_EVM_TO', 'ERR_EVM_DATA', 'ERR_EVM_ACCESS_LIST'],
+  evm: [
+    'ERR_EVM_TOO_LONG', 'ERR_EVM_TYPE', 'ERR_EVM_RLP', 'ERR_EVM_CHAIN_ID', 'ERR_EVM_INT_WIDTH', 'ERR_EVM_TO', 'ERR_EVM_DATA', 'ERR_EVM_TOKEN',
+    'ERR_EVM_VALUE', 'ERR_EVM_ACCESS_LIST',
+  ],
   btc: [
     'ERR_BTC_INPUT_COUNT', 'ERR_BTC_PREIMAGE_LEN', 'ERR_BTC_VERSION', 'ERR_BTC_SIGHASH', 'ERR_BTC_SCRIPTCODE', 'ERR_BTC_LOCKTIME', 'ERR_BTC_SEQUENCE',
     'ERR_BTC_MIXED_TX', 'ERR_BTC_PREVOUTS_INCOMPLETE', 'ERR_BTC_SEQUENCES_MISMATCH', 'ERR_BTC_OUTPUTS_MISMATCH', 'ERR_BTC_OUTPUTS_MALFORMED',
     'ERR_BTC_DUPLICATE_INPUT',
   ],
   sol: ['ERR_SOL_TOO_LONG', 'ERR_SOL_VERSION', 'ERR_SOL_HEADER', 'ERR_SOL_MALFORMED', 'ERR_SOL_INSTRUCTION', 'ERR_SOL_DURABLE_NONCE'],
+  msg: ['ERR_MSG_EMPTY', 'ERR_MSG_TOO_LONG', 'ERR_MSG_ENCODING'],
 }
+
+/** C3 chain id RLP items (first list item) and their C2 USDC, from the spec table. */
+const CHAIN_HEADS: Record<string, string> = {
+  '83aa36a7': '1c7d4b196cb0c7b01d743fbc6116a902379c7238',
+  '83014a34': '036cbd53842c5426634e7929541ec2318f3dcf7e',
+  '83066eee': '75faf114eafb1bdbe2f0316df893fd58ce46aa4d',
+  '83aa37dc': '5fd84259d66cd46123540766be93dfe6d43130d7',
+}
+const utf8ok = (m: Uint8Array) => Buffer.from(Buffer.from(m).toString('utf8'), 'utf8').equals(Buffer.from(m))
 
 const sha256d = (b: Uint8Array) => sha256(sha256(b))
 const u32 = (b: Uint8Array, o: number) => new DataView(b.buffer, b.byteOffset).getUint32(o, true)
@@ -32,11 +45,30 @@ const hex = (s: string) => hexToBytesStrict(s)
 function invariantViolation(chain: Chain, c: Case): string | null {
   if (chain === 'evm' && 'evm' in c.r) {
     const b = hex(c.r.evm.unsigned_tx)
-    if (b.length > 128 || b[0] !== 2) return 'type/len'
+    if (b.length > 160 || b[0] !== 2) return 'type/len'
     const head = b[1]! <= 0xf7 ? 2 : 3
-    if (toHex(b.subarray(head, head + 4)) !== '83aa36a7') return 'chain id is not the first item = 11155111'
-    if (toHex(b.subarray(-2)) !== '80c0') return 'data / access list not empty'
-    if (c.h?.[0] !== toHex(keccak_256(b)) || c.f?.chain_id !== '11155111') return 'hash/fields'
+    const token = CHAIN_HEADS[toHex(b.subarray(head, head + 4))]
+    if (!token) return 'chain id is not the first item = one of the four testnets'
+    if (toHex(b.subarray(-2)) !== '80c0') {
+      // C2: … 94 ‖ token(20) ‖ 80 (value 0) ‖ b8 44 ‖ a9059cbb ‖ 12 zero ‖ to ‖ 16 zero ‖ amount ‖ c0
+      const t = b.subarray(-93)
+      if (t[0] !== 0x94 || toHex(t.subarray(1, 21)) !== token || t[21] !== 0x80 || toHex(t.subarray(22, 28)) !== 'b844a9059cbb' || t[92] !== 0xc0)
+        return 'data is not a USDC transfer to this chain\'s token with value 0'
+      if (t.subarray(28, 40).some((x) => x !== 0) || t.subarray(60, 76).some((x) => x !== 0)) return 'non-canonical transfer words'
+      if (!c.f?.erc20) return 'erc20 fields missing'
+    } else if (c.f?.erc20) return 'erc20 fields on a native transfer'
+    if (c.h?.[0] !== toHex(keccak_256(b))) return 'hash/fields'
+    return null
+  }
+  if (chain === 'msg' && ('evm_message' in c.r || 'sol_message' in c.r)) {
+    const isEvm = 'evm_message' in c.r
+    const m = hex('evm_message' in c.r ? c.r.evm_message.message : 'sol_message' in c.r ? c.r.sol_message.message : '')
+    if (m.length < 1 || m.length > 1024 || !utf8ok(m)) return 'message length / UTF-8'
+    const enc = new TextEncoder()
+    const want = isEvm
+      ? keccak_256(concatBytes(enc.encode(`\x19Ethereum Signed Message:\n${m.length}`), m))
+      : sha256(concatBytes(Uint8Array.of(0xff), enc.encode('solana offchain'), Uint8Array.of(0, m.every((x) => x >= 0x20 && x < 0x7f) ? 0 : 1, m.length & 0xff, m.length >> 8), m))
+    if (c.h?.[0] !== toHex(want) || c.f?.message !== toHex(m)) return 'hash/fields'
     return null
   }
   if (chain === 'btc' && 'btc' in c.r) {
@@ -71,7 +103,7 @@ function invariantViolation(chain: Chain, c: Case): string | null {
 
 describe('fuzz: TS reference classifier', () => {
   const seeds = loadSeeds()
-  for (const chain of ['evm', 'btc', 'sol'] as const) {
+  for (const chain of ['evm', 'btc', 'sol', 'msg'] as const) {
     it(`${chain}: ${N} generated cases never throw, refuse with a stable code, and accept only valid requests`, () => {
       const hist: Record<string, number> = {}
       const bad: string[] = []

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { PublicClient } from 'viem'
 import evm from '../../../vectors/evm.json' with { type: 'json' }
-import {
+import { buildErc20TransferTx,
   attachEvmSignature,
   blockscoutHistory,
   broadcastEvm,
@@ -41,16 +41,18 @@ describe('evm builder', () => {
     const acc = evm.vectors.filter((v) => v.expect.ok && v.expect.fields)
     expect(acc.length).toBeGreaterThanOrEqual(7)
     for (const v of acc) {
-      const f = v.expect.fields as Record<string, string>
+      const f = v.expect.fields as Record<string, string> & { erc20?: { to: string; amount: string } }
       if (BigInt(f.nonce!) > BigInt(Number.MAX_SAFE_INTEGER)) continue // viem takes number nonces; covered by the Rust/TS classifiers
-      const tx = buildUnsignedEvmTx({
+      const common = {
+        chainId: Number(f.chain_id),
         nonce: Number(f.nonce),
-        to: f.to as `0x${string}`,
-        value: BigInt(f.value!),
         gas: BigInt(f.gas_limit!),
         maxFeePerGas: BigInt(f.max_fee_per_gas!),
         maxPriorityFeePerGas: BigInt(f.max_priority_fee_per_gas!),
-      })
+      }
+      const tx = f.erc20
+        ? buildErc20TransferTx({ ...common, recipient: `0x${f.erc20.to}`, amount: BigInt(f.erc20.amount) }) // C2
+        : buildUnsignedEvmTx({ ...common, to: f.to as `0x${string}`, value: BigInt(f.value!) })
       expect(serializeUnsignedEvmTx(tx).slice(2), v.name).toBe(f.unsigned_tx)
       expect(toHex(evmPayloadHash(serializeUnsignedEvmTx(tx))), v.name).toBe(v.expect.hash)
     }

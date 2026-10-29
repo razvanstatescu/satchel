@@ -8,6 +8,8 @@ import { ed25519 } from '@noble/curves/ed25519.js'
 import { base58 } from '@scure/base'
 import { toEd25519Signature, type MpcSignature } from '../../near/mpc'
 import { classifySolBytes } from '../../policy/sol'
+import { solOffchainMessageBytes } from '../../policy/msg'
+import { hexToBytesStrict, utf8 } from '../../bytes'
 
 export const SOL_DEVNET_RPC = 'https://api.devnet.solana.com'
 export const SOL_FEE_LAMPORTS = 5000n
@@ -176,3 +178,16 @@ export function parseSolAddress(input: string): ParsedSolAddress {
 
 export const solTxUrl = (sig: string) => `https://explorer.solana.com/tx/${sig}?cluster=devnet`
 export const solAddressUrl = (addr: string) => `https://explorer.solana.com/address/${addr}?cluster=devnet`
+
+/**
+ * C7: verify a `sol_message` record's Ed25519 signature (`signature` hex from the `sig_records` view) over the Solana
+ * off-chain message v0 the contract built from `message`, as `solana verify-offchain-signature` would.
+ */
+export function verifySolOffchainSignature(message: string | Uint8Array, signatureHex: string, pubkeyBase58: string): boolean {
+  const body = typeof message === 'string' ? utf8(message) : message
+  try {
+    return ed25519.verify(hexToBytesStrict(signatureHex), solOffchainMessageBytes(body), base58.decode(pubkeyBase58))
+  } catch {
+    return false
+  }
+}

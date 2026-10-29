@@ -9,8 +9,10 @@ export type ContractRole = 'dev' | 'rc' | 'final'
 /**
  * Per-record verdict (spec §7.2/§7.3). `foreign` (BTC, review S-07): the prevout exists but its scriptPubKey is not one
  * this Satchel's key can satisfy, so the signature can never move the coins being bought. Non-blocking, like `unfunded`.
+ * `message` (C7): an EIP-191 or Solana off-chain message signature; it can't move coins, so it never blocks Buy, but
+ * the Buy tab lists it with its text (docs/specs/C1-C2-C3-C7.md §7.2).
  */
-export type ItemStatus = 'spent' | 'expired' | 'unfunded' | 'foreign' | 'settling' | 'unused' | 'unknown'
+export type ItemStatus = 'spent' | 'expired' | 'unfunded' | 'foreign' | 'message' | 'settling' | 'unused' | 'unknown'
 
 /** Aggregate verdict (spec §7.3). Buy is enabled only for `clean` and `empty`. */
 export type Aggregate = 'empty' | 'unsafe' | 'unknown' | 'blocked' | 'settling' | 'clean'
@@ -30,9 +32,20 @@ export interface SigRecordView {
   status: 'pending' | 'signed' | 'failed' | 'unparsed'
   signature: RecordSignatureView | null
   detail:
-    | { evm: { chain_id: number | string; nonce: number | string; unsigned_tx: string } }
+    | {
+        evm: {
+          chain_id: number | string
+          nonce: number | string
+          unsigned_tx: string
+          /** C2: present only on USDC transfers (derived by the contract from `unsigned_tx`) */
+          erc20?: { token: string; to: string; amount: string }
+        }
+      }
     | { btc: { txid: string; vout: number; amount_sats: string | number } }
     | { sol: { recent_blockhash: string; lamports: string | number } }
+    /** C7: hex of the UTF-8 body; `chain` is "evm" / "sol" (the key that signed) */
+    | { evm_message: { message: string } }
+    | { sol_message: { message: string } }
 }
 
 /** What one NEAR RPC returned for the token and the contract. */
@@ -141,7 +154,13 @@ export interface CheckInput {
 }
 
 export interface CheckDeps {
+  /** Sepolia providers (two that must agree); also the fallback for `evmByChain[11155111]` */
   evm: EvmSource[]
+  /**
+   * C3: providers per EVM chain id (Base Sepolia 84532, Arbitrum Sepolia 421614, OP Sepolia 11155420; Sepolia may be
+   * given here too). A chain that has records but no providers gives `unknown` items (fail closed).
+   */
+  evmByChain?: Partial<Record<number, EvmSource[]>>
   btc: BtcSource[]
   sol: SolSource[]
   cache?: VerdictCache
@@ -160,6 +179,11 @@ export interface ItemReport {
   outpoint?: string
   /** the record's claimed amount for BTC (never verified: shown as "claimed", R-23) */
   claimed_amount_sats?: string
+  /** C2: a USDC transfer record's token, recipient and amount (base units) */
+  erc20?: { token: string; to: string; amount: string }
+  /** C7: `evm_message` / `sol_message`, and the decoded text, for `message` items */
+  message_kind?: 'evm_message' | 'sol_message'
+  message_text?: string
   recent_blockhash?: string
   evidence: Record<string, unknown>
   evidence_url?: string
@@ -170,6 +194,8 @@ export interface ItemReport {
 
 export interface AccountReport {
   chain: 'evm' | 'sol'
+  /** C3: the EVM chain this account check ran on (absent for SOL) */
+  chain_id?: number
   address: string
   status: AccountStatus
   reason: string

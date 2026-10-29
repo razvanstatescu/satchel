@@ -11,6 +11,11 @@ export type PolicyError =
   | 'ERR_EVM_DATA'
   | 'ERR_EVM_ACCESS_LIST'
   | 'ERR_EVM_NONCE_GAP'
+  | 'ERR_EVM_TOKEN'
+  | 'ERR_EVM_VALUE'
+  | 'ERR_MSG_EMPTY'
+  | 'ERR_MSG_TOO_LONG'
+  | 'ERR_MSG_ENCODING'
   | 'ERR_BTC_INPUT_COUNT'
   | 'ERR_BTC_PREIMAGE_LEN'
   | 'ERR_BTC_VERSION'
@@ -33,15 +38,35 @@ export type PolicyError =
 
 export type MpcPayloadV2 = { Ecdsa: string } | { Eddsa: string }
 
+/** C2: a canonical ERC-20 `transfer(to, amount)`; `token` is the tx's `to` (the chain's USDC). */
+export interface Erc20Transfer {
+  token: `0x${string}`
+  to: `0x${string}`
+  amount: bigint
+}
+
 export interface EvmFields {
   chainId: bigint
   nonce: bigint
   maxPriorityFeePerGas: bigint
   maxFeePerGas: bigint
   gasLimit: bigint
+  /** the tx's `to`: the recipient of a native transfer, or the token contract of a USDC transfer */
   to: `0x${string}`
   value: bigint
+  /** calldata: empty, or the 68-byte transfer call */
+  data: Uint8Array
+  erc20: Erc20Transfer | null
   unsignedTx: Uint8Array
+}
+
+/** C7: an `evm_message` / `sol_message` body and the exact bytes the contract builds from it. */
+export interface MessageFields {
+  message: Uint8Array
+  /** the body decoded as UTF-8 (the contract refuses anything else) */
+  text: string
+  /** EVM: the EIP-191 bytes whose keccak256 is signed; SOL: the off-chain message v0 bytes signed as-is */
+  signedBytes: Uint8Array
 }
 
 export interface BtcInputFields {
@@ -88,11 +113,16 @@ export type ClassifyResult<F> =
   | { ok: false; error: PolicyError }
 
 /**
- * Token state that `sign_for` checks after the stateless classifier (spec §5.9 nonce-gap rule, D-43).
- * `evmMaxSignedNonce`: the highest nonce of the token's EVM records (`maxSignedEvmNonce(records)`), null if none.
+ * Token state that `sign_for` checks after the stateless classifier (spec §5.9 nonce-gap rule, D-43; per chain, C3).
+ * Build it with `signContextFromRecords(records)`.
+ * - `evmMaxSignedNonceByChain`: the highest nonce of the token's EVM records per chain id (decimal key), null if none.
+ *   When present it decides (a missing key means "no record on that chain").
+ * - `evmMaxSignedNonce`: used only when `evmMaxSignedNonceByChain` is absent; it then applies to the request's chain
+ *   (the pre-C3 meaning, when every record was on Sepolia).
  */
 export interface SignContext {
   evmMaxSignedNonce: bigint | null
+  evmMaxSignedNonceByChain?: Readonly<Record<string, bigint | null>>
 }
 
 export class PolicyRefusal extends Error {
