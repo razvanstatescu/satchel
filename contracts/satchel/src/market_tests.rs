@@ -915,8 +915,13 @@ fn a_full_token_of_offers_costs_the_same_to_accept() {
 
 // ── IdIndex: swap-remove property ──────────────────────────────────────────────────────────────
 
+/// Case count: `PROPTEST_CASES` if set (deep runs, docs/security/fuzzing.md §8), else the fast CI default.
+fn cases(default: u32) -> u32 {
+    std::env::var("PROPTEST_CASES").ok().and_then(|v| v.parse().ok()).unwrap_or(default)
+}
+
 proptest! {
-    #![proptest_config(ProptestConfig { cases: 64, ..ProptestConfig::default() })]
+    #![proptest_config(ProptestConfig { cases: cases(64), failure_persistence: None, ..ProptestConfig::default() })]
 
     /// The index behaves exactly like `Vec::swap_remove` per key, and `remove` reports the entry that moved.
     #[test]
@@ -994,7 +999,7 @@ struct Model {
 }
 
 proptest! {
-    #![proptest_config(ProptestConfig { cases: 48, ..ProptestConfig::default() })]
+    #![proptest_config(ProptestConfig { cases: cases(48), failure_persistence: None, ..ProptestConfig::default() })]
 
     /// Random mixes of deposits, withdrawals (delivered or failed), offers, cancels, accepts (paid or failed),
     /// transfers and signatures. After every step the contract's per-token balances, epochs, open offers, proceeds
