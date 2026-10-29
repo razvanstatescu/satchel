@@ -237,9 +237,14 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
       </>
     );
     action = (
-      <Button variant="primary" size="lg" block disabled={!canReview} aria-describedby="xfer-status" onClick={() => canReview && setPhase("review")} data-testid="xfer-review">
-        {copy.send.form.review}
-      </Button>
+      <div className="flex flex-col gap-2.5">
+        <Button variant="primary" size="lg" block disabled={!canReview} aria-describedby="xfer-status" onClick={() => canReview && setPhase("review")} data-testid="xfer-review">
+          {copy.send.form.review}
+        </Button>
+        <Button size="lg" block href={`/s/${snap.token_id}/give-link`} data-testid="give-by-link">
+          {copy.xfer.giveByLink}
+        </Button>
+      </div>
     );
   } else {
     title = copy.xfer.reviewTitle;

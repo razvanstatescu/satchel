@@ -40,6 +40,10 @@ interface SimState {
   sales: Record<string, SimSale>;
   /** Escrow (`proceeds[(account, currency)]`): written only when a payout fails. */
   proceeds: Record<string, { near?: string; usdc?: string }>;
+  /** A2 Give by link: NEAR yocto held by fresh implicit (claim) accounts. Regular accounts are never tracked here. */
+  near: Record<string, string>;
+  /** Implicit accounts ever funded (A2): existence persists even after a claim drains the balance, like real NEAR. */
+  funded: Record<string, true>;
 }
 
 export interface SimSale {
@@ -55,7 +59,7 @@ export interface SimSale {
   payoutOk: boolean;
 }
 
-const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {} });
+const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {}, near: {}, funded: {} });
 
 function read(): SimState {
   if (typeof window === "undefined") return empty();
@@ -190,6 +194,38 @@ export function simTransfer(tokenId: string, to: string) {
   const s = read();
   s.owners[tokenId] = to;
   write(s);
+}
+
+/* ── A2 Give by link: a fresh implicit account's NEAR balance ── */
+
+export function simFundNear(accountId: string, amountYocto: string) {
+  const s = read();
+  const cur = BigInt(s.near[accountId] ?? "0");
+  s.near[accountId] = (cur + BigInt(amountYocto)).toString();
+  s.funded[accountId] = true;
+  write(s);
+}
+
+export function simNearBalance(accountId: string): string {
+  return read().near[accountId] ?? "0";
+}
+
+/** Existence persists once funded, even after a claim drains the balance (like a real NEAR account). */
+export function simImplicitExists(accountId: string): boolean {
+  return !!read().funded[accountId];
+}
+
+/** The claim: every Satchel this implicit account owns moves to `to`, and its leftover NEAR goes along too. */
+export function simClaim(implicitAccountId: string, to: string): { tokenIds: string[]; nearSent: string } {
+  const s = read();
+  const tokenIds = Object.entries(s.owners)
+    .filter(([, owner]) => owner === implicitAccountId)
+    .map(([id]) => id);
+  for (const id of tokenIds) s.owners[id] = to;
+  const nearSent = s.near[implicitAccountId] ?? "0";
+  s.near[implicitAccountId] = "0";
+  write(s);
+  return { tokenIds, nearSent };
 }
 
 export function simMint(owner: string): string {

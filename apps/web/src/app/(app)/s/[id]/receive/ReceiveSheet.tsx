@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import QRCode from "qrcode";
 import { Hourglass, Info, TriangleAlert } from "lucide-react";
 import { AddressDisplay } from "@/components/AddressDisplay";
 import { ChainCharm, Charm } from "@/components/brand";
@@ -11,14 +10,10 @@ import { CHAIN_NAME, copy, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { APP_URL, FAUCETS } from "@/lib/config";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { buildPaymentUri, validateChainAmount } from "@/lib/payment-uri";
+import { qrSvg } from "@/lib/qr";
 import { UI_CHAINS, type UiChain } from "@/lib/view";
 
-/** The QR as SVG (ECC M, a 4-module quiet zone, the plain address, no logo), drawn in `currentColor`: the plate is a
- * Day island, so its modules are always ink on white, in Day and in Night. */
-export async function qrSvg(address: string): Promise<string> {
-  const svg = await QRCode.toString(address, { type: "svg", errorCorrectionLevel: "M", margin: 4, color: { dark: "#000000", light: "#0000" } });
-  return svg.replace(/stroke="#000000"/g, 'stroke="currentColor"').replace("<svg ", '<svg aria-hidden="true" focusable="false" ');
-}
+export { qrSvg };
 
 /**
  * Add coins (app-screens §8; proto app-receive.html): the sheet over the Wallet tab. The chain switch (links), the QR
