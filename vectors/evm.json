@@ -774,12 +774,54 @@
       }
     },
     {
-      "name": "chain_id_84532_base_sepolia",
+      "name": "chain_id_8453_base_mainnet",
       "kind": "evm",
-      "hex": "02ee83014a340383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "hex": "02ed8221050383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
       "request": {
         "evm": {
-          "unsigned_tx": "02ee83014a340383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+          "unsigned_tx": "02ed8221050383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_CHAIN_ID"
+      }
+    },
+    {
+      "name": "chain_id_42161_arbitrum_one",
+      "kind": "evm",
+      "hex": "02ed82a4b10383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02ed82a4b10383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_CHAIN_ID"
+      }
+    },
+    {
+      "name": "chain_id_10_op_mainnet",
+      "kind": "evm",
+      "hex": "02eb0a0383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02eb0a0383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_CHAIN_ID"
+      }
+    },
+    {
+      "name": "chain_id_17000_holesky",
+      "kind": "evm",
+      "hex": "02ed8242680383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02ed8242680383030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
         }
       },
       "expect": {
@@ -1123,7 +1165,22 @@
       }
     },
     {
-      "name": "too_long_129_bytes",
+      "name": "too_long_161_bytes",
+      "kind": "evm",
+      "hex": "0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_TOO_LONG"
+      },
+      "note": "the limit is 160 B (a maximal USDC transfer is 152 B)"
+    },
+    {
+      "name": "len_129_bytes_is_not_too_long",
       "kind": "evm",
       "hex": "020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
       "request": {
@@ -1133,7 +1190,744 @@
       },
       "expect": {
         "ok": false,
-        "error": "ERR_EVM_TOO_LONG"
+        "error": "ERR_EVM_RLP"
+      },
+      "note": "the old 128-byte limit no longer applies"
+    },
+    {
+      "name": "chain_base_sepolia_native",
+      "kind": "evm",
+      "hex": "0x02ee83014a348083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02ee83014a348083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "de2babe4500b755158dc4b0b94462662d1ed76d1a556c936586687a7d16ac24f",
+        "hashes": [
+          "de2babe4500b755158dc4b0b94462662d1ed76d1a556c936586687a7d16ac24f"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "de2babe4500b755158dc4b0b94462662d1ed76d1a556c936586687a7d16ac24f"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "84532",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "21000",
+          "to": "0x61739f33adbb7f76c1b5b222e4119085257528be",
+          "value": "100000000000000",
+          "unsigned_tx": "02ee83014a348083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "note": "Base Sepolia 84532"
+    },
+    {
+      "name": "chain_arbitrum_sepolia_native",
+      "kind": "evm",
+      "hex": "0x02ee83066eee0183030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02ee83066eee0183030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "5574b7607bb2dfd87eb2cdc3752c5eb3b458a7c29221f6fba148279701547d3a",
+        "hashes": [
+          "5574b7607bb2dfd87eb2cdc3752c5eb3b458a7c29221f6fba148279701547d3a"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "5574b7607bb2dfd87eb2cdc3752c5eb3b458a7c29221f6fba148279701547d3a"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "421614",
+          "nonce": "1",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "21000",
+          "to": "0x61739f33adbb7f76c1b5b222e4119085257528be",
+          "value": "100000000000000",
+          "unsigned_tx": "02ee83066eee0183030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "note": "Arbitrum Sepolia 421614"
+    },
+    {
+      "name": "chain_op_sepolia_native",
+      "kind": "evm",
+      "hex": "0x02ee83aa37dc8083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02ee83aa37dc8083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "d4fb752324fb73c74a946781db52ce229717f3c24d514db2d9d839b768a5a4a0",
+        "hashes": [
+          "d4fb752324fb73c74a946781db52ce229717f3c24d514db2d9d839b768a5a4a0"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "d4fb752324fb73c74a946781db52ce229717f3c24d514db2d9d839b768a5a4a0"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "11155420",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "21000",
+          "to": "0x61739f33adbb7f76c1b5b222e4119085257528be",
+          "value": "100000000000000",
+          "unsigned_tx": "02ee83aa37dc8083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "note": "OP Sepolia 11155420"
+    },
+    {
+      "name": "chain_base_sepolia_native_nonce9",
+      "kind": "evm",
+      "hex": "0x02e883014a340983030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02e883014a340983030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "4acc744c880ccb4fc8ac22dc34349c15089db6547dfb81913c11d86179fa9570",
+        "hashes": [
+          "4acc744c880ccb4fc8ac22dc34349c15089db6547dfb81913c11d86179fa9570"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "4acc744c880ccb4fc8ac22dc34349c15089db6547dfb81913c11d86179fa9570"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "84532",
+          "nonce": "9",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "21000",
+          "to": "0x61739f33adbb7f76c1b5b222e4119085257528be",
+          "value": "1",
+          "unsigned_tx": "02e883014a340983030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0"
+        }
+      },
+      "state": {
+        "evm_max_nonce": "8"
+      },
+      "note": "Base nonce 9 after Base max 8"
+    },
+    {
+      "name": "nonce_gap_chain_base_first_request_nonce2",
+      "kind": "evm",
+      "hex": "0x02e883014a340283030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02e883014a340283030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_NONCE_GAP"
+      },
+      "state": {
+        "evm_max_nonce": null
+      },
+      "note": "no Base record yet (whatever Sepolia has): nonce ≤ 1"
+    },
+    {
+      "name": "nonce_gap_chain_op_skip_one",
+      "kind": "evm",
+      "hex": "0x02e883aa37dc0683030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02e883aa37dc0683030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be0180c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_NONCE_GAP"
+      },
+      "state": {
+        "evm_max_nonce": "4"
+      },
+      "note": "OP max 4 → 6 refused"
+    },
+    {
+      "name": "erc20_usdc_transfer_sepolia",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "395383fbe4033789a6730ca1af3489c778ca1c7a8a43298c42f85c7ba62e8b28",
+        "hashes": [
+          "395383fbe4033789a6730ca1af3489c778ca1c7a8a43298c42f85c7ba62e8b28"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "395383fbe4033789a6730ca1af3489c778ca1c7a8a43298c42f85c7ba62e8b28"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "11155111",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+          "value": "0",
+          "unsigned_tx": "02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "erc20": {
+            "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "1500000"
+          }
+        }
+      },
+      "note": "transfer(0x2222…, 1.5 USDC) on 11155111"
+    },
+    {
+      "name": "erc20_usdc_transfer_base_sepolia",
+      "kind": "evm",
+      "hex": "0x02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f",
+        "hashes": [
+          "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "84532",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+          "value": "0",
+          "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "erc20": {
+            "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "1500000"
+          }
+        }
+      },
+      "note": "transfer(0x2222…, 1.5 USDC) on 84532"
+    },
+    {
+      "name": "erc20_usdc_transfer_arbitrum_sepolia",
+      "kind": "evm",
+      "hex": "0x02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "1923ac409861fa08aa1b7a3b509820106e457b61d26679ffae4e16edb504d2f0",
+        "hashes": [
+          "1923ac409861fa08aa1b7a3b509820106e457b61d26679ffae4e16edb504d2f0"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "1923ac409861fa08aa1b7a3b509820106e457b61d26679ffae4e16edb504d2f0"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "421614",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+          "value": "0",
+          "unsigned_tx": "02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "erc20": {
+            "token": "75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "1500000"
+          }
+        }
+      },
+      "note": "transfer(0x2222…, 1.5 USDC) on 421614"
+    },
+    {
+      "name": "erc20_usdc_transfer_op_sepolia",
+      "kind": "evm",
+      "hex": "0x02f86d83aa37dc8083030d4883030d5c82fde8945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa37dc8083030d4883030d5c82fde8945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "f4cab1896acd3da324d8e554a770c9d516daba16edd7401445dcb70f15c16980",
+        "hashes": [
+          "f4cab1896acd3da324d8e554a770c9d516daba16edd7401445dcb70f15c16980"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "f4cab1896acd3da324d8e554a770c9d516daba16edd7401445dcb70f15c16980"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "11155420",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x5fd84259d66cd46123540766be93dfe6d43130d7",
+          "value": "0",
+          "unsigned_tx": "02f86d83aa37dc8083030d4883030d5c82fde8945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "erc20": {
+            "token": "5fd84259d66cd46123540766be93dfe6d43130d7",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "1500000"
+          }
+        }
+      },
+      "note": "transfer(0x2222…, 1.5 USDC) on 11155420"
+    },
+    {
+      "name": "erc20_max_width_152_bytes",
+      "kind": "evm",
+      "hex": "02f89583aa37dc88fffffffffffffffe90ffffffffffffffffffffffffffffffff90ffffffffffffffffffffffffffffffff88ffffffffffffffff945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f89583aa37dc88fffffffffffffffe90ffffffffffffffffffffffffffffffff90ffffffffffffffffffffffffffffffff88ffffffffffffffff945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffffc0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "1753d3fe9140ff53d1a02c8d85a3b2e9324a6938fefc7a82b87fce4b6dbf75f7",
+        "hashes": [
+          "1753d3fe9140ff53d1a02c8d85a3b2e9324a6938fefc7a82b87fce4b6dbf75f7"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "1753d3fe9140ff53d1a02c8d85a3b2e9324a6938fefc7a82b87fce4b6dbf75f7"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "11155420",
+          "nonce": "18446744073709551614",
+          "max_priority_fee_per_gas": "340282366920938463463374607431768211455",
+          "max_fee_per_gas": "340282366920938463463374607431768211455",
+          "gas_limit": "18446744073709551615",
+          "to": "0x5fd84259d66cd46123540766be93dfe6d43130d7",
+          "value": "0",
+          "unsigned_tx": "02f89583aa37dc88fffffffffffffffe90ffffffffffffffffffffffffffffffff90ffffffffffffffffffffffffffffffff88ffffffffffffffff945fd84259d66cd46123540766be93dfe6d43130d780b844a9059cbb000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+          "erc20": {
+            "token": "5fd84259d66cd46123540766be93dfe6d43130d7",
+            "to": "ffffffffffffffffffffffffffffffffffffffff",
+            "amount": "340282366920938463463374607431768211455"
+          }
+        }
+      },
+      "state": {
+        "evm_max_nonce": "18446744073709551613"
+      },
+      "note": "nonce 2^64−2, gas 2^64−1, fees 2^128−1, amount 2^128−1: 152 bytes"
+    },
+    {
+      "name": "erc20_amount_zero",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000000c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000000c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "a62efa11655be3cfe8eca7d0ce586964628a1369eb5917129e6d62df8a348005",
+        "hashes": [
+          "a62efa11655be3cfe8eca7d0ce586964628a1369eb5917129e6d62df8a348005"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "a62efa11655be3cfe8eca7d0ce586964628a1369eb5917129e6d62df8a348005"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "11155111",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+          "value": "0",
+          "unsigned_tx": "02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000000c0",
+          "erc20": {
+            "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "0"
+          }
+        }
+      },
+      "note": "a 0-amount transfer is harmless (at most it uses the nonce)"
+    },
+    {
+      "name": "erc20_amount_u128_max",
+      "kind": "evm",
+      "hex": "0x02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000ffffffffffffffffffffffffffffffffc0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "fb22178cf6a359896dc7dc546eda4f8556e90b658562ff111ec77d5388436edd",
+        "hashes": [
+          "fb22178cf6a359896dc7dc546eda4f8556e90b658562ff111ec77d5388436edd"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "fb22178cf6a359896dc7dc546eda4f8556e90b658562ff111ec77d5388436edd"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "84532",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+          "value": "0",
+          "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+          "erc20": {
+            "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "340282366920938463463374607431768211455"
+          }
+        }
+      },
+      "note": "largest amount the contract accepts"
+    },
+    {
+      "name": "erc20_recipient_is_the_token",
+      "kind": "evm",
+      "hex": "0x02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb00000000000000000000000075faf114eafb1bdbe2f0316df893fd58ce46aa4d0000000000000000000000000000000000000000000000000000000000000005c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb00000000000000000000000075faf114eafb1bdbe2f0316df893fd58ce46aa4d0000000000000000000000000000000000000000000000000000000000000005c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "b9685ef8e6d00a36fea290d2e7a9dc548579890b5499614389ea345103f9818b",
+        "hashes": [
+          "b9685ef8e6d00a36fea290d2e7a9dc548579890b5499614389ea345103f9818b"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "b9685ef8e6d00a36fea290d2e7a9dc548579890b5499614389ea345103f9818b"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "421614",
+          "nonce": "0",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+          "value": "0",
+          "unsigned_tx": "02f86d83066eee8083030d4883030d5c82fde89475faf114eafb1bdbe2f0316df893fd58ce46aa4d80b844a9059cbb00000000000000000000000075faf114eafb1bdbe2f0316df893fd58ce46aa4d0000000000000000000000000000000000000000000000000000000000000005c0",
+          "erc20": {
+            "token": "75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+            "to": "75faf114eafb1bdbe2f0316df893fd58ce46aa4d",
+            "amount": "5"
+          }
+        }
+      },
+      "note": "reverts or not, it only uses the nonce"
+    },
+    {
+      "name": "erc20_nonce_next",
+      "kind": "evm",
+      "hex": "0x02f86d83014a340383030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83014a340383030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "hash": "87ad543982fd16de2a4248bb9ed57c849c61ad4b06cd4da5685971cf25408966",
+        "hashes": [
+          "87ad543982fd16de2a4248bb9ed57c849c61ad4b06cd4da5685971cf25408966"
+        ],
+        "mpc": [
+          {
+            "path_chain": "evm",
+            "domain_id": 0,
+            "payload_v2": {
+              "Ecdsa": "87ad543982fd16de2a4248bb9ed57c849c61ad4b06cd4da5685971cf25408966"
+            }
+          }
+        ],
+        "fields": {
+          "chain_id": "84532",
+          "nonce": "3",
+          "max_priority_fee_per_gas": "200008",
+          "max_fee_per_gas": "200028",
+          "gas_limit": "65000",
+          "to": "0x036cbd53842c5426634e7929541ec2318f3dcf7e",
+          "value": "0",
+          "unsigned_tx": "02f86d83014a340383030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "erc20": {
+            "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+            "to": "2222222222222222222222222222222222222222",
+            "amount": "1500000"
+          }
+        }
+      },
+      "state": {
+        "evm_max_nonce": "2"
+      },
+      "note": "shares the chain nonce sequence with native sends"
+    },
+    {
+      "name": "erc20_nonce_gap",
+      "kind": "evm",
+      "hex": "0x02f86d83014a340483030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83014a340483030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_NONCE_GAP"
+      },
+      "state": {
+        "evm_max_nonce": "2"
+      },
+      "note": "max 2 → 4 refused"
+    },
+    {
+      "name": "erc20_sepolia_usdc_on_base",
+      "kind": "evm",
+      "hex": "0x02f86d83014a348083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83014a348083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_TOKEN"
+      },
+      "note": "another chain's USDC"
+    },
+    {
+      "name": "erc20_unlisted_token_weth",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8947b79995e5f793a07bc00c21412e50ecae098e7f980b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8947b79995e5f793a07bc00c21412e50ecae098e7f980b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_TOKEN"
+      },
+      "note": "a valid transfer to a token that is not on the allowlist"
+    },
+    {
+      "name": "erc20_with_value",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723801b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723801b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_VALUE"
+      },
+      "note": "a token transfer that also sends ETH"
+    },
+    {
+      "name": "erc20_amount_2_pow_128",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000100000000000000000000000000000000c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000100000000000000000000000000000000c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      },
+      "note": "amount ≥ 2^128 (the high 16 bytes must be zero)"
+    },
+    {
+      "name": "erc20_dirty_address_padding",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb01000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb01000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      },
+      "note": "non-canonical address word"
+    },
+    {
+      "name": "erc20_transfer_from",
+      "kind": "evm",
+      "hex": "0x02f88d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b86423b872dd00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f88d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b86423b872dd00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      },
+      "note": "transferFrom (100 bytes)"
+    },
+    {
+      "name": "erc20_approve_usdc",
+      "kind": "evm",
+      "hex": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844095ea7b3000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86d83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844095ea7b3000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000ffffffffffffffffffffffffffffffffc0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      },
+      "note": "approve on the allowlisted token: never"
+    },
+    {
+      "name": "erc20_67_bytes",
+      "kind": "evm",
+      "hex": "0x02f86c83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b843a9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000000000c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86c83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b843a9059cbb000000000000000000000000222222222222222222222222222222222222222200000000000000000000000000000000000000000000000000000000000000c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      }
+    },
+    {
+      "name": "erc20_69_bytes",
+      "kind": "evm",
+      "hex": "0x02f86e83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b845a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000000000100c0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "0x02f86e83aa36a78083030d4883030d5c82fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b845a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000000000100c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      }
+    },
+    {
+      "name": "erc20_access_list",
+      "kind": "evm",
+      "hex": "02f87e83aa36a780010282fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001d7d69461739f33adbb7f76c1b5b222e4119085257528bec0",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f87e83aa36a780010282fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000022222222222222222222222222222222222222220000000000000000000000000000000000000000000000000000000000000001d7d69461739f33adbb7f76c1b5b222e4119085257528bec0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_ACCESS_LIST"
       }
     },
     {

@@ -1,5 +1,5 @@
 import { toHex } from "@satchel/core/bytes";
-import { classifySignRequest, maxSignedEvmNonce } from "@satchel/core/policy";
+import { classifySignRequest, maxSignedEvmNonce, type Asset, type CapInput } from "@satchel/core/policy";
 import { IS_FIXTURE, USDC_CONTRACT } from "@/lib/config";
 import { FIXTURE_HEIGHT, FIXTURE_RECORDS } from "@/lib/data/fixtures";
 import {
@@ -7,6 +7,7 @@ import {
   simAcceptOffer,
   simBuy,
   simCancelOffer,
+  simDebitDelegated,
   simDelist,
   simDepositFt,
   simDepositNear,
@@ -16,6 +17,8 @@ import {
   simMint,
   simOverlay,
   simPrepayStorage,
+  simRevokeAllowance,
+  simSetAllowance,
   simSignFor,
   simTransfer,
   simWithdraw,
@@ -56,6 +59,10 @@ function recordsFor(request: SignRequest, tokenId: string): { chain: "btc" | "ev
   if (r.chain === "btc") {
     return r.fields.inputs.map((inp, i) => ({ chain: "btc" as const, payload: toHex(r.recordPayloads[i]), detail: { btc: { txid: inp.txid, vout: inp.vout, amount_sats: inp.amountSats.toString() } } }));
   }
+  if (r.chain !== "sol") {
+    // C7 message kinds (evm_message / sol_message): not simulated by the mock wallet yet (phase-2 UI)
+    throw new Error(`mock wallet: ${r.chain} requests are not simulated`);
+  }
   return [{ chain: "sol", payload: toHex(r.recordPayloads[0]), detail: { sol: { recent_blockhash: toHex(r.fields.recentBlockhash), lamports: r.fields.lamports.toString() } } }];
 }
 
@@ -72,8 +79,27 @@ function applyTx(tx: WalletTx, accountId: string): unknown {
     const args = (action?.args ?? {}) as Record<string, unknown>;
     const height = simOverlay().height(FIXTURE_HEIGHT);
     switch (action?.methodName) {
-      case "sign_for":
-        simSignFor({ tokenId: String(args.token_id), requester: accountId, items: recordsFor(args.request as SignRequest, String(args.token_id)), height });
+      case "sign_for": {
+        const tokenId = String(args.token_id);
+        const request = args.request as SignRequest;
+        // C5: a non-owner caller is a delegate — check and debit its allowance before the (simulated) MPC call,
+        // exactly where the contract does it (authorize_signer, then debit_allowance before step 5).
+        const owner = simOverlay().token(tokenId)?.owner_id;
+        if (owner && owner !== accountId) {
+          const listed = !!simOverlay().satchel(tokenId)?.listing;
+          const chk = simDebitDelegated(tokenId, accountId, request, listed);
+          if (!chk.ok) throw new Error(`Smart contract panicked: ${chk.error}`);
+        }
+        simSignFor({ tokenId, requester: accountId, items: recordsFor(request, tokenId), height });
+        break;
+      }
+      case "set_allowance": {
+        const caps = (args.caps as { asset: Asset; limit: string }[]).map((c): CapInput => ({ asset: c.asset, limit: BigInt(c.limit) }));
+        simSetAllowance(String(args.token_id), accountId, String(args.delegate), caps, args.expires_at_ms as number | undefined);
+        break;
+      }
+      case "revoke_allowance":
+        simRevokeAllowance(String(args.token_id), accountId, String(args.delegate));
         break;
       case "nft_transfer":
         simTransfer(String(args.token_id), String(args.receiver_id));

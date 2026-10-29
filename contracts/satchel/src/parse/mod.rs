@@ -3,6 +3,7 @@
 pub mod btc;
 pub mod evm;
 pub mod hex;
+pub mod msg;
 pub mod rlp;
 pub mod sol;
 
@@ -22,7 +23,8 @@ pub struct Item {
 pub struct Classified {
     pub chain: Chain,
     pub items: Vec<Item>,
-    /// The exact bytes that were classified, for the `sign_requested` event (EVM tx · BTC preimages · SOL message).
+    /// The exact bytes that were classified, for the `sign_requested` event (EVM tx · BTC preimages · SOL message;
+    /// for C7 messages, the full bytes the contract built and hashed).
     pub preimages: Vec<Vec<u8>>,
     pub btc_outputs: Option<Vec<u8>>,
 }
@@ -86,6 +88,34 @@ pub fn classify(req: &SignRequest) -> Result<Classified, &'static str> {
                     detail: SigDetail::Sol { recent_blockhash: parsed.recent_blockhash, lamports: parsed.lamports },
                 }],
                 preimages: vec![m],
+                btc_outputs: None,
+            })
+        }
+        // C7: the contract builds the signed bytes from the body (docs/specs/C1-C2-C3-C7.md §3.3).
+        SignRequest::EvmMessage { message } => {
+            let m = hex::decode(message)?;
+            msg::check(&m)?;
+            let bytes = msg::eip191(&m);
+            let h = keccak(&bytes);
+            Ok(Classified {
+                chain: Chain::Evm,
+                items: vec![Item { mpc_payload: MpcPayload::Ecdsa(hex::encode(&h)), record_payload: h, detail: SigDetail::EvmMessage { message: m } }],
+                preimages: vec![bytes],
+                btc_outputs: None,
+            })
+        }
+        SignRequest::SolMessage { message } => {
+            let m = hex::decode(message)?;
+            msg::check(&m)?;
+            let bytes = msg::sol_offchain(&m);
+            Ok(Classified {
+                chain: Chain::Sol,
+                items: vec![Item {
+                    mpc_payload: MpcPayload::Eddsa(hex::encode(&bytes)),
+                    record_payload: sha256(&bytes),
+                    detail: SigDetail::SolMessage { message: m },
+                }],
+                preimages: vec![bytes],
                 btc_outputs: None,
             })
         }

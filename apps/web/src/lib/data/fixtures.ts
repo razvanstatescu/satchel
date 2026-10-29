@@ -1,4 +1,4 @@
-import type { ConfigView, InsideView, ListingView, MarketConfigView, NftToken, OfferView, SatchelView, SigRecordView } from "@/lib/near/types";
+import type { AllowanceRecord, ConfigView, InsideView, ListingView, MarketConfigView, NftToken, OfferView, SatchelView, SigRecordView } from "@/lib/near/types";
 
 /**
  * Fixture mode (NEXT_PUBLIC_DATA_MODE=fixture): realistic views for the demo state of kb/90 + D-32, so every page renders
@@ -11,6 +11,10 @@ export const FIXTURE_CONTRACT = "satchel.satchelhq.testnet";
 export const ALICE = "alice.satchelhq.testnet";
 export const BOB = "bob.satchelhq.testnet";
 export const CAROL = "carol.satchelhq.testnet";
+
+/** C5's demo delegate (fixtures.ts only): kept separate from BOB/CAROL so existing "a stranger can't send" tests of
+ * those two personas on other tokens stay strangers everywhere. */
+export const DANA = "dana.satchelhq.testnet";
 
 export const FIXTURE_NOW = Date.UTC(2026, 9, 20, 12, 0, 0); // the frozen "now" of the fixture world
 export const FIXTURE_HEIGHT = 274_300_000;
@@ -131,6 +135,26 @@ export const FIXTURE_TOKENS: Record<string, TokenFixture> = {
 
 export const FIXTURE_IDS = Object.keys(FIXTURE_TOKENS);
 
+/**
+ * C5 (docs/specs/C5.md): the demo delegation on Satchel #1 (ALICE owns it) — DANA can sign BTC and ETH up to a daily
+ * cap, nothing spent yet, no expiry. `sim.ts` merges this with the in-browser mutations (set/revoke/spend) into the
+ * same `AllowanceView` shape the real `allowance`/`allowances_of` views return.
+ */
+export const FIXTURE_ALLOWANCES: Record<string, AllowanceRecord[]> = {
+  "1": [
+    {
+      delegate: DANA,
+      owner: ALICE,
+      set_at_ms: tAt(hAgo(5_000)),
+      expires_at_ms: null,
+      caps: [
+        { asset: "btc", limit: "50000", spends: [] },
+        { asset: { evm: { chain_id: 11155111 } }, limit: "20000000000000000", spends: [] },
+      ],
+    },
+  ],
+};
+
 export function fixtureSatchel(id: string, cooldown = 250): SatchelView | null {
   const t = FIXTURE_TOKENS[id];
   if (!t) return null;
@@ -157,7 +181,14 @@ export const FIXTURE_CONFIG: ConfigView = {
   mpc_contract_id: "v1.signer-prod.testnet",
   usdc_contract_id: "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af",
   cooldown_blocks: 250,
-  evm_chain_ids: [11155111],
+  evm_chain_ids: [11155111, 84532, 421614, 11155420],
+  erc20_tokens: [
+    { chain_id: 11155111, token: "1c7d4b196cb0c7b01d743fbc6116a902379c7238" },
+    { chain_id: 84532, token: "036cbd53842c5426634e7929541ec2318f3dcf7e" },
+    { chain_id: 421614, token: "75faf114eafb1bdbe2f0316df893fd58ce46aa4d" },
+    { chain_id: 11155420, token: "5fd84259d66cd46123540766be93dfe6d43130d7" },
+  ],
+  max_message_bytes: 1024,
   max_btc_inputs: 10,
   mpc_sign_gas_tgas: 15,
   on_signed_gas_tgas: { base: 10, per_request: 2 },

@@ -16,7 +16,7 @@
 //! Deep run:      `PROPTEST_CASES=200000 cargo test -p satchel --lib --release parse::fuzz_tests`
 //!                `SATCHEL_FUZZ_CORPUS=target/fuzz-corpus cargo test -p satchel --lib --release differential`
 
-use super::{btc, classify, evm, hex as phex, rlp, sol, Classified};
+use super::{btc, classify, evm, hex as phex, msg, rlp, sol, Classified};
 use crate::errors::*;
 use crate::mpc::MpcPayload;
 use crate::types::{Chain, SigDetail, SignRequest};
@@ -56,8 +56,10 @@ fn env_tick() {
 }
 
 const EVM_CODES: &[&str] = &[
-    ERR_EVM_TOO_LONG, ERR_EVM_TYPE, ERR_EVM_RLP, ERR_EVM_CHAIN_ID, ERR_EVM_INT_WIDTH, ERR_EVM_TO, ERR_EVM_DATA, ERR_EVM_ACCESS_LIST,
+    ERR_EVM_TOO_LONG, ERR_EVM_TYPE, ERR_EVM_RLP, ERR_EVM_CHAIN_ID, ERR_EVM_INT_WIDTH, ERR_EVM_TO, ERR_EVM_DATA, ERR_EVM_TOKEN,
+    ERR_EVM_VALUE, ERR_EVM_ACCESS_LIST,
 ];
+const MSG_CODES: &[&str] = &[ERR_MSG_EMPTY, ERR_MSG_TOO_LONG, ERR_MSG_ENCODING];
 const BTC_CODES: &[&str] = &[
     ERR_BTC_INPUT_COUNT, ERR_BTC_PREIMAGE_LEN, ERR_BTC_VERSION, ERR_BTC_SIGHASH, ERR_BTC_SCRIPTCODE, ERR_BTC_LOCKTIME,
     ERR_BTC_SEQUENCE, ERR_BTC_MIXED_TX, ERR_BTC_PREVOUTS_INCOMPLETE, ERR_BTC_SEQUENCES_MISMATCH, ERR_BTC_OUTPUTS_MISMATCH,
@@ -213,14 +215,24 @@ fn rlp_hot(b: &[u8], base: usize, out: &mut Vec<usize>, depth: usize) {
 struct EvmO {
     chain_id: u64,
     nonce: u64,
+    /// (token, recipient, amount) of a USDC transfer (C2)
+    erc20: Option<([u8; 20], [u8; 20], u128)>,
 }
+
+/// C2/C3 from the spec text (docs/specs/C1-C2-C3-C7.md §2), written as hex strings rather than the contract's arrays.
+const ORACLE_CHAINS: [(u128, &str); 4] = [
+    (11_155_111, "1c7d4b196cb0c7b01d743fbc6116a902379c7238"),
+    (84_532, "036cbd53842c5426634e7929541ec2318f3dcf7e"),
+    (421_614, "75faf114eafb1bdbe2f0316df893fd58ce46aa4d"),
+    (11_155_420, "5fd84259d66cd46123540766be93dfe6d43130d7"),
+];
 
 fn be_u128(b: &[u8]) -> u128 {
     b.iter().fold(0u128, |a, x| (a << 8) | *x as u128)
 }
 
 fn evm_oracle(tx: &[u8]) -> Option<EvmO> {
-    if tx.len() > 128 || tx.first() != Some(&0x02) {
+    if tx.len() > 160 || tx.first() != Some(&0x02) {
         return None;
     }
     let R::L(f) = rlp_canonical(&tx[1..])? else { return None };
@@ -234,16 +246,48 @@ fn evm_oracle(tx: &[u8]) -> Option<EvmO> {
     let int = |i: usize| s(i).filter(|b| b.first() != Some(&0));
     let (chain, nonce, tip, fee, gas, to, value, data) = (int(0)?, int(1)?, int(2)?, int(3)?, int(4)?, s(5)?, int(6)?, s(7)?);
     let R::L(al) = &f[8] else { return None };
-    if chain.len() > 8 || be_u128(chain) != 11_155_111 {
+    if chain.len() > 8 {
         return None;
     }
+    let (cid, token_hex) = ORACLE_CHAINS.iter().find(|(c, _)| *c == be_u128(chain))?;
     if nonce.len() > 8 || gas.len() > 8 || tip.len() > 16 || fee.len() > 16 || value.len() > 16 {
         return None;
     }
-    if be_u128(nonce) == u64::MAX as u128 || to.len() != 20 || !data.is_empty() || !al.is_empty() {
+    if be_u128(nonce) == u64::MAX as u128 || to.len() != 20 || !al.is_empty() {
         return None;
     }
-    Some(EvmO { chain_id: 11_155_111, nonce: be_u128(nonce) as u64 })
+    // ABI view of the calldata: selector ‖ word(address) ‖ word(uint256); both words must be canonical for a u160/u128
+    let erc20 = if data.is_empty() {
+        None
+    } else {
+        if data.len() != 4 + 2 * 32 || hx(&data[..4]) != "a9059cbb" {
+            return None;
+        }
+        let (w_to, w_amount) = (&data[4..36], &data[36..68]);
+        if w_to.iter().take(12).any(|b| *b != 0) || w_amount.iter().take(16).any(|b| *b != 0) {
+            return None;
+        }
+        if hx(to) != *token_hex || !value.is_empty() {
+            return None;
+        }
+        Some((to.try_into().ok()?, w_to[12..].try_into().ok()?, be_u128(&w_amount[16..])))
+    };
+    Some(EvmO { chain_id: *cid as u64, nonce: be_u128(nonce) as u64, erc20 })
+}
+
+// ───────────────────────────────────────── oracle: messages (C7) ─────────────────────────────────────────
+
+fn msg_oracle_ok(m: &[u8]) -> bool {
+    (1..=1024).contains(&m.len()) && String::from_utf8(m.to_vec()).is_ok()
+}
+
+fn eip191_oracle(m: &[u8]) -> Vec<u8> {
+    [format!("\x19Ethereum Signed Message:\n{}", m.len()).into_bytes(), m.to_vec()].concat()
+}
+
+fn offchain_oracle(m: &[u8]) -> Vec<u8> {
+    let ascii = m.iter().all(|c| c.is_ascii_graphic() || *c == b' ');
+    [b"\xffsolana offchain".to_vec(), vec![0, if ascii { 0 } else { 1 }], (m.len() as u16).to_le_bytes().to_vec(), m.to_vec()].concat()
 }
 
 // ───────────────────────────────────────── oracle: BTC ─────────────────────────────────────────
@@ -516,7 +560,9 @@ fn check_evm(tx: &[u8]) -> Result<(), String> {
     let got = evm::classify(tx);
     let want = evm_oracle(tx);
     match (&got, &want) {
-        (Ok(g), Some(w)) if g.chain_id == w.chain_id && g.nonce == w.nonce => Ok(()),
+        (Ok(g), Some(w)) if g.chain_id == w.chain_id && g.nonce == w.nonce && g.erc20.map(|e| (e.token, e.to, e.amount)) == w.erc20 => {
+            if w.erc20.is_some() && g.value != 0 { Err(format!("EVM {}: token transfer with value", hx(tx))) } else { Ok(()) }
+        }
         (Err(e), None) if EVM_CODES.contains(e) => Ok(()),
         _ => Err(format!("EVM {}: contract {got:?}, oracle {want:?}", hx(tx))),
     }
@@ -623,6 +669,31 @@ fn check_request(req: &SignRequest) -> Result<(), String> {
                 _ => fail("verdict differs from oracle"),
             }
         }
+        SignRequest::EvmMessage { message } | SignRequest::SolMessage { message } => {
+            let evm_kind = matches!(req, SignRequest::EvmMessage { .. });
+            let Some(m) = hex_oracle(message) else { return if got == Err(ERR_HEX) { Ok(()) } else { fail("want ERR_HEX") } };
+            if !msg_oracle_ok(&m) {
+                let want = if m.is_empty() { ERR_MSG_EMPTY } else if m.len() > 1024 { ERR_MSG_TOO_LONG } else { ERR_MSG_ENCODING };
+                return if got == Err(want) { Ok(()) } else { fail("want a message refusal") };
+            }
+            let Ok(c) = &got else { return fail("valid message refused") };
+            let (bytes, chain) = if evm_kind { (eip191_oracle(&m), Chain::Evm) } else { (offchain_oracle(&m), Chain::Sol) };
+            let (record, mpc, detail) = if evm_kind {
+                (keccak(&bytes), ecdsa(&keccak(&bytes)), SigDetail::EvmMessage { message: m.clone() })
+            } else {
+                (sha256(&bytes), MpcPayload::Eddsa(hx(&bytes)), SigDetail::SolMessage { message: m.clone() })
+            };
+            let ok = c.chain == chain
+                && c.items.len() == 1
+                && c.items[0].record_payload == record
+                && c.items[0].mpc_payload == mpc
+                && c.items[0].detail == detail
+                && c.preimages == vec![bytes.clone()]
+                && c.btc_outputs.is_none();
+            // the signed bytes are never a transaction on either key
+            let never_tx = evm::classify(&bytes).is_err() && sol::classify(&bytes).is_err() && sol_oracle(&bytes).is_none();
+            if ok && never_tx { Ok(()) } else { fail("accepted with wrong record, or signed bytes parse as a tx") }
+        }
     }
 }
 
@@ -633,18 +704,42 @@ fn int_r(v: u128) -> R {
 }
 
 fn evm_build(nonce: u64, tip: u128, fee: u128, gas: u64, to: [u8; 20], value: u128) -> Vec<u8> {
+    evm_build_on(11_155_111, nonce, tip, fee, gas, to.to_vec(), value, vec![])
+}
+
+#[allow(clippy::too_many_arguments)]
+fn evm_build_on(chain: u128, nonce: u64, tip: u128, fee: u128, gas: u64, to: Vec<u8>, value: u128, data: Vec<u8>) -> Vec<u8> {
     let l = R::L(vec![
-        int_r(11_155_111),
+        int_r(chain),
         int_r(nonce as u128),
         int_r(tip),
         int_r(fee),
         int_r(gas as u128),
-        R::S(to.to_vec()),
+        R::S(to),
         int_r(value),
-        R::S(vec![]),
+        R::S(data),
         R::L(vec![]),
     ]);
     [vec![0x02], rlp_enc(&l)].concat()
+}
+
+/// `transfer(to, amount)` calldata, built from ABI words (independent of the contract's layout constants).
+fn transfer_calldata(to: [u8; 20], amount: u128) -> Vec<u8> {
+    let mut w_to = [0u8; 32];
+    w_to[12..].copy_from_slice(&to);
+    let mut w_amount = [0u8; 32];
+    w_amount[16..].copy_from_slice(&amount.to_be_bytes());
+    [vec![0xa9, 0x05, 0x9c, 0xbb], w_to.to_vec(), w_amount.to_vec()].concat()
+}
+
+fn oracle_token(i: usize) -> (u128, Vec<u8>) {
+    let (c, t) = ORACLE_CHAINS[i % 4];
+    (c, hex::decode(t).unwrap())
+}
+
+fn erc20_build(i: usize, nonce: u64, recipient: [u8; 20], amount: u128) -> Vec<u8> {
+    let (chain, token) = oracle_token(i);
+    evm_build_on(chain, nonce, 1_000_000, 2_000_000_000, 65_000, token, 0, transfer_calldata(recipient, amount))
 }
 
 #[derive(Debug, Clone)]
@@ -723,8 +818,46 @@ fn evm_seeds() -> &'static Vec<Vec<u8>> {
             vectors("evm").iter().filter_map(|x| x["request"]["evm"]["unsigned_tx"].as_str().and_then(hex_oracle)).collect();
         v.push(evm_build(7, 1_500_000_000, 30_000_000_000, 21_000, [0x11; 20], 10u128.pow(15)));
         v.push(evm_build(u64::MAX - 1, u128::MAX, u128::MAX, u64::MAX, [0xff; 20], u128::MAX));
+        for i in 0..4 {
+            v.push(erc20_build(i, i as u64, [0x22; 20], 1_500_000));
+            let (chain, _) = oracle_token(i);
+            v.push(evm_build_on(chain, 3, 1, 2, 21_000, vec![0x33; 20], 5, vec![]));
+        }
+        v.push({
+            let (chain, token) = oracle_token(3);
+            evm_build_on(chain, u64::MAX - 1, u128::MAX, u128::MAX, u64::MAX, token, 0, transfer_calldata([0xff; 20], u128::MAX))
+        });
         v
     })
+}
+
+fn msg_seeds() -> &'static Vec<(bool, Vec<u8>)> {
+    static S: OnceLock<Vec<(bool, Vec<u8>)>> = OnceLock::new();
+    S.get_or_init(|| {
+        let mut v: Vec<(bool, Vec<u8>)> = vectors("msg")
+            .iter()
+            .filter_map(|x| {
+                let r = &x["request"];
+                let (evm_kind, m) = match (r.get("evm_message"), r.get("sol_message")) {
+                    (Some(e), _) => (true, e["message"].as_str()?),
+                    (_, Some(s)) => (false, s["message"].as_str()?),
+                    _ => return None,
+                };
+                Some((evm_kind, hex_oracle(m)?))
+            })
+            .collect();
+        for k in [true, false] {
+            v.push((k, b"Sign in to satchel.example\nNonce: 8f2c".to_vec()));
+            v.push((k, "Grüße ✓ 🎒".as_bytes().to_vec()));
+            v.push((k, vec![b'a'; 1024]));
+            v.push((k, vec![b'~'; 1]));
+        }
+        v
+    })
+}
+
+fn msg_req(evm_kind: bool, message: String) -> SignRequest {
+    if evm_kind { SignRequest::EvmMessage { message } } else { SignRequest::SolMessage { message } }
 }
 
 type BtcCase = (Vec<Vec<u8>>, Vec<u8>);
@@ -767,6 +900,10 @@ fn seeds_are_loaded_and_agree_with_oracles() {
     fails.extend(sol_seeds().iter().filter_map(|s| check_sol(s).err()));
     assert!(fails.is_empty(), "{}", fails.join("\n"));
     assert!(evm_seeds().iter().filter(|s| evm_oracle(s).is_some()).count() >= 8);
+    assert!(evm_seeds().iter().filter(|s| evm_oracle(s).is_some_and(|o| o.erc20.is_some())).count() >= 4, "ERC-20 seeds");
+    assert!(msg_seeds().len() >= 8, "vectors/msg.json missing");
+    let msg_fails: Vec<String> = msg_seeds().iter().filter_map(|(k, m)| check_request(&msg_req(*k, hx(m))).err()).collect();
+    assert!(msg_fails.is_empty(), "{}", msg_fails.join("\n"));
     assert!(btc_seeds().iter().filter(|(p, o)| btc_oracle(p, o).is_some()).count() >= 10);
     assert!(sol_seeds().iter().filter(|s| sol_oracle(s).is_some()).count() >= 6);
 }
@@ -985,7 +1122,14 @@ fn arb_evm_field() -> impl Strategy<Value = R> {
             R::S(v)
         }),
         2 => Just(int_r(11_155_111)),
-        1 => prop_oneof![Just(int_r(1)), Just(int_r(84532)), Just(R::S(vec![0, 0xaa, 0x36, 0xa7])), Just(int_r(u64::MAX as u128))],
+        1 => prop_oneof![Just(int_r(1)), Just(int_r(84532)), Just(int_r(421_614)), Just(int_r(11_155_420)), Just(int_r(8453)),
+                         Just(R::S(vec![0, 0xaa, 0x36, 0xa7])), Just(int_r(u64::MAX as u128))],
+        1 => (0usize..4).prop_map(|i| R::S(oracle_token(i).1)),
+        1 => (any::<[u8; 20]>(), any::<u128>(), any::<u8>()).prop_map(|(t, a, k)| {
+            let mut d = transfer_calldata(t, a);
+            match k % 4 { 0 => {}, 1 => d[k as usize % 16] ^= 1, 2 => { d.pop(); }, _ => d.push(k) }
+            R::S(d)
+        }),
         2 => prop::collection::vec(any::<u8>(), 18..=22).prop_map(R::S),
         1 => Just(R::S(vec![])),
         1 => Just(R::L(vec![])),
@@ -1027,11 +1171,13 @@ proptest! {
     }
 
     #[test]
-    fn classify_arbitrary_requests(s in "(0[xX])?[0-9a-fA-F]{0,300}", n in 0usize..13, chain in 0u8..3) {
+    fn classify_arbitrary_requests(s in "(0[xX])?[0-9a-fA-F]{0,300}", n in 0usize..13, chain in 0u8..5) {
         let req = match chain {
             0 => SignRequest::Evm { unsigned_tx: s.clone() },
             1 => SignRequest::Btc { preimages: vec![s.clone(); n], outputs: s.clone() },
-            _ => SignRequest::Sol { message: s.clone() },
+            2 => SignRequest::Sol { message: s.clone() },
+            3 => SignRequest::EvmMessage { message: s.clone() },
+            _ => SignRequest::SolMessage { message: s.clone() },
         };
         check_request(&req).map_err(TestCaseError::fail)?;
         prop_assert_eq!(classify(&req), classify(&req)); // pure
@@ -1070,8 +1216,81 @@ proptest! {
                                  tip in any::<u128>(), fee in any::<u128>(), gas in any::<u64>(), to in any::<[u8; 20]>(), value in any::<u128>(),
                                  shift in 0u32..128) {
         let tx = evm_build(nonce, tip >> shift, fee >> shift, gas >> (shift % 64), to, value >> shift);
-        prop_assert_eq!(evm::classify(&tx), Ok(evm::EvmTx { chain_id: 11_155_111, nonce }));
+        prop_assert_eq!(evm::classify(&tx), Ok(evm::EvmTx { chain_id: 11_155_111, nonce, value: value >> shift, erc20: None }));
         check_request(&SignRequest::Evm { unsigned_tx: hx(&tx) }).map_err(TestCaseError::fail)?;
+        // C3: the same transfer on every supported chain
+        for (chain, _) in ORACLE_CHAINS {
+            let tx = evm_build_on(chain, nonce, tip >> shift, fee >> shift, gas >> (shift % 64), to.to_vec(), value >> shift, vec![]);
+            prop_assert_eq!(evm::classify(&tx).map(|t| (t.chain_id as u128, t.nonce, t.erc20)), Ok((chain, nonce, None)));
+            check_evm(&tx).map_err(TestCaseError::fail)?;
+        }
+    }
+
+    // C2: every canonical USDC transfer is accepted with the right token, recipient and amount
+    #[test]
+    fn erc20_valid_always_accepted(i in 0usize..4, nonce in prop_oneof![0u64..1000, any::<u64>().prop_map(|n| n.min(u64::MAX - 1))],
+                                   tip in any::<u128>(), fee in any::<u128>(), gas in any::<u64>(), rcpt in any::<[u8; 20]>(), amount in any::<u128>()) {
+        let (chain, token) = oracle_token(i);
+        let tx = evm_build_on(chain, nonce, tip, fee, gas, token.clone(), 0, transfer_calldata(rcpt, amount));
+        prop_assert!(tx.len() <= 160);
+        let t = evm::classify(&tx).map_err(|e| TestCaseError::fail(format!("valid USDC transfer refused: {e}")))?;
+        prop_assert_eq!((t.chain_id as u128, t.nonce, t.value), (chain, nonce, 0));
+        prop_assert_eq!(t.erc20.map(|e| (e.token.to_vec(), e.to, e.amount)), Some((token, rcpt, amount)));
+        check_request(&SignRequest::Evm { unsigned_tx: hx(&tx) }).map_err(TestCaseError::fail)?;
+    }
+
+    // C2: one rule broken at a time (token of another chain, value, selector, padding, length, amount width)
+    #[test]
+    fn erc20_one_rule_broken(i in 0usize..4, j in 0usize..4, value in 1u128.., rcpt in any::<[u8; 20]>(), amount in any::<u128>(),
+                             k in 0u8..7, pos in any::<u8>(), b in 1u8..) {
+        let (chain, token) = oracle_token(i);
+        let mut data = transfer_calldata(rcpt, amount);
+        let (to, value, want) = match k {
+            0 if i != j => (oracle_token(j).1, 0, ERR_EVM_TOKEN),
+            1 => (token, value, ERR_EVM_VALUE),
+            2 => { data[pos as usize % 4] ^= b; (token, 0, ERR_EVM_DATA) }
+            3 => { data[4 + pos as usize % 12] |= b; (token, 0, ERR_EVM_DATA) }
+            4 => { data[36 + pos as usize % 16] |= b; (token, 0, ERR_EVM_DATA) }
+            5 => { if pos % 2 == 0 { data.pop(); } else { data.push(b); } (token, 0, ERR_EVM_DATA) }
+            _ => (vec![pos; 20], 0, ERR_EVM_TOKEN),
+        };
+        let token_like = ORACLE_CHAINS.iter().any(|(c, t)| *c == chain && *t == hx(&to));
+        let tx = evm_build_on(chain, 0, 1, 2, 65_000, to, value, data);
+        if !(want == ERR_EVM_TOKEN && token_like) {
+            prop_assert_eq!(evm::classify(&tx).map(|_| ()), Err(want));
+        }
+        check_evm(&tx).map_err(TestCaseError::fail)?;
+    }
+
+    // ── C7 messages ──
+    #[test]
+    fn msg_arbitrary_bytes(b in prop_oneof![prop::collection::vec(any::<u8>(), 0..64), prop::collection::vec(any::<u8>(), 1000..1100)],
+                           s in ".{0,300}", evm_kind in any::<bool>(), mode in any::<u8>(), pos in any::<u16>()) {
+        for m in [b.clone(), s.as_bytes().to_vec()] {
+            check_request(&msg_req(evm_kind, hx(&m))).map_err(TestCaseError::fail)?;
+            check_request(&msg_req(evm_kind, hex_variant(&m, mode, pos))).map_err(TestCaseError::fail)?;
+            if let Err(e) = classify(&msg_req(evm_kind, hx(&m))) { prop_assert!(MSG_CODES.contains(&e), "{}", e); }
+        }
+    }
+
+    #[test]
+    fn msg_valid_always_accepted(s in "\\PC{1,256}", n in 1usize..=1024, c in any::<char>(), evm_kind in any::<bool>()) {
+        let mut long: String = std::iter::repeat_n(c, n).collect();
+        while long.len() > 1024 { long.pop(); }
+        for m in [s.as_bytes(), long.as_bytes()] {
+            if m.is_empty() || m.len() > 1024 { continue; }
+            let c = classify(&msg_req(evm_kind, hx(m))).map_err(|e| TestCaseError::fail(format!("valid message refused: {e}")))?;
+            prop_assert_eq!(c.items.len(), 1);
+            check_request(&msg_req(evm_kind, hx(m))).map_err(TestCaseError::fail)?;
+            prop_assert_eq!(msg::check(m), Ok(()));
+        }
+    }
+
+    #[test]
+    fn msg_mutated_seeds(i in any::<Index>(), ops in arb_ops(8)) {
+        let (evm_kind, seed) = i.get(msg_seeds());
+        let m = mutate(seed, &ops, &[0, seed.len() / 2, seed.len().saturating_sub(1)]);
+        check_request(&msg_req(*evm_kind, hx(&m))).map_err(TestCaseError::fail)?;
     }
 
     #[test]
@@ -1103,9 +1322,11 @@ proptest! {
 
     // ── structured EVM: random fields of every kind in a 7–10 item list ──
     #[test]
-    fn evm_structured_fields(fields in prop::collection::vec(arb_evm_field(), 7..=10), sepolia in any::<bool>(), ty in prop_oneof![9 => Just(2u8), 1 => any::<u8>()]) {
+    fn evm_structured_fields(fields in prop::collection::vec(arb_evm_field(), 7..=10), sepolia in any::<bool>(), ty in prop_oneof![9 => Just(2u8), 1 => any::<u8>()],
+                             chain in 0usize..4, token in any::<bool>()) {
         let mut fields = fields;
-        if sepolia { fields[0] = int_r(11_155_111); }
+        if sepolia { fields[0] = int_r(oracle_token(chain).0); }
+        if token { fields[5] = R::S(oracle_token(chain).1); }
         let tx = [vec![ty], rlp_enc(&R::L(fields))].concat();
         check_evm(&tx).map_err(TestCaseError::fail)?;
     }
@@ -1196,6 +1417,14 @@ fn mutation_coverage_stats() {
         let seed = i.get(sol_seeds());
         verdict(&classify(&SignRequest::Sol { message: hx(&mutate(seed, &ops, &sol_hot(seed))) }))
     }, &["ok", ERR_SOL_VERSION, ERR_SOL_HEADER, ERR_SOL_MALFORMED, ERR_SOL_INSTRUCTION, ERR_SOL_DURABLE_NONCE]);
+    let msg_s = (any::<Index>(), arb_ops(8));
+    tally("msg", &mut |r| {
+        let (i, ops) = msg_s.new_tree(r).unwrap().current();
+        let (evm_kind, seed) = i.get(msg_seeds());
+        let m = mutate(seed, &ops, &[0, seed.len() / 2, seed.len().saturating_sub(1)]);
+        let m = if ops.len() % 3 == 0 { m.into_iter().take(ops.len() / 3).collect() } else { m }; // reach the empty message
+        verdict(&classify(&msg_req(*evm_kind, hx(&m))))
+    }, &[&["ok"][..], MSG_CODES].concat());
 }
 
 // ───────────────────────────────────────── recorded findings (see docs/security/fuzzing.md) ─────────────────────────────────────────
@@ -1301,9 +1530,21 @@ fn compare_ok(chain: &str, line: &Value, c: &Classified) -> Result<(), String> {
     let f = &line["f"];
     let s = |v: &Value| v.as_str().map(String::from).unwrap_or_else(|| v.to_string());
     match (chain, &c.items[0].detail) {
-        ("evm", SigDetail::Evm { chain_id, nonce, .. }) => {
+        ("evm", SigDetail::Evm { chain_id, nonce, unsigned_tx }) => {
             if s(&f["chain_id"]) != chain_id.to_string() || s(&f["nonce"]) != nonce.to_string() {
                 return Err(format!("evm fields {f}"));
+            }
+            let e = evm::erc20_of(unsigned_tx);
+            let want = f.get("erc20").filter(|v| !v.is_null());
+            match (e, want) {
+                (None, None) => {}
+                (Some(e), Some(w)) if s(&w["token"]) == hx(&e.token) && s(&w["to"]) == hx(&e.to) && s(&w["amount"]) == e.amount.to_string() => {}
+                _ => return Err(format!("erc20 fields {f} vs {e:?}")),
+            }
+        }
+        ("msg", SigDetail::EvmMessage { message } | SigDetail::SolMessage { message }) => {
+            if s(&f["message"]) != hx(message) {
+                return Err(format!("message {f}"));
             }
         }
         ("btc", _) => {
@@ -1344,7 +1585,7 @@ fn differential_vs_ts_reference() {
     let mut known: BTreeMap<&'static str, usize> = BTreeMap::new();
     let mut oracle_fails: Vec<String> = vec![];
     let mut ran = 0usize;
-    for chain in ["evm", "btc", "sol"] {
+    for chain in ["evm", "btc", "sol", "msg"] {
         let path = dir.join(format!("{chain}.jsonl"));
         let Ok(text) = std::fs::read_to_string(&path) else {
             eprintln!("differential: {} not present, skipped (generate with tools/fuzz/gen-corpus.ts)", path.display());

@@ -3,7 +3,12 @@ import { classifySignRequest, type AnyClassifyResult, type PolicyError } from '@
 import { toHex } from '@satchel/core/bytes'
 import type { SignRequest } from '@satchel/core/near'
 
-export type Kind = 'evm' | 'btc' | 'sol'
+/** The request tag; C7 message kinds live in vectors/msg.json. */
+export type Kind = 'evm' | 'btc' | 'sol' | 'evm_message' | 'sol_message'
+/** A vector file: one per chain, plus `msg` for the C7 message kinds. */
+export type VectorSet = 'evm' | 'btc' | 'sol' | 'msg'
+/** The key that signs a request kind (the MPC path's chain slug). */
+export const pathChain = (k: Kind): 'evm' | 'btc' | 'sol' => (k === 'evm_message' ? 'evm' : k === 'sol_message' ? 'sol' : k)
 
 export interface Vector {
   name: string
@@ -15,12 +20,13 @@ export interface Vector {
     error?: PolicyError
     hash?: string
     hashes?: string[]
-    mpc?: { path_chain: Kind; domain_id: 0 | 1; payload_v2: { Ecdsa: string } | { Eddsa: string } }[]
+    mpc?: { path_chain: 'evm' | 'btc' | 'sol'; domain_id: 0 | 1; payload_v2: { Ecdsa: string } | { Eddsa: string } }[]
     fields?: Record<string, unknown>
   }
   /**
    * Token state `sign_for` checks after the stateless classifier (spec §5.9 nonce-gap rule, D-43). `evm_max_nonce` is
-   * the highest EVM nonce the token has signed (decimal string), or null; an absent `state` means null (no EVM record).
+   * the highest EVM nonce the token has signed **on the vector's chain** (C3: the rule is per chain id; decimal string),
+   * or null; an absent `state` means null (no EVM record on that chain).
    */
   state?: { evm_max_nonce: string | null }
   note?: string
@@ -28,7 +34,7 @@ export interface Vector {
 
 export interface VectorFile {
   schema: 'satchel-vectors/1'
-  set: Kind
+  set: VectorSet
   generator: 'tools/vectors/gen.ts'
   vectors: Vector[]
 }
@@ -48,7 +54,13 @@ function fieldsOf(r: AnyClassifyResult): Record<string, unknown> {
       to: f.to.toLowerCase(),
       value: str(f.value),
       unsigned_tx: toHex(f.unsignedTx),
+      // C2: the view's `detail.evm.erc20` (absent on native transfers)
+      ...(f.erc20 ? { erc20: { token: f.erc20.token.slice(2), to: f.erc20.to.slice(2), amount: str(f.erc20.amount) } } : {}),
     }
+  }
+  if (r.chain === 'evm_message' || r.chain === 'sol_message') {
+    const f = r.fields
+    return { message: toHex(f.message), text: f.text, signed_bytes: toHex(f.signedBytes) }
   }
   if (r.chain === 'btc') {
     const f = r.fields
@@ -75,7 +87,16 @@ export function vec(name: string, kind: Kind, request: SignRequest, want: 'ok' |
   const r = classifySignRequest(request, { evmMaxSignedNonce: max === undefined || max === null ? null : BigInt(max) })
   const got = r.ok ? 'ok' : r.error
   if (got !== want) throw new Error(`vector ${name}: spec says ${want}, reference classifier says ${got}`)
-  const hex = 'evm' in request ? request.evm.unsigned_tx : 'sol' in request ? request.sol.message : null
+  const hex =
+    'evm' in request
+      ? request.evm.unsigned_tx
+      : 'sol' in request
+        ? request.sol.message
+        : 'evm_message' in request
+          ? request.evm_message.message
+          : 'sol_message' in request
+            ? request.sol_message.message
+            : null
   const v: Vector = { name, kind, hex, request, expect: { ok: r.ok } }
   if (state) v.state = state
   if (!r.ok) v.expect.error = r.error
@@ -83,7 +104,7 @@ export function vec(name: string, kind: Kind, request: SignRequest, want: 'ok' |
     const hashes = r.recordPayloads.map(toHex)
     v.expect.hash = hashes[0]!
     v.expect.hashes = hashes
-    v.expect.mpc = r.mpcPayloads.map((p) => ({ path_chain: kind, domain_id: kind === 'sol' ? 1 : 0, payload_v2: p }))
+    v.expect.mpc = r.mpcPayloads.map((p) => ({ path_chain: pathChain(kind), domain_id: pathChain(kind) === 'sol' ? 1 : 0, payload_v2: p }))
     v.expect.fields = fieldsOf(r)
   }
   if (note) v.note = note

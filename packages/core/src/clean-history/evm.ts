@@ -2,12 +2,31 @@
  * EVM dead-signature rule (spec §7.2): `spent` if the nonce count at `latest − 3` exceeds the record's nonce;
  * `settling` if only `latest` does; else `unused`. Two providers must agree; both are queried at the SAME
  * block number (min head − 3) so their answers are comparable. O(1) per address. Account check: getCode == "0x".
+ * C3: one run per chain id, on that chain's providers (`eth_chainId` guard); USDC transfers (C2) follow the same rule.
  */
-import { classifyEvm } from '../policy/evm'
+import { classifyEvm, EVM_SUPPORTED_CHAIN_IDS } from '../policy/evm'
 import type { AccountReport, EvmSource, ItemReport, ItemStatus, Policy, SigRecordView } from './types'
 import { agree, baseItem, settle } from './util'
 
 export const SEPOLIA = 11155111
+
+/** C3: the chain ids whose records the checker can judge (the contract's allowlist). */
+export const EVM_CHECK_CHAINS: readonly number[] = EVM_SUPPORTED_CHAIN_IDS.map(Number)
+
+const EXPLORERS: Readonly<Record<number, string>> = {
+  11155111: 'https://sepolia.etherscan.io',
+  84532: 'https://sepolia.basescan.org',
+  421614: 'https://sepolia.arbiscan.io',
+  11155420: 'https://sepolia-optimism.etherscan.io',
+}
+
+/**
+ * Confirmation depth (blocks) for `chainId` (review SR-01): `max(evmConfirmations, evmConfirmationsByChain[chainId])`,
+ * so a per-chain override can deepen the rule but never make it shallower than the global one.
+ */
+export function evmDepth(policy: Policy, chainId: number): number {
+  return Math.max(policy.evmConfirmations, policy.evmConfirmationsByChain?.[chainId] ?? 0)
+}
 
 export interface EvmCheckResult {
   items: ItemReport[]
@@ -24,7 +43,7 @@ interface ProviderAnswer {
   tag: bigint
 }
 
-function recordNonce(r: SigRecordView): { nonce: bigint; chainId: number } | { error: string } {
+function recordNonce(r: SigRecordView): { nonce: bigint; chainId: number; erc20: ItemReport['erc20'] } | { error: string } {
   if (!('evm' in r.detail)) return { error: 'not_evm' }
   const d = r.detail.evm
   const c = classifyEvm(d.unsigned_tx)
@@ -33,15 +52,22 @@ function recordNonce(r: SigRecordView): { nonce: bigint; chainId: number } | { e
   const payloadOk = c.mpcPayloads[0] && 'Ecdsa' in c.mpcPayloads[0] && c.mpcPayloads[0].Ecdsa === r.payload.toLowerCase()
   if (!payloadOk) return { error: 'record_inconsistent' }
   if (c.fields.nonce !== BigInt(d.nonce) || c.fields.chainId !== BigInt(d.chain_id)) return { error: 'record_inconsistent' }
-  return { nonce: c.fields.nonce, chainId: Number(c.fields.chainId) }
+  const e = c.fields.erc20
+  const erc20 = e ? { token: e.token.slice(2), to: e.to.slice(2), amount: e.amount.toString() } : undefined
+  return { nonce: c.fields.nonce, chainId: Number(c.fields.chainId), erc20 }
 }
 
+/**
+ * Judge `records` (EVM transactions on `chainId`) on that chain's `sources`, plus the account check there.
+ * `chainId` defaults to Sepolia (the pre-C3 behaviour). Records on any other chain are `unknown` / `chain_unsupported`.
+ */
 export async function checkEvm(
   address: string,
   records: SigRecordView[],
   sources: EvmSource[],
   policy: Policy,
   cachedSeqs: ReadonlyMap<number, Record<string, unknown>> = new Map(),
+  chainId: number = SEPOLIA,
 ): Promise<EvmCheckResult> {
   // phase 1: chain guard + head per provider
   const p1 = await Promise.all(
@@ -49,14 +75,14 @@ export async function checkEvm(
       const r = await settle(Promise.all([s.chainId(), s.blockNumber()]))
       if (!r.ok) return { s, ok: false as const, error: r.error }
       const [cid, head] = r.value
-      if (cid !== SEPOLIA) return { s, ok: false as const, error: `wrong chain ${cid}` }
+      if (cid !== chainId) return { s, ok: false as const, error: `wrong chain ${cid}` }
       return { s, ok: true as const, head }
     }),
   )
   const live = p1.filter((x) => x.ok) as { s: EvmSource; ok: true; head: bigint }[]
   const errors: Record<string, string> = Object.fromEntries(p1.filter((x) => !x.ok).map((x) => [x.s.name, (x as { error: string }).error]))
   const minHead = live.length ? live.reduce((m, x) => (x.head < m ? x.head : m), live[0]!.head) : 0n
-  const tag = minHead - BigInt(policy.evmConfirmations)
+  const tag = minHead - BigInt(evmDepth(policy, chainId))
 
   // phase 2: two counts + code per provider, at the common tag
   const answers: ProviderAnswer[] = []
@@ -77,8 +103,9 @@ export async function checkEvm(
       items.push({ ...baseItem(r), status: 'unknown', reason: n.error, evidence: {}, sources: 0, cached: false })
       continue
     }
-    const common = { ...baseItem(r), chain_id: n.chainId, nonce: n.nonce.toString(), evidence_url: `https://sepolia.etherscan.io/address/${address}` }
-    if (n.chainId !== SEPOLIA) {
+    const explorer = EXPLORERS[n.chainId] ?? EXPLORERS[SEPOLIA]
+    const common = { ...baseItem(r), chain_id: n.chainId, nonce: n.nonce.toString(), evidence_url: `${explorer}/address/${address}`, ...(n.erc20 ? { erc20: n.erc20 } : {}) }
+    if (n.chainId !== chainId || !EVM_CHECK_CHAINS.includes(n.chainId)) {
       items.push({ ...common, status: 'unknown', reason: 'chain_unsupported', evidence: {}, sources: 0, cached: false })
       continue
     }
@@ -113,6 +140,7 @@ export async function checkEvm(
   )
   const account: AccountReport = {
     chain: 'evm',
+    chain_id: chainId,
     address,
     status: acct.status === 'spent' ? 'ok' : acct.status === 'unused' ? 'unsafe' : 'unknown',
     reason: acct.reason,

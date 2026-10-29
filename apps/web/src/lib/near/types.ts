@@ -15,6 +15,10 @@ export interface ConfigView {
   usdc_contract_id: string | null;
   cooldown_blocks: number;
   evm_chain_ids: number[];
+  /** C2 (docs/specs/C1-C2-C3-C7.md §5.3) */
+  erc20_tokens?: { chain_id: number; token: string }[];
+  /** C7 */
+  max_message_bytes?: number;
   max_btc_inputs: number;
   mpc_sign_gas_tgas: number;
   on_signed_gas_tgas: { base: number; per_request: number };
@@ -139,4 +143,20 @@ export interface MarketTotalsView {
   inside_near: string;
   offers_near: string;
   storage_credit: string;
+}
+
+/** C5 spending allowance (docs/specs/C5.md): the TS mirror's JSON shapes, re-exported so the app imports one place. */
+export type { Asset, AllowanceStatus, AllowanceView, CapInput } from "@satchel/core/policy";
+
+/**
+ * FIXTURE MODE ONLY: the static demo shape of one delegate's allowance on a token (fixtures.ts), merged with
+ * `sim.ts`'s in-browser mutations into the same `AllowanceView` the real `allowance`/`allowances_of` views return.
+ */
+export interface AllowanceRecord {
+  delegate: string;
+  /** The owner who granted it (the backstop rule, spec §1.2 "Allowances of a previous owner never show"). */
+  owner: string;
+  set_at_ms: number;
+  expires_at_ms: number | null;
+  caps: { asset: import("@satchel/core/policy").Asset; limit: string; spends: { at_ms: number; amount: string }[] }[];
 }

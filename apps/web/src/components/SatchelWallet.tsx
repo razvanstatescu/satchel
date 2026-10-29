@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { ChainRow } from "@/components/ChainRow";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
+import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
 import { Freshness, InsideAddCoins, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
 import { IncomingOffers, InsideNearActions, InsideNearAmount, MakeOfferEntry } from "@/components/client/Market";
 import { cx } from "@/components/ui";
@@ -42,6 +43,8 @@ export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers
     <>
       <ObjCol>
         <WalletColumn snap={snap} />
+        <DelegateBanner snap={snap} />
+        <AllowanceOwnerPanel snap={snap} />
       </ObjCol>
       <ObjMain data-judge-facts="">
         <section aria-labelledby="inside-title">
@@ -70,6 +73,8 @@ export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers
           </div>
         </VisitorOnly>
         <FactsGrid snap={snap} />
+        {/* C5 (docs/specs/C5.md §1.2): a public fact — who else can spend from this Satchel, and under what caps. */}
+        <AllowanceFacts snap={snap} />
         <VerifyDisclosure snap={snap} />
         <VisitorOnly snap={snap}>
           <HowItWorks />

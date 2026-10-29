@@ -118,6 +118,10 @@ function fixtureView(): ViewFn {
       case "market_totals":
         // Not exhaustively accurate in fixture mode (no UI reads it); the real contract's I-M2 is a sandbox invariant.
         return { inside_near: "0", offers_near: "0", storage_credit: "0" } as T;
+      case "allowances_of":
+        return sim.allowancesOf(id) as T;
+      case "allowance":
+        return (sim.allowanceOf(id, String(args.delegate ?? "")) ?? null) as T | null;
       default:
         return null;
     }

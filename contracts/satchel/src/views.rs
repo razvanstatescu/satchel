@@ -4,7 +4,8 @@ use near_sdk::json_types::{U128, U64};
 use near_sdk::{env, near, AccountId};
 
 use crate::mpc::derivation_path;
-use crate::parse::{evm::EVM_CHAIN_IDS, hex};
+use crate::parse::evm::{erc20_of, ERC20_TOKENS, EVM_CHAIN_IDS};
+use crate::parse::{hex, msg::MAX_MESSAGE_BYTES};
 use crate::types::*;
 use crate::*;
 
@@ -19,15 +20,20 @@ fn record_view(seq: u64, r: &SigRecord) -> SigRecordView {
         },
     });
     let detail = match &r.detail {
-        SigDetail::Evm { chain_id, nonce, unsigned_tx } => {
-            SigDetailView::Evm { chain_id: *chain_id, nonce: *nonce, unsigned_tx: hex::encode(unsigned_tx) }
-        }
+        SigDetail::Evm { chain_id, nonce, unsigned_tx } => SigDetailView::Evm {
+            chain_id: *chain_id,
+            nonce: *nonce,
+            unsigned_tx: hex::encode(unsigned_tx),
+            erc20: erc20_of(unsigned_tx).map(|e| Erc20View { token: hex::encode(&e.token), to: hex::encode(&e.to), amount: U128(e.amount) }),
+        },
         SigDetail::Btc { txid, vout, amount_sats } => {
             SigDetailView::Btc { txid: hex::encode(txid), vout: *vout, amount_sats: U64(*amount_sats) }
         }
         SigDetail::Sol { recent_blockhash, lamports } => {
             SigDetailView::Sol { recent_blockhash: hex::encode(recent_blockhash), lamports: U64(*lamports) }
         }
+        SigDetail::EvmMessage { message } => SigDetailView::EvmMessage { message: hex::encode(message) },
+        SigDetail::SolMessage { message } => SigDetailView::SolMessage { message: hex::encode(message) },
     };
     SigRecordView {
         seq,
@@ -54,6 +60,8 @@ impl Contract {
             usdc_contract_id: self.usdc.clone(),
             cooldown_blocks: COOLDOWN_BLOCKS,
             evm_chain_ids: EVM_CHAIN_IDS.to_vec(),
+            erc20_tokens: ERC20_TOKENS.iter().map(|(c, t)| Erc20TokenView { chain_id: *c, token: hex::encode(t) }).collect(),
+            max_message_bytes: MAX_MESSAGE_BYTES as u64,
             max_btc_inputs: MAX_BTC_INPUTS,
             mpc_sign_gas_tgas: MPC_SIGN_GAS_TGAS,
             on_signed_gas_tgas: GasFormula { base: ON_SIGNED_GAS_BASE_TGAS, per_request: ON_SIGNED_GAS_PER_REQUEST_TGAS },

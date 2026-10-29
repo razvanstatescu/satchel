@@ -5,16 +5,18 @@
     "evm": {
       "cases": 1500,
       "verdicts": {
-        "ERR_EVM_RLP": 835,
-        "ERR_HEX": 90,
-        "ok": 282,
-        "ERR_EVM_INT_WIDTH": 37,
-        "ERR_EVM_CHAIN_ID": 30,
-        "ERR_EVM_TYPE": 180,
-        "ERR_EVM_TOO_LONG": 12,
+        "ERR_EVM_RLP": 812,
+        "ERR_EVM_TYPE": 157,
+        "ERR_EVM_INT_WIDTH": 23,
+        "ok": 256,
+        "ERR_EVM_TOO_LONG": 34,
+        "ERR_EVM_CHAIN_ID": 33,
+        "ERR_EVM_TOKEN": 41,
+        "ERR_HEX": 91,
+        "ERR_EVM_TO": 15,
+        "ERR_EVM_DATA": 31,
         "ERR_EVM_ACCESS_LIST": 6,
-        "ERR_EVM_DATA": 15,
-        "ERR_EVM_TO": 13
+        "ERR_EVM_VALUE": 1
       }
     },
     "btc": {
@@ -48,6 +50,16 @@
         "ERR_SOL_VERSION": 111,
         "ERR_SOL_TOO_LONG": 27,
         "ERR_SOL_DURABLE_NONCE": 18
+      }
+    },
+    "msg": {
+      "cases": 1500,
+      "verdicts": {
+        "ERR_MSG_ENCODING": 408,
+        "ok": 762,
+        "ERR_MSG_EMPTY": 130,
+        "ERR_MSG_TOO_LONG": 154,
+        "ERR_HEX": 46
       }
     }
   }

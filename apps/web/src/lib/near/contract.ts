@@ -12,6 +12,8 @@ import {
   offerAcceptBlock,
   offerExpiryValid,
   prepayStorageCall,
+  revokeAllowanceCall,
+  setAllowanceCall,
   usdcOfferCall,
   withdrawFtCall,
   withdrawNearCall,
@@ -20,9 +22,11 @@ import {
   type OfferBlock,
   type OfferTerms,
 } from "@satchel/core/near";
+import type { CapInput } from "@satchel/core/policy";
 import { SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { ATTACH, signAttachDeposit, signAttachTgas, tgas } from "@/lib/near/constants";
 import type {
+  AllowanceView,
   Chain,
   ConfigView,
   Currency,
@@ -89,6 +93,9 @@ export function contractViews(view: ViewFn, contractId: string = SATCHEL_CONTRAC
       (await view<OfferView[]>(contractId, "offers_by", { account_id, from_index, limit: Math.min(limit, 50) })) ?? [],
     marketConfig: () => view<MarketConfigView>(contractId, "market_config", {}),
     marketTotals: () => view<MarketTotalsView>(contractId, "market_totals", {}),
+    // C5 (docs/specs/C5.md §1.2): at most MAX_DELEGATES (4) rows, insertion order; [] when none.
+    allowancesOf: async (token_id: TokenId) => (await view<AllowanceView[]>(contractId, "allowances_of", { token_id })) ?? [],
+    allowance: (token_id: TokenId, delegate: string) => view<AllowanceView>(contractId, "allowance", { token_id, delegate }),
   };
 }
 
@@ -175,6 +182,18 @@ export const calls = {
 
   usdcRegister: (account_id: string, usdc = USDC_CONTRACT) =>
     fc(usdc, "storage_deposit", { account_id, registration_only: true }, ATTACH.usdcRegister.gas, ATTACH.usdcRegister.deposit),
+
+  /** C5: owner only, deposit ≥ measured storage (the core builder validates caps and throws RangeError with the contract's code). */
+  setAllowance: (token_id: TokenId, delegate: string, caps: readonly CapInput[], expires_at_ms?: number, contractId = SATCHEL_CONTRACT): WalletTx => {
+    const p = setAllowanceCall(token_id, delegate, caps, expires_at_ms);
+    return fc(contractId, p.methodName, p.args, p.gas, p.deposit);
+  },
+
+  /** C5: owner only, exactly 1 yocto. */
+  revokeAllowance: (token_id: TokenId, delegate: string, contractId = SATCHEL_CONTRACT): WalletTx => {
+    const p = revokeAllowanceCall(token_id, delegate);
+    return fc(contractId, p.methodName, p.args, p.gas, p.deposit);
+  },
 };
 
 /** A `@satchel/core` `MarketCall` (one FunctionCall, gas/deposit as strings already) in the local wallet-tx shape. */

@@ -18,6 +18,7 @@
  */
 
 import { NBSP, plural as n } from "@/lib/format";
+import { allowanceCopy } from "@/lib/copy/allowance";
 import { commerce } from "@/lib/copy/commerce";
 import { flows } from "@/lib/copy/flows";
 import { landing } from "@/lib/copy/landing";
@@ -70,7 +71,20 @@ const card = {
 
 // `market.inside`/`market.offers` (C4/C6, copy/market.ts) are merged as TOP-LEVEL `inside`/`offers` keys, never
 // spread as `...market`: `commerce.market` already owns `copy.market` (the /market page's title/count/lead/…).
-export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, pill, card, landing, inside: market.inside, offers: market.offers, offerEntry: market.offerEntry } as const;
+export const copy = {
+  ...shell,
+  ...satchel,
+  ...flows,
+  ...commerce,
+  ...walletOps,
+  ...allowanceCopy,
+  pill,
+  card,
+  landing,
+  inside: market.inside,
+  offers: market.offers,
+  offerEntry: market.offerEntry,
+} as const;
 
 /** Map a contract/MPC failure code to user copy (kb/80 R3 §Error map): what happened, what didn't move, one action. */
 export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm" | "sol" }): string {
@@ -132,6 +146,7 @@ export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm"
     case "ERR_INSOLVENT":
       return copy.errors.E6("0");
     default:
+      if (code in copy.allowance.err) return copy.allowance.err[code as keyof typeof copy.allowance.err];
       if (/^ERR_(EVM|BTC|SOL|HEX)/.test(code)) return copy.errors.E39(chainName);
       return copy.sign.failed;
   }

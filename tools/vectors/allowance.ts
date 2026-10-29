@@ -141,7 +141,10 @@ function debitVectors(): DebitVector[] {
   add('evm_fee_overflow', evmSignRequest(evmTx({ gas: 2n ** 64n - 1n, maxFee: 2n ** 127n })), { ok: false, error: 'ERR_ALLOWANCE_EXCEEDED' })
   add('evm_max_value_no_fee', evmSignRequest(evmTx({ value: U128_MAX, maxFee: 0n })), { ok: true, debits: [dj(evmA(), U128_MAX)] })
   add('evm_chain_1_refused_by_classifier', evmSignRequest(evmTx({ chainId: 1n })), { ok: false, error: 'ERR_EVM_CHAIN_ID' }, 'the classifier refusal comes first')
-  add('evm_calldata_refused_by_classifier', evmSignRequest(evmTx({ data: erc20Data('a9059cbb', TO, 1n) })), { ok: false, error: 'ERR_EVM_DATA' }, 'until C2 lands; evm_raw covers the debit')
+  add('evm_calldata_refused_by_classifier', evmSignRequest(evmTx({ data: erc20Data('a9059cbb', TO, 1n) })), { ok: false, error: 'ERR_EVM_TOKEN' }, 'C2: a transfer() to a contract that is not the chain USDC')
+  add('erc20_usdc_transfer_debits', evmSignRequest(evmTx({ to: hexToBytesStrict(USDC_SEPOLIA), value: 0n, gas: 65_000n, maxFee: 3_000_000_000n, data: erc20Data('a9059cbb', TO, 5_000_000n) })), { ok: true, debits: [dj(erc20A(), 5_000_000n), dj(evmA(), 65_000n * 3_000_000_000n)] }, 'C2 through the classifier: token amount, then the ETH gas')
+  add('evm_message_refused_for_delegates', { evm_message: { message: '68656c6c6f' } }, { ok: false, error: 'ERR_ALLOWANCE_KIND' }, 'C7: messages move no coins, so no cap measures them; owner only')
+  add('sol_message_refused_for_delegates', { sol_message: { message: '68656c6c6f' } }, { ok: false, error: 'ERR_ALLOWANCE_KIND' }, 'C7: owner only')
 
   add('btc_change_not_counted', btcReq([30_000n, 31_000n], [{ script: RECIP, value: 40_000n }, { script: SELF, value: 20_500n }]), { ok: true, debits: [dj('btc', 40_000n + 500n)] }, '40000 out + 500 fee; 20500 change to 0014‖pkh')
   add('btc_no_change', btcReq([50_000n], [{ script: RECIP, value: 49_000n }]), { ok: true, debits: [dj('btc', 50_000n)] }, 'everything leaves: 49000 + 1000 fee')
