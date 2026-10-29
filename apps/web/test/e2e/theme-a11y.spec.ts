@@ -185,7 +185,20 @@ async function axe(page: Page, include?: string, tags: string[] = WCAG_22) {
 }
 
 test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and Night (stored) on every page (A2)", () => {
-  const pages = ["/", "/s/1", "/s/1/activity", "/s/4/sale", "/contract", "/market", "/mint", "/satchels", "/no-such-page"];
+  const pages = [
+    "/",
+    "/s/1",
+    "/s/1/activity",
+    "/s/4/sale",
+    "/contract",
+    "/market",
+    "/mint",
+    "/satchels",
+    "/no-such-page",
+    "/s/1/give-link", // A2 (plan/feature-ideas.md A2): the not-connected guard state
+    "/claim", // A2: the "missing secret" state (no fragment)
+    "/s/1/empty", // A3 (plan/feature-ideas.md A3): the not-connected guard state
+  ];
   for (const theme of ["day", "night"] as const) {
     for (const path of pages) {
       test(`no serious or critical violations on ${path} in ${theme === "day" ? "Day" : "Night"}`, async ({ browser }) => {
@@ -238,4 +251,34 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
     await page.keyboard.press("Escape");
     await expect(page).toHaveURL(/\/s\/1$/);
   });
+
+  for (const theme of ["day", "night"] as const) {
+    const label = theme === "day" ? "Day" : "Night";
+
+    test(`give by link (A2) review step: no serious or critical violations, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, ALICE);
+      await page.goto("/s/1/give-link");
+      await expect(page.getByTestId("create-link")).toBeVisible();
+      expect(await axe(page, "[data-flow-shell]")).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`empty the Satchel (A3) address form: no serious or critical violations, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, ALICE);
+      await page.goto("/s/1/empty");
+      await expect(page.getByTestId("empty-addr-btc")).toBeVisible();
+      expect(await axe(page, "[data-flow-shell]")).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`claim page (A2), the invalid-link state: no serious or critical violations, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await page.goto("/claim#not-a-real-secret");
+      await expect(page.getByText("This link isn't valid")).toBeVisible();
+      expect(await axe(page)).toEqual([]);
+      await ctx.close();
+    });
+  }
 });
