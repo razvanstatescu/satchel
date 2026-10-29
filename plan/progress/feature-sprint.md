@@ -93,3 +93,11 @@ it. Phase-2 UI work builds against those specs.
 ## Integration log (orchestrator)
 - 2026-10-29: sprint set up: role definitions in `.claude/agents/`, this tracker, the log, and five agents spawned in
   worktrees.
+- 2026-10-29: the role definitions only load at session start, so this run spawns `general-purpose` agents with the
+  model set per spawn (Opus for the 3 contract agents, Sonnet for the 2 web agents). Each reads its role file
+  first. Effort is inherited from the session in this run; the `effort:` in the role files applies from the next
+  session.
+- 2026-10-29 14:55Z: the previous session ended while the 5 agents were still reading. They had no commits and no
+  changes, so nothing was lost. The empty worktrees and branches were removed, and the agents were respawned under
+  the now-loaded role definitions (`satchel-contract` Opus/high, `satchel-web` Sonnet/medium). They are told to
+  commit WIP at every milestone, so a session end can't lose work again.
