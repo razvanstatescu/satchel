@@ -1,17 +1,45 @@
+import {
+  ATTACH_MARKET,
+  MAX_OFFER_TTL_MS,
+  MAX_OFFERS_PER_ACCOUNT,
+  WNEAR_TESTNET,
+  acceptOfferCall,
+  cancelOfferCall,
+  depositNearCall,
+  ftDepositCall,
+  ftOfferMsg,
+  makeOfferCall,
+  offerAcceptBlock,
+  offerExpiryValid,
+  prepayStorageCall,
+  usdcOfferCall,
+  withdrawFtCall,
+  withdrawNearCall,
+  withdrawStorageCreditCall,
+  type MarketCall,
+  type OfferBlock,
+  type OfferTerms,
+} from "@satchel/core/near";
 import { SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { ATTACH, signAttachDeposit, signAttachTgas, tgas } from "@/lib/near/constants";
 import type {
   Chain,
   ConfigView,
   Currency,
+  InsideView,
   ListingView,
+  MarketConfigView,
+  MarketTotalsView,
   NftToken,
+  OfferView,
   ProceedsView,
   SatchelView,
   SigRecordView,
   SignRequest,
   TokenId,
 } from "@/lib/near/types";
+
+export { ATTACH_MARKET, MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, WNEAR_TESTNET, ftOfferMsg, offerAcceptBlock, offerExpiryValid, type OfferBlock, type OfferTerms };
 
 /**
  * Typed views and call builders for the Satchel contract (kb/90 §5.6, §5.14).
@@ -51,6 +79,16 @@ export function contractViews(view: ViewFn, contractId: string = SATCHEL_CONTRAC
       (await view<NftToken[]>(contractId, "nft_tokens_for_owner", { account_id, from_index, limit })) ?? [],
     nftSupplyForOwner: async (account_id: string) =>
       Number((await view<string>(contractId, "nft_supply_for_owner", { account_id })) ?? "0"),
+    // ── C6 inside assets / C4 offers (docs/specs/C4-C6.md §4) ──────────────────────────────────
+    insideOf: (token_id: TokenId) => view<InsideView>(contractId, "inside_of", { token_id }),
+    storageCreditOf: async (account_id: string) => (await view<string>(contractId, "storage_credit_of", { account_id })) ?? "0",
+    offer: (offer_id: number) => view<OfferView>(contractId, "offer", { offer_id }),
+    offersFor: async (token_id: TokenId, from_index = 0, limit = 50) =>
+      (await view<OfferView[]>(contractId, "offers_for", { token_id, from_index, limit: Math.min(limit, 50) })) ?? [],
+    offersBy: async (account_id: string, from_index = 0, limit = 50) =>
+      (await view<OfferView[]>(contractId, "offers_by", { account_id, from_index, limit: Math.min(limit, 50) })) ?? [],
+    marketConfig: () => view<MarketConfigView>(contractId, "market_config", {}),
+    marketTotals: () => view<MarketTotalsView>(contractId, "market_totals", {}),
   };
 }
 
@@ -137,6 +175,27 @@ export const calls = {
 
   usdcRegister: (account_id: string, usdc = USDC_CONTRACT) =>
     fc(usdc, "storage_deposit", { account_id, registration_only: true }, ATTACH.usdcRegister.gas, ATTACH.usdcRegister.deposit),
+};
+
+/** A `@satchel/core` `MarketCall` (one FunctionCall, gas/deposit as strings already) in the local wallet-tx shape. */
+const fromMarketCall = (c: MarketCall): FunctionCallTx => ({ receiverId: c.receiverId, actions: [{ type: "FunctionCall", params: c.params }] });
+
+/**
+ * C4 (offers) + C6 (inside assets) calls (docs/specs/C4-C6.md §1): thin wrappers over `@satchel/core/near`'s pure
+ * builders, bound to this app's contract ids. Amounts are bigint yoctoNEAR / base FT units.
+ */
+export const marketCalls = {
+  depositNear: (token_id: TokenId, attached: bigint, contractId = SATCHEL_CONTRACT) => fromMarketCall(depositNearCall(contractId, token_id, attached)),
+  withdrawNear: (token_id: TokenId, amount: bigint, receiver_id?: string, contractId = SATCHEL_CONTRACT) => fromMarketCall(withdrawNearCall(contractId, token_id, amount, receiver_id)),
+  withdrawFt: (token_id: TokenId, ft: string, amount: bigint, receiver_id?: string, contractId = SATCHEL_CONTRACT) => fromMarketCall(withdrawFtCall(contractId, token_id, ft, amount, receiver_id)),
+  /** FT deposit (`ft_transfer_call`): `ft` is the FT contract (USDC or wrap.testnet). */
+  ftDeposit: (ft: string, token_id: TokenId, amount: bigint, contractId = SATCHEL_CONTRACT) => fromMarketCall(ftDepositCall(ft, contractId, token_id, amount)),
+  prepayStorage: (attached: bigint = ATTACH_MARKET.prepayStorage.deposit, account_id?: string, contractId = SATCHEL_CONTRACT) => fromMarketCall(prepayStorageCall(contractId, attached, account_id)),
+  withdrawStorageCredit: (contractId = SATCHEL_CONTRACT) => fromMarketCall(withdrawStorageCreditCall(contractId)),
+  makeOfferNear: (amount: bigint, t: OfferTerms, contractId = SATCHEL_CONTRACT) => fromMarketCall(makeOfferCall(contractId, amount, t)),
+  makeOfferUsdc: (amount: bigint, t: OfferTerms, usdc = USDC_CONTRACT, contractId = SATCHEL_CONTRACT) => fromMarketCall(usdcOfferCall(usdc, contractId, amount, t)),
+  cancelOffer: (offer_id: number, contractId = SATCHEL_CONTRACT) => fromMarketCall(cancelOfferCall(contractId, offer_id)),
+  acceptOffer: (offer_id: number, contractId = SATCHEL_CONTRACT) => fromMarketCall(acceptOfferCall(contractId, offer_id)),
 };
 
 /** Status pill derived from contract state (kb/90 §5.10, kb/81 R3 precedence). */

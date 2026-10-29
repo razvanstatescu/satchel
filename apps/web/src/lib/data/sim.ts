@@ -1,5 +1,6 @@
-import type { NftToken, SatchelView, SigDetailView, SigRecordView } from "@/lib/near/types";
-import { FIXTURE_RECORDS, fixtureSatchel, fixtureToken, FIXTURE_TOKENS } from "@/lib/data/fixtures";
+import { MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, offerAcceptBlock, offerExpiryValid } from "@satchel/core/near";
+import type { InsideView, NftToken, OfferView, SatchelView, SigDetailView, SigRecordView } from "@/lib/near/types";
+import { fixtureInside, FIXTURE_RECORDS, fixtureSatchel, fixtureToken, FIXTURE_TOKENS } from "@/lib/data/fixtures";
 
 /**
  * FIXTURE MODE ONLY: an in-browser simulation of what the contract and the chains would do after a wallet call,
@@ -44,6 +45,31 @@ interface SimState {
   near: Record<string, string>;
   /** Implicit accounts ever funded (A2): existence persists even after a claim drains the balance, like real NEAR. */
   funded: Record<string, true>;
+  /** C6: inside-asset deltas on top of `FIXTURE_INSIDE` (fixtures.ts). */
+  inside: Record<string, SimInside>;
+  /** C4: open offers, keyed by id. */
+  offers: Record<number, SimOffer>;
+  nextOfferId: number;
+  /** C4/C6: storage credit per account (`prepay_storage`). */
+  storageCredit: Record<string, string>;
+}
+
+interface SimInside {
+  near: string;
+  fts: Record<string, string>;
+  epoch: number;
+}
+
+interface SimOffer {
+  id: number;
+  tokenId: string;
+  offererId: string;
+  amount: string;
+  currency: "near" | "usdc";
+  expectedSigCount: number;
+  expectedInsideEpoch: number;
+  expiresAtMs: number;
+  createdAtMs: number;
 }
 
 export interface SimSale {
@@ -59,7 +85,24 @@ export interface SimSale {
   payoutOk: boolean;
 }
 
-const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {}, near: {}, funded: {} });
+const empty = (): SimState => ({
+  startedAt: Date.now(),
+  records: [],
+  owners: {},
+  minted: [],
+  delisted: [],
+  listed: {},
+  broadcastAttempts: {},
+  nextListingId: 6,
+  sales: {},
+  proceeds: {},
+  near: {},
+  funded: {},
+  inside: {},
+  offers: {},
+  nextOfferId: 1,
+  storageCredit: {},
+});
 
 function read(): SimState {
   if (typeof window === "undefined") return empty();
@@ -92,6 +135,9 @@ export function simKnob(name: "mode" | "delay" | "payout" | "sollife"): string |
 }
 
 const BLOCK_MS = 560;
+
+/** ≈ 0.0009 NEAR: the one-time storage a brand-new inside record or storage-credit slot costs (spec §1, §C4-C6 1.1). */
+const STORAGE_SLOT = 900_000_000_000_000_000_000n;
 
 /** Deterministic 32-byte hex "hash" for fixture payloads (NOT a cryptographic hash; fixture mode only). */
 export function fixtureHash(input: string): string {
@@ -162,7 +208,43 @@ export function simOverlay() {
       const listing = s.delisted.includes(id) ? null : s.listed[id] ?? base.listing;
       return { ...base, owner_id: o, sig_count: baseCount(id) + extra.length, last_sign_height: last, listable_at: last === 0 ? 0 : last + 250, listing };
     },
+    /* ── C6 inside assets / C4 offers (docs/specs/C4-C6.md) ── */
+    insideOf(id: string): InsideView {
+      const base = fixtureInside(id);
+      const delta = s.inside[id];
+      if (!delta) return base;
+      const fts = Object.entries(delta.fts)
+        .filter(([, amount]) => BigInt(amount) > 0n)
+        .map(([token, amount]) => ({ token, amount }));
+      return { near: delta.near, fts, epoch: delta.epoch } as InsideView;
+    },
+    offer(id: number): OfferView | null {
+      const o = s.offers[id];
+      if (!o) return null;
+      return { id: o.id, token_id: o.tokenId, offerer_id: o.offererId, amount: o.amount, currency: o.currency, expected_sig_count: o.expectedSigCount, expected_inside_epoch: o.expectedInsideEpoch, expires_at_ms: o.expiresAtMs, created_at_ms: o.createdAtMs };
+    },
+    offersFor(tokenId: string): OfferView[] {
+      return Object.values(s.offers)
+        .filter((o) => o.tokenId === tokenId)
+        .sort((a, b) => a.id - b.id)
+        .map((o) => ({ id: o.id, token_id: o.tokenId, offerer_id: o.offererId, amount: o.amount, currency: o.currency, expected_sig_count: o.expectedSigCount, expected_inside_epoch: o.expectedInsideEpoch, expires_at_ms: o.expiresAtMs, created_at_ms: o.createdAtMs }));
+    },
+    offersBy(accountId: string): OfferView[] {
+      return Object.values(s.offers)
+        .filter((o) => o.offererId === accountId)
+        .sort((a, b) => a.id - b.id)
+        .map((o) => ({ id: o.id, token_id: o.tokenId, offerer_id: o.offererId, amount: o.amount, currency: o.currency, expected_sig_count: o.expectedSigCount, expected_inside_epoch: o.expectedInsideEpoch, expires_at_ms: o.expiresAtMs, created_at_ms: o.createdAtMs }));
+    },
+    storageCreditOf(accountId: string): string {
+      return s.storageCredit[accountId] ?? "0";
+    },
   };
+}
+
+/** `inside_epoch` of a fixture token, folding in this browser's sim deltas (fixtures.ts has none above 0). */
+function insideOfRaw(s: SimState, id: string): SimInside {
+  const base = fixtureInside(id);
+  return s.inside[id] ?? { near: base.near, fts: Object.fromEntries(base.fts.map((f) => [f.token, f.amount])), epoch: base.inside_epoch };
 }
 
 /* ── mutations the mock wallet performs ── */
@@ -281,6 +363,149 @@ export function simWithdraw(account: string, currency: "near" | "usdc"): { ok: t
   if (!paid) credit(s, account, currency, owed);
   write(s);
   return { ok: true, paid, amount: owed.toString() };
+}
+
+/* ── C6: NEAR-side assets inside a Satchel (docs/specs/C4-C6.md §2) ─────────────────────────────── */
+
+/** `deposit_near`: anyone, any time (even while listed). Storage is charged only on the token's first inside record. */
+export function simDepositNear(tokenId: string, attached: bigint): string {
+  const s = read();
+  const cur = insideOfRaw(s, tokenId);
+  const isFirst = BigInt(cur.near) === 0n && Object.keys(cur.fts).length === 0 && !s.inside[tokenId];
+  const credited = isFirst ? (attached > STORAGE_SLOT ? attached - STORAGE_SLOT : 0n) : attached;
+  s.inside[tokenId] = { near: (BigInt(cur.near) + credited).toString(), fts: cur.fts, epoch: cur.epoch };
+  write(s);
+  return credited.toString();
+}
+
+/** `deposit` ft_on_transfer message: same storage rule, per (token, ft) slot. */
+export function simDepositFt(tokenId: string, ft: string, amount: bigint): void {
+  const s = read();
+  const cur = insideOfRaw(s, tokenId);
+  const fts = { ...cur.fts, [ft]: (BigInt(cur.fts[ft] ?? "0") + amount).toString() };
+  s.inside[tokenId] = { near: cur.near, fts, epoch: cur.epoch };
+  write(s);
+}
+
+function assertOwnerAndNotListed(s: SimState, tokenId: string, owner: string) {
+  const sat = simOverlayFromState(s).satchel(tokenId);
+  if (!sat) throw new Error("ERR_TOKEN_NOT_FOUND: no such Satchel");
+  if (sat.owner_id !== owner) throw new Error("ERR_NOT_OWNER: only the owner can do this");
+  if (sat.listing) throw new Error("ERR_LISTED: can't withdraw while it's for sale");
+  return sat;
+}
+
+/** `withdraw_near`: owner only, not while listed. Debits first and bumps `inside_epoch`. */
+export function simWithdrawNear(tokenId: string, owner: string, amount: bigint): void {
+  const s = read();
+  assertOwnerAndNotListed(s, tokenId, owner);
+  const cur = insideOfRaw(s, tokenId);
+  if (amount <= 0n) throw new Error("ERR_AMOUNT: amount must be > 0");
+  if (amount > BigInt(cur.near)) throw new Error("ERR_INSIDE_BALANCE: not that much inside this Satchel");
+  s.inside[tokenId] = { near: (BigInt(cur.near) - amount).toString(), fts: cur.fts, epoch: cur.epoch + 1 };
+  write(s);
+}
+
+/** `withdraw_ft`: same guards, per FT. */
+export function simWithdrawFt(tokenId: string, owner: string, ft: string, amount: bigint): void {
+  const s = read();
+  assertOwnerAndNotListed(s, tokenId, owner);
+  const cur = insideOfRaw(s, tokenId);
+  const bal = BigInt(cur.fts[ft] ?? "0");
+  if (amount <= 0n) throw new Error("ERR_AMOUNT: amount must be > 0");
+  if (amount > bal) throw new Error("ERR_INSIDE_BALANCE: not that much inside this Satchel");
+  s.inside[tokenId] = { near: cur.near, fts: { ...cur.fts, [ft]: (bal - amount).toString() }, epoch: cur.epoch + 1 };
+  write(s);
+}
+
+/** `prepay_storage`: anyone; only the account's first prepay keeps a slice for the credit slot's own storage. */
+export function simPrepayStorage(accountId: string, attached: bigint): string {
+  const s = read();
+  const had = s.storageCredit[accountId] !== undefined;
+  const credited = had ? attached : attached > STORAGE_SLOT ? attached - STORAGE_SLOT : 0n;
+  const next = (BigInt(s.storageCredit[accountId] ?? "0") + credited).toString();
+  s.storageCredit[accountId] = next;
+  write(s);
+  return next;
+}
+
+export function simWithdrawStorageCredit(accountId: string): string {
+  const s = read();
+  const owed = s.storageCredit[accountId] ?? "0";
+  if (BigInt(owed) === 0n) throw new Error("ERR_NOTHING_OWED: nothing to withdraw");
+  s.storageCredit[accountId] = "0";
+  write(s);
+  return owed;
+}
+
+/* ── C4: offers (docs/specs/C4-C6.md §3) ─────────────────────────────────────────────────────── */
+
+export interface OfferTermsSim {
+  expectedSigCount: number;
+  expectedInsideEpoch: number;
+  expiresAtMs: number;
+}
+
+/** `make_offer` / the `offer` ft_on_transfer message (spec §3.1). Returns the new offer id. */
+export function simMakeOffer(tokenId: string, offererId: string, amount: bigint, currency: "near" | "usdc", t: OfferTermsSim): number {
+  const s = read();
+  const sat = simOverlayFromState(s).satchel(tokenId);
+  if (!sat) throw new Error("ERR_TOKEN_NOT_FOUND: no such Satchel");
+  if (sat.owner_id === offererId) throw new Error("ERR_SELF_BUY: you already own this Satchel");
+  if (amount <= 0n) throw new Error("ERR_AMOUNT: amount must be > 0");
+  const insideEpoch = insideOfRaw(s, tokenId).epoch;
+  if (sat.sig_count !== t.expectedSigCount || insideEpoch !== t.expectedInsideEpoch) throw new Error("ERR_OFFER_STALE: this Satchel changed since you reviewed it");
+  const now = Date.now();
+  if (!offerExpiryValid(t.expiresAtMs, now) || t.expiresAtMs - now > MAX_OFFER_TTL_MS) throw new Error("ERR_OFFER_EXPIRY: expiry must be in the future and at most 90 days away");
+  const open = Object.values(s.offers).filter((o) => o.offererId === offererId).length;
+  if (open >= MAX_OFFERS_PER_ACCOUNT) throw new Error("ERR_TOO_MANY_OFFERS: you already have 20 open offers");
+  const id = s.nextOfferId++;
+  s.offers[id] = { id, tokenId, offererId, amount: amount.toString(), currency, expectedSigCount: t.expectedSigCount, expectedInsideEpoch: t.expectedInsideEpoch, expiresAtMs: t.expiresAtMs, createdAtMs: now };
+  write(s);
+  return id;
+}
+
+/** `accept_offer`: owner only. Mirrors `offerAcceptBlock` (the UX mirror from `@satchel/core/near`) for the same
+ * refusal the contract would give, then moves the NFT (inside balances stay put: they're keyed by token id). */
+export function simAcceptOffer(offerId: number, owner: string, height: number): { tokenId: string; offererId: string } {
+  const s = read();
+  const o = s.offers[offerId];
+  if (!o) throw new Error("ERR_NO_OFFER: no open offer with that id");
+  const overlay = simOverlayFromState(s);
+  const sat = overlay.satchel(o.tokenId);
+  if (!sat) throw new Error("ERR_TOKEN_NOT_FOUND: no such Satchel");
+  if (sat.owner_id !== owner) throw new Error("ERR_NOT_OWNER: only the owner can accept an offer");
+  const insideEpoch = insideOfRaw(s, o.tokenId).epoch;
+  const block = offerAcceptBlock(
+    { offerer_id: o.offererId, expected_sig_count: o.expectedSigCount, expected_inside_epoch: o.expectedInsideEpoch, expires_at_ms: o.expiresAtMs },
+    sat,
+    insideEpoch,
+    { ms: Date.now(), height },
+  );
+  if (block) throw new Error(`${block}: this offer can no longer be accepted`);
+  delete s.offers[offerId];
+  if (!s.delisted.includes(o.tokenId)) s.delisted.push(o.tokenId);
+  s.owners[o.tokenId] = o.offererId;
+  write(s);
+  return { tokenId: o.tokenId, offererId: o.offererId };
+}
+
+/** `cancel_offer`: the offerer at any time, or anyone once expired. The refund always goes to the offerer (not
+ * tracked as a NEAR balance here, same as `simWithdraw`'s payout: sim only tracks implicit-account NEAR). */
+export function simCancelOffer(offerId: number, caller: string, nowMs = Date.now()): SimOffer {
+  const s = read();
+  const o = s.offers[offerId];
+  if (!o) throw new Error("ERR_NO_OFFER: no open offer with that id");
+  if (caller !== o.offererId && nowMs < o.expiresAtMs) throw new Error("ERR_NOT_OFFERER: only the offerer can cancel before it expires");
+  delete s.offers[offerId];
+  write(s);
+  return o;
+}
+
+/** Internal: `simOverlay()`'s `satchel()` needs a `SimState` it didn't just re-read from storage. */
+function simOverlayFromState(s: SimState) {
+  write(s);
+  return simOverlay();
 }
 
 /** Broadcast simulation: "broadcast-fail" fails the first attempt per intent, then succeeds (Broadcast again). */

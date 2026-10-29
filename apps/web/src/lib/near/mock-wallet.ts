@@ -1,9 +1,28 @@
 import { toHex } from "@satchel/core/bytes";
 import { classifySignRequest, maxSignedEvmNonce } from "@satchel/core/policy";
-import { IS_FIXTURE } from "@/lib/config";
-import { FIXTURE_HEIGHT } from "@/lib/data/fixtures";
-import { FIXTURE_RECORDS } from "@/lib/data/fixtures";
-import { fixtureHash, simBuy, simDelist, simFundNear, simList, simMint, simOverlay, simSignFor, simTransfer, simWithdraw } from "@/lib/data/sim";
+import { IS_FIXTURE, USDC_CONTRACT } from "@/lib/config";
+import { FIXTURE_HEIGHT, FIXTURE_RECORDS } from "@/lib/data/fixtures";
+import {
+  fixtureHash,
+  simAcceptOffer,
+  simBuy,
+  simCancelOffer,
+  simDelist,
+  simDepositFt,
+  simDepositNear,
+  simFundNear,
+  simList,
+  simMakeOffer,
+  simMint,
+  simOverlay,
+  simPrepayStorage,
+  simSignFor,
+  simTransfer,
+  simWithdraw,
+  simWithdrawFt,
+  simWithdrawNear,
+  simWithdrawStorageCredit,
+} from "@/lib/data/sim";
 import type { WalletTx } from "@/lib/near/contract";
 import type { SigDetailView, SignRequest } from "@/lib/near/types";
 import type { WalletAdapter } from "@/lib/near/wallet";
@@ -77,9 +96,58 @@ function applyTx(tx: WalletTx, accountId: string): unknown {
         if (!r.ok) throw new Error(`Smart contract panicked: ${r.error}`);
         break;
       }
+      // ── C6 inside assets / C4 offers (docs/specs/C4-C6.md) ──────────────────────────────────
+      case "deposit_near": {
+        const credited = simDepositNear(String(args.token_id), BigInt(String(action?.deposit ?? "0")));
+        return { transaction: { hash }, status: { SuccessValue: btoa(JSON.stringify(credited)) }, final_execution_status: "EXECUTED_OPTIMISTIC" };
+      }
+      case "withdraw_near":
+        simWithdrawNear(String(args.token_id), accountId, BigInt(String(args.amount)));
+        break;
+      case "withdraw_ft":
+        simWithdrawFt(String(args.token_id), accountId, String(args.ft), BigInt(String(args.amount)));
+        break;
+      case "prepay_storage": {
+        const credit = simPrepayStorage(String(args.account_id ?? accountId), BigInt(String(action?.deposit ?? "0")));
+        return { transaction: { hash }, status: { SuccessValue: btoa(JSON.stringify(credit)) }, final_execution_status: "EXECUTED_OPTIMISTIC" };
+      }
+      case "withdraw_storage_credit":
+        simWithdrawStorageCredit(accountId);
+        break;
+      case "make_offer": {
+        const id = simMakeOffer(String(args.token_id), accountId, BigInt(String(args.amount)), "near", {
+          expectedSigCount: Number(args.expected_sig_count),
+          expectedInsideEpoch: Number(args.expected_inside_epoch),
+          expiresAtMs: Number(args.expires_at_ms),
+        });
+        return { transaction: { hash }, status: { SuccessValue: btoa(JSON.stringify(id)) }, final_execution_status: "EXECUTED_OPTIMISTIC" };
+      }
+      case "cancel_offer":
+        simCancelOffer(Number(args.offer_id), accountId);
+        break;
+      case "accept_offer": {
+        simAcceptOffer(Number(args.offer_id), accountId, height);
+        break;
+      }
       case "ft_transfer_call": {
-        const msg = JSON.parse(String(args.msg)) as { buy: { token_id: string } };
-        simBuy(msg.buy.token_id, accountId, hash, height);
+        const msg = JSON.parse(String(args.msg)) as
+          | { buy: { token_id: string } }
+          | { deposit: string }
+          | { offer: { token_id: string; expected_sig_count: number; expected_inside_epoch: number; expires_at_ms: number } };
+        const ft = tx.receiverId;
+        if ("buy" in msg) {
+          simBuy(msg.buy.token_id, accountId, hash, height);
+        } else if ("deposit" in msg) {
+          simDepositFt(msg.deposit, ft, BigInt(String(args.amount)));
+        } else if ("offer" in msg) {
+          // ft_on_transfer's "offer" message is accepted only from the USDC contract (spec §1.2 rule 3).
+          if (ft !== USDC_CONTRACT) throw new Error("ERR_WRONG_TOKEN: offers only accept USDC");
+          simMakeOffer(msg.offer.token_id, accountId, BigInt(String(args.amount)), "usdc", {
+            expectedSigCount: msg.offer.expected_sig_count,
+            expectedInsideEpoch: msg.offer.expected_inside_epoch,
+            expiresAtMs: msg.offer.expires_at_ms,
+          });
+        }
         return { transaction: { hash }, status: { SuccessValue: btoa(JSON.stringify(String(args.amount))) }, final_execution_status: "EXECUTED_OPTIMISTIC" };
       }
     }

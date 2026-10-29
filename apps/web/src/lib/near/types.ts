@@ -104,3 +104,39 @@ export function detailChain(d: SigDetailView): Chain {
   if ("btc" in d) return "btc";
   return "sol";
 }
+
+/** C4/C6 view shapes (docs/specs/C4-C6.md §4), mirrored here so apps/web's `near/*` stays the one place the
+ * contract's JSON is typed (@satchel/core's market.ts has the pure call builders and the same shapes). */
+export interface FtBalanceView {
+  token: string;
+  amount: string;
+}
+/** `inside_of(token_id)`; null for a token that doesn't exist. `fts` lists only non-zero balances. */
+export interface InsideView {
+  near: string;
+  fts: FtBalanceView[];
+  inside_epoch: number;
+}
+/** `offer(id)`, `offers_for(token_id, from, limit)`, `offers_by(account_id, from, limit)` */
+export interface OfferView {
+  id: number;
+  token_id: TokenId;
+  offerer_id: string;
+  amount: string;
+  currency: Currency;
+  expected_sig_count: number;
+  expected_inside_epoch: number;
+  expires_at_ms: number;
+  created_at_ms: number;
+}
+export interface MarketConfigView {
+  inside_fts: string[];
+  max_offers_per_account: number;
+  max_offer_ttl_ms: number;
+  next_offer_id: number;
+}
+export interface MarketTotalsView {
+  inside_near: string;
+  offers_near: string;
+  storage_credit: string;
+}
