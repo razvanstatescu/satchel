@@ -23,6 +23,12 @@ pub const ERR_EVM_DATA: &str = "ERR_EVM_DATA";
 pub const ERR_EVM_ACCESS_LIST: &str = "ERR_EVM_ACCESS_LIST";
 pub const ERR_EVM_TOO_LONG: &str = "ERR_EVM_TOO_LONG";
 pub const ERR_EVM_NONCE_GAP: &str = "ERR_EVM_NONCE_GAP";
+pub const ERR_EVM_TOKEN: &str = "ERR_EVM_TOKEN";
+pub const ERR_EVM_VALUE: &str = "ERR_EVM_VALUE";
+
+pub const ERR_MSG_EMPTY: &str = "ERR_MSG_EMPTY";
+pub const ERR_MSG_TOO_LONG: &str = "ERR_MSG_TOO_LONG";
+pub const ERR_MSG_ENCODING: &str = "ERR_MSG_ENCODING";
 
 pub const ERR_BTC_INPUT_COUNT: &str = "ERR_BTC_INPUT_COUNT";
 pub const ERR_BTC_PREIMAGE_LEN: &str = "ERR_BTC_PREIMAGE_LEN";
@@ -102,7 +108,8 @@ pub fn sentence(code: &str) -> &'static str {
         ERR_TOO_MANY_OFFERS => "too many open offers",
         ERR_NOTHING_OWED => "nothing to withdraw",
         ERR_MPC_DEPOSIT => "mpc_deposit must be in [1 yocto, 0.01 NEAR]",
-        c if c.starts_with("ERR_EVM") => "only plain Sepolia ETH transfers are signed",
+        c if c.starts_with("ERR_EVM") => "only ETH and USDC transfers on the supported testnets are signed",
+        c if c.starts_with("ERR_MSG") => "messages must be 1 to 1024 bytes of UTF-8",
         c if c.starts_with("ERR_BTC") => "BTC payload refused by policy",
         c if c.starts_with("ERR_SOL") => "SOL payload refused by policy",
         _ => "refused",

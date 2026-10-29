@@ -11,17 +11,19 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { checkUnique, type Kind, type Vector, type VectorFile } from './lib'
+import { checkUnique, type Vector, type VectorFile, type VectorSet } from './lib'
 import { evmVectors } from './evm'
 import { btcVectors } from './btc'
 import { solVectors } from './sol'
+import { msgVectors } from './msg'
+import { historyVectors } from './history'
 import { deriveVectors } from './derive'
 import { allowanceVectors } from './allowance'
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'vectors')
 const check = process.argv.includes('--check')
 
-function file(set: Kind, vectors: Vector[]): VectorFile {
+function file(set: VectorSet, vectors: Vector[]): VectorFile {
   checkUnique(vectors)
   return { schema: 'satchel-vectors/1', set, generator: 'tools/vectors/gen.ts', vectors }
 }
@@ -30,6 +32,8 @@ const outputs: [string, unknown][] = [
   ['evm.json', file('evm', evmVectors())],
   ['btc.json', file('btc', btcVectors())],
   ['sol.json', file('sol', solVectors())],
+  ['msg.json', file('msg', msgVectors())],
+  ['history.json', historyVectors()],
   ['derive.json', deriveVectors()],
   ['allowance.json', allowanceVectors()],
 ]
@@ -59,7 +63,7 @@ for (const [name, data] of outputs) {
     }
     const n = (data as { vectors: unknown[] }).vectors.length
     const vs = (data as { vectors: Vector[] }).vectors
-    const ok = Array.isArray(vs) && 'expect' in (vs[0] ?? {}) ? vs.filter((v) => v.expect.ok).length : n
+    const ok = Array.isArray(vs) && typeof vs[0]?.expect?.ok === 'boolean' ? vs.filter((v) => v.expect.ok).length : n
     console.log(`wrote ${path}: ${n} vectors (${ok} accepted, ${n - ok} refused)`)
   }
 }

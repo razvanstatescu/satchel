@@ -172,6 +172,21 @@ fn check_accepted(set: &str, name: &str, expect: &Value, c: &Classified) -> Opti
                 && u != hex::encode(unsigned_tx) {
                     return fail("unsigned_tx".into());
                 }
+            // C2: the view's `erc20` (token, recipient, amount) must equal what the contract derives from the bytes
+            let want = f.get("erc20").filter(|e| !e.is_null());
+            match (evm::erc20_of(unsigned_tx), want) {
+                (None, None) => {}
+                (Some(e), Some(w))
+                    if str_field(w, "token") == Some(&hex::encode(&e.token))
+                        && str_field(w, "to") == Some(&hex::encode(&e.to))
+                        && dec(&w["amount"]) == Some(e.amount) => {}
+                (got, _) => return fail(format!("erc20 {got:?} vs {f}")),
+            }
+        }
+        (Chain::Evm, SigDetail::EvmMessage { message }) | (Chain::Sol, SigDetail::SolMessage { message }) => {
+            if str_field(f, "message") != Some(&hex::encode(message)) || str_field(f, "signed_bytes") != Some(&hex::encode(&c.preimages[0])) {
+                return fail(format!("message fields {f}"));
+            }
         }
         (Chain::Btc, _) => {
             let inputs = f["inputs"].as_array().cloned().unwrap_or_default();
@@ -204,7 +219,7 @@ fn check_accepted(set: &str, name: &str, expect: &Value, c: &Classified) -> Opti
 fn shared_vectors() {
     let mut failures = vec![];
     let mut ran = 0;
-    for set in ["evm", "btc", "sol"] {
+    for set in ["evm", "btc", "sol", "msg"] {
         let path = vectors_dir().join(format!("{set}.json"));
         let Ok(text) = std::fs::read_to_string(&path) else {
             eprintln!("shared_vectors: {} not present yet, skipped", path.display());

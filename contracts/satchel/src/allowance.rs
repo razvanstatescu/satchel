@@ -447,6 +447,8 @@ pub fn request_debits(c: &Classified) -> Result<Vec<(Asset, u128)>, Refusal> {
             Ok(vec![(Asset::Btc, btc_debit(&c.preimages, outputs)?)])
         }
         SigDetail::Sol { lamports, .. } => Ok(vec![(Asset::Sol, *lamports as u128 + SOL_FEE_LAMPORTS)]),
+        // C7: a message moves no coins, so no cap can measure it; delegates are refused in `authorize_signer` already
+        SigDetail::EvmMessage { .. } | SigDetail::SolMessage { .. } => Err(kind_refusal()),
     }
 }
 
@@ -492,6 +494,8 @@ impl Contract {
         // anything whose value can't be capped is refused.
         match request {
             SignRequest::Evm { .. } | SignRequest::Btc { .. } | SignRequest::Sol { .. } => {}
+            // C7: message signing (log-ins, ownership proofs) is the owner's alone
+            SignRequest::EvmMessage { .. } | SignRequest::SolMessage { .. } => return Err(kind_refusal()),
         }
         if a.is_expired(env::block_timestamp_ms()) {
             return Err(Refusal::new(ERR_ALLOWANCE_EXPIRED, "the allowance has expired"));

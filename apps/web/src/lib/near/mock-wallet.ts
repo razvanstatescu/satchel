@@ -37,6 +37,10 @@ function recordsFor(request: SignRequest, tokenId: string): { chain: "btc" | "ev
   if (r.chain === "btc") {
     return r.fields.inputs.map((inp, i) => ({ chain: "btc" as const, payload: toHex(r.recordPayloads[i]), detail: { btc: { txid: inp.txid, vout: inp.vout, amount_sats: inp.amountSats.toString() } } }));
   }
+  if (r.chain !== "sol") {
+    // C7 message kinds (evm_message / sol_message): not simulated by the mock wallet yet (phase-2 UI)
+    throw new Error(`mock wallet: ${r.chain} requests are not simulated`);
+  }
   return [{ chain: "sol", payload: toHex(r.recordPayloads[0]), detail: { sol: { recent_blockhash: toHex(r.fields.recentBlockhash), lamports: r.fields.lamports.toString() } } }];
 }
 

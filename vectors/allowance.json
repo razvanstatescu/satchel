@@ -161,9 +161,66 @@
       },
       "expect": {
         "ok": false,
-        "error": "ERR_EVM_DATA"
+        "error": "ERR_EVM_TOKEN"
       },
-      "note": "until C2 lands; evm_raw covers the debit"
+      "note": "C2: a transfer() to a contract that is not the chain USDC"
+    },
+    {
+      "name": "erc20_usdc_transfer_debits",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000000000000000000000000000000000000004c4b40c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "erc20": {
+                "chain_id": 11155111,
+                "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+              }
+            },
+            "amount": "5000000"
+          },
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "195000000000000"
+          }
+        ]
+      },
+      "note": "C2 through the classifier: token amount, then the ETH gas"
+    },
+    {
+      "name": "evm_message_refused_for_delegates",
+      "request": {
+        "evm_message": {
+          "message": "68656c6c6f"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      },
+      "note": "C7: messages move no coins, so no cap measures them; owner only"
+    },
+    {
+      "name": "sol_message_refused_for_delegates",
+      "request": {
+        "sol_message": {
+          "message": "68656c6c6f"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      },
+      "note": "C7: owner only"
     },
     {
       "name": "btc_change_not_counted",

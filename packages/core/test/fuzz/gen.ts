@@ -11,11 +11,12 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { bigIntToBytesBE, concatBytes, hexToBytesStrict, toHex, u32le, u64le } from '../../src/bytes'
+import { bigIntToBytesBE, concatBytes, hexToBytesStrict, toHex, u32le, u64le, utf8 } from '../../src/bytes'
 import type { SignRequest } from '../../src/near/sign-request'
-import { classifySignRequest, encodeCompactU16, encodeRlp, sha256d, type RlpInput } from '../../src/policy'
+import { classifySignRequest, encodeCompactU16, encodeRlp, EVM_TOKEN_ALLOWLIST, sha256d, type RlpInput } from '../../src/policy'
 
-export type Chain = 'evm' | 'btc' | 'sol'
+/** `msg` = the C7 request kinds (`evm_message`, `sol_message`), one corpus file. */
+export type Chain = 'evm' | 'btc' | 'sol' | 'msg'
 
 /** One corpus line: request, TS verdict ('ok' | ERR_… | THROW:…), and on ok the record hashes + key fields. */
 export interface Case {
@@ -98,10 +99,17 @@ export interface Seeds {
   evm: Uint8Array[]
   btc: { pre: Uint8Array[]; outs: Uint8Array }[]
   sol: Uint8Array[]
+  msg: { evm: boolean; m: Uint8Array }[]
 }
 
 export function loadSeeds(): Seeds {
-  const read = (c: Chain) => (JSON.parse(readFileSync(join(VECTORS, `${c}.json`), 'utf8')) as VectorFile).vectors.map((v) => v.request)
+  const read = (c: Chain) => {
+    try {
+      return (JSON.parse(readFileSync(join(VECTORS, `${c}.json`), 'utf8')) as VectorFile).vectors.map((v) => v.request)
+    } catch {
+      return [] // vectors/msg.json may not exist yet while the vectors are being regenerated
+    }
+  }
   const evm = read('evm')
     .map((r) => ('evm' in r ? tryHex(r.evm.unsigned_tx) : null))
     .filter((x): x is Uint8Array => x !== null)
@@ -115,7 +123,13 @@ export function loadSeeds(): Seeds {
     const outs = tryHex(r.btc.outputs)
     if (outs && pre.every((p) => p !== null)) btc.push({ pre: pre as Uint8Array[], outs })
   }
-  return { evm, btc, sol }
+  const msg: Seeds['msg'] = []
+  for (const r of read('msg')) {
+    const m = 'evm_message' in r ? tryHex(r.evm_message.message) : 'sol_message' in r ? tryHex(r.sol_message.message) : null
+    if (m) msg.push({ evm: 'evm_message' in r, m })
+  }
+  for (const evm of [true, false]) for (const t of ['Sign in to satchel.example', 'Grüße ✓ 🎒', 'x'.repeat(1024), 'line\nbreak']) msg.push({ evm, m: utf8(t) })
+  return { evm, btc, sol, msg }
 }
 
 // ───────────────────────────────────────── byte mutation ─────────────────────────────────────────
@@ -209,7 +223,20 @@ export function hexLayer(r: Rng, b: Uint8Array, p = 0.1): string {
 // ───────────────────────────────────────── EVM ─────────────────────────────────────────
 
 const SEPOLIA = 11155111n
+/** C3 chains with their C2 token (from the spec table, not from the classifier's constants) */
+const CHAINS: readonly [bigint, string][] = [
+  [11155111n, '1c7d4b196cb0c7b01d743fbc6116a902379c7238'],
+  [84532n, '036cbd53842c5426634e7929541ec2318f3dcf7e'],
+  [421614n, '75faf114eafb1bdbe2f0316df893fd58ce46aa4d'],
+  [11155420n, '5fd84259d66cd46123540766be93dfe6d43130d7'],
+]
 const intBytes = (v: bigint) => bigIntToBytesBE(v)
+
+/** `transfer(to, amount)`: selector ‖ word(to) ‖ word(amount) (amount < 2^128 for a valid one). */
+export function transferData(to: Uint8Array, amount: bigint): Uint8Array {
+  const w = (b: Uint8Array) => concatBytes(new Uint8Array(32 - b.length), b)
+  return concatBytes(hexToBytesStrict('a9059cbb'), w(to), w(bigIntToBytesBE(amount)))
+}
 
 /** Header with a chosen form: canonical, long form for a short payload, or a leading-zero length. */
 function header(base: 0x80 | 0xc0, len: number, form: 'c' | 'long' | 'zero'): Uint8Array {
@@ -245,19 +272,22 @@ function randIntField(r: Rng, maxW: number): Uint8Array {
   return strEnc(intBytes(r.bigOfWidth(r.pick([0, 1, 1, 2, 4, 8, r.range(0, maxW)]))))
 }
 
+/** A valid request: a native transfer on any of the four chains, or (C2) a USDC transfer on its own chain. */
 export function evmValid(r: Rng): Uint8Array {
   const nonce = r.bool(0.1) ? 0xfffffffffffffffen : r.bigOfWidth(r.range(0, 8)) % 0xffffffffffffffffn
+  const [chain, token] = r.bool(0.5) ? CHAINS[0]! : r.pick(CHAINS)
+  const erc20 = r.bool(0.35)
   return concatBytes(
     Uint8Array.of(2),
     encodeRlp([
-      intBytes(SEPOLIA),
+      intBytes(chain),
       intBytes(nonce),
       intBytes(r.bigOfWidth(r.range(0, 16))),
       intBytes(r.bigOfWidth(r.range(0, 16))),
       intBytes(r.bigOfWidth(r.range(0, 8))),
-      r.bytes(20),
-      intBytes(r.bigOfWidth(r.range(0, 16))),
-      new Uint8Array(0),
+      erc20 ? hexToBytesStrict(token) : r.bytes(20),
+      erc20 ? new Uint8Array(0) : intBytes(r.bigOfWidth(r.range(0, 16))),
+      erc20 ? transferData(r.bytes(20), r.bigOfWidth(r.range(0, 16))) : new Uint8Array(0),
       [],
     ]),
   )
@@ -287,16 +317,53 @@ export function evmStructured(r: Rng): Uint8Array {
     ? r.pick([
         strEnc(intBytes(1n)),
         strEnc(intBytes(0n)),
-        strEnc(intBytes(84532n)),
+        strEnc(intBytes(8453n)),
+        strEnc(intBytes(84531n)),
         strEnc(intBytes(SEPOLIA + 1n)),
         strEnc(Uint8Array.of(1, 0, 0, 0, 0, 0, 0xaa, 0x36, 0xa7)),
         strEnc(Uint8Array.of(0, 0xaa, 0x36, 0xa7)),
         listEnc([]),
       ])
-    : strEnc(intBytes(SEPOLIA))
+    : strEnc(intBytes(r.pick(CHAINS)[0]))
   const nonce = bad() && r.bool(0.4) ? strEnc(intBytes(0xffffffffffffffffn)) : intField(8)
-  const to = bad() ? r.pick([strEnc(new Uint8Array(0)), strEnc(r.bytes(19)), strEnc(r.bytes(21)), strEnc(r.bytes(32)), listEnc([])]) : strEnc(r.bytes(20))
-  const data = bad() ? r.pick([strEnc(r.bytes(r.range(1, 6))), strEnc(Uint8Array.of(0)), listEnc([]), strEnc(Uint8Array.of(0x09, 0x5e, 0xa7, 0xb3))]) : strEnc(new Uint8Array(0))
+  // C2: a third of the cases are token transfers: token (sometimes another chain's), then calldata variants
+  const erc20 = r.bool(0.33)
+  const token = hexToBytesStrict(r.pick(CHAINS)[1])
+  const toOk = erc20 ? strEnc(token) : strEnc(r.bytes(20))
+  const to = bad() ? r.pick([strEnc(new Uint8Array(0)), strEnc(r.bytes(19)), strEnc(r.bytes(21)), strEnc(r.bytes(32)), listEnc([]), strEnc(r.bytes(20))]) : toOk
+  const goodData = transferData(r.bytes(20), r.bigOfWidth(r.range(0, 16)))
+  const badData = (): Uint8Array => {
+    const d = Uint8Array.from(goodData)
+    switch (r.int(7)) {
+      case 0: {
+        const i = r.int(4)
+        d[i] = d[i]! ^ (1 << r.int(8)) // selector
+        return d
+      }
+      case 1:
+        d[4 + r.int(12)] = r.range(1, 255) // dirty address padding
+        return d
+      case 2:
+        d[36 + r.int(16)] = r.range(1, 255) // amount ≥ 2^128
+        return d
+      case 3:
+        return d.subarray(0, r.range(0, 67))
+      case 4:
+        return concatBytes(d, r.bytes(r.range(1, 32)))
+      case 5:
+        return hexToBytesStrict('095ea7b3') // approve selector
+      default:
+        return r.bytes(r.range(1, 6))
+    }
+  }
+  const data = erc20
+    ? bad()
+      ? r.pick([strEnc(badData()), strEnc(badData()), listEnc([])])
+      : strEnc(goodData)
+    : bad()
+      ? r.pick([strEnc(r.bytes(r.range(1, 6))), strEnc(Uint8Array.of(0)), listEnc([]), strEnc(Uint8Array.of(0x09, 0x5e, 0xa7, 0xb3)), strEnc(goodData)])
+      : strEnc(new Uint8Array(0))
+  const valueField = erc20 && !bad() ? strEnc(new Uint8Array(0)) : intField(16)
   const al = bad()
     ? r.pick([
         encodeRlp([[r.bytes(20), []]]),
@@ -306,7 +373,7 @@ export function evmStructured(r: Rng): Uint8Array {
         listEnc([], r.pick(['long', 'zero'] as const)),
       ])
     : listEnc([])
-  const fields = [chain, nonce, intField(16), intField(16), intField(8), to, intField(16), data, al]
+  const fields = [chain, nonce, intField(16), intField(16), intField(8), to, valueField, data, al]
   if (r.bool(0.04)) fields.pop()
   if (r.bool(0.04)) fields.push(strEnc(r.bytes(r.range(0, 3))))
   const body = listEnc(fields, r.bool(0.04) ? r.pick(['long', 'zero'] as const) : 'c')
@@ -357,7 +424,7 @@ export function genEvm(r: Rng, seeds: Seeds): SignRequest {
     tx = mutateBytes(r, s, rlpHot(s, 1))
   } else if (k < 85) tx = evmValid(r)
   else {
-    tx = r.bytes(r.pick([0, 1, 2, r.range(0, 140)]))
+    tx = r.bytes(r.pick([0, 1, 2, r.range(0, 140), r.range(150, 175)]))
     if (tx.length && r.bool(0.7)) tx[0] = 2
   }
   return { evm: { unsigned_tx: hexLayer(r, tx) } }
@@ -646,6 +713,37 @@ export function genSol(r: Rng, seeds: Seeds): SignRequest {
   return { sol: { message: hexLayer(r, m) } }
 }
 
+// ───────────────────────────────────────── messages (C7) ─────────────────────────────────────────
+
+const SCRIPTS = ['Sign in to example.org', 'Nonce: 8f2c41', 'Grüße', '✓', '🎒', '日本語', 'مرحبا', '\n', '\t', ' ', '~', '\u0000', 'é']
+
+/** A message body: seeds mutated, random UTF-8 text, raw bytes (often invalid UTF-8), and the length boundaries. */
+export function msgBody(r: Rng, seeds: Seeds): Uint8Array {
+  const k = r.int(100)
+  if (k < 30 && seeds.msg.length) {
+    const s = r.pick(seeds.msg).m
+    return mutateBytes(r, s, [0, s.length >> 1, Math.max(s.length - 1, 0)])
+  }
+  if (k < 60) {
+    let t = ''
+    const n = r.range(1, 40)
+    for (let i = 0; i < n; i++) t += r.pick(SCRIPTS)
+    return utf8(t)
+  }
+  if (k < 75) return r.bytes(r.pick([0, 1, 2, 3, r.range(0, 64)]))
+  const len = r.pick([0, 1, 1023, 1024, 1025, r.range(1000, 1100)])
+  const fill = r.pick([0x61, 0x7e, 0x20, 0x0a, 0xff])
+  const b = new Uint8Array(len).fill(fill)
+  if (r.bool(0.2) && len) b[r.int(len)] = 0xc3 // a dangling UTF-8 lead byte
+  return b
+}
+
+export function genMsg(r: Rng, seeds: Seeds): SignRequest {
+  const m = msgBody(r, seeds)
+  const message = hexLayer(r, m, 0.05)
+  return r.bool() ? { evm_message: { message } } : { sol_message: { message } }
+}
+
 // ───────────────────────────────────────── verdicts ─────────────────────────────────────────
 
 export function verdictOf(req: SignRequest): Case {
@@ -653,7 +751,13 @@ export function verdictOf(req: SignRequest): Case {
     const res = classifySignRequest(req)
     if (!res.ok) return { r: req, v: res.error }
     const h = res.recordPayloads.map(toHex)
-    if (res.chain === 'evm') return { r: req, v: 'ok', h, f: { chain_id: res.fields.chainId.toString(), nonce: res.fields.nonce.toString() } }
+    if (res.chain === 'evm') {
+      const e = res.fields.erc20
+      const f: Record<string, unknown> = { chain_id: res.fields.chainId.toString(), nonce: res.fields.nonce.toString() }
+      if (e) f.erc20 = { token: e.token.slice(2), to: e.to.slice(2), amount: e.amount.toString() }
+      return { r: req, v: 'ok', h, f }
+    }
+    if (res.chain === 'evm_message' || res.chain === 'sol_message') return { r: req, v: 'ok', h, f: { message: toHex(res.fields.message) } }
     if (res.chain === 'btc')
       return {
         r: req,
@@ -667,10 +771,13 @@ export function verdictOf(req: SignRequest): Case {
   }
 }
 
-export const GENERATORS: Record<Chain, (r: Rng, s: Seeds) => SignRequest> = { evm: genEvm, btc: genBtc, sol: genSol }
+export const GENERATORS: Record<Chain, (r: Rng, s: Seeds) => SignRequest> = { evm: genEvm, btc: genBtc, sol: genSol, msg: genMsg }
 
 /** Deterministic corpus: `n` cases for `chain` from `seed`. */
 export function* corpus(chain: Chain, n: number, seed: number, seeds: Seeds = loadSeeds()): Generator<Case> {
-  const r = new Rng(seed ^ { evm: 0x1000, btc: 0x2000, sol: 0x3000 }[chain])
+  const r = new Rng(seed ^ { evm: 0x1000, btc: 0x2000, sol: 0x3000, msg: 0x4000 }[chain])
   for (let i = 0; i < n; i++) yield verdictOf(GENERATORS[chain](r, seeds))
 }
+
+// the generator's own table must equal the classifier's allowlist (else "valid" builds would be refused)
+for (const [c, t] of CHAINS) if (EVM_TOKEN_ALLOWLIST[c.toString()] !== `0x${t}`) throw new Error(`fuzz CHAINS table out of date for ${c}`)

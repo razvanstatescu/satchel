@@ -1,0 +1,689 @@
+{
+  "schema": "satchel-vectors/1",
+  "set": "history",
+  "generator": "tools/vectors/gen.ts",
+  "vectors": [
+    {
+      "name": "empty_history",
+      "contract_id": "satchel.satchelhq.testnet",
+      "token_id": "1",
+      "records": [],
+      "expect": {
+        "sig_count": 0,
+        "digest_hex": "f86b4a2618d729a434da0c9a5419c8135011242f2c8c88a9b91f01d1acf87c4e",
+        "header_hex": "120000007361746368656c2e686973746f72792e7631190000007361746368656c2e7361746368656c68712e746573746e657401000000310000000000000000",
+        "entries_hex": []
+      },
+      "note": "sig_count 0: SHA-256(H) only"
+    },
+    {
+      "name": "one_evm_record",
+      "contract_id": "satchel.satchelhq.testnet",
+      "token_id": "1",
+      "records": [
+        {
+          "seq": 0,
+          "request_id": 0,
+          "input_index": 0,
+          "height": 274600000,
+          "timestamp_ms": 1793000000000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 11155111,
+              "nonce": 0,
+              "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "sig_count": 1,
+        "digest_hex": "e7279cc59eed72592677c9eb8523166a9e56fdb7d407ded481b9c0bdae4c7bb4",
+        "header_hex": "120000007361746368656c2e686973746f72792e7631190000007361746368656c2e7361746368656c68712e746573746e657401000000310100000000000000",
+        "entries_hex": [
+          "000000000000000000000000000000000040105e100000000000ca2077a101000017000000616c6963652e7361746368656c68712e746573746e6574bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac37700a736aa000000000000000000000000003000000002ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        ]
+      },
+      "note": "the kb/31 Sepolia transfer"
+    },
+    {
+      "name": "every_kind",
+      "contract_id": "satchel.satchelhq.testnet",
+      "token_id": "3",
+      "records": [
+        {
+          "seq": 0,
+          "request_id": 0,
+          "input_index": 0,
+          "height": 274600000,
+          "timestamp_ms": 1793000000000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 11155111,
+              "nonce": 0,
+              "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+            }
+          }
+        },
+        {
+          "seq": 1,
+          "request_id": 1,
+          "input_index": 0,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "5843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412",
+              "vout": 0,
+              "amount_sats": "30000"
+            }
+          }
+        },
+        {
+          "seq": 2,
+          "request_id": 1,
+          "input_index": 1,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "7292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "4f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d",
+              "vout": 1,
+              "amount_sats": "31000"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "request_id": 3,
+          "input_index": 0,
+          "height": 274600014,
+          "timestamp_ms": 1793000008000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c4925",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol": {
+              "recent_blockhash": "130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b7",
+              "lamports": "1000000"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "request_id": 4,
+          "input_index": 0,
+          "height": 274600021,
+          "timestamp_ms": 1793000012000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 84532,
+              "nonce": 0,
+              "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+              "erc20": {
+                "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+                "to": "2222222222222222222222222222222222222222",
+                "amount": "1500000"
+              }
+            }
+          }
+        },
+        {
+          "seq": 5,
+          "request_id": 5,
+          "input_index": 0,
+          "height": 274600028,
+          "timestamp_ms": 1793000016000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm_message": {
+              "message": "68656c6c6f"
+            }
+          }
+        },
+        {
+          "seq": 6,
+          "request_id": 6,
+          "input_index": 0,
+          "height": 274600035,
+          "timestamp_ms": 1793000020000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol_message": {
+              "message": "4772c3bcc39f6520e29c93"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "sig_count": 7,
+        "digest_hex": "c25d824bfe158d01806e49e1def332d3b13b44dd63d2b353842498b90585b3be",
+        "header_hex": "120000007361746368656c2e686973746f72792e7631190000007361746368656c2e7361746368656c68712e746573746e657401000000330700000000000000",
+        "entries_hex": [
+          "000000000000000000000000000000000040105e100000000000ca2077a101000017000000616c6963652e7361746368656c68712e746573746e6574bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac37700a736aa000000000000000000000000003000000002ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+          "010000000000000001000000000000000047105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e6574f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e015843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412000000003075000000000000",
+          "020000000000000001000000000000000147105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e65747292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6014f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d010000001879000000000000",
+          "03000000000000000300000000000000004e105e100000000040e92077a101000017000000616c6963652e7361746368656c68712e746573746e6574de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c492502130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b740420f0000000000",
+          "040000000000000004000000000000000055105e1000000000e0f82077a101000017000000616c6963652e7361746368656c68712e746573746e6574050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f00344a01000000000000000000000000007000000002f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "05000000000000000500000000000000005c105e100000000080082177a101000017000000616c6963652e7361746368656c68712e746573746e657450b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750030500000068656c6c6f",
+          "060000000000000006000000000000000063105e100000000020182177a101000017000000616c6963652e7361746368656c68712e746573746e6574b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680040b0000004772c3bcc39f6520e29c93"
+        ]
+      },
+      "note": "EVM, BTC ×2 inputs, SOL, USDC on Base, EIP-191 message, Solana off-chain message"
+    },
+    {
+      "name": "every_kind_resolved",
+      "contract_id": "satchel.satchelhq.testnet",
+      "token_id": "3",
+      "records": [
+        {
+          "seq": 0,
+          "request_id": 0,
+          "input_index": 0,
+          "height": 274600000,
+          "timestamp_ms": 1793000000000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+          "status": "signed",
+          "signature": {
+            "r": "1111111111111111111111111111111111111111111111111111111111111111",
+            "s": "2222222222222222222222222222222222222222222222222222222222222222",
+            "recovery_id": 1
+          },
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 11155111,
+              "nonce": 0,
+              "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+            }
+          }
+        },
+        {
+          "seq": 1,
+          "request_id": 1,
+          "input_index": 0,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e",
+          "status": "failed",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "5843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412",
+              "vout": 0,
+              "amount_sats": "30000"
+            }
+          }
+        },
+        {
+          "seq": 2,
+          "request_id": 1,
+          "input_index": 1,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "7292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6",
+          "status": "signed",
+          "signature": {
+            "r": "1111111111111111111111111111111111111111111111111111111111111111",
+            "s": "2222222222222222222222222222222222222222222222222222222222222222",
+            "recovery_id": 1
+          },
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "4f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d",
+              "vout": 1,
+              "amount_sats": "31000"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "request_id": 3,
+          "input_index": 0,
+          "height": 274600014,
+          "timestamp_ms": 1793000008000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c4925",
+          "status": "failed",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol": {
+              "recent_blockhash": "130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b7",
+              "lamports": "1000000"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "request_id": 4,
+          "input_index": 0,
+          "height": 274600021,
+          "timestamp_ms": 1793000012000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f",
+          "status": "signed",
+          "signature": {
+            "r": "1111111111111111111111111111111111111111111111111111111111111111",
+            "s": "2222222222222222222222222222222222222222222222222222222222222222",
+            "recovery_id": 1
+          },
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 84532,
+              "nonce": 0,
+              "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+              "erc20": {
+                "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+                "to": "2222222222222222222222222222222222222222",
+                "amount": "1500000"
+              }
+            }
+          }
+        },
+        {
+          "seq": 5,
+          "request_id": 5,
+          "input_index": 0,
+          "height": 274600028,
+          "timestamp_ms": 1793000016000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750",
+          "status": "failed",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm_message": {
+              "message": "68656c6c6f"
+            }
+          }
+        },
+        {
+          "seq": 6,
+          "request_id": 6,
+          "input_index": 0,
+          "height": 274600035,
+          "timestamp_ms": 1793000020000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680",
+          "status": "signed",
+          "signature": {
+            "signature": "abababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab"
+          },
+          "chain": "sol",
+          "detail": {
+            "sol_message": {
+              "message": "4772c3bcc39f6520e29c93"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "sig_count": 7,
+        "digest_hex": "c25d824bfe158d01806e49e1def332d3b13b44dd63d2b353842498b90585b3be",
+        "header_hex": "120000007361746368656c2e686973746f72792e7631190000007361746368656c2e7361746368656c68712e746573746e657401000000330700000000000000",
+        "entries_hex": [
+          "000000000000000000000000000000000040105e100000000000ca2077a101000017000000616c6963652e7361746368656c68712e746573746e6574bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac37700a736aa000000000000000000000000003000000002ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+          "010000000000000001000000000000000047105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e6574f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e015843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412000000003075000000000000",
+          "020000000000000001000000000000000147105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e65747292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6014f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d010000001879000000000000",
+          "03000000000000000300000000000000004e105e100000000040e92077a101000017000000616c6963652e7361746368656c68712e746573746e6574de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c492502130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b740420f0000000000",
+          "040000000000000004000000000000000055105e1000000000e0f82077a101000017000000616c6963652e7361746368656c68712e746573746e6574050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f00344a01000000000000000000000000007000000002f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "05000000000000000500000000000000005c105e100000000080082177a101000017000000616c6963652e7361746368656c68712e746573746e657450b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750030500000068656c6c6f",
+          "060000000000000006000000000000000063105e100000000020182177a101000017000000616c6963652e7361746368656c68712e746573746e6574b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680040b0000004772c3bcc39f6520e29c93"
+        ]
+      },
+      "note": "same records, statuses and signatures changed: the digest must not change"
+    },
+    {
+      "name": "every_kind_other_token",
+      "contract_id": "satchel.satchelhq.testnet",
+      "token_id": "4",
+      "records": [
+        {
+          "seq": 0,
+          "request_id": 0,
+          "input_index": 0,
+          "height": 274600000,
+          "timestamp_ms": 1793000000000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 11155111,
+              "nonce": 0,
+              "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+            }
+          }
+        },
+        {
+          "seq": 1,
+          "request_id": 1,
+          "input_index": 0,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "5843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412",
+              "vout": 0,
+              "amount_sats": "30000"
+            }
+          }
+        },
+        {
+          "seq": 2,
+          "request_id": 1,
+          "input_index": 1,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "7292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "4f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d",
+              "vout": 1,
+              "amount_sats": "31000"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "request_id": 3,
+          "input_index": 0,
+          "height": 274600014,
+          "timestamp_ms": 1793000008000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c4925",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol": {
+              "recent_blockhash": "130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b7",
+              "lamports": "1000000"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "request_id": 4,
+          "input_index": 0,
+          "height": 274600021,
+          "timestamp_ms": 1793000012000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 84532,
+              "nonce": 0,
+              "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+              "erc20": {
+                "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+                "to": "2222222222222222222222222222222222222222",
+                "amount": "1500000"
+              }
+            }
+          }
+        },
+        {
+          "seq": 5,
+          "request_id": 5,
+          "input_index": 0,
+          "height": 274600028,
+          "timestamp_ms": 1793000016000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm_message": {
+              "message": "68656c6c6f"
+            }
+          }
+        },
+        {
+          "seq": 6,
+          "request_id": 6,
+          "input_index": 0,
+          "height": 274600035,
+          "timestamp_ms": 1793000020000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol_message": {
+              "message": "4772c3bcc39f6520e29c93"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "sig_count": 7,
+        "digest_hex": "141cf6e3c5af62ac9dd38e071977ac779a691738f9baa847ddc2bb13f2ad2364",
+        "header_hex": "120000007361746368656c2e686973746f72792e7631190000007361746368656c2e7361746368656c68712e746573746e657401000000340700000000000000",
+        "entries_hex": [
+          "000000000000000000000000000000000040105e100000000000ca2077a101000017000000616c6963652e7361746368656c68712e746573746e6574bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac37700a736aa000000000000000000000000003000000002ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+          "010000000000000001000000000000000047105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e6574f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e015843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412000000003075000000000000",
+          "020000000000000001000000000000000147105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e65747292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6014f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d010000001879000000000000",
+          "03000000000000000300000000000000004e105e100000000040e92077a101000017000000616c6963652e7361746368656c68712e746573746e6574de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c492502130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b740420f0000000000",
+          "040000000000000004000000000000000055105e1000000000e0f82077a101000017000000616c6963652e7361746368656c68712e746573746e6574050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f00344a01000000000000000000000000007000000002f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "05000000000000000500000000000000005c105e100000000080082177a101000017000000616c6963652e7361746368656c68712e746573746e657450b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750030500000068656c6c6f",
+          "060000000000000006000000000000000063105e100000000020182177a101000017000000616c6963652e7361746368656c68712e746573746e6574b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680040b0000004772c3bcc39f6520e29c93"
+        ]
+      },
+      "note": "same records under another token id: a different digest"
+    },
+    {
+      "name": "every_kind_rc_contract",
+      "contract_id": "rc.satchelhq.testnet",
+      "token_id": "3",
+      "records": [
+        {
+          "seq": 0,
+          "request_id": 0,
+          "input_index": 0,
+          "height": 274600000,
+          "timestamp_ms": 1793000000000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 11155111,
+              "nonce": 0,
+              "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+            }
+          }
+        },
+        {
+          "seq": 1,
+          "request_id": 1,
+          "input_index": 0,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "5843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412",
+              "vout": 0,
+              "amount_sats": "30000"
+            }
+          }
+        },
+        {
+          "seq": 2,
+          "request_id": 1,
+          "input_index": 1,
+          "height": 274600007,
+          "timestamp_ms": 1793000004000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "7292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6",
+          "status": "pending",
+          "signature": null,
+          "chain": "btc",
+          "detail": {
+            "btc": {
+              "txid": "4f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d",
+              "vout": 1,
+              "amount_sats": "31000"
+            }
+          }
+        },
+        {
+          "seq": 3,
+          "request_id": 3,
+          "input_index": 0,
+          "height": 274600014,
+          "timestamp_ms": 1793000008000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c4925",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol": {
+              "recent_blockhash": "130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b7",
+              "lamports": "1000000"
+            }
+          }
+        },
+        {
+          "seq": 4,
+          "request_id": 4,
+          "input_index": 0,
+          "height": 274600021,
+          "timestamp_ms": 1793000012000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm": {
+              "chain_id": 84532,
+              "nonce": 0,
+              "unsigned_tx": "02f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+              "erc20": {
+                "token": "036cbd53842c5426634e7929541ec2318f3dcf7e",
+                "to": "2222222222222222222222222222222222222222",
+                "amount": "1500000"
+              }
+            }
+          }
+        },
+        {
+          "seq": 5,
+          "request_id": 5,
+          "input_index": 0,
+          "height": 274600028,
+          "timestamp_ms": 1793000016000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "50b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750",
+          "status": "pending",
+          "signature": null,
+          "chain": "evm",
+          "detail": {
+            "evm_message": {
+              "message": "68656c6c6f"
+            }
+          }
+        },
+        {
+          "seq": 6,
+          "request_id": 6,
+          "input_index": 0,
+          "height": 274600035,
+          "timestamp_ms": 1793000020000,
+          "requester": "alice.satchelhq.testnet",
+          "payload": "b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680",
+          "status": "pending",
+          "signature": null,
+          "chain": "sol",
+          "detail": {
+            "sol_message": {
+              "message": "4772c3bcc39f6520e29c93"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "sig_count": 7,
+        "digest_hex": "881d98806e1b21e0b7c79e5671a7c76718a663c1973d6770bd6543bdb6b072e1",
+        "header_hex": "120000007361746368656c2e686973746f72792e76311400000072632e7361746368656c68712e746573746e657401000000330700000000000000",
+        "entries_hex": [
+          "000000000000000000000000000000000040105e100000000000ca2077a101000017000000616c6963652e7361746368656c68712e746573746e6574bc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac37700a736aa000000000000000000000000003000000002ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+          "010000000000000001000000000000000047105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e6574f28809051de0c5111ca3aa8e062dd7a100ff1c06aa4e0a222d165460fb701d5e015843ffa8062c23ca2684870aa08e37dc0acb0709e6f72c71ace014e527044412000000003075000000000000",
+          "020000000000000001000000000000000147105e1000000000a0d92077a101000017000000616c6963652e7361746368656c68712e746573746e65747292b886aacc28ce5eabec648427f5782a2ddedfeb0f9c92943850eda32965b6014f81a18a2fe33b841c2c7eef64d6cb5ba1d4359a25813a35675c33e0185ccc1d010000001879000000000000",
+          "03000000000000000300000000000000004e105e100000000040e92077a101000017000000616c6963652e7361746368656c68712e746573746e6574de81df58d8cc35e65e62b47cca3acaebb538a92a5f6b17ba272e7901ac0c492502130729ebaf33178f0569a1d74018fbbd7ce136dddd875ff54a0f0f37cf6080b740420f0000000000",
+          "040000000000000004000000000000000055105e1000000000e0f82077a101000017000000616c6963652e7361746368656c68712e746573746e6574050aac9eff5678183d4657992b06370a310f8fd2c60025a6bd8dee09ca4c414f00344a01000000000000000000000000007000000002f86d83014a348083030d4883030d5c82fde894036cbd53842c5426634e7929541ec2318f3dcf7e80b844a9059cbb0000000000000000000000002222222222222222222222222222222222222222000000000000000000000000000000000000000000000000000000000016e360c0",
+          "05000000000000000500000000000000005c105e100000000080082177a101000017000000616c6963652e7361746368656c68712e746573746e657450b2c43fd39106bafbba0da34fc430e1f91e3c96ea2acee2bc34119f92b37750030500000068656c6c6f",
+          "060000000000000006000000000000000063105e100000000020182177a101000017000000616c6963652e7361746368656c68712e746573746e6574b8fe381d4cc69f146c5a1942892647976fd3e82cce89b929d0c15de9a6d64680040b0000004772c3bcc39f6520e29c93"
+        ]
+      },
+      "note": "same records on another contract: a different digest"
+    }
+  ]
+}

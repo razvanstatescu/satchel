@@ -15,6 +15,8 @@ use near_sdk::{env, near, AccountId, BorshStorageKey, Gas, PanicOnDefault, Promi
 pub mod allowance;
 pub mod errors;
 pub mod events;
+pub mod evm_nonces;
+pub mod history;
 pub mod inside;
 pub mod market;
 pub mod mpc;
@@ -73,6 +75,8 @@ pub enum StorageKey {
     OffersByAccount,
     OffersByAccountLen,
     StorageCredit,
+    /// C3: max signed EVM nonce per (token, chain_id) for chains other than Sepolia (`evm_nonces.rs`). Appended last.
+    EvmNonces,
 }
 
 #[near(contract_state, contract_metadata(standard(standard = "nep171", version = "1.0.0"), standard(standard = "nep177", version = "2.0.0"), standard(standard = "nep181", version = "1.0.0"), standard(standard = "nep297", version = "1.0.0")))]
@@ -305,3 +309,5 @@ mod security_tests;
 mod allowance_tests;
 #[cfg(test)]
 mod market_tests;
+#[cfg(test)]
+mod feature_tests;

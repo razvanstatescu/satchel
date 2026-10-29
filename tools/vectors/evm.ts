@@ -1,5 +1,8 @@
-/** EVM vectors (spec §12.2): accepted type-2 Sepolia native transfers and every refusal class of §5.9. Built with viem. */
-import { keccak256, serializeTransaction, toHex as vHex, parseTransaction, type Hex } from 'viem'
+/**
+ * EVM vectors (spec §12.2): accepted type-2 native transfers on the four testnets (C3), USDC transfers (C2), and every
+ * refusal class of §5.9 / docs/specs/C1-C2-C3-C7.md §3.1. Built with viem (an independent encoder).
+ */
+import { encodeFunctionData, erc20Abi, keccak256, serializeTransaction, toHex as vHex, parseTransaction, type Hex } from 'viem'
 import { classifyEvm, encodeRlp, type RlpInput } from '@satchel/core/policy'
 import { bigIntToBytesBE, concatBytes, hexToBytesStrict, toHex, utf8 } from '@satchel/core/bytes'
 import { evmSignRequest } from '@satchel/core/near'
@@ -33,17 +36,32 @@ function std(over: Partial<Record<'chainId' | 'nonce' | 'tip' | 'maxFee' | 'gas'
   ]
 }
 
-const viemType2 = (p: { nonce: number; to: `0x${string}`; value: bigint; tip?: bigint; maxFee?: bigint; gas?: bigint }): Hex =>
+const viemType2 = (p: { nonce: number; to: `0x${string}`; value: bigint; tip?: bigint; maxFee?: bigint; gas?: bigint; chainId?: number; data?: Hex }): Hex =>
   serializeTransaction({
     type: 'eip1559',
-    chainId: SEPOLIA,
+    chainId: p.chainId ?? SEPOLIA,
     nonce: p.nonce,
     to: p.to,
     value: p.value,
     gas: p.gas ?? 21_000n,
     maxFeePerGas: p.maxFee ?? 200_028n,
     maxPriorityFeePerGas: p.tip ?? 200_008n,
+    ...(p.data ? { data: p.data } : {}),
   })
+
+/** C2/C3: chain ids and Circle testnet USDC from the spec table (docs/specs/C1-C2-C3-C7.md §2). */
+const USDC = {
+  11155111: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+  84532: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+  421614: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d',
+  11155420: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7',
+} as const
+type Cid = keyof typeof USDC
+const RCPT = '0x2222222222222222222222222222222222222222' as const
+/** viem's own ABI encoder for `transfer(to, amount)` (independent of the classifier). */
+const transferCall = (to: `0x${string}`, amount: bigint): Hex => encodeFunctionData({ abi: erc20Abi, functionName: 'transfer', args: [to, amount] })
+const usdcTx = (chainId: Cid, p: { nonce?: number; amount?: bigint; to?: `0x${string}`; value?: bigint; data?: Hex; gas?: bigint } = {}): Hex =>
+  viemType2({ chainId, nonce: p.nonce ?? 0, to: p.to ?? USDC[chainId], value: p.value ?? 0n, gas: p.gas ?? 65_000n, data: p.data ?? transferCall(RCPT, p.amount ?? 1_500_000n) })
 
 export function evmVectors(): Vector[] {
   const v: Vector[] = []
@@ -113,7 +131,10 @@ export function evmVectors(): Vector[] {
   add('raw_32_byte_hash', h32, 'ERR_EVM_TYPE', 'a blind 32-byte hash is never signed')
   add('empty_payload', '', 'ERR_EVM_TYPE')
   add('chain_id_1_mainnet', type2(std({ chainId: 1n })), 'ERR_EVM_CHAIN_ID')
-  add('chain_id_84532_base_sepolia', type2(std({ chainId: 84532n })), 'ERR_EVM_CHAIN_ID')
+  add('chain_id_8453_base_mainnet', type2(std({ chainId: 8453n })), 'ERR_EVM_CHAIN_ID')
+  add('chain_id_42161_arbitrum_one', type2(std({ chainId: 42161n })), 'ERR_EVM_CHAIN_ID')
+  add('chain_id_10_op_mainnet', type2(std({ chainId: 10n })), 'ERR_EVM_CHAIN_ID')
+  add('chain_id_17000_holesky', type2(std({ chainId: 17000n })), 'ERR_EVM_CHAIN_ID')
   add('chain_id_over_wide', type2(std({ chainId: 2n ** 64n + 11155111n })), 'ERR_EVM_CHAIN_ID', '9-byte chain id')
   const approve = concatBytes(hexToBytesStrict('095ea7b3'), new Uint8Array(12), raw(TO), new Uint8Array(32).fill(0xff))
   add('calldata_erc20_approve', type2(std({ data: approve, to: raw(WETH_SEPOLIA) })), 'ERR_EVM_DATA', 'approve(spender, max)')
@@ -147,7 +168,40 @@ export function evmVectors(): Vector[] {
   add('gas_over_wide_9_bytes', type2(std({ gas: 2n ** 64n })), 'ERR_EVM_INT_WIDTH')
   add('value_over_wide_17_bytes', type2(std({ value: 2n ** 128n })), 'ERR_EVM_INT_WIDTH', 'refused, never truncated')
   add('max_fee_over_wide_17_bytes', type2(std({ maxFee: 2n ** 128n })), 'ERR_EVM_INT_WIDTH')
-  add('too_long_129_bytes', `02${'00'.repeat(128)}`, 'ERR_EVM_TOO_LONG')
+  add('too_long_161_bytes', `02${'00'.repeat(160)}`, 'ERR_EVM_TOO_LONG', 'the limit is 160 B (a maximal USDC transfer is 152 B)')
+  add('len_129_bytes_is_not_too_long', `02${'00'.repeat(128)}`, 'ERR_EVM_RLP', 'the old 128-byte limit no longer applies')
+
+  // ── C3: four testnets, the same key; the nonce-gap state is per chain id ─────────────────────────
+  add('chain_base_sepolia_native', viemType2({ chainId: 84532, nonce: 0, to: TO, value: 10n ** 14n }), 'ok', 'Base Sepolia 84532')
+  add('chain_arbitrum_sepolia_native', viemType2({ chainId: 421614, nonce: 1, to: TO, value: 10n ** 14n }), 'ok', 'Arbitrum Sepolia 421614')
+  add('chain_op_sepolia_native', viemType2({ chainId: 11155420, nonce: 0, to: TO, value: 10n ** 14n }), 'ok', 'OP Sepolia 11155420')
+  add('chain_base_sepolia_native_nonce9', viemType2({ chainId: 84532, nonce: 9, to: TO, value: 1n }), 'ok', 'Base nonce 9 after Base max 8', { evm_max_nonce: '8' })
+  add('nonce_gap_chain_base_first_request_nonce2', viemType2({ chainId: 84532, nonce: 2, to: TO, value: 1n }), 'ERR_EVM_NONCE_GAP', 'no Base record yet (whatever Sepolia has): nonce ≤ 1', { evm_max_nonce: null })
+  add('nonce_gap_chain_op_skip_one', viemType2({ chainId: 11155420, nonce: 6, to: TO, value: 1n }), 'ERR_EVM_NONCE_GAP', 'OP max 4 → 6 refused', { evm_max_nonce: '4' })
+
+  // ── C2: one canonical USDC transfer, value 0, to the chain's own USDC ───────────────────────────
+  for (const [cid, name] of [[11155111, 'sepolia'], [84532, 'base_sepolia'], [421614, 'arbitrum_sepolia'], [11155420, 'op_sepolia']] as const)
+    add(`erc20_usdc_transfer_${name}`, usdcTx(cid), 'ok', `transfer(0x2222…, 1.5 USDC) on ${cid}`)
+  const maxUsdc = type2([b(11155420n), b(U64_MAX - 1n), b(U128_MAX), b(U128_MAX), b(U64_MAX), raw(USDC[11155420]), new Uint8Array(0), raw(transferCall('0xffffffffffffffffffffffffffffffffffffffff', U128_MAX)), []])
+  assert(maxUsdc.length / 2 === 152, 'maximal USDC transfer is 152 bytes')
+  add('erc20_max_width_152_bytes', maxUsdc, 'ok', 'nonce 2^64−2, gas 2^64−1, fees 2^128−1, amount 2^128−1: 152 bytes', { evm_max_nonce: (U64_MAX - 2n).toString() })
+  add('erc20_amount_zero', usdcTx(11155111, { amount: 0n }), 'ok', 'a 0-amount transfer is harmless (at most it uses the nonce)')
+  add('erc20_amount_u128_max', usdcTx(84532, { amount: U128_MAX }), 'ok', 'largest amount the contract accepts')
+  add('erc20_recipient_is_the_token', usdcTx(421614, { data: transferCall(USDC[421614], 5n) }), 'ok', 'reverts or not, it only uses the nonce')
+  add('erc20_nonce_next', usdcTx(84532, { nonce: 3 }), 'ok', 'shares the chain nonce sequence with native sends', { evm_max_nonce: '2' })
+  add('erc20_nonce_gap', usdcTx(84532, { nonce: 4 }), 'ERR_EVM_NONCE_GAP', 'max 2 → 4 refused', { evm_max_nonce: '2' })
+  add('erc20_sepolia_usdc_on_base', usdcTx(84532, { to: USDC[11155111] }), 'ERR_EVM_TOKEN', "another chain's USDC")
+  add('erc20_unlisted_token_weth', usdcTx(11155111, { to: WETH_SEPOLIA }), 'ERR_EVM_TOKEN', 'a valid transfer to a token that is not on the allowlist')
+  add('erc20_with_value', usdcTx(11155111, { value: 1n }), 'ERR_EVM_VALUE', 'a token transfer that also sends ETH')
+  add('erc20_amount_2_pow_128', usdcTx(11155111, { data: transferCall(RCPT, 2n ** 128n) }), 'ERR_EVM_DATA', 'amount ≥ 2^128 (the high 16 bytes must be zero)')
+  const dirty = hexToBytesStrict(transferCall(RCPT, 1n))
+  dirty[4] = 0x01 // a byte of the address word's zero padding
+  add('erc20_dirty_address_padding', usdcTx(11155111, { data: `0x${toHex(dirty)}` }), 'ERR_EVM_DATA', 'non-canonical address word')
+  add('erc20_transfer_from', usdcTx(11155111, { data: encodeFunctionData({ abi: erc20Abi, functionName: 'transferFrom', args: [TO, RCPT, 1n] }) }), 'ERR_EVM_DATA', 'transferFrom (100 bytes)')
+  add('erc20_approve_usdc', usdcTx(11155111, { data: encodeFunctionData({ abi: erc20Abi, functionName: 'approve', args: [RCPT, U128_MAX] }) }), 'ERR_EVM_DATA', 'approve on the allowlisted token: never')
+  add('erc20_67_bytes', usdcTx(11155111, { data: transferCall(RCPT, 1n).slice(0, -2) as Hex }), 'ERR_EVM_DATA')
+  add('erc20_69_bytes', usdcTx(11155111, { data: `${transferCall(RCPT, 1n)}00` }), 'ERR_EVM_DATA')
+  add('erc20_access_list', type2([b(11155111n), b(0n), b(1n), b(2n), b(65_000n), raw(USDC[11155111]), new Uint8Array(0), raw(transferCall(RCPT, 1n)), [[raw(TO), []]]]), 'ERR_EVM_ACCESS_LIST')
   add('bad_hex_odd_length', kb31.slice(2, -1), 'ERR_HEX')
   add('bad_hex_characters', `02zz${kb31.slice(6)}`, 'ERR_HEX')
   add('bad_hex_double_prefix', `0x0x${kb31.slice(2)}`, 'ERR_HEX')

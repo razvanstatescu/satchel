@@ -227,7 +227,7 @@ async fn payload_is_hash_of_preimage() -> Result<()> {
 async fn payload_is_hash_of_preimage_shared_vectors() -> Result<()> {
     let root = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../vectors");
     let mut accepted = vec![];
-    for set in ["evm", "btc", "sol"] {
+    for set in ["evm", "btc", "sol", "msg"] {
         let Ok(s) = std::fs::read_to_string(root.join(format!("{set}.json"))) else {
             continue;
         };
@@ -245,25 +245,30 @@ async fn payload_is_hash_of_preimage_shared_vectors() -> Result<()> {
     let env = setup().await?;
     let mut seen = 0usize;
     let mut skipped = vec![];
-    // All vectors run on token 1, so the nonce-gap rule (spec §5.9, D-43) sees one growing EVM history: before an EVM
-    // vector with nonce n, sign plain transfers up to n − 1 when needed. Far-future nonces (a state that would need
-    // billions of records) are covered by the unit run of the same vectors (`parse::tests::shared_vectors`).
-    let mut max_evm: Option<u64> = None;
+    // All vectors run on token 1, so the nonce-gap rule (spec §5.9, D-43; per chain id since C3) sees one growing
+    // EVM history per chain: before an EVM vector with nonce n on chain c, sign plain transfers on c up to n − 1 when
+    // needed. Far-future nonces (a state that would need billions of records) are covered by the unit run of the same
+    // vectors (`parse::tests::shared_vectors`).
+    let mut max_evm: std::collections::BTreeMap<u64, u64> = Default::default();
     for v in &accepted {
         if v["kind"] == "evm" {
             let n: u64 = v["expect"]["fields"]["nonce"].as_str().unwrap_or("0").parse()?;
-            let allowed = max_evm.map_or(1, |m| m + 1);
+            let chain: u64 = v["expect"]["fields"]["chain_id"].as_str().unwrap_or("11155111").parse()?;
+            let allowed = max_evm.get(&chain).map_or(1, |m| m + 1);
             if n > allowed {
                 if n > 64 {
                     skipped.push(v["name"].to_string());
                     continue;
                 }
                 for k in allowed..n {
-                    assert_ok(&sign_and_wait(&env, &env.alice, "1", &evm_req(&EvmTx::transfer(k).encode())).await?);
+                    let mut t = EvmTx::transfer(k);
+                    t.chain_id = chain;
+                    assert_ok(&sign_and_wait(&env, &env.alice, "1", &evm_req(&t.encode())).await?);
                 }
-                max_evm = Some(n - 1);
+                max_evm.insert(chain, n - 1);
             }
-            max_evm = Some(max_evm.map_or(n, |m| m.max(n)));
+            let m = max_evm.get(&chain).map_or(n, |m| (*m).max(n));
+            max_evm.insert(chain, m);
         }
         let before = mpc_count(&env).await? as usize;
         let r = sign_and_wait(&env, &env.alice, "1", &v["request"]).await?;
@@ -285,7 +290,7 @@ async fn payload_is_hash_of_preimage_shared_vectors() -> Result<()> {
         seen += 1;
     }
     eprintln!("shared vectors exercised: {seen}; far-future EVM nonces left to the unit run: {skipped:?}");
-    assert!(skipped.len() <= 3, "only the 2^53/2^64-scale nonce vectors may be skipped: {skipped:?}");
+    assert!(skipped.len() <= 4, "only the 2^53/2^64-scale nonce vectors may be skipped: {skipped:?}");
     Ok(())
 }
 
@@ -426,7 +431,7 @@ async fn refusals_change_nothing_evm() -> Result<()> {
         ("ERR_EVM_ACCESS_LIST", evm_req(&access.encode())),
         ("ERR_EVM_RLP", evm_req(&trailing)),
         ("ERR_EVM_INT_WIDTH", evm_req(&wide_nonce)),
-        ("ERR_EVM_TOO_LONG", evm_req(&[0x02; 129])),
+        ("ERR_EVM_TOO_LONG", evm_req(&[0x02; 161])), // limit 160 B since C2
         ("ERR_HEX", json!({ "evm": { "unsigned_tx": "02zz" } })),
         ("ERR_HEX", json!({ "evm": { "unsigned_tx": "020" } })),
     ];

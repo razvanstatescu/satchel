@@ -9,6 +9,7 @@ use crate::events::SatchelEvent;
 use crate::mpc::{derivation_path, extract_signature_65, MpcSignArgs, MpcSignRequest};
 use crate::parse::{self, hex};
 use crate::types::*;
+use crate::evm_nonces;
 use crate::{charge_storage, min_sign_prepaid, on_signed_gas, promise, Contract, ContractExt, MAX_MPC_DEPOSIT, MPC_DEPOSIT_DEFAULT, MPC_SIGN_GAS_TGAS};
 
 /// Upper bound on one MPC response we read (a secp256k1 reply is ≈ 200 B; ed25519 ≈ 300 B).
@@ -16,7 +17,16 @@ const MAX_MPC_RESPONSE: usize = 1024;
 
 fn detail_json(seq: u64, d: &SigDetail) -> Value {
     match d {
-        SigDetail::Evm { chain_id, nonce, .. } => json!({ "seq": seq, "chain_id": chain_id, "nonce": nonce }),
+        SigDetail::Evm { chain_id, nonce, unsigned_tx } => {
+            let mut v = json!({ "seq": seq, "chain_id": chain_id, "nonce": nonce });
+            if let Some(e) = parse::evm::erc20_of(unsigned_tx) {
+                v["erc20"] = json!({ "token": hex::encode(&e.token), "to": hex::encode(&e.to), "amount": U128(e.amount) });
+            }
+            v
+        }
+        // C7: the message is in the event's `preimages` (the full signed bytes)
+        SigDetail::EvmMessage { .. } => json!({ "seq": seq, "kind": "evm_message" }),
+        SigDetail::SolMessage { .. } => json!({ "seq": seq, "kind": "sol_message" }),
         SigDetail::Btc { txid, vout, amount_sats } => {
             json!({ "seq": seq, "txid": hex::encode(txid), "vout": vout, "amount_sats": U64(*amount_sats) })
         }
@@ -52,14 +62,8 @@ impl Contract {
         ensure((1..=MAX_MPC_DEPOSIT).contains(&d), ERR_MPC_DEPOSIT);
         // 4. classify + hash on-chain (INV-09: a refusal panics before any state change)
         let c = parse::classify(&request).unwrap_or_else(|code| fail(code));
-        // 4b. EVM nonce-gap rule (spec §5.9, D-43): after every stateless check, before any state change
-        if let Some(SigDetail::Evm { nonce, .. }) = c.items.first().map(|i| &i.detail) {
-            if parse::evm::check_nonce(*nonce, st.max_evm_nonce).is_err() {
-                let allowed = parse::evm::max_allowed_nonce(st.max_evm_nonce).to_string();
-                fail_with(ERR_EVM_NONCE_GAP, &["nonce must be ≤ ", &allowed, " (highest signed nonce + 1)"].concat());
-            }
-            st.max_evm_nonce = Some(st.max_evm_nonce.map_or(*nonce, |m| m.max(*nonce)));
-        }
+        // 4b. EVM nonce-gap rule, per chain id (spec §5.9, D-43; C3): after every stateless check, before any write
+        let nonce_update = evm_nonces::gate(&token_id, &st, &c);
         // 5. records before the MPC call
         let s0 = env::storage_usage();
         let first_seq = st.sig_count;
@@ -83,6 +87,7 @@ impl Contract {
                 },
             );
         }
+        evm_nonces::commit(&token_id, &mut st, nonce_update);
         st.sig_count += n64;
         st.last_sign_height = height;
         self.state.insert(token_id.clone(), st);
