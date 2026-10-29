@@ -5,6 +5,7 @@ import { CircleAlert, Plus, RefreshCw, Tag, TriangleAlert } from "lucide-react";
 import { SatchelCard } from "@/components/SatchelCard";
 import { Banner, Button, EmptyState, Icon, Skeleton, cx } from "@/components/ui";
 import { ConnectButton } from "@/components/client/ConnectButton";
+import { MyOfferRow } from "@/components/client/Market";
 import { useCharmSwing } from "@/components/client/MintFlow";
 import { EscrowPanel, useProceeds } from "@/components/client/SoldReceipt";
 import { copy } from "@/lib/copy";
@@ -14,6 +15,7 @@ import { buildSnapshot } from "@/lib/data/snapshot";
 import { dataSource } from "@/lib/data/source";
 import type { Aggregate, CleanReport, SatchelSnapshot } from "@/lib/data/types";
 import { contractViews } from "@/lib/near/contract";
+import type { OfferView } from "@/lib/near/types";
 import { useWallet } from "@/lib/near/wallet";
 import { cardChips, priceText } from "@/lib/view";
 
@@ -72,6 +74,52 @@ async function loadMine(accountId: string): Promise<Pick<Loaded, "items" | "hint
   const listed = items.filter((s) => s.listing);
   const hints = Object.fromEntries((await Promise.all(listed.map(async (s) => [s.token_id, await hintFor(s)] as const))).filter((e): e is [string, Hint] => !!e[1]));
   return { items, hints };
+}
+
+/** C4: "My offers" — the offers this account has made on other Satchels (docs/specs/C4-C6.md §3). Client-only,
+ * wallet-driven, same lane as My Satchels itself; the per-token offers an owner receives are server-rendered on
+ * `/s/[id]` instead (IncomingOffers in Market.tsx), since those are that page's judge fact. */
+async function loadMyOffers(accountId: string): Promise<OfferView[]> {
+  const views = contractViews(dataSource().view, SATCHEL_CONTRACT);
+  try {
+    return await views.offersBy(accountId, 0, 50);
+  } catch {
+    return [];
+  }
+}
+
+function useMyOffers(accountId: string | null) {
+  const [state, setState] = useState<{ for: string | null; offers: OfferView[] }>({ for: null, offers: [] });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!accountId) return;
+    let alive = true;
+    void loadMyOffers(accountId).then((offers) => {
+      if (alive) setState({ for: accountId, offers });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [accountId, attempt]);
+  const loading = !!accountId && state.for !== accountId;
+  return { offers: loading ? null : state.offers, reload: () => setAttempt((n) => n + 1) };
+}
+
+function MyOffers({ accountId }: { accountId: string }) {
+  const { offers, reload } = useMyOffers(accountId);
+  if (!offers?.length) return null;
+  return (
+    <section aria-labelledby="my-offers-title" data-testid="my-offers" className="mb-6 flex flex-col gap-2.5">
+      <h2 id="my-offers-title" className="m-0 font-sans text-label text-ink">
+        {copy.offers.mine.title}
+      </h2>
+      <ul className="m-0 list-none rounded-md border border-line bg-surface p-0">
+        {offers.map((o) => (
+          <MyOfferRow key={o.id} offer={o} onChanged={reload} />
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 function useMySatchels(accountId: string | null) {
@@ -185,6 +233,7 @@ export function SatchelsHome() {
           <EscrowPanel owed={owed} accountId={accountId} onChange={reload} />
         </div>
       ) : null}
+      {accountId ? <MyOffers accountId={accountId} /> : null}
       {!accountId ? (
         <SignedOut />
       ) : loading ? (
