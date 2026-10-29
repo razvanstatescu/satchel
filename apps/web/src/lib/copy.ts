@@ -22,6 +22,7 @@ import { allowanceCopy } from "@/lib/copy/allowance";
 import { commerce } from "@/lib/copy/commerce";
 import { flows } from "@/lib/copy/flows";
 import { landing } from "@/lib/copy/landing";
+import { market } from "@/lib/copy/market";
 import { satchel } from "@/lib/copy/satchel";
 import { shell } from "@/lib/copy/shell";
 import { walletOps } from "@/lib/copy/wallet-ops";
@@ -69,7 +70,23 @@ const card = {
   ogClean: "Clean history",
 } as const;
 
-export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, ...allowanceCopy, ...multichain, pill, card, landing } as const;
+// `market.inside`/`market.offers` (C4/C6, copy/market.ts) are merged as TOP-LEVEL `inside`/`offers` keys, never
+// spread as `...market`: `commerce.market` already owns `copy.market` (the /market page's title/count/lead/…).
+export const copy = {
+  ...shell,
+  ...satchel,
+  ...flows,
+  ...commerce,
+  ...walletOps,
+  ...allowanceCopy,
+  ...multichain,
+  pill,
+  card,
+  landing,
+  inside: market.inside,
+  offers: market.offers,
+  offerEntry: market.offerEntry,
+} as const;
 
 /** Map a contract/MPC failure code to user copy (kb/80 R3 §Error map): what happened, what didn't move, one action. */
 export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm" | "sol" }): string {
@@ -108,6 +125,28 @@ export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm"
       return copy.errors.nonceGap("the next one");
     case "ERR_TOKEN_NOT_FOUND":
       return copy.page.notfound.title(ctx.id);
+    case "ERR_INSIDE_BALANCE":
+      return copy.errors.E6("0");
+    case "ERR_STORAGE_CREDIT":
+      return copy.inside.storage.need("0.01 NEAR");
+    case "ERR_NO_OFFER":
+      return copy.offers.none;
+    case "ERR_NOT_OFFERER":
+      return copy.offers.mine.cancel;
+    case "ERR_OFFER_EXPIRED":
+      return copy.offers.mine.expired;
+    case "ERR_OFFER_EXPIRY":
+      return copy.offers.expiryErr;
+    case "ERR_OFFER_STALE":
+      return copy.offers.stale;
+    case "ERR_TOO_MANY_OFFERS":
+      return copy.offers.tooMany;
+    case "ERR_QUIET_PERIOD":
+      return copy.offers.incoming.blocked.ERR_QUIET_PERIOD;
+    // M-01 (fix/m01-solvency, pending merge into C4/C6): the contract refused a call that would have let the
+    // escrowed total (inside balances + open offers + storage credit) exceed its own NEAR. Nothing moved.
+    case "ERR_INSOLVENT":
+      return copy.errors.E6("0");
     default:
       if (code in copy.allowance.err) return copy.allowance.err[code as keyof typeof copy.allowance.err];
       if (/^ERR_(EVM|BTC|SOL|HEX)/.test(code)) return copy.errors.E39(chainName);

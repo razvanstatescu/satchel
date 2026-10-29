@@ -5,6 +5,7 @@ import {
   FIXTURE_CONFIG,
   FIXTURE_HEIGHT,
   FIXTURE_LOCK,
+  FIXTURE_MARKET_CONFIG,
   FIXTURE_RECORDS,
   fixtureListings,
   fixtureSatchel,
@@ -95,6 +96,32 @@ function fixtureView(): ViewFn {
         const ids = [...Object.keys(FIXTURE_TOKENS), ...sim.minted.map((m) => m.id)];
         return String(ids.map((i) => sim.token(i) ?? fixtureToken(i)).filter((t) => t?.owner_id === acct).length) as T;
       }
+      // ── C6 inside assets / C4 offers (docs/specs/C4-C6.md) ──────────────────────────────────
+      case "inside_of":
+        return (sim.token(id) ?? fixtureToken(id)) ? (sim.insideOf(id) as T) : (null as T | null);
+      case "storage_credit_of":
+        return sim.storageCreditOf(String(args.account_id ?? "")) as T;
+      case "offer": {
+        const offerId = Number(args.offer_id ?? -1);
+        return (sim.offer(offerId) ?? null) as T | null;
+      }
+      case "offers_for": {
+        const all = sim.offersFor(id);
+        const from = Number(args.from_index ?? 0);
+        const limit = Math.min(Number(args.limit ?? 50), 50);
+        return all.slice(from, from + limit) as T;
+      }
+      case "offers_by": {
+        const all = sim.offersBy(String(args.account_id ?? ""));
+        const from = Number(args.from_index ?? 0);
+        const limit = Math.min(Number(args.limit ?? 50), 50);
+        return all.slice(from, from + limit) as T;
+      }
+      case "market_config":
+        return { ...FIXTURE_MARKET_CONFIG, next_offer_id: FIXTURE_MARKET_CONFIG.next_offer_id } as T;
+      case "market_totals":
+        // Not exhaustively accurate in fixture mode (no UI reads it); the real contract's I-M2 is a sandbox invariant.
+        return { inside_near: "0", offers_near: "0", storage_credit: "0", proceeds_near: "0", escrow_near: "0" } as T;
       case "allowances_of":
         return sim.allowancesOf(id) as T;
       case "allowance":

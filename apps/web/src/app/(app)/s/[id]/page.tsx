@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { WalletTab } from "@/components/SatchelWallet";
-import { getSatchelSnapshot } from "@/lib/data/server";
+import { getOffersFor, getSatchelSnapshot } from "@/lib/data/server";
 import { FIXTURE_IDS } from "@/lib/data/fixtures";
 
 /** The Wallet tab (the judge page for /s/1). Blocking SSR; every judge fact renders outside any Suspense boundary. */
@@ -12,7 +12,7 @@ export async function generateStaticParams() {
 
 export default async function WalletPage(props: PageProps<"/s/[id]">) {
   const { id } = await props.params;
-  const snap = await getSatchelSnapshot(id);
+  const [snap, offers] = await Promise.all([getSatchelSnapshot(id), getOffersFor(id)]);
   if (!snap) notFound();
-  return <WalletTab snap={snap} />;
+  return <WalletTab snap={snap} offers={offers} />;
 }

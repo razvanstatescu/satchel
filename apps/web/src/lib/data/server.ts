@@ -1,14 +1,14 @@
 import { cacheLife } from "next/cache";
 import { CONTRACT_ROLE, DATA_MODE, IS_FIXTURE, SATCHEL_CONTRACT } from "@/lib/config";
 import { fixtureCleanReport, unavailableReport } from "@/lib/data/clean";
-import { fixtureEvents } from "@/lib/data/fixtures";
+import { fixtureEvents, fixtureInside, FIXTURE_MARKET_CONFIG } from "@/lib/data/fixtures";
 import { dataSource, type LockRead } from "@/lib/data/source";
 import type { ActivityRow, CleanReport, ContractFacts, MarketEntry, SatchelSnapshot } from "@/lib/data/types";
 import { buildSnapshot, isTokenId, UPSTREAM_MS } from "@/lib/data/snapshot";
 import { contractViews } from "@/lib/near/contract";
 import { satchelEvents } from "@/lib/near/history";
 import { withTimeout } from "@/lib/near/rpc";
-import { isMessageDetail, type ConfigView, type SigRecordView } from "@/lib/near/types";
+import { isMessageDetail, type ConfigView, type InsideView, type MarketConfigView, type OfferView, type SigRecordView } from "@/lib/near/types";
 import { messageFromHex } from "@/lib/message";
 
 /**
@@ -144,6 +144,57 @@ export function signRow(base: Pick<ActivityRow, "tx" | "block" | "timestampMs">,
   if (d?.chain_id) row.evmChainId = d.chain_id;
   if (d?.erc20) Object.assign(row, { token: "USDC" as const, amount: d.erc20.amount, to: `0x${d.erc20.to.replace(/^0x/, "")}` });
   return row;
+}
+
+/** C6: NEAR + allowlisted FTs held inside the Satchel contract for this token (docs/specs/C4-C6.md §4). Server-rendered
+ * next to the chain balances, no action required — anyone can read it. */
+export async function getInside(id: string): Promise<InsideView> {
+  "use cache";
+  cacheLife({ revalidate: 15, expire: 3600 });
+  if (!isTokenId(id)) return { near: "0", fts: [], inside_epoch: 0 };
+  if (IS_FIXTURE) return fixtureInside(id);
+  try {
+    const v = await withTimeout(contractViews(dataSource().view).insideOf(id), UPSTREAM_MS, "inside_of");
+    return v ?? { near: "0", fts: [], inside_epoch: 0 };
+  } catch {
+    return { near: "0", fts: [], inside_epoch: 0 };
+  }
+}
+
+/** C4: open offers on this token (the owner's incoming offers), oldest first. */
+export async function getOffersFor(id: string): Promise<OfferView[]> {
+  "use cache";
+  cacheLife({ revalidate: 15, expire: 3600 });
+  if (!isTokenId(id)) return [];
+  try {
+    return await withTimeout(contractViews(dataSource().view).offersFor(id, 0, 50), UPSTREAM_MS, "offers_for");
+  } catch {
+    return [];
+  }
+}
+
+/** C4: open offers made by this account ("My offers"). Not cached as long as the per-token reads: it's read from a
+ * client component (MySatchels), so a short-lived cache is enough to avoid hammering RPC on every poll. */
+export async function getOffersBy(accountId: string): Promise<OfferView[]> {
+  "use cache";
+  cacheLife({ revalidate: 15, expire: 3600 });
+  try {
+    return await withTimeout(contractViews(dataSource().view).offersBy(accountId, 0, 50), UPSTREAM_MS, "offers_by");
+  } catch {
+    return [];
+  }
+}
+
+export async function getMarketConfig(): Promise<MarketConfigView> {
+  "use cache";
+  cacheLife({ revalidate: 60, expire: 3600 });
+  if (IS_FIXTURE) return FIXTURE_MARKET_CONFIG;
+  try {
+    const v = await withTimeout(contractViews(dataSource().view).marketConfig(), UPSTREAM_MS, "market_config");
+    return v ?? FIXTURE_MARKET_CONFIG;
+  } catch {
+    return FIXTURE_MARKET_CONFIG;
+  }
 }
 
 /** Activity rows (first page) from NEP-297 events: FastNEAR tx API in live mode, fixtures otherwise. */

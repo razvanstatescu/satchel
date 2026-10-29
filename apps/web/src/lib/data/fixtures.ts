@@ -1,4 +1,4 @@
-import type { AllowanceRecord, ConfigView, ListingView, NftToken, SatchelView, SigRecordView } from "@/lib/near/types";
+import type { AllowanceRecord, ConfigView, InsideView, ListingView, MarketConfigView, NftToken, OfferView, SatchelView, SigRecordView } from "@/lib/near/types";
 
 /**
  * Fixture mode (NEXT_PUBLIC_DATA_MODE=fixture): realistic views for the demo state of kb/90 + D-32, so every page renders
@@ -391,3 +391,28 @@ export function fixtureEvidence(id: string, seq: number): { line: string; url?: 
 }
 
 export const FIXTURE_TIME = { tAt, hAgo, BLOCK_MS };
+
+/* ── C6: NEAR-side assets inside a Satchel (docs/specs/C4-C6.md) ───────────────────────────────── */
+
+/** `inside_of` baseline: only Satchel #1 starts holding something, so the Wallet tab's "NEAR inside" row has a
+ * judge-visible fact with no action taken. Everything else (deposits, withdrawals) comes from `sim.ts`. */
+export const FIXTURE_INSIDE: Record<string, InsideView> = {
+  "1": { near: "500000000000000000000000", fts: [], inside_epoch: 0 }, // 0.5 NEAR
+};
+
+export function fixtureInside(id: string): InsideView {
+  return FIXTURE_INSIDE[id] ?? { near: "0", fts: [], inside_epoch: 0 };
+}
+
+export const FIXTURE_USDC = "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af";
+export const FIXTURE_WNEAR = "wrap.testnet";
+
+export const FIXTURE_MARKET_CONFIG: MarketConfigView = {
+  inside_fts: [FIXTURE_USDC, FIXTURE_WNEAR],
+  max_offers_per_account: 20,
+  max_offer_ttl_ms: 90 * 24 * 3600 * 1000,
+  next_offer_id: 1,
+};
+
+/** No open offers at rest; every offer in the fixture world is made during a session (`sim.ts`). */
+export const FIXTURE_OFFERS: OfferView[] = [];
