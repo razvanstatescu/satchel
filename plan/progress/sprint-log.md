@@ -69,3 +69,8 @@
 - 2026-10-29T20:07Z [C2-ui C3-ui C7-ui] wip: UI committed (network rows, send picker + gas check, receive picker + EIP-681 chain id, /sign flow); tsc + lint clean
 - 2026-10-29T20:11Z [C4-ui|C6-ui] wip: Playwright offers.spec.ts green; fixed offers' fixture-mode client refresh and an aria-label collision @b7b5b10
 - 2026-10-29T20:13Z [orchestrator] C5 UI merged (1fb28f8) + stale-sheet fix; web unit 396, e2e 169/169
+- 2026-10-29T20:13Z [C2-ui C3-ui C7-ui] wip: merged main (C5 UI, review cf70d63); L-02 hex+digest flag; unit 422/422, tsc + lint clean; e2e next
+- 2026-10-29T20:22Z [M-01] wip: monitor spare=free-escrow, TS mirror (MarketTotalsView, spareNear), docs (C4-C6 §2.4, kb/90 §5.17 + E-53), new proptest prop_ensure_solvent (found+fixed a zero-escrow edge); unit 177/177
+- 2026-10-29T20:24Z [C4-ui|C6-ui] wip: axe coverage for offer flow + inside/offers state, Day and Night, all green @35c0ab8
+- 2026-10-29T20:28Z [M-01] done: fix/m01-solvency ready to merge (unit 177/177, sandbox 119/119 incl. review.rs M-01 proof un-ignored, core 467, tools 72; wasm 423,977 B sha256 10c6a8e9…614a, INV-22 OK)
+- 2026-10-29T20:29Z [C2-ui C3-ui C7-ui] done: feat/ui-sign (merged main 1fb28f8); web unit 422/422, Playwright 183/183 (CI=1 E2E_PORT=3329), tsc + lint clean; not pushed
