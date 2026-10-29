@@ -15,6 +15,7 @@ import {
   offerAcceptBlock,
   offerExpiryValid,
   prepayStorageCall,
+  spareNear,
   TGAS,
   usdcOfferCall,
   withdrawFtCall,
@@ -22,6 +23,7 @@ import {
   withdrawStorageCreditCall,
   WNEAR_TESTNET,
 } from '../src/near'
+import type { MarketTotalsView } from '../src/near'
 
 const SATCHEL = 'satchel.satchelhq.testnet'
 const USDC = '3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af'
@@ -133,5 +135,28 @@ describe('market: client-side mirrors of the contract checks', () => {
     expect(offerAcceptBlock(offer, { ...sat, owner_id: 'bob.testnet' }, 0, { ms: now, height: 2000 })).toBe('ERR_SELF_BUY')
     // a token that never signed has no quiet period
     expect(offerAcceptBlock({ ...offer, expected_sig_count: 0 }, { ...sat, sig_count: 0, last_sign_height: 0 }, 0, { ms: now, height: 1 })).toBeNull()
+  })
+})
+
+describe('M-01: the contract\'s own spare NEAR', () => {
+  const NEAR = 10n ** 24n
+  const totals = (escrow: bigint): MarketTotalsView => ({
+    inside_near: String(escrow - 3n * NEAR),
+    offers_near: String(2n * NEAR),
+    storage_credit: String(NEAR / 2n),
+    proceeds_near: String(NEAR / 2n),
+    escrow_near: String(escrow),
+  })
+  it('is free balance minus escrow_near (escrow is never spare)', () => {
+    // 20 NEAR, 422,562 B of code + state = 4.22562 NEAR staked, 15 NEAR escrowed
+    const acct = { amount: String(20n * NEAR), storage_usage: 422_562 }
+    expect(spareNear(acct, totals(15n * NEAR))).toBe(20n * NEAR - 422_562n * 10n ** 19n - 15n * NEAR)
+    expect(spareNear(acct, totals(15n * NEAR)) < 3n * NEAR).toBe(true) // the monitor alerts
+    expect(spareNear(acct, totals(3n * NEAR)) > 5n * NEAR).toBe(true)
+  })
+  it('goes negative exactly when I-M1 is broken', () => {
+    const acct = { amount: String(5n * NEAR), storage_usage: 100_000 } // 1 NEAR staked, 4 NEAR free
+    expect(spareNear(acct, totals(4n * NEAR))).toBe(0n)
+    expect(spareNear(acct, totals(4n * NEAR + 1n))).toBe(-1n)
   })
 })

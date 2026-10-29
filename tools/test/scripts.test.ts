@@ -87,15 +87,31 @@ describe('shell scripts', () => {
     expect(out).toContain('free balance')
     expect(out).toContain('< 3 NEAR')
   })
-  it('free-balance.py: FAIL (alert) below 3 NEAR free, WARN below the 5 NEAR floor, PASS above (review S-02)', () => {
-    const run = (amountNear: number, storageBytes: number) => {
-      const resp = JSON.stringify({ result: { amount: (BigInt(Math.round(amountNear * 1000)) * 10n ** 21n).toString(), storage_usage: storageBytes } })
-      return spawnSync('python3', [join(TOOLS, 'lib/free-balance.py'), resp, '3', '5'], { encoding: 'utf8' }).stdout.trim()
+  it('free-balance.py: verdict on spare = free − escrow; FAIL below 3 NEAR, WARN below the 5 NEAR floor, PASS above (review S-02, M-01)', () => {
+    const yocto = (near: number) => (BigInt(Math.round(near * 1000)) * 10n ** 21n).toString()
+    // a call_function(market_totals) JSON-RPC response: the view's JSON as a byte array
+    const totalsResp = (t: Record<string, string>) =>
+      JSON.stringify({ result: { result: [...Buffer.from(JSON.stringify(t))], logs: [] } })
+    const run = (amountNear: number, storageBytes: number, totals?: string) => {
+      const resp = JSON.stringify({ result: { amount: yocto(amountNear), storage_usage: storageBytes } })
+      const args = [join(TOOLS, 'lib/free-balance.py'), resp, '3', '5', ...(totals === undefined ? [] : [totals])]
+      return spawnSync('python3', args, { encoding: 'utf8' }).stdout.trim()
     }
+    const none = totalsResp({ inside_near: '0', offers_near: '0', storage_credit: '0', proceeds_near: '0', escrow_near: '0' })
     // 290 KB of code ≈ 2.9 NEAR of storage stake
-    expect(run(20, 290_000)).toMatch(/^PASS free 17\.1000 NEAR/)
-    expect(run(7, 290_000)).toMatch(/^WARN free 4\.1000 NEAR/)
-    expect(run(5.8, 290_000)).toMatch(/^FAIL free 2\.9000 NEAR .*top up/)
+    expect(run(20, 290_000, none)).toMatch(/^PASS spare 17\.1000 NEAR \(free 17\.1000 − escrow 0\.0000/)
+    expect(run(7, 290_000, none)).toMatch(/^WARN spare 4\.1000 NEAR/)
+    expect(run(5.8, 290_000, none)).toMatch(/^FAIL spare 2\.9000 NEAR .*top up/)
+    // M-01: 17.1 NEAR free, but 15 NEAR of it is user escrow → only 2.1 NEAR can pay S-02 storage
+    const escrow = totalsResp({ inside_near: yocto(12), offers_near: yocto(2), storage_credit: yocto(0.5), proceeds_near: yocto(0.5), escrow_near: yocto(15) })
+    expect(run(20, 290_000, escrow)).toMatch(/^FAIL spare 2\.1000 NEAR \(free 17\.1000 − escrow 15\.0000.*top up/)
+    // an older view without escrow_near: the parts are summed
+    const parts = totalsResp({ inside_near: yocto(12), offers_near: yocto(2), storage_credit: yocto(1) })
+    expect(run(20, 290_000, parts)).toMatch(/^FAIL spare 2\.1000 NEAR \(free 17\.1000 − escrow 15\.0000/)
+    // escrow unreadable (no totals, a contract error, a pre-C4 contract): never PASS, since free overstates the buffer
+    expect(run(20, 290_000)).toMatch(/^WARN free 17\.1000 NEAR, escrow unknown/)
+    expect(run(20, 290_000, JSON.stringify({ result: { error: 'MethodNotFound', logs: [] } }))).toMatch(/^WARN .*escrow unknown/)
+    expect(run(5.8, 290_000, '{}')).toMatch(/^FAIL free 2\.9000 NEAR, escrow unknown.*top up/)
     const err = spawnSync('python3', [join(TOOLS, 'lib/free-balance.py'), '{"error":{"cause":{"name":"UNKNOWN_ACCOUNT"}}}', '3', '5'], { encoding: 'utf8' })
     expect(err.stdout.trim()).toBe('FAIL account UNKNOWN_ACCOUNT')
   })
