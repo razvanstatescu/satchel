@@ -27,6 +27,9 @@ export const NEAR_TX = {
   t1btc: "CWvZ71xZuwVVjr3Ltg1pGo7AfFJ41bbSFuC4DSFXC3b4",
   t2xfer: "Hpm7hDnPeFMJEHH4g8dTD9cysQGJ9Bm7WCDa6P75s7KP",
   t2btc: "8sQhhX6vfFfzoVd42Qbm42XdS9QH6yYD1w3LojAWSvHH",
+  t2usdc: "5Ft8uJ3cQk2WmZpL9vRbN4xYhG6sD7aE1oTqC8wVnK2M",
+  t2base: "3HkP9sWd6fQx2LmT7vRcN5yBg8jZa4uE1oYqC2wVnM8K",
+  t2msg: "7JqR4tYe2gSx9MnU5vPcL3zBh6kWa8uD1oXqF2wVmN4H",
   t3evm: "2mUVXXpsenonfVoJjK57HgJZTYw2Qx94inRuCm2Lva4h",
   t3list: "6vfGivrQ1ANLvaDrmTeBFA3qwWZCCz4jMi4NSp3JXJVp",
   t4evm: "DmmynatTNfTePHtCehhwfZn5VdK8ceuK2diFWQ6RoPJz",
@@ -71,8 +74,36 @@ const BTC = {
   t5: { txid: "e1d4004bb7584655d4ac8cbe64ca89918ed8cf6c9df9c00c9a12d9211abc9ded", payload: "28a79d3583f55043cc23985b741c8908b30dc98fd40c602faa4e52cd33459c9e", r: "49c7ed99c4474c2f1347410b4b5fe1cba2fdf7f9c06fc7826a23ce5a3b0ab312", s: "3b2c5c47da345fe2eb3ccb051db7f174c8da85a1cc9d9d2d9815566dcedd9a6b", spend: "399b093f3b131880e3b0ce6f36e0a4caf7c9f117651846d0085488ee83f3ce3b", amount: "50000", sent: "30000", to: "tb1qaanvpz7r4c5u9yqd8m3yfk8yh2k7c5gzky8sd" },
 } as const;
 
+/**
+ * C2 / C3 / C7 records of #2 (generated with @satchel/core: real type-2 RLP, payload = keccak256(unsigned_tx); the
+ * message payload = keccak256(EIP-191 bytes)). Signatures are placeholders.
+ */
+const RECIPIENT2 = "0x61739f33adbb7f76c1b5b222e4119085257528be";
+const C2 = {
+  usdc: {
+    unsigned_tx:
+      "02f87083aa36a780843b9aca008459682f00830130b0941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be000000000000000000000000000000000000000000000000000000000016e360c0",
+    payload: "4694b152d5e9cdfd9c05fbd7a33abdcae849afcc2e0e191abd6ae7a8d08fcf9e",
+    token: "1c7d4b196cb0c7b01d743fbc6116a902379c7238",
+    amount: "1500000",
+    chainTx: "0x5d0c1f8e2a7b9c3d4e6f708192a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5",
+  },
+  base: {
+    unsigned_tx: "02f183014a3480843b9aca008459682f008252089461739f33adbb7f76c1b5b222e4119085257528be870aa87bee53800080c0",
+    payload: "7f1f7fa2fde2cf7195a786b812b768fefef1373b8c3119cdef8c80c981b439bf",
+    valueWei: "3000000000000000",
+    chainTx: "0x9a8b7c6d5e4f30211203f4e5d6c7b8a9908f7e6d5c4b3a291807f6e5d4c3b2a1",
+  },
+  msg: {
+    text: "Sign in to example.xyz as the owner of Satchel #2. Nonce: 7f3a91",
+    hex: "5369676e20696e20746f206578616d706c652e78797a20617320746865206f776e6572206f66205361746368656c2023322e204e6f6e63653a20376633613931",
+    payload: "5132a023d7379be16a8e4c49d7bd506028ae0cc1af5edb8e87c607147270b566",
+  },
+} as const;
+
 export const FIXTURE_BTC = BTC;
 export const FIXTURE_EVM = EVM;
+export const FIXTURE_C2 = { ...C2, recipient: RECIPIENT2 };
 
 const paths = (id: string) => ({ btc: `satchel/${id}/btc`, evm: `satchel/${id}/evm`, sol: `satchel/${id}/sol` });
 
@@ -92,6 +123,9 @@ const H1_EVM = hAgo(90_000);
 const H1_BTC = hAgo(60_000);
 const H2_XFER = hAgo(40_000);
 const H2_BTC = hAgo(30_000);
+const H2_USDC = hAgo(26_000);
+const H2_BASE = hAgo(25_000);
+const H2_MSG = hAgo(24_000);
 const H3_EVM = hAgo(20_000);
 const H3_LIST = hAgo(18_000);
 const H4_EVM = hAgo(12_000);
@@ -104,7 +138,25 @@ export const FIXTURE_RECORDS: Record<string, SigRecordView[]> = {
     rec({ seq: 0, chain: "evm", height: H1_EVM, payload: EVM.t1.payload, signature: { r: EVM.t1.r, s: EVM.t1.s, recovery_id: 1 }, detail: { evm: { chain_id: 11155111, nonce: 0, unsigned_tx: EVM.t1.unsigned_tx } } }),
     rec({ seq: 1, chain: "btc", height: H1_BTC, payload: BTC.t1.payload, signature: { r: BTC.t1.r, s: BTC.t1.s, recovery_id: 0 }, detail: { btc: { txid: BTC.t1.txid, vout: 1, amount_sats: BTC.t1.amount } } }),
   ],
-  "2": [rec({ seq: 0, chain: "btc", height: H2_BTC, payload: BTC.t2.payload, signature: { r: BTC.t2.r, s: BTC.t2.s, recovery_id: 1 }, detail: { btc: { txid: BTC.t2.txid, vout: 0, amount_sats: BTC.t2.amount } } }, BOB)],
+  "2": [
+    rec({ seq: 0, chain: "btc", height: H2_BTC, payload: BTC.t2.payload, signature: { r: BTC.t2.r, s: BTC.t2.s, recovery_id: 1 }, detail: { btc: { txid: BTC.t2.txid, vout: 0, amount_sats: BTC.t2.amount } } }, BOB),
+    // C2: a USDC transfer on Sepolia (nonce 0)
+    rec(
+      {
+        seq: 1,
+        chain: "evm",
+        height: H2_USDC,
+        payload: C2.usdc.payload,
+        signature: { r: BTC.t2.s, s: BTC.t2.r, recovery_id: 0 },
+        detail: { evm: { chain_id: 11155111, nonce: 0, unsigned_tx: C2.usdc.unsigned_tx, erc20: { token: C2.usdc.token, to: RECIPIENT2.slice(2), amount: C2.usdc.amount } } },
+      },
+      BOB,
+    ),
+    // C3: a native send on Base Sepolia (its own nonce 0: the nonce rule is per chain)
+    rec({ seq: 2, chain: "evm", height: H2_BASE, payload: C2.base.payload, signature: { r: EVM.t1.s, s: EVM.t1.r, recovery_id: 1 }, detail: { evm: { chain_id: 84532, nonce: 0, unsigned_tx: C2.base.unsigned_tx } } }, BOB),
+    // C7: an EIP-191 message (never blocks Buy)
+    rec({ seq: 3, chain: "evm", height: H2_MSG, payload: C2.msg.payload, signature: { r: EVM.t3.s, s: EVM.t3.r, recovery_id: 0 }, detail: { evm_message: { message: C2.msg.hex } } }, BOB),
+  ],
   "3": [rec({ seq: 0, chain: "evm", height: H3_EVM, payload: EVM.t3.payload, signature: { r: EVM.t3.r, s: EVM.t3.s, recovery_id: 0 }, detail: { evm: { chain_id: 11155111, nonce: 0, unsigned_tx: EVM.t3.unsigned_tx } } })],
   "4": [rec({ seq: 0, chain: "evm", height: H4_EVM, payload: EVM.t4.payload, signature: { r: EVM.t4.r, s: EVM.t4.s, recovery_id: 1 }, detail: { evm: { chain_id: 11155111, nonce: 1, unsigned_tx: EVM.t4.unsigned_tx } } })],
   "5": [rec({ seq: 0, chain: "btc", height: H5_BTC, payload: BTC.t5.payload, signature: { r: BTC.t5.r, s: BTC.t5.s, recovery_id: 0 }, detail: { btc: { txid: BTC.t5.txid, vout: 0, amount_sats: BTC.t5.amount } } })],
@@ -121,7 +173,7 @@ interface TokenFixture {
 
 export const FIXTURE_TOKENS: Record<string, TokenFixture> = {
   "1": { owner: ALICE, last_sign_height: H1_BTC, listing: null, mintedAt: BIRTH_HEIGHT },
-  "2": { owner: BOB, last_sign_height: H2_BTC, listing: null, mintedAt: BIRTH_HEIGHT },
+  "2": { owner: BOB, last_sign_height: H2_MSG, listing: null, mintedAt: BIRTH_HEIGHT },
   "3": { owner: ALICE, last_sign_height: H3_EVM, listing: { id: 3, seller: ALICE, price: "5000000", currency: "usdc", listed_at: H3_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
   "4": { owner: ALICE, last_sign_height: H4_EVM, listing: { id: 4, seller: ALICE, price: "2000000000000000000000000", currency: "near", listed_at: H4_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
   "5": { owner: ALICE, last_sign_height: H5_BTC, listing: { id: 5, seller: ALICE, price: "1000000000000000000000000", currency: "near", listed_at: H5_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
@@ -191,6 +243,25 @@ export const FIXTURE_BALANCES: Record<string, { btc: { confirmed: string; unconf
   "7": { btc: { confirmed: "100000", unconfirmed: "0" }, evm: "20000000000000000", sol: "0" },
 };
 
+/**
+ * C2 + C3: USDC on Sepolia, and ETH + USDC on Base Sepolia, Arbitrum Sepolia and OP Sepolia (base units). Sepolia's
+ * ETH stays `FIXTURE_BALANCES[id].evm`. Tokens not listed hold nothing on the other networks.
+ */
+export const FIXTURE_EVM_CHAINS: Record<string, Partial<Record<number, { wei?: string; usdc?: string }>>> = {
+  "1": { 11155111: { usdc: "25000000" }, 84532: { wei: "20000000000000000", usdc: "10000000" }, 11155420: { wei: "5000000000000000" } },
+  "2": { 11155111: { usdc: "3500000" }, 84532: { wei: "17000000000000000" } },
+  "7": { 84532: { wei: "8000000000000000" } },
+};
+
+export function fixtureEvmChains(id: string): { chain_id: number; wei: string; usdc: string }[] {
+  const t = FIXTURE_EVM_CHAINS[id] ?? {};
+  return [11155111, 84532, 421614, 11155420].map((c) => ({
+    chain_id: c,
+    wei: c === 11155111 ? (FIXTURE_BALANCES[id]?.evm ?? "0") : (t[c]?.wei ?? "0"),
+    usdc: t[c]?.usdc ?? "0",
+  }));
+}
+
 export const FIXTURE_LOCK = {
   access_keys: 0,
   account_exists: true,
@@ -210,7 +281,9 @@ export interface FixtureEvent {
   timestampMs: number;
   event: "nft_mint" | "nft_transfer" | "sign_requested" | "sign_resolved" | "listed" | "delisted" | "sold";
   data: Record<string, unknown>;
-  chainTx?: { chain: "btc" | "evm"; id: string; amount: string; to: string; fee?: string };
+  chainTx?: { chain: "btc" | "evm"; id: string; amount: string; to: string; fee?: string; token?: "USDC"; chainId?: number };
+  /** C7: a signed message (no chain tx) */
+  message?: { chain: "evm" | "sol"; text: string };
 }
 
 export function fixtureEvents(id: string): FixtureEvent[] {
@@ -222,6 +295,9 @@ export function fixtureEvents(id: string): FixtureEvent[] {
       mint,
     ],
     "2": [
+      { tx: NEAR_TX.t2msg, block: H2_MSG, timestampMs: tAt(H2_MSG), event: "sign_requested", data: { token_id: "2", chain: "evm", first_seq: 3, count: 1, kind: "evm_message" }, message: { chain: "evm", text: C2.msg.text } },
+      { tx: NEAR_TX.t2base, block: H2_BASE, timestampMs: tAt(H2_BASE), event: "sign_requested", data: { token_id: "2", chain: "evm", first_seq: 2, count: 1 }, chainTx: { chain: "evm", id: C2.base.chainTx, amount: C2.base.valueWei, to: RECIPIENT2, fee: "21000000000000", chainId: 84532 } },
+      { tx: NEAR_TX.t2usdc, block: H2_USDC, timestampMs: tAt(H2_USDC), event: "sign_requested", data: { token_id: "2", chain: "evm", first_seq: 1, count: 1 }, chainTx: { chain: "evm", id: C2.usdc.chainTx, amount: C2.usdc.amount, to: RECIPIENT2, fee: "52000000000000", token: "USDC", chainId: 11155111 } },
       { tx: NEAR_TX.t2btc, block: H2_BTC, timestampMs: tAt(H2_BTC), event: "sign_requested", data: { token_id: "2", chain: "btc", first_seq: 0, count: 1, owner_id: BOB }, chainTx: { chain: "btc", id: BTC.t2.spend, amount: BTC.t2.sent, to: BTC.t2.to, fee: "282" } },
       { tx: NEAR_TX.t2xfer, block: H2_XFER, timestampMs: tAt(H2_XFER), event: "nft_transfer", data: { old_owner_id: ALICE, new_owner_id: BOB, token_ids: ["2"] } },
       mint,
@@ -259,6 +335,11 @@ export function fixtureEvidence(id: string, seq: number): { line: string; url?: 
   if ("evm" in r.detail) {
     const nonce = r.detail.evm.nonce;
     if (fixtureItemStatus(id, seq) === "unused") return { line: `Nonce ${nonce} not used yet` };
+    if (id === "2") {
+      const base = r.detail.evm.chain_id === 84532;
+      const tx = base ? C2.base.chainTx : C2.usdc.chainTx;
+      return { line: `Nonce ${nonce} used by ${tx.slice(0, 6)}…${tx.slice(-4)} · 3 confirmations`, url: base ? `https://sepolia.basescan.org/tx/${tx}` : `https://sepolia.etherscan.io/tx/${tx}` };
+    }
     const tx = id === "1" ? EVM.t1.chainTx : EVM.t3.chainTx;
     return { line: `Nonce ${nonce} used by ${tx.slice(0, 6)}…${tx.slice(-4)} · 3 confirmations`, url: `https://sepolia.etherscan.io/tx/${tx}` };
   }
