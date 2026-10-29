@@ -197,6 +197,8 @@ export const satchel = {
       wouldSend: "Would send",
       wouldSendValue: (amount: string, to: string) => `${amount} to ${to}`,
       unusedNote: "Not used yet, so this signature could still move coins.",
+      /** C5: a delegate's own signature names them, never the owner (docs/specs/C5.md §1.3 `requester`). */
+      requestedBy: "Requested by",
     },
     /** The In progress group (client): the line under "Sending to …", per stage. */
     progress: {

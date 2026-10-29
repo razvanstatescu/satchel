@@ -194,9 +194,13 @@ export function DetailList({ rows }: { rows: readonly { label: string; value: Re
 
 const linkCls = "min-h-11 font-semibold";
 
-function details(r: ActivityRow): { label: string; value: ReactNode }[] {
+function details(r: ActivityRow, owner?: string): { label: string; value: ReactNode }[] {
   const d = copy.act.detail;
   const out: { label: string; value: ReactNode }[] = [{ label: d.date, value: r.timestampMs ? utcLong(r.timestampMs) : copy.act.block(groupDigits(r.block)) }];
+  // C5: a delegate's requester names them (never shown for the owner's own signatures).
+  if ((r.kind === "issued" || r.kind === "sent") && r.requester && r.requester !== owner) {
+    out.push({ label: d.requestedBy, value: <span className="font-mono text-[0.8125rem]/5 break-all">{r.requester}</span> });
+  }
   if (r.kind === "issued" && r.chain && r.amount && r.to) {
     out.push({ label: d.wouldSend, value: d.wouldSendValue(formatAmount(r.amount, rowTicker(r)), truncateAddress(r.to)) });
   }
@@ -236,7 +240,7 @@ function details(r: ActivityRow): { label: string; value: ReactNode }[] {
   return out;
 }
 
-export function ActivityItem({ r }: { r: ActivityRow }) {
+export function ActivityItem({ r, owner }: { r: ActivityRow; owner?: string }) {
   const amount = amountOf(r);
   const pill = r.status === "unused" ? <ItemPill status="unused" /> : null;
   const network = rowNetwork(r);
@@ -270,7 +274,7 @@ export function ActivityItem({ r }: { r: ActivityRow }) {
           <Icon icon={ChevronDown} size={20} className="text-ink-muted transition-transform duration-150 ease-out group-open/row:rotate-180" />
         </summary>
         <div className="px-4 pb-4 sm:pl-16">
-          <DetailList rows={details(r)} />
+          <DetailList rows={details(r, owner)} />
         </div>
       </details>
     </li>
@@ -290,13 +294,13 @@ export function FeedGroup({ id, heading, children }: { id: string; heading: Reac
 }
 
 /** The record: day groups, newest first. */
-export function Timeline({ rows }: { rows: readonly ActivityRow[] }) {
+export function Timeline({ rows, owner }: { rows: readonly ActivityRow[]; owner?: string }) {
   return (
     <div className="flex flex-col gap-8" data-timeline>
       {dayGroups(rows).map((g) => (
         <FeedGroup key={g.day} id={`day-${g.day}`} heading={g.day === "unknown" ? copy.act.earlier : <DayLabel ms={g.rows[0].timestampMs!} />}>
           {g.rows.map((r, i) => (
-            <ActivityItem key={`${r.tx}-${r.kind}-${i}`} r={r} />
+            <ActivityItem key={`${r.tx}-${r.kind}-${i}`} r={r} owner={owner} />
           ))}
         </FeedGroup>
       ))}

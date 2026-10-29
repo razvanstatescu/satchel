@@ -1,9 +1,23 @@
 import { toHex } from "@satchel/core/bytes";
-import { classifySignRequest, signContextFromRecords } from "@satchel/core/policy";
+import { classifySignRequest, signContextFromRecords, type Asset, type CapInput } from "@satchel/core/policy";
 import { IS_FIXTURE } from "@/lib/config";
 import { FIXTURE_HEIGHT } from "@/lib/data/fixtures";
 import { FIXTURE_RECORDS } from "@/lib/data/fixtures";
-import { fixtureHash, simBuy, simDelist, simFundNear, simList, simMint, simOverlay, simSignFor, simTransfer, simWithdraw } from "@/lib/data/sim";
+import {
+  fixtureHash,
+  simBuy,
+  simDebitDelegated,
+  simDelist,
+  simFundNear,
+  simList,
+  simMint,
+  simOverlay,
+  simRevokeAllowance,
+  simSetAllowance,
+  simSignFor,
+  simTransfer,
+  simWithdraw,
+} from "@/lib/data/sim";
 import type { WalletTx } from "@/lib/near/contract";
 import type { SigDetailView, SignRequest } from "@/lib/near/types";
 import type { WalletAdapter } from "@/lib/near/wallet";
@@ -59,8 +73,27 @@ function applyTx(tx: WalletTx, accountId: string): unknown {
     const args = (action?.args ?? {}) as Record<string, unknown>;
     const height = simOverlay().height(FIXTURE_HEIGHT);
     switch (action?.methodName) {
-      case "sign_for":
-        simSignFor({ tokenId: String(args.token_id), requester: accountId, items: recordsFor(args.request as SignRequest, String(args.token_id)), height });
+      case "sign_for": {
+        const tokenId = String(args.token_id);
+        const request = args.request as SignRequest;
+        // C5: a non-owner caller is a delegate — check and debit its allowance before the (simulated) MPC call,
+        // exactly where the contract does it (authorize_signer, then debit_allowance before step 5).
+        const owner = simOverlay().token(tokenId)?.owner_id;
+        if (owner && owner !== accountId) {
+          const listed = !!simOverlay().satchel(tokenId)?.listing;
+          const chk = simDebitDelegated(tokenId, accountId, request, listed);
+          if (!chk.ok) throw new Error(`Smart contract panicked: ${chk.error}`);
+        }
+        simSignFor({ tokenId, requester: accountId, items: recordsFor(request, tokenId), height });
+        break;
+      }
+      case "set_allowance": {
+        const caps = (args.caps as { asset: Asset; limit: string }[]).map((c): CapInput => ({ asset: c.asset, limit: BigInt(c.limit) }));
+        simSetAllowance(String(args.token_id), accountId, String(args.delegate), caps, args.expires_at_ms as number | undefined);
+        break;
+      }
+      case "revoke_allowance":
+        simRevokeAllowance(String(args.token_id), accountId, String(args.delegate));
         break;
       case "nft_transfer":
         simTransfer(String(args.token_id), String(args.receiver_id));

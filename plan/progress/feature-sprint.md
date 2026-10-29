@@ -30,13 +30,13 @@
 | A2 | Give by link (claim link) | web-flows | **merged + pushed** (94428ea) | `/s/[id]/give-link`, `/claim` (fragment-only secret, local signer); batch fund + nft_transfer with fallback. Needs a real-wallet test |
 | A3 | Empty the Satchel | web-flows | **merged + pushed** (94428ea) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
 | A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
-| C1 | `history_digest` view | contract-sign | in progress: done on the branch; merging main | C1/C2/C3/C7 on `feat/contract-sign` (368d3f3): sandbox 88, core 379, fuzz 4.0M Rust + 400k differential + 400k TS (0 disagreements); branch wasm 309,266 B `1cac1e97…`; merging main (C4/C5/C6) next |
-| C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
-| C3 | More EVM testnets | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
+| C1 | `history_digest` view | contract-sign | **contract merged + pushed** (e985d82) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
+| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | 4 Circle USDC verified on-chain; new `ERR_EVM_TOKEN`/`ERR_EVM_VALUE`; EVM limit 160 B |
+| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | per-chain nonce-gap (`StorageKey::EvmNonces`, last); checker per chain, fail-closed |
 | C4 | Offers | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | `make_offer` takes an explicit `amount`; 20 open offers per offerer, 90-day max expiry; storage-credit methods for FT paths. Needs a security review |
 | C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract merged** into main 24a680b; UI in progress | 115 unit, 91 sandbox, 359 core, 55 vectors; wasm 329,320 B `e7ded724…`. Debits include fees; message signing refused for delegates; explicit clear on transfer and sale |
 | C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | USDC + wrap.testnet allowlist; withdraw blocked while listed; invariants I-M1..I-M8; 142 unit, 107 sandbox (on the branch), 371 core |
-| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress: done on the branch; merging main | see C1; UI in phase 2 |
+| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | status `message`, never blocks; refused for delegates; BIP-322 skipped (spec §9) |
 
 ## Interface decisions fixed up front (so parallel branches agree)
 Each contract agent first commits `docs/specs/<id>.md` with its exact method signatures and JSON shapes, and logs
@@ -122,3 +122,48 @@ it. Phase-2 UI work builds against those specs.
 
   All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (4349840); a confirmation sandbox run is in progress.
 - 16:50Z: confirmation run on main (A1–A4, C4, C5, C6): sandbox 107/107, web unit 379, web typecheck clean.
+- 17:00Z: merged `feat/contract-sign` (C1, C2, C3, C7) into main (e985d82), clean, since the branch had already merged main: contract unit 172, core 459, tools 72 with all 7 vector files OK, web unit 379, typecheck OK. Pushed. **All seven contract features are now on main**; the merged wasm is 422,562 B `bd5d8e01…` (the agent's build).
+- 17:05Z: a Claude authentication outage stopped web-sign, web-market and web-allowance, and two spawns (reviewer, docs) failed on worktree races. Empty worktrees were removed; web-allowance (4 commits) and web-market (uncommitted data layer) were resumed and told to commit, then merge main; reviewer (Opus), web-sign (Sonnet) and docs-spec (Sonnet, kb/90 update) were respawned from e985d82. The full verification on main (wasm, sandbox, e2e) is re-running.
+- 17:15–17:30Z: web-allowance and web-market reported file writes and reads refused with "the user doesn't want to take this action … STOP". The orchestrator paused resumes and asked Razvan.
+- 17:40Z: Razvan said "continue". Session restart #4. All five agents resumed with the PATH fix (this session's shell lacked cargo, node and pnpm): web-allowance (fd6ce38 + 2 uncommitted), web-market (44a0ae9 + 4 uncommitted), reviewer, web-sign and docs-spec (8 uncommitted). The main verification (wasm, sandbox, e2e) is re-running with PATH set.
+- 17:50Z: web-sign handed its build to a nested satchel-web agent (running on `feat/ui-sign`, nothing committed yet). Its survey found web gaps on main that the C2/C3/C7 UI must close:
+  - `clean-live.ts` passes only Sepolia `evm` sources, so records on the other three chains would be "unknown" and block Buy;
+  - `Clean.tsx` drops "message" items;
+  - `send.ts`, `adapter.ts`, the retry intents and `view.allZero()` are Sepolia-only;
+  - `buildEip681` hard-codes 11155111;
+  - the `notCoveredList` copy says three networks.
+
+  **Release gate:** these must be fixed before the web deploy switches to a contract that has C2, C3 or C7.
+- 18:05Z: the other agents hit the same refusals. The C2/C3/C7 nested agent, web-market and web-allowance all report Read/Edit/Write refused with "the user doesn't want to take this action … STOP", even after Razvan's "continue". All are paused pending Razvan's choice: allow agent file edits, orchestrator does the UI, or stop the UI work.
+  - `feat/ui-allowance`: 531557b, with a **merge of main in progress** (`sim.ts` and `mock-wallet.ts` still conflicted).
+  - `feat/ui-market`: 3999f22 (data layer, copy, server-rendered inside balances; typecheck and lint clean).
+  - `feat/ui-sign`: one uncommitted types change, plus fixture vectors in the agent's report.
+- 18:10Z: merged `docs/kb90-sprint` (kb/90 §2/§5.4/§5.5/§5.9/§5.17/§6.1/§7/§13/§14, README, judge-snippets) into main. **Corrected its inferred StorageKey order** to the real enum in `lib.rs`: Allowances 8, Inside…StorageCredit 9–16, EvmNonces 17 (eb1f1c6). Pushed.
+- 18:20Z: **the security reviewer reported provisional findings and was then blocked**: its Write of `tests/tests/review.rs` was refused, so nothing is committed yet. The review is about 60% done. It ran contract unit 172/172, the sandbox (exit 0) and a fresh differential fuzz (120k cases, 0 disagreements). Wasm 422,562 B `bd5d8e01…`, INV-22 OK. **No Critical or High.**
+  - **M-01 (Medium): contract-paid storage can consume user escrow.** `nft_transfer`, `buy` and `accept_offer` to a new holder cost the contract about 250 B (S-02). Since C4/C6, the balance also holds inside NEAR, NEAR offers, storage credit and NEAR proceeds, so that growth can come out of escrow. I-M1 then breaks, and the last `withdraw_near` hits `LackBalanceForState`. The monitor's free-balance check counts escrow as free.
+    - Proposed fix: a `proceeds_near` total, plus `ensure_solvent` (free ≥ inside + offers + credit + NEAR proceeds) at the end of `nft_transfer`, `execute_sale` and `accept_offer`.
+    - The monitor should also subtract `market_totals`.
+    - **Verdict: C4/C6 ship only with this fix.**
+  - **L-01:** C5's delegate debit ignores the OP-stack L1 data fee on Base and OP Sepolia. The impact is bounded (≤ 160 B tx). Reserve a margin or document it.
+  - **L-02:** a C7 32-byte body can be ground to look like an `eth_sign` digest, relevant only if the Satchel address is ever a Safe owner. Buy-tab hardening: show the hex, escape control and bidi characters, flag digest-like bodies.
+  - **L-03:** `history_digest` view gas, estimated ~0.1 Tgas per record, needs a sandbox measurement.
+  - **Info:** unlimited 1-yocto offers clutter `offers_for`; `withdraw_storage_credit` has no re-credit; `prepay_storage(contract)` credit is unwithdrawable; wrap.testnet trust is bounded; an OP/Base portal deposit can bump the L2 nonce.
+  - **Provisional verdicts:**
+    - C1 ships (pending L-03);
+    - C2 and C3 ship;
+    - C5 ships (L-01 documented);
+    - C7 ships (with L-02 UI hardening);
+    - **C4/C6 need the M-01 fix.**
+- 20:00Z (local 22:00): Razvan said "you can continue". Verified main e985d82: wasm 422,562 B `bd5d8e01…`, INV-22 OK, Playwright 161/161 (the sandbox is 112/112 per the reviewer on the same tree). Resumed web-allowance, web-market, the nested web-sign agent (C2/C3/C7 UI, told to wire `evmByChain` and escape message text) and the reviewer (told M-01 is fixed elsewhere). Spawned **contract-fix-m01** (Opus) on `fix/m01-solvency` in a manually created worktree `.claude/worktrees/fix-m01`, since harness worktree creation keeps racing: failing test first, then `ensure_solvent()` plus an escrow-total view, plus a monitor update.
+- 20:30Z: **security review complete** (`docs/security/sprint-review.md`), merged into main (cf70d63) and pushed. No Critical or High.
+  - **M-01, Medium:** the escrow solvency issue. The fix is in progress on `fix/m01-solvency`; the proof `review.rs::m01_…` is `#[ignore]`d until it lands.
+  - **L-01:** OP-stack L1 fee, documented.
+  - **L-02:** message display hardening; assigned to web-sign.
+  - **L-03:** `history_digest` ceiling measured (≈ 3,000 small or 2,000 1-KiB records; ~1,500 cross-contract), docs corrected.
+  - **L-04 (SR-01):** fixed, `evmConfirmationsByChain` (Base and OP 30, Arbitrum 240).
+  - **L-05:** the web app's `evmByChain` and `mapCoreReport`; assigned to web-sign; the release gate for L2 sends.
+  - **I-01..I-09:** accepted or documented.
+
+  Verdicts: C1, C2, C5 ship; C3 ships (app needs L-05); C7 ships (L-02 UI); **C4/C6 ship with the M-01 fix**.
+
+  Suites on the review branch: contract unit 172, sandbox 115 + 1 ignored, core 465, tools 72, differential fuzz 400k with 0 disagreements.

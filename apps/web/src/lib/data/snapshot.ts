@@ -5,7 +5,7 @@ import type { LockFacts, SatchelSnapshot } from "@/lib/data/types";
 import { satchelAddresses } from "@/lib/derive";
 import { contractViews, deriveStatus } from "@/lib/near/contract";
 import { withTimeout } from "@/lib/near/rpc";
-import type { ConfigView, SigRecordView } from "@/lib/near/types";
+import type { AllowanceView, ConfigView, SigRecordView } from "@/lib/near/types";
 
 /** Builds the kb/90 §9 snapshot from a data source. Shared by the cached server read and the fixture client refresh. */
 
@@ -48,6 +48,8 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
   let recent: SigRecordView[] = [];
   if (sigCount > 0) recent = await bounded(views.sigRecords(id, Math.max(0, sigCount - 20), 20), "sig_records", errors, [] as SigRecordView[]);
   const last = recent.length ? recent[recent.length - 1] : null;
+  // C5: a public fact (judge-visible), never gated on the viewer.
+  const allowances = await bounded(views.allowancesOf(id), "allowances", errors, [] as AllowanceView[]);
 
   const cooldown = deps.config?.cooldown_blocks ?? 250;
   const status = satchel ? deriveStatus({ satchel, records: recent, height, cooldownBlocks: cooldown }) : "active";
@@ -89,6 +91,7 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
       birth_tx: deps.lock.birth_tx,
       birth_block: deps.lock.birth_block,
     },
+    allowances,
     errors,
   };
 }

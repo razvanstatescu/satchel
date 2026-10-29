@@ -18,6 +18,7 @@
  */
 
 import { NBSP, plural as n } from "@/lib/format";
+import { allowanceCopy } from "@/lib/copy/allowance";
 import { commerce } from "@/lib/copy/commerce";
 import { flows } from "@/lib/copy/flows";
 import { landing } from "@/lib/copy/landing";
@@ -68,7 +69,7 @@ const card = {
   ogClean: "Clean history",
 } as const;
 
-export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, ...multichain, pill, card, landing } as const;
+export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, ...allowanceCopy, ...multichain, pill, card, landing } as const;
 
 /** Map a contract/MPC failure code to user copy (kb/80 R3 §Error map): what happened, what didn't move, one action. */
 export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm" | "sol" }): string {
@@ -108,6 +109,7 @@ export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm"
     case "ERR_TOKEN_NOT_FOUND":
       return copy.page.notfound.title(ctx.id);
     default:
+      if (code in copy.allowance.err) return copy.allowance.err[code as keyof typeof copy.allowance.err];
       if (/^ERR_(EVM|BTC|SOL|HEX)/.test(code)) return copy.errors.E39(chainName);
       return copy.sign.failed;
   }
