@@ -1,6 +1,5 @@
 import { ImageResponse } from "next/og";
-import { ART } from "@/components/brand/art";
-import { Mark } from "@/components/brand/Mark";
+import { ART, S_PATH } from "@/components/brand/art";
 import { copy } from "@/lib/copy";
 import { getSatchelSnapshot } from "@/lib/data/server";
 import { buildOgCardProps, type OgCardProps } from "@/lib/og";
@@ -39,6 +38,19 @@ function ogFonts() {
   ];
 }
 
+/** The mark (brand/Mark.tsx's coral tile + white S), inlined: satori only allows intrinsic elements as direct
+ * children of `<svg>`, so it can't reuse Mark/SStrokes (which nest a custom component inside their `<svg>`). */
+function OgMark({ size }: { size: number }) {
+  return (
+    <svg viewBox="0 0 512 512" width={size} height={size}>
+      <rect width="512" height="512" rx="112" fill={ART.coral} />
+      <path d={S_PATH} transform="translate(0 10)" fill="none" stroke={ART.ink} strokeWidth={92} strokeLinecap="round" />
+      <path d={S_PATH} fill="none" stroke={ART.ink} strokeWidth={92} strokeLinecap="round" />
+      <path d={S_PATH} fill="none" stroke={ART.white} strokeWidth={56} strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Pill({ children, color = DAY.ink }: { children: string; color?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", padding: "12px 26px", borderRadius: 999, backgroundColor: DAY.sunken, fontFamily: LABEL, fontWeight: 600, fontSize: 28, color }}>
@@ -62,7 +74,7 @@ function OgCard({ props }: { props: OgCardProps }) {
       <div style={{ display: "flex", flexDirection: "column", width: "100%", height: "100%", borderRadius: 48, backgroundColor: DAY.white, border: `6px solid ${DAY.ink}`, overflow: "hidden" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 176, flexShrink: 0, backgroundColor: DAY.coral, borderBottom: `6px solid ${DAY.ink}`, padding: "0 56px" }}>
           <div style={{ display: "flex", fontFamily: DISPLAY, fontWeight: 800, fontSize: 64, color: DAY.ink }}>{copy.card.name(props.id)}</div>
-          <Mark size={96} />
+          <OgMark size={96} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center", gap: 30, padding: "0 56px" }}>
           <div style={{ display: "flex", fontFamily: DISPLAY, fontWeight: 800, fontSize: 52, color: DAY.ink }}>{props.sigLine}</div>
@@ -85,7 +97,7 @@ function FallbackCard() {
   return (
     <div style={{ display: "flex", width: OG_SIZE.width, height: OG_SIZE.height, backgroundColor: DAY.coral, alignItems: "center", justifyContent: "center" }}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }}>
-        <Mark size={160} />
+        <OgMark size={160} />
         <div style={{ display: "flex", fontFamily: DISPLAY, fontWeight: 800, fontSize: 72, color: DAY.ink }}>Satchel</div>
         <div style={{ display: "flex", fontFamily: LABEL, fontWeight: 600, fontSize: 30, color: DAY.ink }}>An NFT that is a wallet · Testnet</div>
       </div>
