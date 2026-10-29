@@ -31,7 +31,8 @@ impl Chain {
 }
 
 /// What the caller asks the contract to sign. Externally tagged JSON:
-/// `{"evm":{"unsigned_tx":"02…"}}`, `{"btc":{"preimages":["…"],"outputs":"…"}}`, `{"sol":{"message":"…"}}`.
+/// `{"evm":{"unsigned_tx":"02…"}}`, `{"btc":{"preimages":["…"],"outputs":"…"}}`, `{"sol":{"message":"…"}}`,
+/// and (C7) `{"evm_message":{"message":"<hex of the UTF-8 body>"}}`, `{"sol_message":{"message":"<hex>"}}`.
 #[near(serializers = [json])]
 #[serde(rename_all = "snake_case")]
 #[derive(Clone, Debug)]
@@ -39,6 +40,10 @@ pub enum SignRequest {
     Evm { unsigned_tx: String },
     Btc { preimages: Vec<String>, outputs: String },
     Sol { message: String },
+    /// EIP-191 `personal_sign` of the body; the contract adds the prefix (docs/specs/C1-C2-C3-C7.md §3.3).
+    EvmMessage { message: String },
+    /// Solana off-chain message v0 of the body; the contract adds the header.
+    SolMessage { message: String },
 }
 
 #[near(serializers = [borsh])]
@@ -61,14 +66,18 @@ pub enum SigDetail {
     Evm { chain_id: u64, nonce: u64, unsigned_tx: Vec<u8> },
     Btc { txid: [u8; 32], vout: u32, amount_sats: u64 },
     Sol { recent_blockhash: [u8; 32], lamports: u64 },
+    // C7: appended, so the borsh tags of the three above never change. `message` is the UTF-8 body (≤ 1024 B).
+    EvmMessage { message: Vec<u8> },
+    SolMessage { message: Vec<u8> },
 }
 
 impl SigDetail {
+    /// The key that signs: EVM messages use the EVM key, Solana messages the Solana key.
     pub fn chain(&self) -> Chain {
         match self {
-            SigDetail::Evm { .. } => Chain::Evm,
+            SigDetail::Evm { .. } | SigDetail::EvmMessage { .. } => Chain::Evm,
             SigDetail::Btc { .. } => Chain::Btc,
-            SigDetail::Sol { .. } => Chain::Sol,
+            SigDetail::Sol { .. } | SigDetail::SolMessage { .. } => Chain::Sol,
         }
     }
 }
@@ -89,8 +98,9 @@ pub struct TokenState {
     pub sig_count: u64,
     pub last_sign_height: u64,
     pub listing: Option<Listing>,
-    /// Highest EVM (Sepolia) nonce ever signed for this token; None = no EVM record yet. Drives the nonce-gap rule
-    /// (spec §5.9, D-43): a new EVM request needs `nonce ≤ max + 1`, or `nonce ≤ 1` for the first one.
+    /// Highest **Sepolia** nonce ever signed for this token; None = no Sepolia record yet. Drives the nonce-gap rule
+    /// (spec §5.9, D-43): a new EVM request needs `nonce ≤ max + 1`, or `nonce ≤ 1` for the first one. The other
+    /// chains keep theirs in `evm_nonces` (C3), so this layout is unchanged.
     pub max_evm_nonce: Option<u64>,
 }
 
@@ -138,6 +148,10 @@ pub struct ConfigView {
     pub usdc_contract_id: Option<AccountId>,
     pub cooldown_blocks: u64,
     pub evm_chain_ids: Vec<u64>,
+    /// C2: the one ERC-20 (Circle testnet USDC) `sign_for` may transfer on each chain
+    pub erc20_tokens: Vec<Erc20TokenView>,
+    /// C7: the largest message body `evm_message` / `sol_message` accept
+    pub max_message_bytes: u64,
     pub max_btc_inputs: u64,
     pub mpc_sign_gas_tgas: u64,
     pub on_signed_gas_tgas: GasFormula,
@@ -178,12 +192,45 @@ pub enum SignatureView {
 }
 
 #[near(serializers = [json])]
+#[derive(Clone, Debug, PartialEq)]
+pub struct Erc20TokenView {
+    pub chain_id: u64,
+    pub token: String,
+}
+
+/// C2: the transfer inside an EVM record's `unsigned_tx` (derived from those exact bytes, not stored twice).
+#[near(serializers = [json])]
+#[derive(Clone, Debug, PartialEq)]
+pub struct Erc20View {
+    pub token: String,
+    pub to: String,
+    pub amount: U128,
+}
+
+#[near(serializers = [json])]
 #[serde(rename_all = "snake_case")]
 #[derive(Clone, Debug, PartialEq)]
 pub enum SigDetailView {
-    Evm { chain_id: u64, nonce: u64, unsigned_tx: String },
+    Evm {
+        chain_id: u64,
+        nonce: u64,
+        unsigned_tx: String,
+        /// absent (never null) on native transfers
+        #[serde(skip_serializing_if = "Option::is_none")]
+        erc20: Option<Erc20View>,
+    },
     Btc { txid: String, vout: u32, amount_sats: U64 },
     Sol { recent_blockhash: String, lamports: U64 },
+    EvmMessage { message: String },
+    SolMessage { message: String },
+}
+
+/// C1: `history_digest(token_id)`; the byte encoding is in docs/specs/C1-C2-C3-C7.md §5.1.
+#[near(serializers = [json])]
+#[derive(Clone, Debug, PartialEq)]
+pub struct HistoryDigestView {
+    pub sig_count: u64,
+    pub digest_hex: String,
 }
 
 #[near(serializers = [json])]

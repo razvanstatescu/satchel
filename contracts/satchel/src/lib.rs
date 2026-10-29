@@ -14,6 +14,8 @@ use near_sdk::{env, near, AccountId, BorshStorageKey, Gas, PanicOnDefault, Promi
 
 pub mod errors;
 pub mod events;
+pub mod evm_nonces;
+pub mod history;
 pub mod mpc;
 pub mod parse;
 pub mod sale;
@@ -59,6 +61,8 @@ pub enum StorageKey {
     SigLog,
     Listings,
     Proceeds,
+    /// C3: max signed EVM nonce per (token, chain_id) for chains other than Sepolia (`evm_nonces.rs`). Appended.
+    EvmNonces,
 }
 
 #[near(contract_state, contract_metadata(standard(standard = "nep171", version = "1.0.0"), standard(standard = "nep177", version = "2.0.0"), standard(standard = "nep181", version = "1.0.0"), standard(standard = "nep297", version = "1.0.0")))]
@@ -275,3 +279,5 @@ impl NonFungibleTokenMetadataProvider for Contract {
 mod tests;
 #[cfg(test)]
 mod security_tests;
+#[cfg(test)]
+mod feature_tests;

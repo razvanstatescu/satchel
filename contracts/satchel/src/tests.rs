@@ -201,7 +201,10 @@ fn config_matches_constants() {
     assert_eq!(
         v,
         json!({"version":"1.0.0","mpc_contract_id":"mpc.testnet","usdc_contract_id":"usdc.testnet","cooldown_blocks":250,
-            "evm_chain_ids":[11155111],"max_btc_inputs":10,"mpc_sign_gas_tgas":15,"on_signed_gas_tgas":{"base":10,"per_request":2},
+            "evm_chain_ids":[11155111,84532,421614,11155420],
+            "erc20_tokens":[{"chain_id":11155111,"token":"1c7d4b196cb0c7b01d743fbc6116a902379c7238"},{"chain_id":84532,"token":"036cbd53842c5426634e7929541ec2318f3dcf7e"},
+                {"chain_id":421614,"token":"75faf114eafb1bdbe2f0316df893fd58ce46aa4d"},{"chain_id":11155420,"token":"5fd84259d66cd46123540766be93dfe6d43130d7"}],
+            "max_message_bytes":1024,"max_btc_inputs":10,"mpc_sign_gas_tgas":15,"on_signed_gas_tgas":{"base":10,"per_request":2},
             "min_sign_prepaid_tgas":{"base":30,"per_request":18},"max_mpc_deposit":"10000000000000000000000",
             "storage_byte_cost": byte_cost().to_string(),"base_uri":"https://satchel.example/api/card/","next_token_id":1,"next_listing_id":1})
     );
