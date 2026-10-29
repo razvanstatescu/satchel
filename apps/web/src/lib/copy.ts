@@ -23,6 +23,7 @@ import { flows } from "@/lib/copy/flows";
 import { landing } from "@/lib/copy/landing";
 import { satchel } from "@/lib/copy/satchel";
 import { shell } from "@/lib/copy/shell";
+import { walletOps } from "@/lib/copy/wallet-ops";
 
 export type { SolVariant } from "@/lib/copy/landing";
 
@@ -61,9 +62,12 @@ const card = {
   chip: (ticker: string, amount: string | null) => (amount === null ? `${ticker}${NBSP}—` : `${ticker}${NBSP}${amount}`),
   svgSigs: (count: number) => n(count, "signature", "signatures"),
   svgSub: "recorded on NEAR testnet",
+  /** A1: the social card's (opengraph-image/twitter-image) signature line when nothing has ever been signed — the
+   * only case a static image can claim without a live per-browser check (kb/90 §7.7). */
+  ogClean: "Clean history",
 } as const;
 
-export const copy = { ...shell, ...satchel, ...flows, ...commerce, pill, card, landing } as const;
+export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, pill, card, landing } as const;
 
 /** Map a contract/MPC failure code to user copy (kb/80 R3 §Error map): what happened, what didn't move, one action. */
 export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm" | "sol" }): string {

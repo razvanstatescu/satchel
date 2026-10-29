@@ -26,16 +26,16 @@
 ## Status
 | ID | Feature | Owner | Status | Notes |
 |---|---|---|---|---|
-| A1 | A social card per Satchel (OG/Twitter image) | web-share | in progress | |
-| A2 | Give by link (claim link) | web-flows | in progress | |
-| A3 | Empty the Satchel | web-flows | in progress | |
-| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | in progress | |
-| C1 | `history_digest` view | contract-sign | in progress | |
+| A1 | A social card per Satchel (OG/Twitter image) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
+| A2 | Give by link (claim link) | web-flows | in progress | built and committed (411658b); Playwright next |
+| A3 | Empty the Satchel | web-flows | in progress | built and committed (a98a53a); Playwright next |
+| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
+| C1 | `history_digest` view | contract-sign | in progress | spec `docs/specs/C1-C2-C3-C7.md` (15:07Z); contract + TS mirror + vectors + fuzz corpus committed (873ed43; Rust/TS 0 disagreements); sandbox and full suites next |
 | C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress | the UI comes in phase 2 |
 | C3 | More EVM testnets | contract-sign | in progress | the UI comes in phase 2 |
-| C4 | Offers | contract-market | in progress | the UI comes in phase 2 |
-| C5 | Spending allowance (delegated signer) | contract-allowance | in progress | the UI comes in phase 2 |
-| C6 | NEAR-side assets inside | contract-market | in progress | the UI comes in phase 2 |
+| C4 | Offers | contract-market | in progress | spec `docs/specs/C4-C6.md`; 26 unit + 15 sandbox (15:26Z) |
+| C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract merged** into main 24a680b; UI in progress | 115 unit, 91 sandbox, 359 core, 55 vectors; wasm 329,320 B `e7ded724…`. Debits include fees; message signing refused for delegates; explicit clear on transfer and sale |
+| C6 | NEAR-side assets inside | contract-market | in progress | with C4; the solvency invariants I-M1/I-M3 are tested |
 | C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress | the UI comes in phase 2 |
 
 ## Interface decisions fixed up front (so parallel branches agree)
@@ -101,3 +101,15 @@ it. Phase-2 UI work builds against those specs.
   changes, so nothing was lost. The empty worktrees and branches were removed, and the agents were respawned under
   the now-loaded role definitions (`satchel-contract` Opus/high, `satchel-web` Sonnet/medium). They are told to
   commit WIP at every milestone, so a session end can't lose work again.
+- 2026-10-29 15:27Z: all three contract specs are committed. Phase-2 UI agents start once each contract branch's TS mirror (core) is final, to avoid rework.
+- 15:55Z: merged `feat/web-share` (A1, A4) into main (1571bf5): web unit 366, Playwright 144/144, tsc and lint clean. **Push to origin was blocked**: pushes need Razvan's explicit yes (CLAUDE.md rule 2), so main stays local until he confirms.
+- 16:00Z: merged `feat/contract-allowance` (C5) into main (24a680b): contract unit 115, core 359, tools 72, vectors agree; the sandbox run on merged main is in progress. Sent the merge notes to contract-market and contract-sign. Spawned web-allowance (Sonnet) for the C5 UI from 24a680b.
+- 16:00Z: Razvan allowed agents to push to the private repo without asking; main pushed (bd94fcc).
+- 16:04Z: the session restarted again. All work up to the stop was committed:
+  - contract-sign at 873ed43;
+  - contract-market at d04b3f8;
+  - web-flows at a98a53a;
+  - ui-allowance had no commits yet.
+
+  The four agents were resumed from their transcripts, and the sandbox run on main was restarted. The finished web-share and contract-allowance worktrees were removed; their branches are merged.
+- 16:35Z: merged main (A1, A4, C5) verified: sandbox 91/91, wasm 329,320 B `e7ded724…`, INV-22 OK.

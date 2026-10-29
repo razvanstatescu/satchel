@@ -18,6 +18,7 @@ import { solVectors } from './sol'
 import { msgVectors } from './msg'
 import { historyVectors } from './history'
 import { deriveVectors } from './derive'
+import { allowanceVectors } from './allowance'
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'vectors')
 const check = process.argv.includes('--check')
@@ -34,6 +35,7 @@ const outputs: [string, unknown][] = [
   ['msg.json', file('msg', msgVectors())],
   ['history.json', historyVectors()],
   ['derive.json', deriveVectors()],
+  ['allowance.json', allowanceVectors()],
 ]
 
 mkdirSync(OUT, { recursive: true })
@@ -54,6 +56,11 @@ for (const [name, data] of outputs) {
     } else console.log(`ok    ${path}`)
   } else {
     writeFileSync(path, text)
+    if (name === 'allowance.json') {
+      const a = data as ReturnType<typeof allowanceVectors>
+      console.log(`wrote ${path}: ${a.debits.length} debits, ${a.evm_raw.length} evm_raw, ${a.window.length} window vectors`)
+      continue
+    }
     const n = (data as { vectors: unknown[] }).vectors.length
     const vs = (data as { vectors: Vector[] }).vectors
     const ok = Array.isArray(vs) && typeof vs[0]?.expect?.ok === 'boolean' ? vs.filter((v) => v.expect.ok).length : n

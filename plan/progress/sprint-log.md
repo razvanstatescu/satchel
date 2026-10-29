@@ -2,3 +2,24 @@
 - 2026-10-29T14:32Z [orchestrator] started: tracker, role definitions, 5 agents (contract-sign, contract-allowance, contract-market, web-share, web-flows)
 - 2026-10-29T14:35Z [orchestrator] spawned 5 agents in worktrees: contract-sign/allowance/market (Opus), web-share/web-flows (Sonnet)
 - 2026-10-29T14:56Z [orchestrator] restart: previous session ended before any agent committed; respawning 5 agents under the satchel-contract/satchel-web roles
+- 2026-10-29T14:57Z [orchestrator] respawned 5 agents (satchel-contract ×3 Opus/high; satchel-web ×2 Sonnet/medium), branched from bff1397
+- 2026-10-29T15:04Z [A2,A3] progress: claim-link + btc-sweep pure logic with unit tests, committed on feat/web-flows
+- 2026-10-29T15:04Z [C5] spec: docs/specs/C5.md committed on feat/contract-allowance (set/revoke_allowance, allowances_of/allowance views, ERR_ALLOWANCE_* codes, rolling 24 h window, clear on transfer+sale)
+- 2026-10-29T15:07Z [C1,C2,C3,C7] spec: docs/specs/C1-C2-C3-C7.md committed on feat/contract-sign (request/record/view JSON, error codes, digest encoding; USDC x4 verified on-chain)
+- 2026-10-29T15:08Z [C4|C6] spec: docs/specs/C4-C6.md committed on feat/contract-market (deposit_near/withdraw_near/withdraw_ft, ft_on_transfer deposit+offer msgs, make/cancel/accept_offer, inside_of/offers_for/offers_by, ERR_* codes, invariants I-M1..I-M8)
+- 2026-10-29T15:12Z [A1] wip: props builder (lib/og.ts) + shared og-card.tsx renderer, TTF font subsets, opengraph-image.tsx/twitter-image.tsx under /s/[id]; unit tests green (351 passed). Next: dev-server check, metadata wiring, Playwright.
+- 2026-10-29T15:16Z [A1] done: /s/[id] opengraph-image + twitter-image render per-Satchel social cards (status, signatures/Clean history, chain amounts, Testnet); data-free branded fallback on error/unknown id; metadata already points at them (no layout.tsx change needed, Next's file convention wins). Unit (og.test.ts) + 3 Playwright tests green.
+- 2026-10-29T15:17Z [A2] progress: give-by-link flow + /claim page + sim/wallet batch support, typecheck/lint/unit green
+- 2026-10-29T15:17Z [C5] implemented: allowance.rs + sign_for hooks + clear on transfer/sale; 115 unit tests green (29 new incl. proptest oracle); TS mirror in @satchel/core; vectors/allowance.json (55) agree Rust/TS
+- 2026-10-29T15:18Z [C1,C2,C3,C7] wip: contract side implemented on feat/contract-sign (unit + fuzz properties green; vectors/corpus regen pending TS mirror)
+- 2026-10-29T15:22Z [C4|C6] progress: contract code + 26 unit tests (incl. accounting proptest vs model, swap-remove index property) on feat/contract-market; lib suite 112/112
+- 2026-10-29T15:22Z [A3] progress: empty-the-satchel flow (multi-chain drain, BTC auto-batching), typecheck/lint/unit green
+- 2026-10-29T15:26Z [A4] done: request coins — BIP-21/EIP-681/Solana Pay builders (lib/payment-uri.ts, vector-tested), Add coins' optional amount field (GET form, works with JS off), payment-URI QR + Copy payment link + Share, shareable app link /s/<id>/receive?chain=&amount= (display only). Unit (payment-uri.test.ts) + Playwright (request-coins.spec.ts incl. axe Day/Night) green.
+- 2026-10-29T15:26Z [C4|C6] progress: sandbox tests/tests/market.rs 15/15 green (deposit/withdraw, listed freeze, transfer+buy move balances, NEAR+USDC offers, stale/quiet/expiry, FT failure re-credit, per-offerer cap, solvency I-M1/I-M3 incl. drained contract)
+- 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @5cce2af; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs bff1397), INV-22 OK
+- 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
+- 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
+- 2026-10-29T16:05Z [orchestrator] session restart #2: resumed contract-sign, contract-market, web-flows, web-allowance from their transcripts; sandbox on main restarted
+- 2026-10-29T16:05Z [C1,C2,C3,C7] wip: core TS tests added (379 green); next sandbox tests, deep fuzz, wasm build
+- 2026-10-29T16:05Z [A2,A3] progress: Playwright specs green (give->link->claim, empty-everything); fixed hashchange, fixture UTXO depletion, and a stale-closure bug in EmptyFlow
+- 2026-10-29T16:08Z [orchestrator] main (A1+A4+C5) verified: sandbox 91/91, wasm 329,320 B e7ded724…, INV-22 OK

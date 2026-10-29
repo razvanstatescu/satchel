@@ -37,14 +37,15 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
 ## Hard rules
 1. **Implementation started 2026-10-21 by Razvan's decision (D-39)**, overriding the plan's "no product code before Nov 1"
    rule (inside the window per Q-001, D-47). The git repo exists: `github.com/razvanstatescu/satchel`, **private**, branch `main`, created by Razvan on
-   2026-10-29. Push to `main` when Razvan asks. Making it public needs his explicit "yes" (Day 13). Product code lives at the project root (`contracts/`, `tests/`,
+   2026-10-29. **Agents may push to the private repo without asking** (Razvan, 2026-10-29). Never force-push, and never make the repo public without his explicit "yes" (Day 13). Product code lives at the project root (`contracts/`, `tests/`,
    `packages/core`, `apps/web`, `tools/`, `vectors/`). Never copy or import `research/spikes` code. Implement from
    `kb/` instead. Every big chunk of work ships with unit tests and an end-to-end test (sandbox, local or testnet).
 2. **HACKATHON.md AI-agent rules.** Never do any of the following without the human's explicit confirmation: send
    the submission; post on X or anywhere else; make the repo public, push or force-push; sign transactions, spend
    tokens or deploy to mainnet; commit secrets. Since 2026-10-29 (D-48) agents may create testnet accounts and sign
-   testnet transactions without asking. The final keyless birth (H-15), mainnet, pushes, the X post and the submission
-   still need an explicit "yes". Stay inside their stated scope and caps. Everything outside them needs a fresh "yes".
+   testnet transactions without asking. Since 2026-10-29 agents may also push (not force-push) to the
+   private repo. The final keyless birth (H-15), mainnet, force-pushes, making the repo public, the X post and the
+   submission still need an explicit "yes". Stay inside their stated scope and caps. Everything outside them needs a fresh "yes".
 3. **Never create `satchel.<team>.testnet` early.** The final contract account is *born keyless* on Day 10 (spec §5.16):
    one near-api-js transaction from `<team>.testnet` does CreateAccount, Transfer, DeployContract, `new` and
    `nft_mint` ×7, with **no AddKey**. That needs an explicit "yes" (H-15). Develop on `devN.<team>.testnet` and rehearse

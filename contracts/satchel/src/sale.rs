@@ -38,6 +38,7 @@ impl Contract {
     /// The single receipt of a sale: transfer, clear the listing, `sold` event, detached payout.
     fn execute_sale(&mut self, token_id: TokenId, listing: Listing, buyer: AccountId) {
         self.tokens.internal_transfer(&listing.seller, &buyer, &token_id, None, Some("sale".to_string()));
+        self.on_owner_change(&token_id, "sale"); // C5 reset rule (clears allowances)
         let mut st = self.token_state(&token_id);
         st.listing = None;
         self.state.insert(token_id.clone(), st);
@@ -55,7 +56,7 @@ impl Contract {
     }
 
     /// Payout promise `.then(on_payout)`. NEAR: plain transfer; USDC: `ft_transfer` with 1 yocto, 15 Tgas.
-    fn payout(&self, account: AccountId, currency: Currency, amount: u128) -> PromiseIndex {
+    pub(crate) fn payout(&self, account: AccountId, currency: Currency, amount: u128) -> PromiseIndex {
         let p = match currency {
             Currency::Near => promise::transfer(&account, amount),
             Currency::Usdc => {
@@ -173,7 +174,7 @@ impl Contract {
 }
 
 /// Exactly 1 yoctoNEAR (S-03): a full-access-key guard that can never keep a larger deposit by mistake.
-fn ensure_one_yocto() {
+pub(crate) fn ensure_one_yocto() {
     if env::attached_deposit() != NearToken::from_yoctonear(1) {
         fail_with(ERR_DEPOSIT, "attach exactly 1 yocto");
     }
@@ -181,14 +182,24 @@ fn ensure_one_yocto() {
 
 #[near]
 impl FungibleTokenReceiver for Contract {
-    /// Only the configured USDC may call. Panics on any mismatch (the FT then refunds 100 %). Success → "0" unused.
+    /// Only allowlisted FTs may call (the configured USDC; wNEAR for deposits only). Panics on any mismatch (the FT then
+    /// refunds 100 %). Success → "0" unused. Messages: `buy` (USDC), `offer` (USDC), `deposit` (any allowlisted FT).
     fn ft_on_transfer(&mut self, sender_id: AccountId, amount: U128, msg: String) -> PromiseOrValue<U128> {
-        let usdc = self.usdc.clone().unwrap_or_else(|| fail(ERR_WRONG_TOKEN));
-        ensure(env::predecessor_account_id() == usdc, ERR_WRONG_TOKEN);
-        let FtMsg::Buy { token_id, listing_id, expected_sig_count } =
-            serde_json::from_str::<FtMsg>(&msg).unwrap_or_else(|_| fail(ERR_BAD_MSG));
-        let listing = self.check_buy(&token_id, listing_id, expected_sig_count, Currency::Usdc, amount.0, &sender_id);
-        self.execute_sale(token_id, listing, sender_id);
+        let ft = env::predecessor_account_id();
+        ensure(self.is_inside_ft(&ft), ERR_WRONG_TOKEN);
+        let parsed = serde_json::from_str::<FtMsg>(&msg).unwrap_or_else(|_| fail(ERR_BAD_MSG));
+        match parsed {
+            FtMsg::Buy { token_id, listing_id, expected_sig_count } => {
+                ensure(Some(&ft) == self.usdc.as_ref(), ERR_WRONG_TOKEN);
+                let listing = self.check_buy(&token_id, listing_id, expected_sig_count, Currency::Usdc, amount.0, &sender_id);
+                self.execute_sale(token_id, listing, sender_id);
+            }
+            FtMsg::Offer(m) => {
+                ensure(Some(&ft) == self.usdc.as_ref(), ERR_WRONG_TOKEN);
+                self.ft_offer(sender_id, m, amount.0);
+            }
+            FtMsg::Deposit(token_id) => self.ft_deposit(ft, sender_id, token_id, amount.0),
+        }
         PromiseOrValue::Value(U128(0))
     }
 }

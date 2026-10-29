@@ -208,6 +208,8 @@ export const flows = {
     doneTitle: "Given",
     stepWho: "Who gets it",
     stepReview: "Review",
+    /** A2 (plan/feature-ideas.md): the alternative to a NEAR account on file — a claim link. */
+    giveByLink: "Give by link instead",
     /** NEW (app-screens §7): the give guards' bodies (the titles are send's). */
     guard: {
       connectBody: (id: string) => `Only the owner of Satchel #${id} can give it away.`,

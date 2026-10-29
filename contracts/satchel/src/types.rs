@@ -123,12 +123,17 @@ pub enum Currency {
     Usdc,
 }
 
-/// msg of `usdc.ft_transfer_call`: `{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4}}`
+/// msg of `ft_transfer_call` to this contract (docs/specs/C4-C6.md §1.2):
+/// `{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4}}` (USDC),
+/// `{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1793000000000}}` (USDC),
+/// `{"deposit":"3"}` (any allowlisted FT).
 #[near(serializers = [json])]
 #[serde(rename_all = "snake_case")]
 #[derive(Clone, Debug)]
 pub enum FtMsg {
     Buy { token_id: TokenId, listing_id: u64, expected_sig_count: u64 },
+    Offer(crate::offers::OfferMsg),
+    Deposit(TokenId),
 }
 
 // ── views ────────────────────────────────────────────────────────────────────────────────

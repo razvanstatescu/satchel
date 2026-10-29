@@ -44,9 +44,9 @@ impl Contract {
     /// The tx result is `on_signed`'s return value (set with `promise_return`).
     #[payable]
     pub fn sign_for(&mut self, token_id: TokenId, request: SignRequest, mpc_deposit: Option<U128>) {
-        // 1. ownership (INV-01)
-        let owner = self.owner_of(&token_id);
-        ensure(env::predecessor_account_id() == owner, ERR_NOT_OWNER);
+        // 1. the owner, or a delegate with a live allowance (INV-01; C5 docs/specs/C5.md)
+        let signer = self.authorize_signer(&token_id, &env::predecessor_account_id(), &request).unwrap_or_else(|r| r.fail());
+        let owner = signer.owner().clone();
         // 2. frozen while listed (INV-13)
         let mut st = self.token_state(&token_id);
         ensure(st.listing.is_none(), ERR_FROZEN);
@@ -67,6 +67,8 @@ impl Contract {
         // 5. records before the MPC call
         let s0 = env::storage_usage();
         let first_seq = st.sig_count;
+        // 4c. delegates: debit the caps (inside the storage measurement, so the delegate pays its spend entries)
+        let spent = self.debit_allowance(&token_id, &signer, &c, first_seq).unwrap_or_else(|r| r.fail());
         let height = env::block_height();
         let ts = env::block_timestamp_ms();
         for (i, it) in c.items.iter().enumerate() {
@@ -77,7 +79,7 @@ impl Contract {
                     input_index: i as u8,
                     height,
                     timestamp_ms: ts,
-                    requester: owner.clone(),
+                    requester: signer.requester().clone(),
                     payload: it.record_payload,
                     detail: it.detail.clone(),
                     status: SigStatus::Pending,
@@ -111,6 +113,9 @@ impl Contract {
             details: c.items.iter().enumerate().map(|(i, it)| detail_json(first_seq + i as u64, &it.detail)).collect(),
         }
         .emit();
+        if let Some(e) = spent {
+            e.emit();
+        }
         // 8. MPC fan-out: one single-action `sign` receipt per payload, joined with .and()
         let domain_id = c.chain.domain_id();
         let calls: Vec<PromiseIndex> = c

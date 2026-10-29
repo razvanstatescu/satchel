@@ -61,6 +61,7 @@ export {
   type SolMessage,
 } from './sol'
 export { decodeRlpExact, encodeRlp, RLP_MAX_DEPTH, type RlpInput, type RlpItem } from './rlp'
+export * from './allowance'
 
 /** `chain` is the request tag: 'evm' | 'btc' | 'sol', or (C7) 'evm_message' | 'sol_message'. */
 export type AnyClassifyResult =

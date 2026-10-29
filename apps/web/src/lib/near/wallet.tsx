@@ -16,6 +16,8 @@ import type { WalletTx } from "@/lib/near/contract";
 export interface WalletAdapter {
   kind: "near-connect" | "fixture";
   signAndSendTransaction(tx: WalletTx & { signerId?: string }): Promise<unknown>;
+  /** Batch two+ transactions behind one wallet approval (A2 Give by link). Optional: not every wallet supports it. */
+  signAndSendTransactions?(txs: (WalletTx & { signerId?: string })[]): Promise<unknown[]>;
 }
 
 interface Ctx {
@@ -90,6 +92,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const asAdapter = (w: import("@hot-labs/near-connect").NearWalletBase): WalletAdapter => ({
         kind: "near-connect",
         signAndSendTransaction: (tx) => w.signAndSendTransaction(tx as never),
+        signAndSendTransactions: (txs) =>
+          w.signAndSendTransactions({ transactions: txs.map(({ receiverId, actions }) => ({ receiverId, actions })) } as never) as Promise<unknown[]>,
       });
       const onIn = (p: { wallet: import("@hot-labs/near-connect").NearWalletBase; accounts: { accountId: string }[] }) =>
         setState({ ready: true, accountId: p.accounts[0]?.accountId ?? null, wallet: asAdapter(p.wallet), connecting: false });

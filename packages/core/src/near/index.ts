@@ -2,3 +2,5 @@
 export * from './sign-request'
 export * from './constants'
 export * from './mpc'
+export * from './allowance'
+export * from './market'
