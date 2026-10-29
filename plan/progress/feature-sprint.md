@@ -139,3 +139,18 @@ it. Phase-2 UI work builds against those specs.
   - `feat/ui-market`: 3999f22 (data layer, copy, server-rendered inside balances; typecheck and lint clean).
   - `feat/ui-sign`: one uncommitted types change, plus fixture vectors in the agent's report.
 - 18:10Z: merged `docs/kb90-sprint` (kb/90 §2/§5.4/§5.5/§5.9/§5.17/§6.1/§7/§13/§14, README, judge-snippets) into main. **Corrected its inferred StorageKey order** to the real enum in `lib.rs`: Allowances 8, Inside…StorageCredit 9–16, EvmNonces 17 (eb1f1c6). Pushed.
+- 18:20Z: **the security reviewer reported provisional findings and was then blocked**: its Write of `tests/tests/review.rs` was refused, so nothing is committed yet. The review is about 60% done. It ran contract unit 172/172, the sandbox (exit 0) and a fresh differential fuzz (120k cases, 0 disagreements). Wasm 422,562 B `bd5d8e01…`, INV-22 OK. **No Critical or High.**
+  - **M-01 (Medium): contract-paid storage can consume user escrow.** `nft_transfer`, `buy` and `accept_offer` to a new holder cost the contract about 250 B (S-02). Since C4/C6, the balance also holds inside NEAR, NEAR offers, storage credit and NEAR proceeds, so that growth can come out of escrow. I-M1 then breaks, and the last `withdraw_near` hits `LackBalanceForState`. The monitor's free-balance check counts escrow as free.
+    - Proposed fix: a `proceeds_near` total, plus `ensure_solvent` (free ≥ inside + offers + credit + NEAR proceeds) at the end of `nft_transfer`, `execute_sale` and `accept_offer`.
+    - The monitor should also subtract `market_totals`.
+    - **Verdict: C4/C6 ship only with this fix.**
+  - **L-01:** C5's delegate debit ignores the OP-stack L1 data fee on Base and OP Sepolia. The impact is bounded (≤ 160 B tx). Reserve a margin or document it.
+  - **L-02:** a C7 32-byte body can be ground to look like an `eth_sign` digest, relevant only if the Satchel address is ever a Safe owner. Buy-tab hardening: show the hex, escape control and bidi characters, flag digest-like bodies.
+  - **L-03:** `history_digest` view gas, estimated ~0.1 Tgas per record, needs a sandbox measurement.
+  - **Info:** unlimited 1-yocto offers clutter `offers_for`; `withdraw_storage_credit` has no re-credit; `prepay_storage(contract)` credit is unwithdrawable; wrap.testnet trust is bounded; an OP/Base portal deposit can bump the L2 nonce.
+  - **Provisional verdicts:**
+    - C1 ships (pending L-03);
+    - C2 and C3 ship;
+    - C5 ships (L-01 documented);
+    - C7 ships (with L-02 UI hardening);
+    - **C4/C6 need the M-01 fix.**
