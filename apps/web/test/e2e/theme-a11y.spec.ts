@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Browser, type Page } from "@playwright/test";
 import { copy } from "@/lib/copy";
-import { ALICE, useMockWallet } from "./helpers";
+import { ALICE, BOB, useMockWallet } from "./helpers";
 
 const DAY_GROUND = "rgb(246, 245, 251)"; // #F6F5FB (brand 2.0 Day ground)
 const NIGHT_GROUND = "rgb(18, 12, 38)"; // #120C26 (brand 2.0 Night ground)
@@ -277,6 +277,36 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
       const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
       await page.goto("/claim#not-a-real-secret");
       await expect(page.getByText("This link isn't valid")).toBeVisible();
+      expect(await axe(page)).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`C4 the offer flow dialog, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, BOB);
+      await page.goto("/s/6/offer");
+      const dialog = page.getByRole("dialog");
+      await expect(dialog).toHaveAttribute("aria-modal", "true");
+      await expect(page.getByTestId("offer-flow").getByTestId("offer-gate")).toHaveAttribute("data-gate", "empty", { timeout: 20_000 });
+      expect(await axe(page, "[data-flow-shell]", ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`C4/C6 the Wallet tab with inside balances and incoming offers, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, BOB);
+      await page.goto("/s/6");
+      await page.getByTestId("add-near-amount").fill("1");
+      await page.getByTestId("add-near-cta").click();
+      await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
+      await page.goto("/s/6/offer");
+      await expect(page.getByTestId("offer-flow").getByTestId("offer-gate")).toHaveAttribute("data-gate", "empty", { timeout: 20_000 });
+      await page.getByTestId("offer-amount").fill("1");
+      await page.getByTestId("offer-cta").click();
+      await expect(page.getByTestId("toast").filter({ hasText: "sent" })).toBeVisible({ timeout: 20_000 });
+      await page.evaluate((a) => localStorage.setItem("satchel:mock-wallet", a), ALICE);
+      await page.goto("/s/6");
+      await expect(page.getByTestId("incoming-offers")).toBeVisible({ timeout: 20_000 });
       expect(await axe(page)).toEqual([]);
       await ctx.close();
     });
