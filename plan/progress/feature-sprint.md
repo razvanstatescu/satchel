@@ -34,7 +34,7 @@
 | C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | 4 Circle USDC verified on-chain; new `ERR_EVM_TOKEN`/`ERR_EVM_VALUE`; EVM limit 160 B |
 | C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | per-chain nonce-gap (`StorageKey::EvmNonces`, last); checker per chain, fail-closed |
 | C4 | Offers | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | `make_offer` takes an explicit `amount`; 20 open offers per offerer, 90-day max expiry; storage-credit methods for FT paths. Needs a security review |
-| C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract merged** into main 24a680b; UI in progress | 115 unit, 91 sandbox, 359 core, 55 vectors; wasm 329,320 B `e7ded724…`. Debits include fees; message signing refused for delegates; explicit clear on transfer and sale |
+| C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract + UI merged + pushed** (1fb28f8) | UI: public allowance facts (no JS), owner add/revoke (max 4), delegate banner + cap-gated Send; unit 396, Playwright 169/169. The orchestrator fixed a stale-sheet bug (reset on each showing). Gaps: no USDC or L2 caps in the Add sheet yet (waits on C2/C3 UI) |
 | C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | USDC + wrap.testnet allowlist; withdraw blocked while listed; invariants I-M1..I-M8; 142 unit, 107 sandbox (on the branch), 371 core |
 | C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | status `message`, never blocks; refused for delegates; BIP-322 skipped (spec §9) |
 
@@ -167,3 +167,4 @@ it. Phase-2 UI work builds against those specs.
   Verdicts: C1, C2, C5 ship; C3 ships (app needs L-05); C7 ships (L-02 UI); **C4/C6 ship with the M-01 fix**.
 
   Suites on the review branch: contract unit 172, sandbox 115 + 1 ignored, core 465, tools 72, differential fuzz 400k with 0 disagreements.
+- 21:05Z: merged `feat/ui-allowance` (C5 UI) into main (1fb28f8). Fixed its reported stale Add-sheet bug (reset form on each <Activity> showing) and replaced the e2e workaround with a regression check. Web unit 396, Playwright 169/169 on merged main. Pushed.
