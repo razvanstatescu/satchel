@@ -36,6 +36,9 @@ const EXPIRY_MS: Record<Expiry, number | null> = { "24h": 86_400_000, "7d": 7 * 
 /** The wall clock, read only from event handlers (never during render). */
 const wallClock = () => Date.now();
 
+const emptyCaps = (): Record<UiChain, { on: boolean; text: string }> =>
+  Object.fromEntries(UI_CHAINS.map((c) => [c, { on: false, text: "" }])) as Record<UiChain, { on: boolean; text: string }>;
+
 export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
   const { live, isOwner, accountId } = useViewer(snap);
   const { wallet, ready } = useWallet();
@@ -49,10 +52,24 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
   const [lookup, setLookup] = useState<{ for: string; ok: boolean; owns: number } | null>(null);
   const exists = !target ? { checking: false, ok: null, owns: 0 } : lookup?.for === target ? { checking: false, ok: lookup.ok as boolean | null, owns: lookup.owns } : { checking: true, ok: null, owns: 0 };
 
-  const [caps, setCaps] = useState<Record<UiChain, { on: boolean; text: string }>>(() => Object.fromEntries(UI_CHAINS.map((c) => [c, { on: false, text: "" }])) as Record<UiChain, { on: boolean; text: string }>);
+  const [caps, setCaps] = useState<Record<UiChain, { on: boolean; text: string }>>(emptyCaps);
   const [expiry, setExpiry] = useState<Expiry>("never");
   const [phase, setPhase] = useState<Phase>("who");
   const [note, setNote] = useState<{ kind: "cancelled" | "error"; text: string } | null>(null);
+
+  // Next keeps a visited route alive (hidden, inside React <Activity>) and re-runs its effects each time it is shown
+  // again, so a quick "add one, then add another" would reopen this sheet on the last submission's caps step. Start
+  // every showing of the sheet from a clean form.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one reset per showing of the sheet, not a render loop */
+    setText("");
+    setLookup(null);
+    setCaps(emptyCaps());
+    setExpiry("never");
+    setPhase("who");
+    setNote(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
 
   useEffect(() => {
     if (!target) return;

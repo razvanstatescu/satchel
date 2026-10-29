@@ -65,12 +65,15 @@ test.describe("C5: the owner adds, sees and revokes", () => {
 
   test("blocked past 4 live accounts", async ({ page }) => {
     await useMockWallet(page, ALICE);
-    // Dana already holds one of the 4; add three more to reach the limit. A hard navigation (not the sheet's own
-    // Link) to each re-open: Next's client router cache can otherwise keep the previous submission's form state
-    // (phase, checked caps) alive across a quick re-visit of the same route.
+    // Dana already holds one of the 4; add three more to reach the limit, each time through the manage panel's own Add
+    // link (a client navigation). Next keeps the sheet's route alive between visits, so this also proves every
+    // reopening starts from a clean form ("who"), never the previous submission's caps step.
+    await page.goto("/s/1");
     for (const who of ["frank.satchelhq.testnet", "grace.satchelhq.testnet", "henry.satchelhq.testnet"]) {
-      await page.goto("/s/1/allowance");
-      const flow = page.getByTestId("allowance-flow");
+      await page.getByTestId("allowance-manage").filter({ visible: true }).getByTestId("add-allowance").click();
+      const flow = page.getByTestId("allowance-flow").filter({ visible: true });
+      await expect(flow.getByTestId("allowance-to")).toHaveValue("");
+      await expect(flow.getByTestId("allowance-cap-sol")).toHaveCount(0); // the caps step isn't showing
       await flow.getByTestId("allowance-to").fill(who);
       await expect(flow.getByTestId("allowance-recipient-card")).toBeVisible();
       await flow.getByTestId("allowance-review").click();
