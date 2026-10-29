@@ -604,6 +604,151 @@ async fn ft_solvency_invariant() -> Result<()> {
     Ok(())
 }
 
+// ── M-01: contract-paid storage never comes out of escrow ────────────────────────────────
+
+/// I-M1 slack: the contract's free balance minus everything it owes in NEAR (inside + open NEAR offers + storage
+/// credit + NEAR proceeds), from `view_account` and `market_totals`. Negative = I-M1 is broken.
+async fn slack(env: &Env) -> Result<i128> {
+    let a = env.worker.view_account(env.satchel.id()).await?;
+    let free = a.balance.as_yoctonear() as i128 - (a.storage_usage as u128 * STORAGE_BYTE_COST) as i128;
+    let t = view(env, "market_totals", json!({})).await?;
+    let get = |k: &str| t.get(k).map(num).unwrap_or(0) as i128;
+    Ok(free - get("inside_near") - get("offers_near") - get("storage_credit") - get("proceeds_near"))
+}
+
+/// Sandbox only (the satchel account still has its key): send the contract's own NEAR away until only ≈ `spare`
+/// yocto is left above what it owes. Returns the slack after the drain.
+async fn drain_to(env: &Env, spare: u128) -> Result<i128> {
+    let s = slack(env).await?;
+    assert!(s > spare as i128, "slack {s} is already below {spare}");
+    let r = env.satchel.as_account().transfer_near(env.root.id(), NearToken::from_yoctonear(s as u128 - spare)).await?;
+    assert!(r.is_success());
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    let s = slack(env).await?;
+    assert!(s > 0 && s <= spare as i128, "drained slack {s}");
+    Ok(s)
+}
+
+/// Anyone can refill the contract's own buffer with a plain transfer (it needs no key on the receiving side).
+async fn top_up(env: &Env, amount: u128) -> Result<()> {
+    assert!(env.root.transfer_near(env.satchel.id(), NearToken::from_yoctonear(amount)).await?.is_success());
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    Ok(())
+}
+
+/// M-01, `nft_transfer`. With the buffer drained to ≈ 0.5 mNEAR above escrow, a transfer to an account that never held
+/// a Satchel needs ≈ 250 B of new storage. It must be refused (ERR_INSOLVENT) rather than paid out of inside NEAR, so
+/// the last yocto inside can still be withdrawn. After anyone tops the buffer up, the same transfer goes through.
+#[tokio::test]
+async fn m01_transfer_to_new_holder_never_spends_escrow() -> Result<()> {
+    let env = setup_with(Opts { mint_to_alice: 2, ..Default::default() }).await?;
+    assert_ok(&deposit_near(&env, &env.bob, "1", 2 * ONE_NEAR).await?);
+    let s0 = drain_to(&env, MILLI / 2).await?;
+    let dave = sub(&env.root, "dave", 5).await?;
+    let u0 = storage_usage(&env, env.satchel.id()).await?;
+    let r = transfer(&env, &env.alice, "1", dave.id()).await?;
+    let grew = storage_usage(&env, env.satchel.id()).await? as i64 - u0 as i64;
+    eprintln!("m01 transfer: slack before {s0}, storage Δ {grew} B, slack after {}, ok {}", slack(&env).await?, r.is_success());
+    // whoever holds the token now must be able to take every yocto that is inside it
+    let holder = if owner_of(&env, "1").await? == dave.id().as_str() { &dave } else { &env.alice };
+    let all = num(&inside(&env, "1").await?["near"]);
+    assert_ok(&withdraw_near(&env, holder, "1", all, None).await?);
+    check_solvency(&env, &["1", "2"], &[env.alice.id(), env.bob.id(), dave.id()]).await?;
+    assert_fails_with(&r, "ERR_INSOLVENT");
+    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string(), "the refused transfer moved nothing");
+    // the buffer, not escrow, pays S-02 storage: refill it and the transfer goes through
+    assert_ok(&deposit_near(&env, &env.bob, "1", ONE_NEAR).await?);
+    top_up(&env, ONE_NEAR / 10).await?;
+    assert_ok(&transfer(&env, &env.alice, "1", dave.id()).await?);
+    check_solvency(&env, &["1", "2"], &[env.alice.id(), env.bob.id(), dave.id()]).await?;
+    let all = num(&inside(&env, "1").await?["near"]);
+    assert_ok(&withdraw_near(&env, &dave, "1", all, None).await?);
+    Ok(())
+}
+
+/// A sandbox account whose id is the longest NEAR allows (64 chars): the new holder's entries are as large as they get.
+async fn long_sub(env: &Env, first: char, near: u128) -> Result<Account> {
+    let name = format!("{first}{}", "x".repeat(64 - env.root.id().as_str().len() - 2));
+    sub(&env.root, &name, near).await
+}
+
+/// M-01, `buy` and USDC `buy` (`execute_sale`). Escrow of every kind is present (inside NEAR, a NEAR offer, storage
+/// credit). The seller keeps another Satchel and the buyers have 64-char ids, so each sale grows storage even though
+/// it frees the listing. With the buffer drained, the sale is refused with ERR_INSOLVENT (the NEAR price and the USDC
+/// come back to the buyer), I-M1 holds, and after a top-up both sales go through.
+#[tokio::test]
+async fn m01_buy_by_new_holder_never_spends_escrow() -> Result<()> {
+    let env = setup_with(Opts { mint_to_alice: 3, ..Default::default() }).await?;
+    let erin = long_sub(&env, 'e', 20).await?;
+    let fred = long_sub(&env, 'f', 5).await?;
+    ft_register(&env, fred.id()).await?;
+    ft_mint(&env, fred.id(), 10 * USDC).await?;
+    let accts = [env.alice.id(), env.bob.id(), env.carol.id(), erin.id(), fred.id()];
+    let toks = ["1", "2", "3"];
+    assert_ok(&deposit_near(&env, &env.bob, "1", 2 * ONE_NEAR).await?);
+    prepay(&env, &env.carol, 20 * MILLI).await?;
+    make_offer_ok(&env, &env.carol, "3", ONE_NEAR, now_ms(&env).await? + 3_600_000).await?;
+    let lid = list_ok(&env, &env.alice, "1", ONE_NEAR, "near").await?;
+
+    // NEAR buy
+    drain_to(&env, MILLI / 2).await?;
+    let e0 = balance(&env, erin.id()).await?;
+    let u0 = storage_usage(&env, env.satchel.id()).await?;
+    let r = buy(&env, &erin, "1", lid, 0, NearToken::from_yoctonear(ONE_NEAR)).await?;
+    let grew = storage_usage(&env, env.satchel.id()).await? as i64 - u0 as i64;
+    eprintln!("m01 buy: storage Δ {grew} B, slack after {}, ok {}", slack(&env).await?, r.is_success());
+    check_solvency(&env, &toks, &accts).await?;
+    assert_fails_with(&r, "ERR_INSOLVENT");
+    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string());
+    assert!(e0 - balance(&env, erin.id()).await? < 10 * MILLI, "the price came back (only gas was spent)");
+    top_up(&env, ONE_NEAR / 10).await?;
+    assert_ok(&buy(&env, &erin, "1", lid, 0, NearToken::from_yoctonear(ONE_NEAR)).await?);
+    assert_eq!(owner_of(&env, "1").await?, erin.id().to_string());
+    check_solvency(&env, &toks, &accts).await?;
+
+    // USDC buy of token 2 (ft_on_transfer): the refusal panics, so the FT refunds 100 %
+    let lid = list_ok(&env, &env.alice, "2", 4 * USDC, "usdc").await?;
+    drain_to(&env, MILLI / 2).await?;
+    let u0 = storage_usage(&env, env.satchel.id()).await?;
+    let r = ft_buy(&env, &fred, 4 * USDC, &buy_msg("2", lid, 0)).await?;
+    let grew = storage_usage(&env, env.satchel.id()).await? as i64 - u0 as i64;
+    eprintln!("m01 usdc buy: storage Δ {grew} B, slack after {}, used {}", slack(&env).await?, used(&r));
+    check_solvency(&env, &toks, &accts).await?;
+    assert_eq!(used(&r), 0, "refused → refunded");
+    assert!(fail_text(&r).contains("ERR_INSOLVENT"), "{}", fail_text(&r));
+    assert_eq!(ft_balance(&env, fred.id()).await?, 10 * USDC);
+    top_up(&env, ONE_NEAR / 10).await?;
+    assert_eq!(used(&ft_buy(&env, &fred, 4 * USDC, &buy_msg("2", lid, 0)).await?), 4 * USDC);
+    assert_eq!(owner_of(&env, "2").await?, fred.id().to_string());
+    check_solvency(&env, &toks, &accts).await?;
+    Ok(())
+}
+
+/// M-01, `accept_offer`. The accept frees the offer record (paid by its offerer) and creates the new holder's entry
+/// and, for a seller who never listed or offered, the seller's proceeds slot. Whatever the net storage change, the
+/// accept must never leave I-M1 broken; if it needs contract-paid storage the buffer can't cover, it is refused.
+#[tokio::test]
+async fn m01_accept_by_new_holder_never_spends_escrow() -> Result<()> {
+    let env = setup_with(Opts { mint_to_alice: 2, ..Default::default() }).await?;
+    let gina = long_sub(&env, 'g', 20).await?;
+    let accts = [env.alice.id(), env.bob.id(), gina.id()];
+    assert_ok(&deposit_near(&env, &env.bob, "1", 2 * ONE_NEAR).await?);
+    let oid = make_offer_ok(&env, &gina, "1", ONE_NEAR, now_ms(&env).await? + 3_600_000).await?;
+    drain_to(&env, MILLI / 2).await?;
+    let u0 = storage_usage(&env, env.satchel.id()).await?;
+    let r = offer_call(&env, &env.alice, "accept_offer", oid).await?;
+    let grew = storage_usage(&env, env.satchel.id()).await? as i64 - u0 as i64;
+    eprintln!("m01 accept: storage Δ {grew} B, slack after {}, ok {}", slack(&env).await?, r.is_success());
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    check_solvency(&env, &["1", "2"], &accts).await?;
+    if grew > 0 {
+        assert_fails_with(&r, "ERR_INSOLVENT");
+    } else {
+        assert_ok(&r);
+    }
+    Ok(())
+}
+
 // ── C5 compatibility ─────────────────────────────────────────────────────────────────────
 
 /// accept_offer is an ownership change: it clears every allowance (C5 reset rule) and the old delegate can no longer
