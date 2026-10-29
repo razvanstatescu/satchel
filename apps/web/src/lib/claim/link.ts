@@ -20,7 +20,8 @@ export interface ClaimKey {
 }
 
 function keyFromPair(kp: KeyPair): ClaimKey {
-  return { secretKey: kp.toString() as KeyPairString, publicKey: kp.publicKey.toString(), implicitAccountId: keyToImplicitAddress(kp.publicKey) };
+  const pub = kp.getPublicKey();
+  return { secretKey: kp.toString() as KeyPairString, publicKey: pub.toString(), implicitAccountId: keyToImplicitAddress(pub) };
 }
 
 /** A fresh claim key (the giver's browser; kb/80 §Give by link step 1). */

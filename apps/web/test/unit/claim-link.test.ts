@@ -12,7 +12,7 @@ describe("generateClaimKey", () => {
     const k = generateClaimKey();
     expect(k.implicitAccountId).toMatch(/^[0-9a-f]{64}$/);
     const kp = KeyPair.fromString(k.secretKey);
-    expect(kp.publicKey.toString()).toBe(k.publicKey);
+    expect(kp.getPublicKey().toString()).toBe(k.publicKey);
   });
 
   it("never repeats across calls", () => {
