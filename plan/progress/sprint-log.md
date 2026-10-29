@@ -19,3 +19,4 @@
 - 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @5cce2af; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs bff1397), INV-22 OK
 - 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
 - 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
+- 2026-10-29T16:05Z [orchestrator] session restart #2: resumed contract-sign, contract-market, web-flows, web-allowance from their transcripts; sandbox on main restarted
