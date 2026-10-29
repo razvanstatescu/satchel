@@ -603,3 +603,37 @@ async fn ft_solvency_invariant() -> Result<()> {
     check_solvency(&env, &["1", "2"], &accts).await?;
     Ok(())
 }
+
+// ── C5 compatibility ─────────────────────────────────────────────────────────────────────
+
+/// accept_offer is an ownership change: it clears every allowance (C5 reset rule) and the old delegate can no longer
+/// sign. A delegate never gets inside or offer powers over the owner's token (ERR_NOT_OWNER / ERR_NOT_OFFERER).
+#[tokio::test]
+async fn offer_accept_clears_allowances_and_delegates_have_no_market_powers() -> Result<()> {
+    let env = setup().await?;
+    assert_ok(&deposit_near(&env, &env.bob, "1", ONE_NEAR).await?);
+    let r = env
+        .alice
+        .call(env.satchel.id(), "set_allowance")
+        .args_json(json!({ "token_id": "1", "delegate": env.carol.id(),
+                           "caps": [{ "asset": { "evm": { "chain_id": 11155111 } }, "limit": ONE_NEAR.to_string() }] }))
+        .deposit(NearToken::from_millinear(10))
+        .gas(Gas::from_tgas(30))
+        .transact()
+        .await?;
+    assert_ok(&r);
+    let oid = make_offer_ok(&env, &env.bob, "1", 2 * ONE_NEAR, now_ms(&env).await? + 3_600_000).await?;
+    assert_fails_with(&withdraw_near(&env, &env.carol, "1", 1, None).await?, "ERR_NOT_OWNER");
+    assert_fails_with(&withdraw_usdc(&env, &env.carol, "1", 1, None).await?, "ERR_NOT_OWNER");
+    assert_fails_with(&offer_call(&env, &env.carol, "accept_offer", oid).await?, "ERR_NOT_OWNER");
+    assert_fails_with(&offer_call(&env, &env.carol, "cancel_offer", oid).await?, "ERR_NOT_OFFERER");
+    let r = offer_call(&env, &env.alice, "accept_offer", oid).await?;
+    assert_ok(&r);
+    let cleared = events(&r, "allowances_cleared");
+    assert_eq!(cleared.len(), 1, "cleared in the accept receipt");
+    assert_eq!((cleared[0]["reason"].as_str(), cleared[0]["delegate_ids"].clone()), (Some("sale"), json!([env.carol.id()])));
+    assert!(view(&env, "allowances_of", json!({ "token_id": "1" })).await?.as_array().unwrap().is_empty());
+    let req = evm_req(&EvmTx::transfer(0).encode());
+    assert_fails_with(&sign_sync_fail(&env, &env.carol, "1", &req, SignOpts::default_for(1)).await?, "ERR_NOT_OWNER");
+    Ok(())
+}
