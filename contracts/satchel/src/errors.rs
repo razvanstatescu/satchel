@@ -23,6 +23,12 @@ pub const ERR_EVM_DATA: &str = "ERR_EVM_DATA";
 pub const ERR_EVM_ACCESS_LIST: &str = "ERR_EVM_ACCESS_LIST";
 pub const ERR_EVM_TOO_LONG: &str = "ERR_EVM_TOO_LONG";
 pub const ERR_EVM_NONCE_GAP: &str = "ERR_EVM_NONCE_GAP";
+pub const ERR_EVM_TOKEN: &str = "ERR_EVM_TOKEN";
+pub const ERR_EVM_VALUE: &str = "ERR_EVM_VALUE";
+
+pub const ERR_MSG_EMPTY: &str = "ERR_MSG_EMPTY";
+pub const ERR_MSG_TOO_LONG: &str = "ERR_MSG_TOO_LONG";
+pub const ERR_MSG_ENCODING: &str = "ERR_MSG_ENCODING";
 
 pub const ERR_BTC_INPUT_COUNT: &str = "ERR_BTC_INPUT_COUNT";
 pub const ERR_BTC_PREIMAGE_LEN: &str = "ERR_BTC_PREIMAGE_LEN";
@@ -57,6 +63,17 @@ pub const ERR_WRONG_TOKEN: &str = "ERR_WRONG_TOKEN";
 pub const ERR_BAD_MSG: &str = "ERR_BAD_MSG";
 pub const ERR_NOTHING_OWED: &str = "ERR_NOTHING_OWED";
 
+// C4 / C6 (docs/specs/C4-C6.md §6)
+pub const ERR_AMOUNT: &str = "ERR_AMOUNT";
+pub const ERR_INSIDE_BALANCE: &str = "ERR_INSIDE_BALANCE";
+pub const ERR_STORAGE_CREDIT: &str = "ERR_STORAGE_CREDIT";
+pub const ERR_NO_OFFER: &str = "ERR_NO_OFFER";
+pub const ERR_NOT_OFFERER: &str = "ERR_NOT_OFFERER";
+pub const ERR_OFFER_EXPIRED: &str = "ERR_OFFER_EXPIRED";
+pub const ERR_OFFER_EXPIRY: &str = "ERR_OFFER_EXPIRY";
+pub const ERR_OFFER_STALE: &str = "ERR_OFFER_STALE";
+pub const ERR_TOO_MANY_OFFERS: &str = "ERR_TOO_MANY_OFFERS";
+
 /// Default human sentence for a code. Kept short: every byte is wasm.
 pub fn sentence(code: &str) -> &'static str {
     match code {
@@ -78,11 +95,21 @@ pub fn sentence(code: &str) -> &'static str {
         ERR_LISTING_CHANGED => "listing changed",
         ERR_SELF_BUY => "seller cannot buy own listing",
         ERR_WRONG_AMOUNT => "amount must equal the price",
-        ERR_WRONG_TOKEN => "only the configured USDC may call",
-        ERR_BAD_MSG => "msg must be {\"buy\":{...}}",
+        ERR_WRONG_TOKEN => "token not accepted for this call",
+        ERR_BAD_MSG => "msg must be {\"buy\":…}, {\"offer\":…} or {\"deposit\":…}",
+        ERR_AMOUNT => "amount must be > 0",
+        ERR_INSIDE_BALANCE => "not that much inside this Satchel",
+        ERR_STORAGE_CREDIT => "prepay_storage first",
+        ERR_NO_OFFER => "no open offer with that id",
+        ERR_NOT_OFFERER => "only the offerer may cancel before expiry",
+        ERR_OFFER_EXPIRED => "offer has expired",
+        ERR_OFFER_EXPIRY => "expires_at_ms must be in the future and at most 90 days away",
+        ERR_OFFER_STALE => "sig_count or inside_epoch changed since the offer",
+        ERR_TOO_MANY_OFFERS => "too many open offers",
         ERR_NOTHING_OWED => "nothing to withdraw",
         ERR_MPC_DEPOSIT => "mpc_deposit must be in [1 yocto, 0.01 NEAR]",
-        c if c.starts_with("ERR_EVM") => "only plain Sepolia ETH transfers are signed",
+        c if c.starts_with("ERR_EVM") => "only ETH and USDC transfers on the supported testnets are signed",
+        c if c.starts_with("ERR_MSG") => "messages must be 1 to 1024 bytes of UTF-8",
         c if c.starts_with("ERR_BTC") => "BTC payload refused by policy",
         c if c.starts_with("ERR_SOL") => "SOL payload refused by policy",
         _ => "refused",

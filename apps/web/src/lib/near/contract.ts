@@ -67,12 +67,23 @@ export interface FunctionCallAction {
   type: "FunctionCall";
   params: { methodName: string; args: Record<string, unknown>; gas: string; deposit: string };
 }
+/** A plain NEAR transfer action (A2 Give by link: funding a fresh implicit account for gas). */
+export interface TransferAction {
+  type: "Transfer";
+  params: { deposit: string };
+}
 export interface WalletTx {
+  receiverId: string;
+  actions: (FunctionCallAction | TransferAction)[];
+}
+/** The function-call-only shape every `calls.*` builder but `transferNear` returns (narrower than `WalletTx`, so
+ * callers keep precise `.actions[0].params` typing; it's structurally a `WalletTx` wherever one is expected). */
+export interface FunctionCallTx {
   receiverId: string;
   actions: FunctionCallAction[];
 }
 
-const fc = (receiverId: string, methodName: string, args: Record<string, unknown>, gas: string, deposit: string): WalletTx => ({
+const fc = (receiverId: string, methodName: string, args: Record<string, unknown>, gas: string, deposit: string): FunctionCallTx => ({
   receiverId,
   actions: [{ type: "FunctionCall", params: { methodName, args, gas, deposit } }],
 });
@@ -92,6 +103,9 @@ export const calls = {
 
   nftTransfer: (token_id: TokenId, receiver_id: string, contractId = SATCHEL_CONTRACT) =>
     fc(contractId, "nft_transfer", { receiver_id, token_id }, ATTACH.transfer.gas, ATTACH.transfer.deposit),
+
+  /** A plain NEAR transfer (A2 Give by link: funding the claim's fresh implicit account for gas). */
+  transferNear: (receiver_id: string, deposit: string): WalletTx => ({ receiverId: receiver_id, actions: [{ type: "Transfer", params: { deposit } }] }),
 
   list: (token_id: TokenId, price: string, currency: Currency, contractId = SATCHEL_CONTRACT) =>
     fc(contractId, "list", { token_id, price, currency }, ATTACH.list.gas, ATTACH.list.deposit),

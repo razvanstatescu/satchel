@@ -68,13 +68,18 @@ function fixtureNextNonce(tokenId: string): number {
   return used.length ? Math.max(...used) + 1 : 0;
 }
 
-function fixtureUtxos(tokenId: string): Utxo[] {
+/**
+ * `spent`: the token's own sig records' `detail.btc.txid` (the real UTXO index would already drop a spent coin;
+ * this fixture must too, or re-"sweeping" the same synthetic coins forever would never run out, e.g. A3's Empty
+ * flow calling `prepareSend({amount:"max"})` more than once on the same token in one session).
+ */
+function fixtureUtxos(tokenId: string, spent: ReadonlySet<string> = new Set()): Utxo[] {
   const total = BigInt(FIXTURE_BALANCES[tokenId]?.btc.confirmed ?? "0");
   if (total === 0n) return [];
   const big = total > 60_000n ? total - 50_000n : total;
   const out: Utxo[] = [{ txid: (tokenId.padStart(2, "0") + "a1").repeat(16), vout: 0, value: big, confirmed: true }];
   if (total > 60_000n) out.push({ txid: (tokenId.padStart(2, "0") + "b2").repeat(16), vout: 1, value: 50_000n, confirmed: true });
-  return out;
+  return out.filter((u) => !spent.has(u.txid.toLowerCase()));
 }
 
 /** mempool.space/testnet4 primary + the configured fallbacks (core `MempoolClient`, kb/90 §8.3). */
@@ -134,7 +139,7 @@ export async function prepareSend(a: PrepareArgs): Promise<PreparedSend> {
   let utxos: Utxo[];
   let feeRate: number;
   if (IS_FIXTURE) {
-    utxos = fixtureUtxos(a.tokenId);
+    utxos = fixtureUtxos(a.tokenId, referencedTxids(a.records));
     feeRate = 2;
   } else {
     const c = mempoolClient();

@@ -9,8 +9,9 @@
  */
 import { deriveEd25519, deriveSatchelAddresses, deriveSecp256k1, nearKeyString, tokenPath } from '../derive'
 import { checkBtc, ownBtcScripts } from './btc'
-import { checkEvm } from './evm'
+import { checkEvm, EVM_CHECK_CHAINS, SEPOLIA, type EvmCheckResult } from './evm'
 import { gate } from './gate'
+import { checkMessages, isMessageRecord } from './messages'
 import { checkSol } from './sol'
 import {
   type CheckDeps,
@@ -102,15 +103,36 @@ export async function checkCleanHistory(input: CheckInput, deps: CheckDeps): Pro
   else if (expected && snap && !snap.contract.exists) codeOk = false
 
   const records = near.ok && snap ? [...snap.records].sort((a, b) => a.seq - b.seq) : []
-  const byChain = (c: SigRecordView['chain']) => records.filter((r) => r.chain === c)
+  // C7: message records are judged on their own (never blocking); everything else goes to its chain's rule
+  const msgRecs = records.filter(isMessageRecord)
+  const txRecs = records.filter((r) => !isMessageRecord(r))
+  const byChain = (c: SigRecordView['chain']) => txRecs.filter((r) => r.chain === c)
   const [evmRecs, btcRecs, solRecs] = [byChain('evm'), byChain('btc'), byChain('sol')]
   const [cEvm, cBtc, cSol] = await Promise.all([cachedFor(input, deps, evmRecs), cachedFor(input, deps, btcRecs), cachedFor(input, deps, solRecs)])
 
-  const [evm, btc, sol] = await Promise.all([
-    checkEvm(addrs.evm, evmRecs, deps.evm, policy, cEvm),
+  // C3: one EVM run per chain id. Sepolia always runs (its account check is unconditional); other chains run when they
+  // have records, on `deps.evmByChain[id]` (none configured ⇒ providers_down ⇒ unknown, fail closed).
+  const evmChainOf = (r: SigRecordView) => ('evm' in r.detail ? Number(r.detail.evm.chain_id) : SEPOLIA)
+  const evmGroups = new Map<number, SigRecordView[]>([[SEPOLIA, []]])
+  for (const r of evmRecs) {
+    const c = evmChainOf(r)
+    const key = EVM_CHECK_CHAINS.includes(c) ? c : SEPOLIA // an unsupported chain id is reported by the Sepolia run
+    evmGroups.set(key, [...(evmGroups.get(key) ?? []), r])
+  }
+  const evmSources = (c: number) => deps.evmByChain?.[c] ?? (c === SEPOLIA ? deps.evm : [])
+
+  const [evmRuns, btc, sol] = await Promise.all([
+    Promise.all([...evmGroups].map(([c, recs]) => checkEvm(addrs.evm, recs, evmSources(c), policy, cEvm, c))),
     checkBtc(btcRecs, deps.btc, policy, cBtc, ownBtcScripts(addrs.btcPubkey)),
     checkSol(addrs.sol, solRecs, deps.sol, policy, input.now, cSol),
   ])
+  const evm: EvmCheckResult = {
+    items: evmRuns.flatMap((x) => x.items),
+    account: evmRuns[0]!.account, // Sepolia
+    finals: evmRuns.flatMap((x) => x.finals),
+  }
+  const otherEvmAccounts = evmRuns.slice(1).map((x) => x.account)
+  const msg = checkMessages(msgRecs)
 
   // persist final verdicts only
   const bySeq = new Map(records.map((r) => [r.seq, r]))
@@ -127,8 +149,8 @@ export async function checkCleanHistory(input: CheckInput, deps: CheckDeps): Pro
   }
   await Promise.all(writes)
 
-  const items: ItemReport[] = [...evm.items, ...btc.items, ...sol.items].sort((a, b) => a.seq - b.seq)
-  const accounts = [evm.account, sol.account]
+  const items: ItemReport[] = [...evm.items, ...btc.items, ...sol.items, ...msg].sort((a, b) => a.seq - b.seq)
+  const accounts = [evm.account, sol.account, ...otherEvmAccounts]
 
   const g = gate({
     role: input.role,
@@ -150,6 +172,7 @@ export async function checkCleanHistory(input: CheckInput, deps: CheckDeps): Pro
   const single =
     near.sources === 1 ||
     evm.account.sources === 1 ||
+    otherEvmAccounts.some((a) => a.sources === 1) ||
     items.some((i) => i.chain !== 'sol' && i.sources === 1 && i.status !== 'unknown')
   return {
     token_id: input.tokenId,

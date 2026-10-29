@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import evm from '../../../vectors/evm.json' with { type: 'json' }
 import btc from '../../../vectors/btc.json' with { type: 'json' }
 import sol from '../../../vectors/sol.json' with { type: 'json' }
+import msg from '../../../vectors/msg.json' with { type: 'json' }
 import {
   checkEvmNonce,
   classifySignRequest,
@@ -31,6 +32,7 @@ describe.each([
   ['evm', evm.vectors as V[]],
   ['btc', btc.vectors as V[]],
   ['sol', sol.vectors as V[]],
+  ['msg', msg.vectors as V[]],
 ])('vectors/%s.json', (_set, vectors) => {
   it.each(vectors.map((v) => [v.name, v] as const))('%s', (_n, v) => {
     // the vectors model `sign_for` on a token with `state` (absent = no EVM record): pass it as the context
@@ -63,11 +65,13 @@ describe('policy: schema coverage', () => {
   })
 
   it('spec §12.2 named cases are present', () => {
-    const names = new Set([...evm.vectors, ...btc.vectors, ...sol.vectors].map((v) => v.name))
+    const names = new Set([...evm.vectors, ...btc.vectors, ...sol.vectors, ...msg.vectors].map((v) => v.name))
     for (const n of [
       'eth_transfer_nonce0_kb31', 'eth_transfer_nonce7_kb70_f1', 'eth_transfer_large_value', 'eth_max_width_all', 'eth_to_contract_address',
       'legacy_eip155', 'legacy_pre155', 'type1_eip2930', 'type4_eip7702', 'auth_7702_chain0', 'eip191_personal_sign', 'eip712_permit',
-      'chain_id_1_mainnet', 'chain_id_84532_base_sepolia', 'calldata_erc20_approve', 'contract_creation_empty_to', 'access_list_non_empty',
+      'chain_id_1_mainnet', 'chain_id_8453_base_mainnet', 'chain_base_sepolia_native', 'chain_arbitrum_sepolia_native', 'chain_op_sepolia_native',
+      'erc20_usdc_transfer_sepolia', 'erc20_usdc_transfer_base_sepolia', 'erc20_sepolia_usdc_on_base', 'erc20_with_value', 'erc20_approve_usdc',
+      'nonce_gap_chain_base_first_request_nonce2', 'too_long_161_bytes', 'calldata_erc20_approve', 'contract_creation_empty_to', 'access_list_non_empty',
       'trailing_byte', 'non_canonical_int_leading_zero', 'nonce_over_wide_9_bytes', 'raw_32_byte_hash',
       'btc_1in_2out', 'btc_2in_2out', 'btc_4in_2out', 'btc_2in_taproot_recipient', 'sighash_none', 'sighash_single', 'sighash_all_anyonecanpay',
       'sighash_0x41', 'preimage_len_181', 'scriptcode_wrong_opcode', 'locktime_nonzero', 'sequence_below_fffffffd', 'mixed_tx',
@@ -75,6 +79,8 @@ describe('policy: schema coverage', () => {
       'sol_transfer_new_account', 'sol_transfer_existing_account', 'sol_self_transfer', 'sol_v0_message', 'sol_durable_nonce_ix0',
       'sol_two_transfers', 'sol_compute_budget_plus_transfer', 'sol_system_assign', 'sol_spl_token_approve', 'sol_two_signers', 'sol_offchain_ff',
       'sol_trailing_byte', 'sol_too_long_1233', 'sol_raw_32_byte_hash',
+      'evm_message_hello', 'evm_message_siwe', 'evm_message_raw_32_byte_hash', 'evm_message_1025_bytes', 'sol_message_ascii_format0',
+      'sol_message_newline_format1', 'sol_message_legacy_tx_bytes',
     ])
       expect(names.has(n), n).toBe(true)
   })

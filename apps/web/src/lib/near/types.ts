@@ -15,6 +15,10 @@ export interface ConfigView {
   usdc_contract_id: string | null;
   cooldown_blocks: number;
   evm_chain_ids: number[];
+  /** C2 (docs/specs/C1-C2-C3-C7.md §5.3) */
+  erc20_tokens?: { chain_id: number; token: string }[];
+  /** C7 */
+  max_message_bytes?: number;
   max_btc_inputs: number;
   mpc_sign_gas_tgas: number;
   on_signed_gas_tgas: { base: number; per_request: number };

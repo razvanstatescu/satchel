@@ -6,8 +6,8 @@
  *   pnpm --filter @satchel/tools fuzz:corpus --n 1500 --n-btc 600                     # seed corpus → tools/fuzz/corpus (committed)
  *   pnpm --filter @satchel/tools fuzz:corpus --n 100000 --out ../target/fuzz-corpus   # deep corpus (not committed)
  *
- * Options: --n <cases per chain> (default 1000) · --n-evm/--n-btc/--n-sol <override> · --seed <u32> (default 1) · --out <dir>
- *          · --chains evm,btc,sol
+ * Options: --n <cases per chain> (default 1000) · --n-evm/--n-btc/--n-sol/--n-msg <override> · --seed <u32> (default 1) · --out <dir>
+ *          · --chains evm,btc,sol,msg (msg = the C7 evm_message / sol_message kinds)
  */
 import { createWriteStream, mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
@@ -22,7 +22,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const nAll = Number(arg('n', '1000'))
 const seed = Number(arg('seed', '1'))
 const out = resolve(arg('out', join(here, 'corpus')))
-const chains = arg('chains', 'evm,btc,sol').split(',') as Chain[]
+const chains = arg('chains', 'evm,btc,sol,msg').split(',') as Chain[]
 
 mkdirSync(out, { recursive: true })
 const seeds = loadSeeds()

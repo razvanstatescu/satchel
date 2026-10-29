@@ -101,7 +101,14 @@ describe('near: gas and deposit formulas (spec §5.5)', () => {
       mpc_contract_id: 'v1.signer-prod.testnet',
       usdc_contract_id: '3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af',
       cooldown_blocks: 250,
-      evm_chain_ids: [11155111],
+      evm_chain_ids: [11155111, 84532, 421614, 11155420],
+      erc20_tokens: [
+        { chain_id: 11155111, token: '1c7d4b196cb0c7b01d743fbc6116a902379c7238' },
+        { chain_id: 84532, token: '036cbd53842c5426634e7929541ec2318f3dcf7e' },
+        { chain_id: 421614, token: '75faf114eafb1bdbe2f0316df893fd58ce46aa4d' },
+        { chain_id: 11155420, token: '5fd84259d66cd46123540766be93dfe6d43130d7' },
+      ],
+      max_message_bytes: 1024,
       max_btc_inputs: 10,
       mpc_sign_gas_tgas: 15,
       on_signed_gas_tgas: { base: 10, per_request: 2 },
@@ -114,6 +121,9 @@ describe('near: gas and deposit formulas (spec §5.5)', () => {
     }
     expect(diffConfig(cfg)).toEqual([])
     expect(diffConfig({ ...cfg, cooldown_blocks: 210 })).toEqual(['cooldown_blocks: contract 210 ≠ client 250'])
+    // a pre-C2/C3/C7 contract (dev1) is reported, field by field
+    const { erc20_tokens: _t, max_message_bytes: _m, ...old } = { ...cfg, evm_chain_ids: [11155111] }
+    expect(diffConfig(old).map((d) => d.split(':')[0])).toEqual(['evm_chain_ids', 'erc20_tokens', 'max_message_bytes'])
   })
 })
 

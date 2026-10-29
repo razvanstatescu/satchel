@@ -472,6 +472,21 @@ impl SignOpts {
     }
 }
 
+/// C7: a message record stores its body, so callers attach 0.005 NEAR + len × 1e19 yocto (`messageSignAttachDeposit`).
+pub fn message_len(request: &Value) -> Option<usize> {
+    ["evm_message", "sol_message"]
+        .iter()
+        .find_map(|k| request[k]["message"].as_str())
+        .map(|h| h.trim_start_matches("0x").trim_start_matches("0X").len() / 2)
+}
+
+pub fn sign_deposit_for(request: &Value) -> NearToken {
+    match message_len(request) {
+        Some(len) => NearToken::from_yoctonear(sign_attach_deposit(1).as_yoctonear() + len as u128 * STORAGE_BYTE_COST),
+        None => sign_attach_deposit(n_of(request)),
+    }
+}
+
 pub fn n_of(request: &Value) -> u64 {
     request["btc"]["preimages"]
         .as_array()
@@ -495,7 +510,7 @@ fn sign_call(
     who.call(env.satchel.id(), "sign_for")
         .args_json(args)
         .gas(o.gas.unwrap_or_else(|| sign_attach_gas(n)))
-        .deposit(o.deposit.unwrap_or_else(|| sign_attach_deposit(n)))
+        .deposit(o.deposit.unwrap_or_else(|| sign_deposit_for(request)))
 }
 
 /// Submit `sign_for` without blocking on the yield (kb/21 §TL;DR 4).

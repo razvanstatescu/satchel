@@ -16,3 +16,30 @@
 - 2026-10-29T15:22Z [A3] progress: empty-the-satchel flow (multi-chain drain, BTC auto-batching), typecheck/lint/unit green
 - 2026-10-29T15:26Z [A4] done: request coins — BIP-21/EIP-681/Solana Pay builders (lib/payment-uri.ts, vector-tested), Add coins' optional amount field (GET form, works with JS off), payment-URI QR + Copy payment link + Share, shareable app link /s/<id>/receive?chain=&amount= (display only). Unit (payment-uri.test.ts) + Playwright (request-coins.spec.ts incl. axe Day/Night) green.
 - 2026-10-29T15:26Z [C4|C6] progress: sandbox tests/tests/market.rs 15/15 green (deposit/withdraw, listed freeze, transfer+buy move balances, NEAR+USDC offers, stale/quiet/expiry, FT failure re-credit, per-offerer cap, solvency I-M1/I-M3 incl. drained contract)
+- 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @5cce2af; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs bff1397), INV-22 OK
+- 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
+- 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
+- 2026-10-29T16:05Z [orchestrator] session restart #2: resumed contract-sign, contract-market, web-flows, web-allowance from their transcripts; sandbox on main restarted
+- 2026-10-29T16:05Z [C1,C2,C3,C7] wip: core TS tests added (379 green); next sandbox tests, deep fuzz, wasm build
+- 2026-10-29T16:05Z [A2,A3] progress: Playwright specs green (give->link->claim, empty-everything); fixed hashchange, fixture UTXO depletion, and a stale-closure bug in EmptyFlow
+- 2026-10-29T16:08Z [orchestrator] main (A1+A4+C5) verified: sandbox 91/91, wasm 329,320 B e7ded724…, INV-22 OK
+- 2026-10-29T16:08Z [C4|C6] progress: merged main (C5) into feat/contract-market; accept_offer clears allowances via on_owner_change -> clear_allowances; delegates refused (ERR_NOT_OWNER); StorageKey C4/C6 variants after Allowances; lib 142/142, market sandbox 16/16
+- 2026-10-29T16:11Z [A2,A3] progress: axe (Day+Night) added for give-link/claim/empty; full e2e suite (139 tests) and unit suite green
+- 2026-10-29T16:15Z [A2,A3] done: full suite green (151 e2e, 357 unit, tsc, lint) on feat/web-flows @ c0538ec
+- 2026-10-29T16:16Z [C1,C2,C3,C7] wip: sandbox suite green (88 incl. 5 new in features.rs); wasm 309,266 B sha256 1cac1e97…077e, INV-22 OK; next deep fuzz + C5 trial merge
+- 2026-10-29T16:17Z [C4|C6] done: feat/contract-market @ 4cfb33f (main 24a680b+bd94fcc merged in); lib 142/142, sandbox 107/107 (market 16), core 371/371, proptest 1000 cases clean; wasm 403,886 B sha256 f5527f72…ddd06, INV-22 OK; spec docs/specs/C4-C6.md
+- 2026-10-29T16:18Z [C5-ui] in progress: data layer done (views/calls in near/contract.ts, snapshot+source+sim.ts fixture mirror of set/revoke/delegated debit, mock wallet, requester threaded through Activity); typecheck green; UI next
+- 2026-10-29T16:20Z [C2,C3,C7] fuzz: 4.0M Rust property cases + 400k Rust/TS differential (0 disagreements) + 400k TS self-check; docs/security/fuzzing.md §0b
+- 2026-10-29T16:24Z [orchestrator] merged A2+A3 (94428ea, pushed) and C4+C6 (a512d45); spawned web-market UI agent; contract-sign asked to merge main
+- 2026-10-29T16:40Z [orchestrator] restart #3: resumed contract-sign (mid-merge), web-allowance, web-market; main pushed (4349840)
+- 2026-10-29T16:40Z [C5-ui] in progress: copy deck added (copy/allowance.ts, errorCopy ERR_ALLOWANCE_* mapping); config-copy-theme unit test passes (house rule: never say 'delegate' in UI copy); building the owner/delegate UI next
+- 2026-10-29T16:42Z [C1,C2,C3,C7] merge: main a512d45 (C5, C4/C6) merged into feat/contract-sign; EvmNonces after StorageCredit; C7 kinds refused for delegates; unit 172 green
+- 2026-10-29T16:46Z [orchestrator] main (A1-A4, C4, C5, C6) confirmed: sandbox 107/107, web unit 379, typecheck clean
+- 2026-10-29T16:47Z [C5-ui] in progress: owner panel + add sheet + delegate banner + Send gating built; typecheck/lint/unit (366) all green; unit+e2e tests for allowance next
+- 2026-10-29T16:50Z [C1,C2,C3,C7] done: feat/contract-sign at a6de2ae incl. main a512d45; unit 172, sandbox 112, core 459, tools 72, web 379, vectors:check ok; merged wasm 422,562 B sha256 bd5d8e01…a1a5, INV-22 OK
+- 2026-10-29T16:51Z [C5-ui] in progress: unit tests added (test/unit/allowance.test.ts, 17 tests); full unit suite 383 passed, typecheck/lint green; Playwright next (owner add/revoke, delegate send within/over cap, server HTML)
+- 2026-10-29T17:11Z [C4-ui|C6-ui] wip: data layer committed (market views/calls, fixtures, sim engine, mock wallet) on feat/ui-market @44a0ae9
+- 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (e985d82, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
+- 2026-10-29T17:40Z [review] start: branch review/sprint @ e985d82, reviewing bff1397..e985d82 (C1-C7)
+- 2026-10-29T17:40Z [orchestrator] Razvan: continue. Restart #4: resumed web-allowance, web-market, reviewer, web-sign, docs-spec with the PATH fix; main verification re-running
+- 2026-10-29T17:41Z [orchestrator] web-sign delegated to a nested agent; web multi-chain gaps recorded as a release gate in the tracker

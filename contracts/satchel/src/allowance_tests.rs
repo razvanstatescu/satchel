@@ -930,3 +930,18 @@ proptest! {
         prop_assert_eq!(d, ext + inputs.saturating_sub(total));
     }
 }
+
+/// C7 × C5: message signing is the owner's alone. A delegate with caps on EVM and SOL is refused ERR_ALLOWANCE_KIND
+/// before anything is written; the owner signs the same message.
+#[test]
+fn c7_messages_are_refused_for_delegates() {
+    let mut c = setup();
+    set(&mut c, bot(), vec![evm_cap(10u128.pow(18)), cap(Asset::Sol, 10u128.pow(12))], None, T0);
+    for req in [SignRequest::EvmMessage { message: hex::encode(b"hello") }, SignRequest::SolMessage { message: hex::encode(b"hello") }] {
+        expect_err(ERR_ALLOWANCE_KIND, || sign_as(&mut c, bot(), req.clone(), T0 + 1_000));
+        assert_eq!(sig_count(&c), 0);
+    }
+    ctx(alice(), 6 * MILLI, T0 + 2_000);
+    c.sign_for("1".into(), SignRequest::EvmMessage { message: hex::encode(b"hello") }, None);
+    assert_eq!(sig_count(&c), 1);
+}

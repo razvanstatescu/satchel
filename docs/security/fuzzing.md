@@ -30,6 +30,30 @@ for why the hash in the shared tree moved.
 
 The nonce-gap rule (S-04, D-43) depends on token state, so it is **not** part of the stateless classifier that this fuzzing compares. `parse::classify` and `classifySignRequest(req)` with no context both still exclude it. It is covered by the shared vectors (`state.evm_max_nonce`), the unit tests and the sandbox tests. The seed corpus (`tools/fuzz/corpus`) was regenerated because the vectors that seed it changed.
 
+## 0b. C2 / C3 / C7 extension (2026-10-29, branch `feat/contract-sign`; docs/specs/C1-C2-C3-C7.md)
+
+The new classifier branches (USDC `transfer` calldata, four chain ids, the 160-byte limit, `evm_message`,
+`sol_message`) are covered by the same three layers. C1 (`history_digest`) is a view with no parser, so it is pinned by
+the shared vector `vectors/history.json` instead (three implementations agree: Rust view, TS `historyDigest`, and an
+independent encoder in the sandbox and unit tests).
+
+| Layer | What changed |
+|---|---|
+| Rust oracles (`fuzz_tests.rs`) | The EVM oracle takes the chain/token table from the spec as hex strings and decodes the calldata as two ABI words; a new message oracle rebuilds the EIP-191 and Solana off-chain bytes with `format!` and `is_ascii_graphic`, and checks that the signed bytes never classify as a transaction on either key |
+| Rust properties | new: `erc20_valid_always_accepted`, `erc20_one_rule_broken` (token of another chain, value, selector, padding, length, amount width), `msg_arbitrary_bytes`, `msg_valid_always_accepted`, `msg_mutated_seeds`; `evm_valid_always_accepted` now runs every chain; `evm_structured_fields` mixes in tokens and calldata variants; `classify_arbitrary_requests` covers the two message kinds |
+| TS generator (`test/fuzz/gen.ts`) | EVM valid builds on all four chains, a third of them USDC transfers; structured cases break one calldata rule at a time; a new `msg` kind (seeds, random UTF-8 in several scripts, raw bytes, the 0/1/1023/1024/1025 boundaries) |
+| Corpus | `tools/fuzz/corpus/msg.jsonl` added; all four files regenerated (`--n 1500 --n-btc 600`, 5,100 cases) |
+
+| Run (release) | Cases | Result |
+|---|---|---|
+| Rust properties, `PROPTEST_CASES=200000 FUZZ_STATS_CASES=200000` | 20 properties × 200,000 = **4.0 M**, plus 4 × 200,000 coverage cases | all 26 tests pass, 50.7 s. Coverage reaches `ok` and every code, incl. `ERR_EVM_TOKEN` 1,662, `ERR_EVM_VALUE` 435, `ERR_MSG_EMPTY` 12,386, `ERR_MSG_TOO_LONG` 17,171, `ERR_MSG_ENCODING` 88,277 |
+| Differential, seed 20261029 (`target/fuzz-corpus`) | **100,000 per kind** (evm, btc, sol, msg = 400 k) | **0 disagreements**, 14.3 s replay (EVM 17,478 ok, msg 49,373 ok) |
+| TS self-check, `FUZZ_CASES=100000` | 100,000 per kind (400 k) | pass (no throw, every code reached, invariants hold) |
+
+One test-side bug was found and fixed: the TS invariant decided "native transfer" from a trailing `80c0`, which a USDC
+amount ending in `0x80` also produces. The classifiers agreed; only the checker of the checker was wrong.
+No new contract finding.
+
 ## 1. Method
 
 Everything uses stable Rust 1.93. The dev-dependencies are `proptest 1.12` (no default features), `sha2 0.10` and
@@ -200,7 +224,7 @@ SATCHEL_FUZZ_CORPUS=target/fuzz-corpus cargo test -p satchel --lib --release dif
 FUZZ_CASES=100000 pnpm --filter @satchel/core exec vitest run test/fuzz
 
 # regenerate the committed seed corpus (deterministic; ≈ 2.3 MB)
-pnpm --filter @satchel/tools fuzz:corpus --n 1500 --n-btc 600
+pnpm --filter @satchel/tools fuzz:corpus --n 1500 --n-btc 600   # evm, btc, sol and msg
 
 # wasm hash check
 cargo near build non-reproducible-wasm --manifest-path contracts/satchel/Cargo.toml   # after the fix pass: aea0b2e9…1bd6 (was bec41e44…a584)
@@ -259,3 +283,24 @@ FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test
   - `Cargo.lock`: additions only
   - `contracts/satchel/src/parse/mod.rs`: `#[cfg(test)] mod fuzz_tests;` appended at the end
   - `tools/package.json`: the `fuzz:corpus` script
+
+## 8. C4/C6 market accounting (property tests, 2026-10-29)
+
+Target: `contracts/satchel/src/{market,inside,offers}.rs` (docs/specs/C4-C6.md). There is no parser here; the risk is
+accounting, so the properties run random operation sequences against a reference model.
+
+| Property (`market_tests::…`) | Input | Checks after every step |
+|---|---|---|
+| `prop_accounting_matches_model` | 1–40 random ops over 3 tokens and 4 accounts: NEAR and USDC deposits, withdrawals (delivered or failed, re-credited by the callback), NEAR and USDC offers, cancels (by the offerer or a stranger; refund delivered or failed), accepts (payout delivered or failed), transfers, signatures, block-time jumps | per-token NEAR, USDC and `inside_epoch` equal the model; open offers per token and per offerer equal the model; `proceeds` equal the model; `market_totals()` equals the sums (I-M2); refused steps change nothing |
+| `prop_id_index_is_a_swap_remove_vec` | 1–80 pushes/removes over 3 keys | the O(1) offer index behaves exactly like `Vec::swap_remove`, and reports the entry that moved |
+| `prop_ft_msg_garbage_is_refused_cleanly` | arbitrary strings ≤ 120 chars as `ft_on_transfer` msg, any amount | only stable `ERR_*` panics (the FT then refunds) |
+
+The NEAR solvency invariant (I-M1) needs real balances, so it runs in the sandbox (`tests/tests/market.rs`
+`check_solvency`, after every step of most tests, including a contract drained to 0.05 NEAR of free balance).
+
+```bash
+cargo test -p satchel --lib market_tests                                     # fast: 64 / 48 / 256 cases
+PROPTEST_CASES=1000 cargo test -p satchel --lib --release market_tests::prop # deeper
+```
+Failure persistence is off (no files under `src/`). Each case starts on empty mocked storage (`wipe()`), since
+`testing_env!` carries storage over between cases.

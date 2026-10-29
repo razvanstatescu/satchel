@@ -462,6 +462,11 @@ export function OwnerActions({ snap }: { snap: SatchelSnapshot }) {
           </Button>
         )}
       </div>
+      {!listed && !zero ? (
+        <Button href={`${base}/empty`} size="md" block variant="link" className="justify-center" data-testid="empty-entry">
+          {copy.empty.cta}
+        </Button>
+      ) : null}
       {reason ? (
         <p id={why} className="m-0 flex items-start gap-2 font-sans text-body-sm text-ink-muted">
           <Icon icon={phase === "idle" ? Info : LoaderCircle} size={16} spin={phase !== "idle"} className="mt-0.5" />

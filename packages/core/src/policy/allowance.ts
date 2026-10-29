@@ -9,6 +9,7 @@ import { EVM_CHAIN_IDS } from '../near/constants'
 import type { SignRequest } from '../near/sign-request'
 import { classifyBtc } from './btc'
 import { classifyEvm } from './evm'
+import { classifyEvmMessage, classifySolMessage } from './msg'
 import { decodeRlpExact, RlpError, type RlpItem } from './rlp'
 import { classifySol } from './sol'
 import type { BtcFields, PolicyError } from './types'
@@ -131,6 +132,11 @@ export function allowanceDebits(req: SignRequest): DebitsResult {
     if ('btc' in req) {
       const r = classifyBtc(req.btc.preimages, req.btc.outputs)
       return r.ok ? { ok: true, debits: [{ asset: 'btc', amount: btcDebit(r.fields) }] } : { ok: false, error: r.error }
+    }
+    if ('evm_message' in req || 'sol_message' in req) {
+      // C7: a message moves no coins, so no cap can measure it: delegates may never sign one (owner only)
+      const r = 'evm_message' in req ? classifyEvmMessage(req.evm_message.message) : classifySolMessage(req.sol_message.message)
+      return r.ok ? { ok: false, error: 'ERR_ALLOWANCE_KIND' } : { ok: false, error: r.error }
     }
     const r = classifySol(req.sol.message)
     return r.ok ? { ok: true, debits: [{ asset: 'sol', amount: r.fields.lamports + SOL_FEE_LAMPORTS }] } : { ok: false, error: r.error }

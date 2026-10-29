@@ -26,17 +26,17 @@
 ## Status
 | ID | Feature | Owner | Status | Notes |
 |---|---|---|---|---|
-| A1 | A social card per Satchel (OG/Twitter image) | web-share | **done on branch** (15:16Z) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
-| A2 | Give by link (claim link) | web-flows | in progress | flow + `/claim` built (15:17Z); Playwright next |
-| A3 | Empty the Satchel | web-flows | in progress | multi-chain drain with BTC batching built (15:22Z) |
-| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **done on branch** (15:26Z) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
-| C1 | `history_digest` view | contract-sign | in progress | spec `docs/specs/C1-C2-C3-C7.md` (15:07Z); contract side done, TS mirror pending (15:18Z) |
-| C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress | the UI comes in phase 2 |
-| C3 | More EVM testnets | contract-sign | in progress | the UI comes in phase 2 |
-| C4 | Offers | contract-market | in progress | spec `docs/specs/C4-C6.md`; 26 unit + 15 sandbox (15:26Z) |
-| C5 | Spending allowance (delegated signer) | contract-allowance | in progress | spec `docs/specs/C5.md`; implemented, 115 unit (proptest), TS mirror + 55 shared vectors (15:17Z) |
-| C6 | NEAR-side assets inside | contract-market | in progress | with C4; the solvency invariants I-M1/I-M3 are tested |
-| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress | the UI comes in phase 2 |
+| A1 | A social card per Satchel (OG/Twitter image) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
+| A2 | Give by link (claim link) | web-flows | **merged + pushed** (94428ea) | `/s/[id]/give-link`, `/claim` (fragment-only secret, local signer); batch fund + nft_transfer with fallback. Needs a real-wallet test |
+| A3 | Empty the Satchel | web-flows | **merged + pushed** (94428ea) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
+| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
+| C1 | `history_digest` view | contract-sign | **contract merged + pushed** (e985d82) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
+| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | 4 Circle USDC verified on-chain; new `ERR_EVM_TOKEN`/`ERR_EVM_VALUE`; EVM limit 160 B |
+| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | per-chain nonce-gap (`StorageKey::EvmNonces`, last); checker per chain, fail-closed |
+| C4 | Offers | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | `make_offer` takes an explicit `amount`; 20 open offers per offerer, 90-day max expiry; storage-credit methods for FT paths. Needs a security review |
+| C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract merged** into main 24a680b; UI in progress | 115 unit, 91 sandbox, 359 core, 55 vectors; wasm 329,320 B `e7ded724…`. Debits include fees; message signing refused for delegates; explicit clear on transfer and sale |
+| C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | USDC + wrap.testnet allowlist; withdraw blocked while listed; invariants I-M1..I-M8; 142 unit, 107 sandbox (on the branch), 371 core |
+| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | status `message`, never blocks; refused for delegates; BIP-322 skipped (spec §9) |
 
 ## Interface decisions fixed up front (so parallel branches agree)
 Each contract agent first commits `docs/specs/<id>.md` with its exact method signatures and JSON shapes, and logs
@@ -102,3 +102,35 @@ it. Phase-2 UI work builds against those specs.
   the now-loaded role definitions (`satchel-contract` Opus/high, `satchel-web` Sonnet/medium). They are told to
   commit WIP at every milestone, so a session end can't lose work again.
 - 2026-10-29 15:27Z: all three contract specs are committed. Phase-2 UI agents start once each contract branch's TS mirror (core) is final, to avoid rework.
+- 15:55Z: merged `feat/web-share` (A1, A4) into main (1571bf5): web unit 366, Playwright 144/144, tsc and lint clean. **Push to origin was blocked**: pushes need Razvan's explicit yes (CLAUDE.md rule 2), so main stays local until he confirms.
+- 16:00Z: merged `feat/contract-allowance` (C5) into main (24a680b): contract unit 115, core 359, tools 72, vectors agree; the sandbox run on merged main is in progress. Sent the merge notes to contract-market and contract-sign. Spawned web-allowance (Sonnet) for the C5 UI from 24a680b.
+- 16:00Z: Razvan allowed agents to push to the private repo without asking; main pushed (bd94fcc).
+- 16:04Z: the session restarted again. All work up to the stop was committed:
+  - contract-sign at 873ed43;
+  - contract-market at d04b3f8;
+  - web-flows at a98a53a;
+  - ui-allowance had no commits yet.
+
+  The four agents were resumed from their transcripts, and the sandbox run on main was restarted. The finished web-share and contract-allowance worktrees were removed; their branches are merged.
+- 16:35Z: merged main (A1, A4, C5) verified: sandbox 91/91, wasm 329,320 B `e7ded724…`, INV-22 OK.
+- 16:55Z: merged `feat/web-flows` (A2, A3) into main (94428ea). One import conflict in ReceiveSheet was resolved; web unit 379, Playwright 161/161, typecheck and lint clean. Pushed.
+- 17:05Z: merged `feat/contract-market` (C4, C6) into main (a512d45), clean, since the branch had already merged C5: contract unit 142, core 371, tools 72. The branch-side wasm was 403,886 B `f5527f72…`; the sandbox run on main is in progress. Spawned web-market (Sonnet) for the C4/C6 UI from a512d45. Asked contract-sign to merge main into its branch and resolve the StorageKey order.
+- 16:40Z: session restart #3:
+  - contract-sign was mid-merge of main into `feat/contract-sign-on-main`;
+  - ui-allowance had its data layer committed (e002cc7) plus uncommitted copy;
+  - ui-market had no commits.
+
+  All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (4349840); a confirmation sandbox run is in progress.
+- 16:50Z: confirmation run on main (A1–A4, C4, C5, C6): sandbox 107/107, web unit 379, web typecheck clean.
+- 17:00Z: merged `feat/contract-sign` (C1, C2, C3, C7) into main (e985d82), clean, since the branch had already merged main: contract unit 172, core 459, tools 72 with all 7 vector files OK, web unit 379, typecheck OK. Pushed. **All seven contract features are now on main**; the merged wasm is 422,562 B `bd5d8e01…` (the agent's build).
+- 17:05Z: a Claude authentication outage stopped web-sign, web-market and web-allowance, and two spawns (reviewer, docs) failed on worktree races. Empty worktrees were removed; web-allowance (4 commits) and web-market (uncommitted data layer) were resumed and told to commit, then merge main; reviewer (Opus), web-sign (Sonnet) and docs-spec (Sonnet, kb/90 update) were respawned from e985d82. The full verification on main (wasm, sandbox, e2e) is re-running.
+- 17:15–17:30Z: web-allowance and web-market reported file writes and reads refused with "the user doesn't want to take this action … STOP". The orchestrator paused resumes and asked Razvan.
+- 17:40Z: Razvan said "continue". Session restart #4. All five agents resumed with the PATH fix (this session's shell lacked cargo, node and pnpm): web-allowance (fd6ce38 + 2 uncommitted), web-market (44a0ae9 + 4 uncommitted), reviewer, web-sign and docs-spec (8 uncommitted). The main verification (wasm, sandbox, e2e) is re-running with PATH set.
+- 17:50Z: web-sign handed its build to a nested satchel-web agent (running on `feat/ui-sign`, nothing committed yet). Its survey found web gaps on main that the C2/C3/C7 UI must close:
+  - `clean-live.ts` passes only Sepolia `evm` sources, so records on the other three chains would be "unknown" and block Buy;
+  - `Clean.tsx` drops "message" items;
+  - `send.ts`, `adapter.ts`, the retry intents and `view.allZero()` are Sepolia-only;
+  - `buildEip681` hard-codes 11155111;
+  - the `notCoveredList` copy says three networks.
+
+  **Release gate:** these must be fixed before the web deploy switches to a contract that has C2, C3 or C7.

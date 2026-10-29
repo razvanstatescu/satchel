@@ -401,7 +401,7 @@ fn guard_records_append_only_across_owners_and_callbacks_scoped() {
     let recs = c.sig_records(id.clone(), 0, 50);
     assert_eq!((recs[0].status, recs[1].status), (SigStatus::Failed, SigStatus::Pending));
     // safety fields of seq 0 survived the transfer and the callback
-    assert_eq!(recs[0].detail, SigDetailView::Evm { chain_id: 11_155_111, nonce: 0, unsigned_tx: evm::tests::KB31_TX.into() });
+    assert_eq!(recs[0].detail, SigDetailView::Evm { chain_id: 11_155_111, nonce: 0, unsigned_tx: evm::tests::KB31_TX.into(), erc20: None });
 }
 
 // ── 3. ownership, quiet period (deviation D1), sale binding ─────────────────────────────────
