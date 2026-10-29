@@ -1,8 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
-import { AllowanceFacts } from "@/components/Allowance";
 import { ChainRow } from "@/components/ChainRow";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
-import { AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
+import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
 import { Freshness, InsideAddCoins, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
 import { cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
