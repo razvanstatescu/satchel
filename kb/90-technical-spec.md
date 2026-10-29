@@ -5,6 +5,14 @@
 > **Revision 2 (2026-10-21, post-review).** Applies the independent review `plan/review.md` (R-01…R-41) and the orchestrator's calls. The main changes: keyless birth of the final contract, no post-listing buy cooldown, a BTC txid-collision check, a gate mode per contract role, blocking judge pages, and FastNEAR as the canonical NEAR proof. The changelog, with a status for every R-xx, is at the top of `plan/decisions.md`.
 > **Security fix pass (2026-10-23).** Brings §1, §5.3–§5.7, §5.11, §5.14–§5.16, §6 and §13 in line with the fixes for `docs/security/contract-review.md` S-01…S-13 (wasm 290,504 B, sha256 `aea0b2e9…451bd6`): `list` reserves the seller's proceeds slot; `on_payout` gets 10 Tgas and needs exactly one promise result; `delist` / `withdraw_proceeds` take exactly 1 yocto; the receiver guard also refuses the USDC contract and applies to `nft_mint`; NEP-181 views are paged at 50; the EVM nonce-gap rule INV-10 is restored (D-43, reverses D-21); birth funding is 20 NEAR (final) / 10 NEAR (rc) (D-34). Interface summary: `docs/handoff/contract.md` §7.
 > **No product code before 2026-11-01.** This document contains interface signatures, data layouts, state machines, constants, command lines and pseudo-code only. Spike code under `research/spikes/` is evidence, never a source to copy.
+> **Sprint update (2026-10-29).** Seven contract features merged into `main` on top of the security fix pass: a
+> history-hashing view, USDC transfers on EVM, three more EVM testnets with a per-chain nonce rule, and message
+> signing (`docs/specs/C1-C2-C3-C7.md`); delegated spending allowances (`docs/specs/C5.md`); and offers plus
+> NEAR/FT assets held inside a token (`docs/specs/C4-C6.md`). Those three files are now normative for the features
+> they cover and win over this document where they differ, exactly as this document wins over kb/10...kb/70. This
+> revision folds in the interface, invariant, clean-history, errata and open-assumption deltas; touched sections are
+> marked "(sprint 2026-10-29)". Long JSON shapes are not duplicated here, see the three spec files.
+>
 > **Citation legend.** `kb/10 §TL;DR 6` = `kb/10-mpc-signer.md`, section "TL;DR", item 6. File names: 00-hackathon-rules, 01-prior-art, 10-mpc-signer, 11-chainsig-js-and-derivation, 20-near-contract-stack, 21-testing-sandbox, 22-deploy-and-lock, 30-bitcoin-testnet4, 31-evm-sepolia, 32-solana-devnet, 40-frontend-wallet, 41-web-stack, 50-data-and-indexing, 51-1click-and-usdc, 70-security-and-clean-history, 80-ux-spec, 81-design-tokens (full index in `kb/README.md`). `spike/mpc` = `research/spikes/mpc/RESULTS.md`, etc. `[ASSUMED]` marks anything not yet verified; every one has a Nov 1 (or named-day) re-check in §14.
 
 ---
@@ -391,7 +399,7 @@ Record cost = `40 + len(key) + len(value)` bytes at 1e19 yocto/byte (kb/20 §Col
 Stake freed by delists and sales stays in the contract as buffer.
 
 **Contract balance:**
-- Code stake: the fix-pass wasm is **290,504 B ≈ 2.9 NEAR** (the nft-spike was 204.5 KB = 2.05 NEAR; the parsers, sale and views add the rest).
+- Code stake **(sprint 2026-10-29)**: the fix-pass wasm was **290,504 B ≈ 2.9 NEAR** (the nft-spike was 204.5 KB = 2.05 NEAR). After C1 (history digest), C2 (USDC calldata), C3 (3 more EVM chains + the per-chain nonce map), C7 (message classifiers), C5 (allowances) and C4/C6 (offers, inside assets) it measures **≈ 422,000 B ≈ 4.2 NEAR** [ASSUMED pending the Day-9 reproducible build, SAT-081]. The 20 NEAR (final) / 10 NEAR (rc) birth funding below already covers this with headroom; re-measure at the Day-9 freeze and adjust `tools/deploy/keyless-birth.ts` only if it does not.
 - Fund the final account with **20 NEAR** (rc: **10 NEAR**) through the Transfer action of the keyless-birth batch (D-34 as revised after review S-02; the `tools/deploy/keyless-birth.ts` defaults `parseNear('20')` for `satchel.*` and `parseNear('10')` for `rc*`). Keep ≥ 5 NEAR liquid (`balance − storage_usage × 1e19`); `tools/monitor.sh` check [4] fails (alert) below 3 NEAR free and warns below 5.
 - Anyone can top it up with a plain transfer (kb/22 §TL;DR 4). `tools/monitor.sh` (SAT-103) checks it daily through Nov 19 (SAT-121).
 - Storage exhaustion shows up as `LackBalanceForState` (kb/22 §Verified facts).
@@ -415,8 +423,8 @@ Stake freed by delists and sales stays in the contract as buffer.
 | `MPC_DEPOSIT` default / cap | **1 yoctoNEAR** per `sign` promise; caller may raise it via `mpc_deposit`, capped at **0.01 NEAR** (`ERR_MPC_DEPOSIT`) | MPC refunds any excess to the **predecessor = this contract**, not the user | kb/10 §TL;DR 4; kb/70 §(j) |
 | `SIGN_ATTACH_DEPOSIT(n)` (callers) | **0.005 NEAR × n** | covers ≈ 0.0028 NEAR record + `n × 1 yocto`; contract refunds the excess | §5.4 |
 | `COOLDOWN_BLOCKS` | **250**: the **quiet period** before `list` (`height ≥ last_sign_height + 250`). There is **no** post-listing buy cooldown | yield 200 blocks + callback ≈ 3–5 + late `respond` ≈ 15 (nodes' stale threshold 10 blocks + 10 s retry) + margin, so no signature can still arrive once a listing exists. ≈ 140 s at 0.554–0.573 s/block | kb/10 §Rec 6; kb/50 §Chain timing; D-05 |
-| `EVM_CHAIN_ID` | **11155111** (only) | allowlist of one, compiled in (confirmed by Nov 1, H-13) | kb/70 §Classification; D-15 |
-| `EVM_MAX_TX_BYTES` | 128 | a maximal native transfer is ≈ 99 B; 52 B typical | kb/70 F1 |
+| `EVM_CHAIN_IDS` **(sprint 2026-10-29)** | **11155111, 84532, 421614, 11155420** (was 11155111 only). Frozen at birth: adding a chain needs a new contract | docs/specs/C1-C2-C3-C7.md §2; D-15 |
+| `EVM_MAX_TX_BYTES` **(sprint 2026-10-29)** | **160** (was 128) | a maximal native transfer is ≈ 99 B; a maximal USDC `transfer` is 152 B (C2) | docs/specs/C1-C2-C3-C7.md §3.1 rule 1 |
 | `SOL_MAX_MESSAGE_BYTES` | 1232 | MPC Eddsa upper bound | kb/10 §TL;DR 3 |
 | `MINT_ATTACH` | 0.02 NEAR, 30 Tgas | measured 682–708 B (≈ 0.007 NEAR), 3.5–3.9 Tgas | kb/20 §Mint with storage deposit |
 | `TRANSFER_ATTACH` | exactly 1 yocto, 30 Tgas | NEP-171 `assert_one_yocto`; measured ≈ 3 Tgas | kb/20 §Verified facts |
@@ -624,6 +632,28 @@ on_signed(token_id, first_seq, n) -> Vec<Option<Value>>:        #[private]; MUST
 - The first EVM request may use nonce 1 (not only 0), so demo #4's blocking record ("nonce = current + 1", §7.6) stays possible.
 - `max_evm_nonce` is `Option<u64>` in `TokenState` (+8 B on the first EVM record, charged to the requester). Clients compute `m` from `sig_records` (`@satchel/core/policy` `maxSignedEvmNonce`, `checkEvmNonce`), and the Send builder refuses to build a request the contract would refuse.
 - A dev contract whose state is reset while its account (so its derived addresses) is kept can find its tokens' chain nonces above `m + 1`; use a new `devN` account instead (D-43).
+
+**EVM, BTC and SOL policy deltas (sprint 2026-10-29; normative text: `docs/specs/C1-C2-C3-C7.md` §2–§3, which wins
+over the EVM table above where they differ).**
+- **C3, four EVM chains.** `chain_id` is now checked against `EVM_CHAIN_IDS` = {11155111, 84532, 421614, 11155420}
+  (rule 4), not `== 11155111`. The Satchel's EVM address is the same on every chain (one key, domain 0); only
+  `chain_id` inside the signed tx differs.
+- **C3, per-chain nonce-gap rule.** The nonce-gap rule (rule 11, below) runs **per `chain_id`**. Sepolia keeps using
+  `TokenState.max_evm_nonce` (unchanged field); the other three chains use a new map
+  `LookupMap<(TokenId, u64 /* chain_id */), u64>` under `StorageKey::EvmNonces`, opened on demand (not a `Contract`
+  field), appended to the `StorageKey` enum after `Proceeds` (and before C5/C4/C6's keys, §13 E-21, E-52).
+- **C2, USDC calldata.** `data` (rule 7) may now be empty **or** exactly a canonical 68-byte ERC-20
+  `transfer(address,uint256)` to this chain's configured USDC (rule 8), with `value == 0` (rule 9). Any other
+  calldata is still `ERR_EVM_DATA`. `EVM_MAX_TX_BYTES` is 160 (was 128, above) to fit a USDC transfer.
+- **C7, message signing.** Two new, EVM/SOL-keyed request kinds, `evm_message` (EIP-191 `personal_sign`) and
+  `sol_message` (Solana off-chain message v0), each one record, one MPC request, classified by `parse/msg.rs` and
+  normatively specified in `docs/specs/C1-C2-C3-C7.md` §3.3. They never touch an EVM nonce or a BTC/SOL balance, and
+  a message signature can never satisfy any transaction/authorization encoding on any of the three chains (§3.4 of
+  that spec) — see §7 below for why clean history never blocks on them.
+- **C5, delegated signing.** `sign_for`'s owner-only check (step 1 above) now also admits a delegate with a live,
+  unexpired allowance that covers the request's asset and amount (`docs/specs/C5.md` §1.3's `authorize_signer` /
+  `debit_allowance`); message requests (C7) and any EVM calldata other than a canonical USDC transfer are refused
+  for delegates with `ERR_ALLOWANCE_KIND`, whatever the classifier above accepts for an owner.
 
 **BTC (`parse/btc.rs`), P2WPKH, SIGHASH_ALL, one complete transaction per call.** The preimage layout follows kb/30 §Preimage layout (182 B):
 
@@ -887,6 +917,34 @@ near transaction construct-transaction <team>.testnet receiver-id <acct> \
 
 ---
 
+### 5.17 Sprint additions: new methods, views, events, errors and storage keys (sprint 2026-10-29)
+
+Full signatures, JSON shapes and preconditions live in the three spec files; this is the index into them. Nothing in
+§5.6/§5.7/§5.13/§5.14/§5.15 above that isn't listed here changed: `sign_for`'s signature, guard order and
+record-before-MPC rule are unchanged except as noted in §5.9 and §5.17.
+
+| Feature | New methods | New/changed views | New events | New error codes | New storage keys |
+|---|---|---|---|---|---|
+| **C1** history digest | — | `history_digest(token_id) -> Option<HistoryDigestView>` (SHA-256 over borsh-encoded immutable fields; cost ≈ 300 Tgas view limit at ≈ 2,500 records, §14 A-22) | — | — | — |
+| **C2** USDC on EVM | — | `sig_records` detail gains `erc20{token,to,amount}` on a transfer (§5.9, §13) | `sign_requested.details[i]` gains `erc20` on a transfer | `ERR_EVM_DATA`, `ERR_EVM_TOKEN`, `ERR_EVM_VALUE` (reused/extended, §5.9) | — |
+| **C3** 4 EVM testnets, per-chain nonces | — | `config()` gains `evm_chain_ids` (now 4), `erc20_tokens`; `max_evm_nonce(token_id, chain_id) -> Option<u64>` | — | `ERR_EVM_NONCE_GAP` now per chain (message unchanged in spirit) | `EvmNonces` (appended after `Proceeds`) |
+| **C7** message signing | — | `sig_records` gains `evm_message`/`sol_message` detail tags; `config()` gains `max_message_bytes` | `sign_requested` for a message carries `kind` instead of `chain_id`/`nonce` | `ERR_MSG_EMPTY`, `ERR_MSG_TOO_LONG`, `ERR_MSG_ENCODING` | — |
+| **C5** allowances | `set_allowance`, `revoke_allowance` | `allowances_of(token_id)`, `allowance(token_id, delegate)` | `allowance_set`, `allowance_revoked`, `allowances_cleared`, `allowance_spent` | `ERR_ALLOWANCE_DELEGATE`, `_CAPS`, `_EXPIRY`, `_LIMIT`, `_NOT_FOUND`, `_EXPIRED`, `_KIND`, `_ASSET`, `_EXCEEDED`, `_RATE` | `Allowances` (appended after `EvmNonces`) |
+| **C6** inside assets | `deposit_near`, `withdraw_near`, `withdraw_ft`, `on_inside_withdraw` (private), `prepay_storage`, `withdraw_storage_credit` | `inside_of(token_id)`, `storage_credit_of(account_id)`, `market_config()`, `market_totals()` | `inside_deposit`, `inside_withdraw`, `inside_withdraw_resolved`, `storage_credit_withdrawn` | `ERR_AMOUNT`, `ERR_INSIDE_BALANCE`, `ERR_STORAGE_CREDIT` (reuses `ERR_TOKEN_NOT_FOUND`, `ERR_NOT_OWNER`, `ERR_DEPOSIT`, `ERR_LISTED`, `ERR_WRONG_TOKEN`) | `Inside`, `InsideFt`, `StorageCredit` |
+| **C4** offers | `make_offer`, `cancel_offer`, `accept_offer` | `offer(offer_id)`, `offers_for(token_id,…)`, `offers_by(account_id,…)` | `offer_made`, `offer_cancelled`, `offer_accepted` | `ERR_NO_OFFER`, `ERR_NOT_OFFERER`, `ERR_OFFER_EXPIRED`, `ERR_OFFER_EXPIRY`, `ERR_OFFER_STALE`, `ERR_TOO_MANY_OFFERS` (reuses `ERR_SELF_BUY`, `ERR_BAD_RECEIVER`, `ERR_QUIET_PERIOD`) | `Offers`, `OffersByToken`, `OffersByTokenLen`, `OffersByAccount`, `OffersByAccountLen` |
+
+`ft_on_transfer` now dispatches three `msg` shapes (`buy` unchanged, plus `deposit` and `offer`, C4/C6 §1.2) instead
+of one; `ERR_BAD_MSG`'s sentence names all three. `StorageKey` order after this sprint, appended in merge order:
+`…, Proceeds, EvmNonces, Allowances, Inside, InsideFt, Offers, OffersByToken, OffersByTokenLen, OffersByAccount,
+OffersByAccountLen, StorageCredit` (C4-C6.md §8; prefix bytes 9–17, one higher than that file's own numbering because
+C5's `Allowances` lands at byte 8). `lib.rs` gains one post-transfer hook, `on_owner_change(token_id, reason)`,
+called after every ownership change (`nft_transfer`, `buy`/`ft_on_transfer`, `accept_offer`); it clears allowances
+(C5) and is the single place C4/C6 and C5 interact. `Contract` gains two fields: `allowances` (C5, opened on demand,
+not a struct field — see C5.md §5) and `market: Market` (C4/C6, one field, C4-C6.md §8), so `new` is otherwise
+unchanged and dev deployments can still redeploy in place.
+
+---
+
 ## 6. Invariants (deduplicated from kb/70 §Invariants and adapted to v1; each is a named test)
 
 Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock signer) and `contracts/satchel/src/**/tests` (unit). TS tests (vitest) live in `apps/web` and `tools`. The mock signer records `(predecessor, path, payload_v2, domain_id, prepaid_gas, attached_deposit)`. It has modes `reply`, `never` (yield, then `fast_forward(250)`), `garbage` (non-JSON success value) and `panic` (kb/21 §Mock signer).
@@ -939,6 +997,18 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 
 ---
 
+### 6.1 Sprint invariants (sprint 2026-10-29; full test lists live in the spec files)
+
+| ID | Property | Ref |
+|---|---|---|
+| INV-34 | A delegate's `sign_for` is authorized only by a live, unexpired allowance from the **current** owner; message requests (C7) and non-USDC EVM calldata are refused for delegates with `ERR_ALLOWANCE_KIND` whatever the classifier accepts for an owner; a debit never exceeds the rolling-24h cap for its asset (checked u128; overflow refuses, never wraps) | `docs/specs/C5.md` §2–§4 |
+| INV-35 | Every ownership change (`nft_transfer`, `buy`/`ft_on_transfer`, `accept_offer`) clears **all** allowances of the token in the same receipt via `on_owner_change`, atomically with C4/C6's own transfer effects | C5.md §4 "Reset rule"; C4-C6.md §8 |
+| INV-36 (= **I-M1**…**I-M8** of C4/C6, listed in full in that spec) | NEAR/FT solvency (`market_totals()` matches the sums of inside balances, open offers and storage credit, bounded by the contract's real balances), debit-first withdrawals, exactly-once offer escrow, no callback-storage growth, offer bindings to `(sig_count, inside_epoch)`, and inside balances following the token through every ownership path | `docs/specs/C4-C6.md` §7 |
+| INV-37 | A message signature (`evm_message`/`sol_message`, C7) is never a valid encoding of a transaction, a 7702 authorization, an EIP-712 digest or a Solana transaction message on any of the three chains, so it can never move funds or satisfy a token/NFT authorization by itself ("never a transaction") | `docs/specs/C1-C2-C3-C7.md` §3.4 |
+| INV-38 | The EVM nonce-gap rule (INV-10) holds independently **per `chain_id`**: a poison nonce on one chain never blocks signing on another | `docs/specs/C1-C2-C3-C7.md` §3.1 rule 11, §3.2 |
+
+---
+
 ## 7. Clean-history protocol
 
 ### 7.1 What is logged (on-chain, at request time, append-only)
@@ -964,6 +1034,23 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 | SOL | `expired` if the record is **≥ 120 s old** and **at least one** provider reports `isBlockhashValid(recent_blockhash, {commitment: "processed"}) == false`. Dead by construction otherwise (durable nonces refused, quiet period ≥ 138 s), so one provider suffices (R-19). Else `unused`. `expired` is permanent and cached. Optional: `getSignatureStatuses([sig], {searchTransactionHistory: true})` shows "landed" | devnet RPC (a second one if available, A-06), one query per distinct blockhash | kb/32 §TL;DR 3; kb/70 §P2 |
 | any | `unknown` when providers **disagree**, all of them error, or the chain is unsupported. If one of two BTC/EVM providers is **down** (errors, not disagreement), the testnet policy H-25 applies: the verdict comes from the remaining provider and is labelled "1 of 2 sources" | — | kb/70 §P3; R-19 |
 
+**EVM, per chain (C3; sprint 2026-10-29).** The checker groups EVM transaction records by `detail.evm.chain_id`
+and runs the EVM row above **separately for each chain**, on that chain's own two providers (§8.1 of
+`docs/specs/C1-C2-C3-C7.md` lists the RPCs). `eth_getCode(address) == "0x"` (the account-level check below) is
+checked on Sepolia always and on every other chain that has records. A supported chain id with no configured
+providers, or with both down, gives `unknown`; a `chain_id` outside the four of §2 of that spec gives `unknown` /
+`chain_unsupported`. USDC transfer records (C2) follow the same nonce rule as a native transfer; the item report
+additionally carries `erc20 {token, to, amount}`.
+
+**Message records, item status `message` (C7; sprint 2026-10-29).** A record whose detail is `evm_message` or
+`sol_message` gets a new item status, **`message`** (reason `message_signature`), which is **never blocking**: the
+aggregate in §7.3 is `clean` when every item is `spent`, `expired`, `unfunded`, `foreign` **or** `message` (INV-37:
+a message can never move the coins a buyer is checking). The item report carries `message_kind` and the decoded
+`message_text`, so the Buy tab can list it ("Signed a message: '…'. Messages can't move coins."). A record whose
+payload doesn't match its message (`keccak256(eip191(m))` / `sha256(offchain(m))`) is `unknown` / `record_inconsistent`
+(fail closed; can't happen with a correct NEAR source). A pre-C7 checker treats these details as unparseable and
+returns `unknown` — old app builds fail closed, they never show a false `clean`.
+
 **Account-level checks** (defense in depth against standing authorizations, kb/70 §TL;DR 6):
 - EVM: `eth_getCode(addr) == "0x"` (the EIP-7702 marker is `0xef0100…`, kb/70 F20).
 - SOL: the account is absent, or its owner is `11111111111111111111111111111111` with empty data.
@@ -982,6 +1069,7 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 | `expired` | Expired ("Blockhash expired. It can't be used.") | no |
 | `unfunded` | **Unfunded** ("Spends coins that don't exist. If they ever appear at this address, the previous owner could move them; they're excluded from what you buy.") | **no** (D-04) |
 | `foreign` | **Foreign** ("Points at a coin this Satchel can't spend. It can't move the coins you're buying.", copy key `clean.item.foreignBody`) | **no** (review S-07) |
+| `message` **(sprint 2026-10-29, C7)** | Message ("Signed a message: '{text}'. Messages can't move coins.") | **no** (INV-37) |
 | `settling` | Settling ("Waiting for {k} more confirmation(s)") | yes |
 | `unused` | Unused ("Nonce {n} not used yet" / "{txid}:{vout} unspent" / "Blockhash still valid") | yes |
 | `unknown` | Can't verify | yes |
@@ -1001,7 +1089,7 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 | `unknown` | any item `unknown` | disabled |
 | `blocked` | any item `unused` | disabled |
 | `settling` | any item `settling` | disabled |
-| `clean` | every item `spent`, `expired`, `unfunded` or `foreign` | enabled; `buy` is called with `(listing_id, expected_sig_count = sig_count read in step 1)`. Shown as "clean (1 of 2 sources)" when policy H-25 applied |
+| `clean` | every item `spent`, `expired`, `unfunded`, `foreign` **or `message` (sprint 2026-10-29, C7)** | enabled; `buy` is called with `(listing_id, expected_sig_count = sig_count read in step 1)`. Shown as "clean (1 of 2 sources)" when policy H-25 applied |
 
 **"Verified balance"** (what the buyer pays for):
 - BTC: confirmed UTXOs at policy depth, **excluding any UTXO whose outpoint is referenced by a non-dead record** ("encumbered", shown separately).
@@ -1536,6 +1624,10 @@ A public CI run and its badge become the cheap "tests pass" proof for judges onc
 | E-46 | §5.10 pill label "For sale" and E-37 "Pills: Active · Signing · For sale · Sold"; §7.3 banner text "DEV CONTRACT…" / "RELEASE CANDIDATE…"; §7.7 "Badge (Hallmark "CLEAN HISTORY")"; §8.6 "warning-tone" `signed_not_sent` card (kb/80 R2) | status vocabulary, letter case, tone | Pills **Active · Signing · Listed · Sold**, plus **Needs attention** (owner view, client-side: a `signed_not_sent` intent, or a signed record with no chain tx). The contract state is unchanged: `listing` set means signing is paused. Banner and badge strings render in sentence case with the same words ("Dev contract: lock and code checks skipped", "Release candidate: testnet rehearsal", the "Clean history" ProofChip); the §7.7 tooltip text stays verbatim. `signed_not_sent` uses the brand's danger tone with calm copy, never a red fill | brand state table; D-36 B-05, B-10 |
 | E-47 | §4 T7 ("no USD values in v1"), §8.3 and §9 (prices route cut), D-20 ("prices already cut") | fiat display | **Conditional (UX-1 reopened, D-36):** if the design lead's default stands on Oct 31, the Satchel card shows one fiat number, "≈ $X · at mainnet prices", and `/api/prices` returns (1Click `/v0/tokens` → CoinGecko, 60 s cache, a 1.5 s SSR bound; kb/50 §Price route). No other fiat anywhere; without prices the card shows "{n} chains". If UX-1 goes native-only, T7, §8.3 and §9 stand as written | D-36; checklist §6 UX-1 |
 | E-48 | kb/31 and `EVM_TRANSFER_GAS` usage: a native transfer always uses gas 21,000 | Sepolia's 2026 fork (state-gas accounting) charges **204,600 gas when the transfer creates the recipient account**, so a 21,000 limit fails "out of gas". The nonce is used and the value stays (dev1 #1 → a fresh address, 2026-10-29, `0x8571dc5b…`) | Builders use `estimateTransferGas` (`eth_estimateGas`, never below 21,000; fallbacks 250k for an empty recipient, 100k for a contract). The contract accepts any gas limit, so no contract change. The retry with the next nonce succeeded (`0x4744f9d9…`, gas 207,391) | live Sepolia, 2026-10-29 |
+| E-49 **(sprint 2026-10-29)** | §5.5 `EVM_CHAIN_ID` single value `11155111`; §5.9's EVM table `chain_id == 11155111`; README/`judge-snippets.sh` `evm_chain_ids = [11155111]`; this document's repeated "EVM Sepolia only" | EVM chain allowlist | **C3: four testnets**, `EVM_CHAIN_IDS = [11155111, 84532, 421614, 11155420]`, frozen at birth. Sepolia keeps `TokenState.max_evm_nonce`; the other three use a new per-chain map (§5.9, §5.17) | `docs/specs/C1-C2-C3-C7.md` §2–§3.2 |
+| E-50 **(sprint 2026-10-29)** | §5.4 "the fix-pass wasm is 290,504 B ≈ 2.9 NEAR" | contract code stake | **≈ 422,000 B ≈ 4.2 NEAR** after C1/C2/C3/C7/C5/C4/C6 [ASSUMED pending the Day-9 reproducible build]; still well inside the 20 NEAR (final) / 10 NEAR (rc) birth funding | §5.4; §5.17 |
+| E-51 **(sprint 2026-10-29)** | Appendix A rows "ERC-20 `transfer`" and "Delegates (S-10)", listed as Phase-3 designs kept out of v1 | scope | **Both shipped in this sprint**: ERC-20 (USDC only, on any of the four EVM chains) as **C2**, and delegated signing as **C5** (a capped, rolling-24h allowance per asset, not the daily-cap sketch in that appendix row). The appendix rows are historical: they describe designs considered and then built differently; the `docs/specs/C5.md` and `C1-C2-C3-C7.md` interfaces win | `docs/specs/C5.md`; `docs/specs/C1-C2-C3-C7.md` §2–§3; Appendix A (superseded) |
+| E-52 **(sprint 2026-10-29)** | §5.4 `StorageKey` enum list (`OwnerById … Proceeds`), "the variant order is the on-chain prefix … and must never be reordered after the final deploy" | storage key order | Still true of the original eight; this sprint **appends** nine more after `Proceeds` in merge order: `EvmNonces` (C3), `Allowances` (C5), `Inside, InsideFt, Offers, OffersByToken, OffersByTokenLen, OffersByAccount, OffersByAccountLen` (C4/C6), and `StorageCredit` (C6) — prefix bytes 9–17. This order must be frozen before the Day-9 reproducible build | §5.17; `docs/specs/C4-C6.md` §8 |
 
 ---
 
