@@ -37,9 +37,11 @@ export function EvmNetworks({ snap }: { snap: SatchelSnapshot }) {
   return (
     <div className="flex flex-col gap-2 md:pl-11" data-evm-networks="">
       {showUsdc ? (
-        <p className="m-0 flex items-center justify-between gap-3 font-sans text-body-sm text-ink-muted" data-evm-balance={SEPOLIA} data-asset="usdc">
+        <p className="m-0 flex items-center justify-between gap-3 font-sans text-body-sm text-ink-muted">
           <span>{copy.nets.usdcOn(evmNetworkName(SEPOLIA))}</span>
-          <span className={cx(AMOUNT, sepolia.usdc && BigInt(sepolia.usdc) > 0n ? "text-ink" : "text-ink-muted")}>{amountText(sepolia.usdc, "USDC")}</span>
+          <span className={cx(AMOUNT, sepolia.usdc && BigInt(sepolia.usdc) > 0n ? "text-ink" : "text-ink-muted")} data-evm-balance={SEPOLIA} data-asset="usdc">
+            {amountText(sepolia.usdc, "USDC")}
+          </span>
         </p>
       ) : null}
       <details className="group rounded-sm border border-line bg-surface" open={withCoins > 0 || undefined}>

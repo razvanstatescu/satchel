@@ -39,6 +39,7 @@ export const NEAR_TX = {
   t4evm: "DmmynatTNfTePHtCehhwfZn5VdK8ceuK2diFWQ6RoPJz",
   t4list: "Bjyn7FSFCgezzYpjEx8xMH62gXLHBSxdwszKq1pn9o8q",
   t5btc: "BQ3DrNJVtNvNqL6aRCwdX5VQhA2ZPRw4qS8bBm72HFV9",
+  t5msg: "4KpW8sTe3hRx6NmV2vQcJ9zBg5kYa7uF1oZqD3wXnL6E",
   t5list: "9vpH8s5t7nc7rzQSfx1vdJAUbBdoSN7GgVSuXD76ii8H",
   mint: "GTyaG5jfZipLPzZxWHjRps9ptYUCLUu5aWuT9DTqgEY2",
 } as const;
@@ -105,6 +106,14 @@ const C2 = {
   },
 } as const;
 
+/** C7: #5's message (EIP-191; payload = keccak256 of the prefixed bytes, generated with @satchel/core). */
+const MSG5 = {
+  text: "I own Satchel #5. Log in to market.example (2026-10-20)",
+  hex: "49206f776e205361746368656c2023352e204c6f6720696e20746f206d61726b65742e6578616d706c652028323032362d31302d323029",
+  payload: "9849e329f9d90eb1ea02e69680901906777919832f490d4561b7f96f5520e36c",
+} as const;
+export const FIXTURE_MSG5 = MSG5;
+
 export const FIXTURE_BTC = BTC;
 export const FIXTURE_EVM = EVM;
 export const FIXTURE_C2 = { ...C2, recipient: RECIPIENT2 };
@@ -135,6 +144,7 @@ const H3_LIST = hAgo(18_000);
 const H4_EVM = hAgo(12_000);
 const H4_LIST = hAgo(11_000);
 const H5_BTC = hAgo(9_000);
+const H5_MSG = hAgo(8_500);
 const H5_LIST = hAgo(7_500);
 
 export const FIXTURE_RECORDS: Record<string, SigRecordView[]> = {
@@ -163,7 +173,11 @@ export const FIXTURE_RECORDS: Record<string, SigRecordView[]> = {
   ],
   "3": [rec({ seq: 0, chain: "evm", height: H3_EVM, payload: EVM.t3.payload, signature: { r: EVM.t3.r, s: EVM.t3.s, recovery_id: 0 }, detail: { evm: { chain_id: 11155111, nonce: 0, unsigned_tx: EVM.t3.unsigned_tx } } })],
   "4": [rec({ seq: 0, chain: "evm", height: H4_EVM, payload: EVM.t4.payload, signature: { r: EVM.t4.r, s: EVM.t4.s, recovery_id: 1 }, detail: { evm: { chain_id: 11155111, nonce: 1, unsigned_tx: EVM.t4.unsigned_tx } } })],
-  "5": [rec({ seq: 0, chain: "btc", height: H5_BTC, payload: BTC.t5.payload, signature: { r: BTC.t5.r, s: BTC.t5.s, recovery_id: 0 }, detail: { btc: { txid: BTC.t5.txid, vout: 0, amount_sats: BTC.t5.amount } } })],
+  "5": [
+    rec({ seq: 0, chain: "btc", height: H5_BTC, payload: BTC.t5.payload, signature: { r: BTC.t5.r, s: BTC.t5.s, recovery_id: 0 }, detail: { btc: { txid: BTC.t5.txid, vout: 0, amount_sats: BTC.t5.amount } } }),
+    // C7: a signed message on a listed Satchel: the buyer's check lists it, and Buy stays on
+    rec({ seq: 1, chain: "evm", height: H5_MSG, payload: MSG5.payload, signature: { r: BTC.t5.s, s: BTC.t5.r, recovery_id: 1 }, detail: { evm_message: { message: MSG5.hex } } }),
+  ],
   "6": [],
   "7": [],
 };
@@ -180,7 +194,7 @@ export const FIXTURE_TOKENS: Record<string, TokenFixture> = {
   "2": { owner: BOB, last_sign_height: H2_MSG, listing: null, mintedAt: BIRTH_HEIGHT },
   "3": { owner: ALICE, last_sign_height: H3_EVM, listing: { id: 3, seller: ALICE, price: "5000000", currency: "usdc", listed_at: H3_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
   "4": { owner: ALICE, last_sign_height: H4_EVM, listing: { id: 4, seller: ALICE, price: "2000000000000000000000000", currency: "near", listed_at: H4_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
-  "5": { owner: ALICE, last_sign_height: H5_BTC, listing: { id: 5, seller: ALICE, price: "1000000000000000000000000", currency: "near", listed_at: H5_LIST, sig_count: 1 }, mintedAt: BIRTH_HEIGHT },
+  "5": { owner: ALICE, last_sign_height: H5_MSG, listing: { id: 5, seller: ALICE, price: "1000000000000000000000000", currency: "near", listed_at: H5_LIST, sig_count: 2 }, mintedAt: BIRTH_HEIGHT },
   "6": { owner: ALICE, last_sign_height: 0, listing: null, mintedAt: BIRTH_HEIGHT },
   "7": { owner: ALICE, last_sign_height: 0, listing: null, mintedAt: BIRTH_HEIGHT },
 };
@@ -339,6 +353,7 @@ export function fixtureEvents(id: string): FixtureEvent[] {
     ],
     "5": [
       { tx: NEAR_TX.t5list, block: H5_LIST, timestampMs: tAt(H5_LIST), event: "listed", data: { token_id: "5", listing_id: 5, price: "1000000000000000000000000", currency: "near", seller_id: ALICE } },
+      { tx: NEAR_TX.t5msg, block: H5_MSG, timestampMs: tAt(H5_MSG), event: "sign_requested", data: { token_id: "5", chain: "evm", first_seq: 1, count: 1, kind: "evm_message" }, message: { chain: "evm", text: MSG5.text } },
       { tx: NEAR_TX.t5btc, block: H5_BTC, timestampMs: tAt(H5_BTC), event: "sign_requested", data: { token_id: "5", chain: "btc", first_seq: 0, count: 1 }, chainTx: { chain: "btc", id: BTC.t5.spend, amount: BTC.t5.sent, to: BTC.t5.to, fee: "282" } },
       mint,
     ],
