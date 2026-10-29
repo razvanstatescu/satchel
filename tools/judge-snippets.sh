@@ -121,11 +121,11 @@ snippet S6 "Its history starts at the birth tx (no earlier incarnation of the id
 "oldest tx = $BIRTH_TX block" "$BIRTH_TX"
 
 CFG_ARGS=$(printf '{}' | base64 | tr -d '\n')
-snippet S7 "Contract constants: 250-block quiet period, the MPC signer, Sepolia only (config view)" \
+snippet S7 "Contract constants: 250-block quiet period, the MPC signer, 4 EVM testnets (config view; sprint 2026-10-29, C3)" \
 "curl -s $RPC -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$C\",\"method_name\":\"config\",\"args_base64\":\"$CFG_ARGS\"}}' | python3 -c 'import sys,json; d=json.load(sys.stdin); \"error\" in d and sys.exit(\"error: \"+str(d[\"error\"].get(\"cause\",{}).get(\"name\"))); r=d[\"result\"]; \"error\" in r and sys.exit(\"error: \"+r[\"error\"][:160]); c=json.loads(bytes(r[\"result\"])); print(\"cooldown_blocks =\", c[\"cooldown_blocks\"]); print(\"mpc =\", c[\"mpc_contract_id\"]); print(\"evm_chain_ids =\", c[\"evm_chain_ids\"])'" \
 "cooldown_blocks = 250
 mpc = $MPC
-evm_chain_ids = [11155111]"
+evm_chain_ids = [11155111, 84532, 421614, 11155420]"
 
 snippet S8 "The MPC signer version the contract depends on" \
 "curl -s $RPC -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$MPC\",\"method_name\":\"version\",\"args_base64\":\"$CFG_ARGS\"}}' | python3 -c 'import sys,json; print(\"mpc version =\", json.loads(bytes(json.load(sys.stdin)[\"result\"][\"result\"])))'" \
