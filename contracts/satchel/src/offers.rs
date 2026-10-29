@@ -292,7 +292,7 @@ impl Contract {
         }
         let o = self.take_offer(offer_id);
         self.tokens.internal_transfer(&owner, &o.offerer, &token_id, None, Some("offer".to_string()));
-        self.on_owner_change(&token_id);
+        self.on_owner_change(&token_id, "sale"); // C5 reset rule: an accepted offer is a sale
         // The freed offer record pays for this slot, so the payout's re-credit never needs contract-paid storage.
         self.reserve_proceeds_slot(&owner, o.currency);
         SatchelEvent::OfferAccepted {

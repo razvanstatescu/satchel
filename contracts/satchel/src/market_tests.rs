@@ -1175,3 +1175,42 @@ proptest! {
         }
     }
 }
+
+// ── C5 compatibility: accept_offer clears allowances; delegates get no inside or offer powers ─────
+
+fn grant(c: &mut Contract, owner: AccountId, id: &str, delegate: AccountId) {
+    use crate::allowance::{Asset, CapInput};
+    Ctx::new(owner).dep(10 * MILLI).set();
+    c.set_allowance(id.into(), delegate, vec![CapInput { asset: Asset::Evm { chain_id: 11_155_111 }, limit: U128(10u128.pow(18)) }], None);
+}
+
+#[test]
+fn delegates_cannot_withdraw_or_accept_and_accept_clears_allowances() {
+    let mut c = setup();
+    let id = funded(&mut c, ONE_NEAR);
+    Ctx::new(bob()).dep(10 * MILLI).set();
+    c.prepay_storage(None);
+    ft_call(&mut c, usdc(), bob(), 5_000_000, deposit_msg(&id));
+    let bot = acc("bot.alice.testnet");
+    grant(&mut c, alice(), &id, bot.clone());
+    assert_eq!(c.allowances_of(id.clone()).len(), 1);
+    let oid = near_offer(&mut c, bob(), &id, 2 * ONE_NEAR);
+    // the delegate may only sign_for: never withdraw inside assets or accept or cancel an offer for the owner
+    Ctx::new(bot.clone()).dep(1).set();
+    expect_err(ERR_NOT_OWNER, || c.withdraw_near(id.clone(), U128(1), None));
+    expect_err(ERR_NOT_OWNER, || c.withdraw_ft(id.clone(), usdc(), U128(1), None));
+    expect_err(ERR_NOT_OWNER, || c.accept_offer(oid));
+    expect_err(ERR_NOT_OFFERER, || c.cancel_offer(oid));
+    // a delegate's own offer spends the delegate's own money and binds nothing of the owner's
+    Ctx::new(bot.clone()).dep(ONE_NEAR + 10 * MILLI).set();
+    let own = c.make_offer(id.clone(), U128(ONE_NEAR), 0, 0, T0 + DAY);
+    assert_eq!(c.offer(own).unwrap().offerer_id, bot);
+    // accepting is an ownership change: the C5 reset rule clears every allowance in the same receipt
+    Ctx::new(alice()).dep(1).set();
+    c.accept_offer(oid);
+    assert_eq!(events("allowances_cleared"), vec![json!({"token_id": id, "delegate_ids": ["bot.alice.testnet"], "reason": "sale"})]);
+    // cleared from state, not just hidden by the owner backstop: back with alice, nothing is left
+    Ctx::new(bob()).dep(1).set();
+    c.nft_transfer(alice(), id.clone(), None, None);
+    assert!(c.allowances_of(id.clone()).is_empty());
+}

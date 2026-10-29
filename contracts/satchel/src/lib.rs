@@ -12,6 +12,7 @@ use near_sdk::json_types::U128;
 use near_sdk::store::{IterableSet, LazyOption, LookupMap};
 use near_sdk::{env, near, AccountId, BorshStorageKey, Gas, PanicOnDefault, PromiseOrValue};
 
+pub mod allowance;
 pub mod errors;
 pub mod events;
 pub mod inside;
@@ -62,7 +63,8 @@ pub enum StorageKey {
     SigLog,
     Listings,
     Proceeds,
-    // C4/C6 (market.rs); appended, never reorder
+    Allowances, // C5, allowance.rs
+    // C4/C6 (market.rs); appended after C5, never reorder
     Inside,
     InsideFt,
     Offers,
@@ -171,10 +173,13 @@ impl Contract {
 
     /// R-18 receiver guard (S-06, S-09): a token owned by the contract itself, the MPC or the configured USDC contract
     /// can never call `sign_for`, so its funds would be stranded for good. Used by `nft_mint` and `nft_transfer`.
-    /// The single post-transfer hook. Called after EVERY ownership change, in the same receipt: `nft_transfer`,
-    /// `execute_sale` (`buy`, USDC `ft_on_transfer` buy) and `accept_offer`. Inside balances (C6) are keyed by token
-    /// and offers (C4) by token state, so neither needs anything here; C5 clears allowances here.
-    pub(crate) fn on_owner_change(&mut self, _token_id: &TokenId) {}
+    /// The single post-transfer hook. Called after EVERY ownership change, in the same receipt: `nft_transfer`
+    /// (reason "transfer"), `execute_sale` (`buy`, USDC `ft_on_transfer` buy; "sale") and `accept_offer` ("sale").
+    /// C5 reset rule: every allowance of the token is cleared. Inside balances (C6) are keyed by token and offers (C4)
+    /// are bound to token state, so neither needs anything here.
+    pub(crate) fn on_owner_change(&mut self, token_id: &TokenId, reason: &str) {
+        self.clear_allowances(token_id, reason);
+    }
 
     pub(crate) fn ensure_receiver(&self, receiver_id: &AccountId) {
         ensure(
@@ -242,7 +247,7 @@ impl NonFungibleTokenCore for Contract {
         ensure(self.token_state(&token_id).listing.is_none(), ERR_LISTED);
         self.ensure_receiver(&receiver_id);
         self.tokens.nft_transfer(receiver_id, token_id.clone(), approval_id, memo);
-        self.on_owner_change(&token_id);
+        self.on_owner_change(&token_id, "transfer");
     }
 
     /// Disabled in v1 (D-07). Present so NEP-171 tooling gets a clear error instead of MethodNotFound.
@@ -296,5 +301,7 @@ impl NonFungibleTokenMetadataProvider for Contract {
 mod tests;
 #[cfg(test)]
 mod security_tests;
+#[cfg(test)]
+mod allowance_tests;
 #[cfg(test)]
 mod market_tests;

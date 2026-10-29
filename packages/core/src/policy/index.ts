@@ -35,6 +35,7 @@ export {
   type SolMessage,
 } from './sol'
 export { decodeRlpExact, encodeRlp, RLP_MAX_DEPTH, type RlpInput, type RlpItem } from './rlp'
+export * from './allowance'
 
 export type AnyClassifyResult =
   | ({ chain: 'evm' } & ClassifyResult<EvmFields>)

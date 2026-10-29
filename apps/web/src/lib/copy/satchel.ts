@@ -149,6 +149,22 @@ export const satchel = {
       pendingHelp: "It counts once it has 1 confirmation.",
       receivedHelp: (id: string, total: string) => `Satchel #${id} now holds ${total}.`,
     },
+    /** A4: Add coins' optional "Request an amount" field (a payment URI + QR a wallet opens pre-filled, and a
+     * shareable app link that opens this sheet pre-filled; app-screens §8). */
+    request: {
+      title: "Request an amount",
+      label: "Amount",
+      create: "Create QR code",
+      update: "Update QR code",
+      invalid: "Enter an amount above zero.",
+      linkTitle: "Request link",
+      linkBody: "Opens this amount and address in any browser, ready to send.",
+      copyUri: "Copy payment link",
+      copyUriAria: "Copy payment link for a wallet app",
+      copiedUri: "Payment link copied",
+      share: "Share",
+      shareTitle: (id: string, amount: string, ticker: string) => `Satchel #${id} request · ${amount}${NBSP}${ticker}`,
+    },
   },
   act: {
     inProgress: "In progress",

@@ -61,6 +61,9 @@ const card = {
   chip: (ticker: string, amount: string | null) => (amount === null ? `${ticker}${NBSP}—` : `${ticker}${NBSP}${amount}`),
   svgSigs: (count: number) => n(count, "signature", "signatures"),
   svgSub: "recorded on NEAR testnet",
+  /** A1: the social card's (opengraph-image/twitter-image) signature line when nothing has ever been signed — the
+   * only case a static image can claim without a live per-browser check (kb/90 §7.7). */
+  ogClean: "Clean history",
 } as const;
 
 export const copy = { ...shell, ...satchel, ...flows, ...commerce, pill, card, landing } as const;
