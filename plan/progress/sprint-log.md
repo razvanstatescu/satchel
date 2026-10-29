@@ -40,3 +40,5 @@
 - 2026-10-29T16:51Z [C5-ui] in progress: unit tests added (test/unit/allowance.test.ts, 17 tests); full unit suite 383 passed, typecheck/lint green; Playwright next (owner add/revoke, delegate send within/over cap, server HTML)
 - 2026-10-29T17:11Z [C4-ui|C6-ui] wip: data layer committed (market views/calls, fixtures, sim engine, mock wallet) on feat/ui-market @44a0ae9
 - 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (e985d82, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
+- 2026-10-29T17:40Z [review] start: branch review/sprint @ e985d82, reviewing bff1397..e985d82 (C1-C7)
+- 2026-10-29T17:40Z [orchestrator] Razvan: continue. Restart #4: resumed web-allowance, web-market, reviewer, web-sign, docs-spec with the PATH fix; main verification re-running
