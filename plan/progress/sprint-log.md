@@ -16,3 +16,6 @@
 - 2026-10-29T15:22Z [A3] progress: empty-the-satchel flow (multi-chain drain, BTC auto-batching), typecheck/lint/unit green
 - 2026-10-29T15:26Z [A4] done: request coins — BIP-21/EIP-681/Solana Pay builders (lib/payment-uri.ts, vector-tested), Add coins' optional amount field (GET form, works with JS off), payment-URI QR + Copy payment link + Share, shareable app link /s/<id>/receive?chain=&amount= (display only). Unit (payment-uri.test.ts) + Playwright (request-coins.spec.ts incl. axe Day/Night) green.
 - 2026-10-29T15:26Z [C4|C6] progress: sandbox tests/tests/market.rs 15/15 green (deposit/withdraw, listed freeze, transfer+buy move balances, NEAR+USDC offers, stale/quiet/expiry, FT failure re-credit, per-offerer cap, solvency I-M1/I-M3 incl. drained contract)
+- 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @5cce2af; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs bff1397), INV-22 OK
+- 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
+- 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
