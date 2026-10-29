@@ -12,6 +12,7 @@ use near_sdk::json_types::U128;
 use near_sdk::store::{IterableSet, LazyOption, LookupMap};
 use near_sdk::{env, near, AccountId, BorshStorageKey, Gas, PanicOnDefault, PromiseOrValue};
 
+pub mod allowance;
 pub mod errors;
 pub mod events;
 pub mod mpc;
@@ -59,6 +60,7 @@ pub enum StorageKey {
     SigLog,
     Listings,
     Proceeds,
+    Allowances, // C5, allowance.rs
 }
 
 #[near(contract_state, contract_metadata(standard(standard = "nep171", version = "1.0.0"), standard(standard = "nep177", version = "2.0.0"), standard(standard = "nep181", version = "1.0.0"), standard(standard = "nep297", version = "1.0.0")))]
@@ -221,7 +223,8 @@ impl NonFungibleTokenCore for Contract {
         ensure(env::predecessor_account_id() == owner, ERR_NOT_OWNER);
         ensure(self.token_state(&token_id).listing.is_none(), ERR_LISTED);
         self.ensure_receiver(&receiver_id);
-        self.tokens.nft_transfer(receiver_id, token_id, approval_id, memo);
+        self.tokens.nft_transfer(receiver_id, token_id.clone(), approval_id, memo);
+        self.clear_allowances(&token_id, "transfer"); // C5 reset rule
     }
 
     /// Disabled in v1 (D-07). Present so NEP-171 tooling gets a clear error instead of MethodNotFound.
