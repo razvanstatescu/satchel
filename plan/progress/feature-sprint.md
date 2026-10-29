@@ -121,3 +121,4 @@ it. Phase-2 UI work builds against those specs.
   - ui-market had no commits.
 
   All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (4349840); a confirmation sandbox run is in progress.
+- 16:50Z: confirmation run on main (A1–A4, C4, C5, C6): sandbox 107/107, web unit 379, web typecheck clean.

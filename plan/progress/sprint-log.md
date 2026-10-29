@@ -32,3 +32,6 @@
 - 2026-10-29T16:20Z [C2,C3,C7] fuzz: 4.0M Rust property cases + 400k Rust/TS differential (0 disagreements) + 400k TS self-check; docs/security/fuzzing.md §0b
 - 2026-10-29T16:24Z [orchestrator] merged A2+A3 (94428ea, pushed) and C4+C6 (a512d45); spawned web-market UI agent; contract-sign asked to merge main
 - 2026-10-29T16:40Z [orchestrator] restart #3: resumed contract-sign (mid-merge), web-allowance, web-market; main pushed (4349840)
+- 2026-10-29T16:40Z [C5-ui] in progress: copy deck added (copy/allowance.ts, errorCopy ERR_ALLOWANCE_* mapping); config-copy-theme unit test passes (house rule: never say 'delegate' in UI copy); building the owner/delegate UI next
+- 2026-10-29T16:42Z [C1,C2,C3,C7] merge: main a512d45 (C5, C4/C6) merged into feat/contract-sign; EvmNonces after StorageCredit; C7 kinds refused for delegates; unit 172 green
+- 2026-10-29T16:46Z [orchestrator] main (A1-A4, C4, C5, C6) confirmed: sandbox 107/107, web unit 379, typecheck clean
