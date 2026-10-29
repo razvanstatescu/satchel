@@ -51,3 +51,14 @@
 - 2026-10-29T19:19Z [C2-ui C3-ui C7-ui] wip: afeb29b types, per-chain ETH/USDC balance reads, #2 fixture records; paused: Edit tool PreToolUse hook timing out
 - 2026-10-29T19:27Z [M-01] blocked: Read/Write PreToolUse hook times out (host unreachable) in worktree fix-m01; no code changed, nothing committed; stopped per no-route-around rule
 - 2026-10-29T19:41Z [review] resumed in worktree .claude/worktrees/review-sprint (review/sprint ff to 9319255). core 459/459, tools 72/72, differential fuzz 400k cases (evm/btc/sol/msg) 0 disagreements, TS fuzz+allowance 73/73, allowance proptests 30/30 @5000, market props 3/3 @1000. BLOCKED: Write/Read PreToolUse hook times out (host unreachable), so tests/tests/review.rs (SR-05/SR-06/M-01 proof), the SR-01 checker fix and docs/security/sprint-review.md are not written. Nothing committed.
+- 2026-10-29T19:48Z [orchestrator] Razvan reconnected (continue): file tools OK; resumed contract-fix-m01, reviewer, web-allowance, web-market, web-sign (nested)
+- 2026-10-29T19:49Z [C5-ui] in progress: test/e2e/allowance.spec.ts written and committed (691db2b); owner add/see/revoke, MAX_DELEGATES guard, delegate send within/over cap, server HTML, axe Day/Night; typecheck/lint green; running full Playwright suite next
+- 2026-10-29T19:49Z [review] review.rs: SR-05 digest ceiling ≈3,000 small / ≈2,000-2,500 x 1 KiB msg records (300 Tgas call); SR-06 accept_offer −143 B (frees); M-01 proven (3 transfers → escrow > free, withdraw LackBalanceForState), proof #[ignore]d. WIP committed.
+- 2026-10-29T19:50Z [C4-ui|C6-ui] wip: Market.tsx built and wired into WalletTab (inside NEAR add/withdraw, incoming offers); copy.ts merge bug fixed @c862cac
+- 2026-10-29T19:52Z [review] SR-01 fixed in core (evmConfirmationsByChain, evmDepth; test/review-sr01.test.ts 6 tests); core 465/465, core+web typecheck clean. WIP committed.
+- 2026-10-29T19:53Z [C4-ui] wip: /s/[id]/offer route and My offers on /satchels @9df16a0
+- 2026-10-29T19:56Z [C4-ui|C6-ui] wip: unit tests for market.ts/sim.ts (21 cases, all green); lint+typecheck clean @7d2a7e1
+- 2026-10-29T19:56Z [review] docs/security/sprint-review.md written (no Crit/High; M-01 Medium fix in progress on fix/m01-solvency; L-04 fixed; L-01/L-03 documented; L-02/L-05 proposed). Unit 172/172. Sandbox final run in progress. WIP committed.
+- 2026-10-29T19:57Z [M-01] wip: failing sandbox tests committed (transfer 150 B → LackBalanceForState on last withdraw; NEAR buy +63 B breaks I-M1; accept nets -194 B)
+- 2026-10-29T19:57Z [C2-ui C3-ui C7-ui] wip: data layer committed (per-chain send/nonce, message adapter, mock wallet msgs, Messages group, evmByChain SR-02, safe text SR-04); unit 379/379, tsc clean
+- 2026-10-29T20:01Z [review] DONE: final unit 172/172, sandbox 115 passed 0 failed 1 ignored (M-01 proof), core 465/465, tools 72/72, diff fuzz 400k/0. Commits 072afea, 0b64dbe, 9ee2696 on review/sprint (not pushed).
