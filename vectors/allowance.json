@@ -1,0 +1,1971 @@
+{
+  "schema": "satchel-allowance-vectors/1",
+  "set": "allowance",
+  "generator": "tools/vectors/allowance.ts",
+  "window_ms": 86400000,
+  "max_spends": 32,
+  "debits": [
+    {
+      "name": "evm_kb31",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "100004200588000"
+          }
+        ]
+      },
+      "note": "value 1e14 + 21000 × max_fee 200028"
+    },
+    {
+      "name": "evm_value0_huge_tip",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02eb83aa36a780843b9aca0085e8d4a510008252089461739f33adbb7f76c1b5b222e4119085257528be8080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "21000000000000000"
+          }
+        ]
+      },
+      "note": "value 0 still debits the worst-case fee"
+    },
+    {
+      "name": "evm_create_account_gas",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f283aa36a780843b9aca0084b2d05e0083031f389461739f33adbb7f76c1b5b222e4119085257528be872386f26fc1000080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "10613800000000000"
+          }
+        ]
+      },
+      "note": "Sepolia account-creating transfer gas (CLAUDE.md)"
+    },
+    {
+      "name": "evm_zero_cost",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02e683aa36a780843b9aca00808252089461739f33adbb7f76c1b5b222e4119085257528be8080c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "0"
+          }
+        ]
+      },
+      "note": "a 0 debit still needs a cap and a spend entry"
+    },
+    {
+      "name": "evm_max_value_overflow",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f483aa36a780843b9aca0001019461739f33adbb7f76c1b5b222e4119085257528be90ffffffffffffffffffffffffffffffff80c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "note": "value + fee > u128: refused, never wrapped"
+    },
+    {
+      "name": "evm_fee_overflow",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f84383aa36a780843b9aca00908000000000000000000000000000000088ffffffffffffffff9461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800080c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      }
+    },
+    {
+      "name": "evm_max_value_no_fee",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f683aa36a780843b9aca00808252089461739f33adbb7f76c1b5b222e4119085257528be90ffffffffffffffffffffffffffffffff80c0"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "340282366920938463463374607431768211455"
+          }
+        ]
+      }
+    },
+    {
+      "name": "evm_chain_1_refused_by_classifier",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02ee0180843b9aca0084773594008252089461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800080c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_CHAIN_ID"
+      },
+      "note": "the classifier refusal comes first"
+    },
+    {
+      "name": "evm_calldata_refused_by_classifier",
+      "request": {
+        "evm": {
+          "unsigned_tx": "02f87683aa36a780843b9aca0084773594008252089461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c68000b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be0000000000000000000000000000000000000000000000000000000000000001c0"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_EVM_DATA"
+      },
+      "note": "until C2 lands; evm_raw covers the debit"
+    },
+    {
+      "name": "btc_change_not_counted",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000fcb4a7aea5edc84166938896b1808c168789c0c6963e7f749a2c52aceb81a08c957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a098f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac3075000000000000fdffffffbf076c1ea32fc1465f60f60643a098ae30882cd669ec705d04882ef9db4772ef0000000001000000",
+            "02000000fcb4a7aea5edc84166938896b1808c168789c0c6963e7f749a2c52aceb81a08c957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a09834099bc7d2efda262362eb7b551dd033e0e0b32c21a862ea283e6cd48c44973d010000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac1879000000000000fdffffffbf076c1ea32fc1465f60f60643a098ae30882cd669ec705d04882ef9db4772ef0000000001000000"
+          ],
+          "outputs": "409c000000000000160014772c0edb29b89796eae37e25c5c52f706b540a7d1450000000000000160014ef66ccc3f77176dc5b27ec7efe81945951f4f42e"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "40500"
+          }
+        ]
+      },
+      "note": "40000 out + 500 fee; 20500 change to 0014‖pkh"
+    },
+    {
+      "name": "btc_no_change",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000c6da945b084bcfc2232622ddb191c6f885102222ddf7b0b387c08430d6060ee3caf35e5224de16efa3ccaf41070f6e7b9432b6f79551e629fca9d1c03b43bc52f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac50c3000000000000fdfffffff1ead4223355dff5e27a6acadb59b04ee51fe0b8b9adedad29b3c692dcb08ac30000000001000000"
+          ],
+          "outputs": "68bf000000000000160014772c0edb29b89796eae37e25c5c52f706b540a7d"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "50000"
+          }
+        ]
+      },
+      "note": "everything leaves: 49000 + 1000 fee"
+    },
+    {
+      "name": "btc_p2pkh_to_own_pkh_counts",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000c6da945b084bcfc2232622ddb191c6f885102222ddf7b0b387c08430d6060ee3caf35e5224de16efa3ccaf41070f6e7b9432b6f79551e629fca9d1c03b43bc52f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac50c3000000000000fdffffff1f221b68d2c0ba7d4d6a74318217abf25b15f8d72ea90e27748b6a8826acd25a0000000001000000"
+          ],
+          "outputs": "10270000000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac5898000000000000160014ef66ccc3f77176dc5b27ec7efe81945951f4f42e"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "11000"
+          }
+        ]
+      },
+      "note": "only 0014‖pkh is change"
+    },
+    {
+      "name": "btc_taproot_recipient",
+      "request": {
+        "btc": {
+          "preimages": [
+            "020000000b920651325dd507150c5d64d73d6a73507416e6d778da0003ae953ae8f7f9b828ce0fc59233e0dcde2e7cdc5f8598042450843e608be898f19485768b8914f9f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac3075000000000000fdffffff124024d597fe008587f07cb731b5e1fb926d8d3589de43ede01595e518fa1a550000000001000000",
+            "020000000b920651325dd507150c5d64d73d6a73507416e6d778da0003ae953ae8f7f9b828ce0fc59233e0dcde2e7cdc5f8598042450843e608be898f19485768b8914f934099bc7d2efda262362eb7b551dd033e0e0b32c21a862ea283e6cd48c44973d010000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac1879000000000000fdffffff124024d597fe008587f07cb731b5e1fb926d8d3589de43ede01595e518fa1a550000000001000000",
+            "020000000b920651325dd507150c5d64d73d6a73507416e6d778da0003ae953ae8f7f9b828ce0fc59233e0dcde2e7cdc5f8598042450843e608be898f19485768b8914f9cd48a10479f439ca6cf28a01841c478c59a1206414b0f93b9fbab8f8c4901bcd020000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac007d000000000000fdffffff124024d597fe008587f07cb731b5e1fb926d8d3589de43ede01595e518fa1a550000000001000000"
+          ],
+          "outputs": "e8030000000000002251201ac0aa08375c4d414b0948a5c86590f31682d437596811a420c6f4cfcc8849f1d007000000000000160014772c0edb29b89796eae37e25c5c52f706b540a7da85b010000000000160014ef66ccc3f77176dc5b27ec7efe81945951f4f42e"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "4000"
+          }
+        ]
+      }
+    },
+    {
+      "name": "btc_outputs_above_inputs",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000c6da945b084bcfc2232622ddb191c6f885102222ddf7b0b387c08430d6060ee3caf35e5224de16efa3ccaf41070f6e7b9432b6f79551e629fca9d1c03b43bc52f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ace803000000000000fdffffff66220b985ab173b523bc5cc41a36123ac9609d7e8186b45b4a9a01c5b9f835c20000000001000000"
+          ],
+          "outputs": "8813000000000000160014772c0edb29b89796eae37e25c5c52f706b540a7d"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "5000"
+          }
+        ]
+      },
+      "note": "no negative fee (the signature would be invalid anyway)"
+    },
+    {
+      "name": "btc_all_to_self",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000c6da945b084bcfc2232622ddb191c6f885102222ddf7b0b387c08430d6060ee3caf35e5224de16efa3ccaf41070f6e7b9432b6f79551e629fca9d1c03b43bc52f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac1027000000000000fdffffff53be66d739b40e634fb37e0972e7f612455a371f539ce5294ac5d72b7467a20e0000000001000000"
+          ],
+          "outputs": "1027000000000000160014ef66ccc3f77176dc5b27ec7efe81945951f4f42e"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "btc",
+            "amount": "0"
+          }
+        ]
+      }
+    },
+    {
+      "name": "btc_sighash_none_refused_by_classifier",
+      "request": {
+        "btc": {
+          "preimages": [
+            "02000000c6da945b084bcfc2232622ddb191c6f885102222ddf7b0b387c08430d6060ee3caf35e5224de16efa3ccaf41070f6e7b9432b6f79551e629fca9d1c03b43bc52f77b97a5a3ce5d02e721224f6632e86541e7431458673de26c715b4d9c0073f2000000001976a914ef66ccc3f77176dc5b27ec7efe81945951f4f42e88ac1027000000000000fdffffff8eaade4aab14d678a7802ad50e5ef7b2fde1a826cd73141924234d8ac2a7cbe50000000002000000"
+          ],
+          "outputs": "2823000000000000160014772c0edb29b89796eae37e25c5c52f706b540a7d"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_BTC_SIGHASH"
+      }
+    },
+    {
+      "name": "sol_transfer",
+      "request": {
+        "sol": {
+          "message": "01000103c0053c754f4f3fd3e6db7b7d1d899a7dec143502c304f82c25bddb3b3d04d4708cbbddfd2c827ab3b0b0dd9345d6dbe64338fb33db6b8fb35173a2b09a1683680000000000000000000000000000000000000000000000000000000000000000da0f23d941b3eb73088dc2fbeee5c70c1dfb48bb4cecd19acc834190d50a488201020200010c0200000040420f0000000000"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "sol",
+            "amount": "1005000"
+          }
+        ]
+      },
+      "note": "lamports + 5000 fee"
+    },
+    {
+      "name": "sol_self_transfer",
+      "request": {
+        "sol": {
+          "message": "01000102c0053c754f4f3fd3e6db7b7d1d899a7dec143502c304f82c25bddb3b3d04d4700000000000000000000000000000000000000000000000000000000000000000da0f23d941b3eb73088dc2fbeee5c70c1dfb48bb4cecd19acc834190d50a488201010200000c020000000100000000000000"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "sol",
+            "amount": "5001"
+          }
+        ]
+      },
+      "note": "counted anyway (conservative)"
+    },
+    {
+      "name": "sol_max_lamports",
+      "request": {
+        "sol": {
+          "message": "01000103c0053c754f4f3fd3e6db7b7d1d899a7dec143502c304f82c25bddb3b3d04d4708cbbddfd2c827ab3b0b0dd9345d6dbe64338fb33db6b8fb35173a2b09a1683680000000000000000000000000000000000000000000000000000000000000000da0f23d941b3eb73088dc2fbeee5c70c1dfb48bb4cecd19acc834190d50a488201020200010c02000000ffffffffffffffff"
+        }
+      },
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": "sol",
+            "amount": "18446744073709556615"
+          }
+        ]
+      }
+    },
+    {
+      "name": "sol_durable_nonce_refused_by_classifier",
+      "request": {
+        "sol": {
+          "message": "01000205c0053c754f4f3fd3e6db7b7d1d899a7dec143502c304f82c25bddb3b3d04d47078377b525757b494427f89014f97d79928f3938d14eb51e20fb5dec9834eb3048cbbddfd2c827ab3b0b0dd9345d6dbe64338fb33db6b8fb35173a2b09a168368000000000000000000000000000000000000000000000000000000000000000006a7d517192c568ee08a845f73d29788cf035c3145b21ab344d8062ea9400000da0f23d941b3eb73088dc2fbeee5c70c1dfb48bb4cecd19acc834190d50a48820203030104000404000000030200020c020000000100000000000000"
+        }
+      },
+      "expect": {
+        "ok": false,
+        "error": "ERR_SOL_DURABLE_NONCE"
+      }
+    }
+  ],
+  "evm_raw": [
+    {
+      "name": "native_plain",
+      "unsigned_tx": "02f183aa36a780843b9aca0084773594008252089461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800080c0",
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "1042000000000000"
+          }
+        ]
+      }
+    },
+    {
+      "name": "native_base_sepolia",
+      "unsigned_tx": "02f183014a3480843b9aca0084773594008252089461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800080c0",
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 84532
+              }
+            },
+            "amount": "1042000000000000"
+          }
+        ]
+      },
+      "note": "C3 chain: the debit names the chain id; the cap must exist for it"
+    },
+    {
+      "name": "erc20_transfer_usdc",
+      "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000000000000000000000000000000000000004c4b40c0",
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "erc20": {
+                "chain_id": 11155111,
+                "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+              }
+            },
+            "amount": "5000000"
+          },
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "195000000000000"
+          }
+        ]
+      },
+      "note": "C2: token amount, then the ETH gas"
+    },
+    {
+      "name": "erc20_transfer_with_value",
+      "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723803b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be0000000000000000000000000000000000000000000000000000000000000007c0",
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "erc20": {
+                "chain_id": 11155111,
+                "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+              }
+            },
+            "amount": "7"
+          },
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "195000000000003"
+          }
+        ]
+      },
+      "note": "C2 refuses value ≠ 0; the debit still counts it"
+    },
+    {
+      "name": "erc20_amount_u128_max",
+      "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000000000000ffffffffffffffffffffffffffffffffc0",
+      "expect": {
+        "ok": true,
+        "debits": [
+          {
+            "asset": {
+              "erc20": {
+                "chain_id": 11155111,
+                "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+              }
+            },
+            "amount": "340282366920938463463374607431768211455"
+          },
+          {
+            "asset": {
+              "evm": {
+                "chain_id": 11155111
+              }
+            },
+            "amount": "195000000000000"
+          }
+        ]
+      }
+    },
+    {
+      "name": "erc20_amount_2_128",
+      "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be0000000000000000000000000000000100000000000000000000000000000000c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "note": "uint256 above u128: refused"
+    },
+    {
+      "name": "erc20_approve",
+      "unsigned_tx": "02f86f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b844095ea7b300000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be0000000000000000000000000000000000000000000000000000000000000001c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      },
+      "note": "approve is never a delegate payment"
+    },
+    {
+      "name": "erc20_transfer_from",
+      "unsigned_tx": "02f88f83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b86423b872dd000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      }
+    },
+    {
+      "name": "erc20_transfer_short",
+      "unsigned_tx": "02f86e83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b843a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be00000000000000000000000000000000000000000000000000000000000000c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      }
+    },
+    {
+      "name": "erc20_transfer_long",
+      "unsigned_tx": "02f87083aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c723880b845a9059cbb00000000000000000000000061739f33adbb7f76c1b5b222e4119085257528be000000000000000000000000000000000000000000000000000000000000000100c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      }
+    },
+    {
+      "name": "one_byte_calldata",
+      "unsigned_tx": "02ea83aa36a780843b9aca0084b2d05e0082fde8941c7d4b196cb0c7b01d743fbc6116a902379c72388000c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      }
+    },
+    {
+      "name": "legacy_type_byte",
+      "unsigned_tx": "01f183aa36a780843b9aca0084773594008252089461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800080c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_KIND"
+      }
+    },
+    {
+      "name": "fee_overflow_before_calldata",
+      "unsigned_tx": "02f84383aa36a780843b9aca00908000000000000000000000000000000088ffffffffffffffff9461739f33adbb7f76c1b5b222e4119085257528be87038d7ea4c6800001c0",
+      "expect": {
+        "ok": false,
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "note": "the overflow check runs before the calldata rule"
+    }
+  ],
+  "window": [
+    {
+      "name": "fresh_exact_cap",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1000"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "1000"
+        ],
+        "remaining_after": [
+          "0"
+        ]
+      }
+    },
+    {
+      "name": "fresh_one_over",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1001"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "1000"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      }
+    },
+    {
+      "name": "spend_counts_until_window_end",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "600"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086399999,
+      "debits": [
+        {
+          "asset": "btc",
+          "amount": "401"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "400"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "note": "at at_ms + W − 1 the spend still counts"
+    },
+    {
+      "name": "spend_fits_inside_window",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "600"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086399999,
+      "debits": [
+        {
+          "asset": "btc",
+          "amount": "400"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "400"
+        ],
+        "remaining_after": [
+          "0"
+        ]
+      }
+    },
+    {
+      "name": "spend_released_at_window_end",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "600"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086400000,
+      "debits": [
+        {
+          "asset": "btc",
+          "amount": "1000"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "1000"
+        ],
+        "remaining_after": [
+          "0"
+        ]
+      },
+      "note": "released exactly at at_ms + W"
+    },
+    {
+      "name": "sliding_not_daily",
+      "caps": [
+        {
+          "asset": "sol",
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "600"
+            },
+            {
+              "at_ms": 1793043200000,
+              "amount": "400"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086400000,
+      "debits": [
+        {
+          "asset": "sol",
+          "amount": "601"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "600"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "note": "only the older spend has left the window"
+    },
+    {
+      "name": "two_debits_same_asset_accumulate",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "600"
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "401"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "1000"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      }
+    },
+    {
+      "name": "erc20_and_gas",
+      "caps": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "limit": "5000000",
+          "spends": []
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000000000000000",
+          "spends": [
+            {
+              "at_ms": 1792999999990,
+              "amount": "100000000000000"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "amount": "5000000"
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "195000000000000"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "5000000",
+          "900000000000000"
+        ],
+        "remaining_after": [
+          "0",
+          "705000000000000"
+        ]
+      }
+    },
+    {
+      "name": "erc20_without_gas_cap",
+      "caps": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "limit": "5000000",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "amount": "1"
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "5000000"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      },
+      "note": "gas needs an EVM cap"
+    },
+    {
+      "name": "asset_missing",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": "sol",
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      }
+    },
+    {
+      "name": "zero_debit_needs_cap",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "0"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      }
+    },
+    {
+      "name": "other_chain_id_is_another_asset",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 84532
+            }
+          },
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      }
+    },
+    {
+      "name": "other_token_is_another_asset",
+      "caps": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1111111111111111111111111111111111111111"
+            }
+          },
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      }
+    },
+    {
+      "name": "order_asset_first",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": "sol",
+          "amount": "1"
+        },
+        {
+          "asset": "btc",
+          "amount": "11"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_ASSET"
+      },
+      "note": "checks run per debit in order"
+    },
+    {
+      "name": "order_exceeded_first",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "10",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000000,
+      "debits": [
+        {
+          "asset": "btc",
+          "amount": "11"
+        },
+        {
+          "asset": "sol",
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      }
+    },
+    {
+      "name": "rate_full",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000001,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000002,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000003,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000004,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000005,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000006,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000007,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000008,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000009,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000010,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000011,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000012,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000013,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000014,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000015,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000016,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000017,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000018,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000019,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000020,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000021,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000022,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000023,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000024,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000025,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000026,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000027,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000028,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000029,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000030,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000031,
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793000000100,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "0"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "1000"
+        ],
+        "error": "ERR_ALLOWANCE_RATE"
+      },
+      "note": "32 debits already inside the window"
+    },
+    {
+      "name": "rate_exceeded_wins_over_rate",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000001,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000002,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000003,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000004,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000005,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000006,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000007,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000008,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000009,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000010,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000011,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000012,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000013,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000014,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000015,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000016,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000017,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000018,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000019,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000020,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000021,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000022,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000023,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000024,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000025,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000026,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000027,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000028,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000029,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000030,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000031,
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793000000100,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1001"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "1000"
+        ],
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      }
+    },
+    {
+      "name": "rate_freed_by_pruning",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000001,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000002,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000003,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000004,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000005,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000006,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000007,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000008,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000009,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000010,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000011,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000012,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000013,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000014,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000015,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000016,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000017,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000018,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000019,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000020,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000021,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000022,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000023,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000024,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000025,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000026,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000027,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000028,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000029,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000030,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000031,
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086400031,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1000"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "1000"
+        ],
+        "remaining_after": [
+          "0"
+        ]
+      },
+      "note": "all 32 left the window"
+    },
+    {
+      "name": "rate_partly_freed",
+      "caps": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000001,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000002,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000003,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000004,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000005,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000006,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000007,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000008,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000009,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000010,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000011,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000012,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000013,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000014,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000015,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000016,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000017,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000018,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000019,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000020,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000021,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000022,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000023,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000024,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000025,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000026,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000027,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000028,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000029,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000030,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000031,
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793086400000,
+      "debits": [
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "5"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "1000"
+        ],
+        "remaining_after": [
+          "995"
+        ]
+      },
+      "note": "the entry at T0 left; 31 remain"
+    },
+    {
+      "name": "rate_two_entries_need_two_slots",
+      "caps": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "limit": "10",
+          "spends": []
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "limit": "1000",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000001,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000002,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000003,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000004,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000005,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000006,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000007,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000008,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000009,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000010,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000011,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000012,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000013,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000014,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000015,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000016,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000017,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000018,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000019,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000020,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000021,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000022,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000023,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000024,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000025,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000026,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000027,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000028,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000029,
+              "amount": "0"
+            },
+            {
+              "at_ms": 1793000000030,
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793000000100,
+      "debits": [
+        {
+          "asset": {
+            "erc20": {
+              "chain_id": 11155111,
+              "token": "1c7d4b196cb0c7b01d743fbc6116a902379c7238"
+            }
+          },
+          "amount": "1"
+        },
+        {
+          "asset": {
+            "evm": {
+              "chain_id": 11155111
+            }
+          },
+          "amount": "1"
+        }
+      ],
+      "expect": {
+        "ok": false,
+        "remaining_before": [
+          "10",
+          "1000"
+        ],
+        "error": "ERR_ALLOWANCE_RATE"
+      }
+    },
+    {
+      "name": "spent_above_lowered_limit",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "100",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "500"
+            }
+          ]
+        }
+      ],
+      "now_ms": 1793000000001,
+      "debits": [
+        {
+          "asset": "btc",
+          "amount": "0"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "0"
+        ],
+        "remaining_after": [
+          "0"
+        ]
+      },
+      "note": "a re-set lower cap keeps older spends: remaining saturates at 0"
+    },
+    {
+      "name": "multi_cap_untouched",
+      "caps": [
+        {
+          "asset": "btc",
+          "limit": "7",
+          "spends": [
+            {
+              "at_ms": 1793000000000,
+              "amount": "2"
+            }
+          ]
+        },
+        {
+          "asset": "sol",
+          "limit": "9",
+          "spends": []
+        }
+      ],
+      "now_ms": 1793000000001,
+      "debits": [
+        {
+          "asset": "sol",
+          "amount": "9"
+        }
+      ],
+      "expect": {
+        "ok": true,
+        "remaining_before": [
+          "5",
+          "9"
+        ],
+        "remaining_after": [
+          "5",
+          "0"
+        ]
+      }
+    }
+  ]
+}

@@ -38,6 +38,7 @@ impl Contract {
     /// The single receipt of a sale: transfer, clear the listing, `sold` event, detached payout.
     fn execute_sale(&mut self, token_id: TokenId, listing: Listing, buyer: AccountId) {
         self.tokens.internal_transfer(&listing.seller, &buyer, &token_id, None, Some("sale".to_string()));
+        self.clear_allowances(&token_id, "sale"); // C5 reset rule
         let mut st = self.token_state(&token_id);
         st.listing = None;
         self.state.insert(token_id.clone(), st);
