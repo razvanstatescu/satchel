@@ -213,6 +213,27 @@ cargo near build non-reproducible-wasm --manifest-path contracts/satchel/Cargo.t
   mock every 200 classifications so that long runs don't hit `GasLimitExceeded`.
 - `SATCHEL_FUZZ_CORPUS` takes a path that is absolute or relative to the repo root.
 
+## 5b. C5 allowance: cap accounting (2026-10-29, `feat/contract-allowance`)
+
+The spending allowance (docs/specs/C5.md) adds state-dependent accounting rather than a parser, so it is covered by
+properties against an independent oracle instead of a byte corpus.
+
+| Property (`contracts/satchel/src/allowance_tests.rs`) | Input | Oracle / invariant |
+|---|---|---|
+| `window_accounting_matches_oracle` | 1–80 steps; each advances time by 0–5 s, ≈ 24 h ± 3 s or up to 48 h, and debits 1–2 random assets (one never capped) for 0–50, 0–1,000 or u128::MAX; 1–4 capped assets with limits 1–2,000 | a full-history oracle: a debit at `t` passes iff Σ(accepted, stamped in `(t − 24 h, t]`) + pending + amount ≤ limit, then the 32-entry rate rule. At every step: same verdict and code, `spent` and `remaining` equal to the oracle's, `spent ≤ limit` at every instant, and ≤ 32 stored entries (storage stays bounded) |
+| `evm_debit_is_worst_case` | random `value` (u128), `gas` (u64), `max_fee` (u128) and 0–80 bytes of calldata | native debit = `value + gas × max_fee` exactly when it fits u128, else `ERR_ALLOWANCE_EXCEEDED` (never wrapped); it is ≥ `value`; non-empty calldata other than a 68-byte `a9059cbb` is `ERR_ALLOWANCE_KIND` |
+| `btc_debit_bounds` | 1–3 inputs with random amounts, 1–5 outputs, each paying either our `0014‖pkh` or another script | debit = Σ external + max(0, Σ in − Σ out), and ≥ every external output |
+| TS `allowance.test.ts` › randomized | seeded LCG, 300 runs × 60 steps (`FUZZ_CASES`) | the same brute-force window oracle against `applyDebits` |
+
+The shared `vectors/allowance.json` (20 request → debit cases through the real classifiers, 13 raw EVM cases including
+ERC-20 calldata, 22 window cases) is replayed on both sides (`shared_allowance_vectors`, `allowance.test.ts`).
+
+```bash
+cargo test -p satchel --lib allowance_tests                                         # fast: 256 cases/property
+PROPTEST_CASES=50000 cargo test -p satchel --lib --release allowance_tests          # deep
+FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test.ts
+```
+
 ## 6. Limits
 - **Not coverage-guided:** cargo-fuzz and libFuzzer need nightly. Structure-aware mutation and the coverage histogram
   stand in for it.
