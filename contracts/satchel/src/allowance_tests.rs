@@ -845,6 +845,7 @@ fn arb_step() -> impl Strategy<Value = (u64, Vec<(usize, u128)>)> {
 proptest! {
     #![proptest_config(ProptestConfig {
         cases: std::env::var("PROPTEST_CASES").ok().and_then(|s| s.parse().ok()).unwrap_or(256),
+        failure_persistence: None,
         ..ProptestConfig::default()
     })]
 
