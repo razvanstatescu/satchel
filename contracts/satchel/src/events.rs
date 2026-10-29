@@ -42,4 +42,36 @@ pub enum SatchelEvent {
     Sold { token_id: TokenId, listing_id: u64, seller_id: AccountId, buyer_id: AccountId, price: U128, currency: Currency },
     #[event_version("1.0.0")]
     Payout { account_id: AccountId, currency: Currency, amount: U128, ok: bool },
+    // ── C6 (docs/specs/C4-C6.md §5) ──
+    #[event_version("1.0.0")]
+    InsideDeposit { token_id: TokenId, sender_id: AccountId, ft: Option<AccountId>, amount: U128 },
+    #[event_version("1.0.0")]
+    InsideWithdraw {
+        token_id: TokenId,
+        owner_id: AccountId,
+        receiver_id: AccountId,
+        ft: Option<AccountId>,
+        amount: U128,
+        inside_epoch: u64,
+    },
+    #[event_version("1.0.0")]
+    InsideWithdrawResolved { token_id: TokenId, ft: Option<AccountId>, amount: U128, ok: bool },
+    #[event_version("1.0.0")]
+    StorageCreditWithdrawn { account_id: AccountId, amount: U128 },
+    // ── C4 ──
+    #[event_version("1.0.0")]
+    OfferMade {
+        offer_id: u64,
+        token_id: TokenId,
+        offerer_id: AccountId,
+        amount: U128,
+        currency: Currency,
+        expected_sig_count: u64,
+        expected_inside_epoch: u64,
+        expires_at_ms: u64,
+    },
+    #[event_version("1.0.0")]
+    OfferCancelled { offer_id: u64, token_id: TokenId, offerer_id: AccountId, by_id: AccountId, amount: U128, currency: Currency },
+    #[event_version("1.0.0")]
+    OfferAccepted { offer_id: u64, token_id: TokenId, seller_id: AccountId, buyer_id: AccountId, amount: U128, currency: Currency },
 }
