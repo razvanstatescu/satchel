@@ -30,10 +30,11 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
   const errors: string[] = [];
   const addr = satchelAddresses(id);
 
-  const [token, satchel, height] = await Promise.all([
+  const [token, satchel, height, inside] = await Promise.all([
     bounded(views.nftToken(id), "nft_token", errors, undefined),
     bounded(views.satchel(id), "satchel", errors, undefined),
     bounded(src.blockHeight(), "block", errors, null as number | null),
+    bounded(views.insideOf(id), "inside_of", errors, null),
   ]);
   // Both views answered null: the token doesn't exist (404). `undefined` means "couldn't read" (render degraded).
   if (token === null && satchel === null) return null;
@@ -89,6 +90,7 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
       birth_tx: deps.lock.birth_tx,
       birth_block: deps.lock.birth_block,
     },
+    inside: inside ?? { near: "0", fts: [], inside_epoch: 0 },
     errors,
   };
 }

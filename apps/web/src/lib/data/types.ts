@@ -1,5 +1,5 @@
 import type { SatchelStatus } from "@/lib/near/contract";
-import type { Chain, ConfigView, Listing, SigRecordView } from "@/lib/near/types";
+import type { Chain, ConfigView, InsideView, Listing, SigRecordView } from "@/lib/near/types";
 
 /** GET /api/satchels/[id] shape (kb/90 §9) — also feeds the blocking /s/[id] render. */
 export interface SatchelSnapshot {
@@ -27,6 +27,8 @@ export interface SatchelSnapshot {
   minted_at: number | null; // ms
   last_signature: { seq: number; chain: Chain; height: number; timestamp_ms: number; status: SigRecordView["status"]; url: string | null } | null;
   lock: LockFacts;
+  /** C6: NEAR and allowlisted FTs held inside the contract for this token (docs/specs/C4-C6.md §4). */
+  inside: InsideView;
   errors: string[];
 }
 

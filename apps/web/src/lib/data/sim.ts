@@ -216,7 +216,7 @@ export function simOverlay() {
       const fts = Object.entries(delta.fts)
         .filter(([, amount]) => BigInt(amount) > 0n)
         .map(([token, amount]) => ({ token, amount }));
-      return { near: delta.near, fts, epoch: delta.epoch } as InsideView;
+      return { near: delta.near, fts, inside_epoch: delta.epoch };
     },
     offer(id: number): OfferView | null {
       const o = s.offers[id];
