@@ -35,8 +35,10 @@ impl Contract {
         listing
     }
 
-    /// The single receipt of a sale: transfer, clear the listing, `sold` event, detached payout.
+    /// The single receipt of a sale: transfer, clear the listing, `sold` event, detached payout, then the M-01
+    /// solvency guard (last, so the NEAR payout is already deducted from the balance it checks).
     fn execute_sale(&mut self, token_id: TokenId, listing: Listing, buyer: AccountId) {
+        let s0 = env::storage_usage();
         self.tokens.internal_transfer(&listing.seller, &buyer, &token_id, None, Some("sale".to_string()));
         self.on_owner_change(&token_id, "sale"); // C5 reset rule (clears allowances)
         let mut st = self.token_state(&token_id);
@@ -53,6 +55,7 @@ impl Contract {
         }
         .emit();
         self.payout(listing.seller, listing.currency, listing.price.0); // detached: never the returned promise
+        self.ensure_solvent(s0);
     }
 
     /// Payout promise `.then(on_payout)`. NEAR: plain transfer; USDC: `ft_transfer` with 1 yocto, 15 Tgas.
@@ -149,6 +152,9 @@ impl Contract {
         ensure(owed > 0, ERR_NOTHING_OWED);
         // S-01: zero the slot instead of removing it, so a re-credit after a failed withdraw needs no new storage.
         self.proceeds.insert(key, 0);
+        if currency == Currency::Near {
+            self.market.totals.proceeds_near -= owed;
+        }
         let p = self.payout(account, currency, owed);
         env::promise_return(p);
     }
@@ -168,6 +174,9 @@ impl Contract {
             let key = (account_id.clone(), currency);
             let owed = self.proceeds.get(&key).copied().unwrap_or(0);
             self.proceeds.insert(key, owed.saturating_add(amount.0));
+            if currency == Currency::Near {
+                self.market.totals.proceeds_near = self.market.totals.proceeds_near.saturating_add(amount.0);
+            }
         }
         SatchelEvent::Payout { account_id, currency, amount, ok }.emit();
     }

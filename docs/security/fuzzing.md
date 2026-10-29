@@ -291,12 +291,16 @@ accounting, so the properties run random operation sequences against a reference
 
 | Property (`market_tests::…`) | Input | Checks after every step |
 |---|---|---|
-| `prop_accounting_matches_model` | 1–40 random ops over 3 tokens and 4 accounts: NEAR and USDC deposits, withdrawals (delivered or failed, re-credited by the callback), NEAR and USDC offers, cancels (by the offerer or a stranger; refund delivered or failed), accepts (payout delivered or failed), transfers, signatures, block-time jumps | per-token NEAR, USDC and `inside_epoch` equal the model; open offers per token and per offerer equal the model; `proceeds` equal the model; `market_totals()` equals the sums (I-M2); refused steps change nothing |
+| `prop_accounting_matches_model` | 1–40 random ops over 3 tokens and 4 accounts: NEAR and USDC deposits, withdrawals (delivered or failed, re-credited by the callback), NEAR and USDC offers, cancels (by the offerer or a stranger; refund delivered or failed), accepts (payout delivered or failed), transfers, signatures, block-time jumps, and (M-01) `withdraw_proceeds(near)` with the payout delivered or failed | per-token NEAR, USDC and `inside_epoch` equal the model; open offers per token and per offerer equal the model; `proceeds` equal the model; `market_totals()` equals the sums, incl. `proceeds_near` and `escrow_near` (I-M2); refused steps change nothing |
+| `prop_ensure_solvent_refuses_exactly_when_escrow_would_pay` (M-01) | a random escrow mix (inside NEAR, a NEAR offer, a storage credit, each possibly 0), a receiver with a 10–64-char id that already holds a Satchel or not, `nft_transfer` or a NEAR `buy`, and a buffer within ±60 B ± 3 yocto of the exact bytes the call adds (measured on a twin run) | the guard refuses **iff** the call grew storage and the spare NEAR (plus a transfer's 1 yocto) can't pay it; every refusal is `ERR_INSOLVENT`; every accepted call leaves `free ≥ escrow_near` (I-M1) |
 | `prop_id_index_is_a_swap_remove_vec` | 1–80 pushes/removes over 3 keys | the O(1) offer index behaves exactly like `Vec::swap_remove`, and reports the entry that moved |
 | `prop_ft_msg_garbage_is_refused_cleanly` | arbitrary strings ≤ 120 chars as `ft_on_transfer` msg, any amount | only stable `ERR_*` panics (the FT then refunds) |
 
 The NEAR solvency invariant (I-M1) needs real balances, so it runs in the sandbox (`tests/tests/market.rs`
-`check_solvency`, after every step of most tests, including a contract drained to 0.05 NEAR of free balance).
+`check_solvency`, after every step of most tests, including a contract drained to 0.05 NEAR of free balance, and the
+`m01_*` tests drained to 0.5 mNEAR above escrow). The M-01 property above checks the guard's decision on the unit mock,
+whose per-call balance is set exactly (`Ctx::bal`); note that `testing_env!` restarts the storage-usage counter on every
+call, so deltas are measured inside one call.
 
 ```bash
 cargo test -p satchel --lib market_tests                                     # fast: 64 / 48 / 256 cases

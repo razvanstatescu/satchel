@@ -58,10 +58,24 @@ export interface MarketConfigView {
   max_offer_ttl_ms: number
   next_offer_id: number
 }
+/** `market_totals()`: the NEAR the contract owes its users (I-M1). `escrow_near` is the sum of the other four (M-01). */
 export interface MarketTotalsView {
   inside_near: string
   offers_near: string
   storage_credit: string
+  /** Σ NEAR proceeds (failed payouts and refunds waiting for `withdraw_proceeds`). */
+  proceeds_near: string
+  /** inside_near + offers_near + storage_credit + proceeds_near. The contract's own spare NEAR is free − this. */
+  escrow_near: string
+}
+
+/**
+ * The contract's own spare NEAR (M-01): `amount − storage_usage × 1e19 − escrow_near`, in yocto. Only this pays
+ * the storage of transfers and buys to new holders; below the ≈ 250 B one costs, they fail with `ERR_INSOLVENT`
+ * until anyone tops the contract up with a plain transfer. Negative means I-M1 is broken.
+ */
+export function spareNear(account: { amount: string; storage_usage: number }, totals: MarketTotalsView): bigint {
+  return BigInt(account.amount) - BigInt(account.storage_usage) * 10n ** 19n - BigInt(totals.escrow_near)
 }
 
 /** A call to send: `receiverId` is the Satchel contract, or the FT contract for `ft_transfer_call`. */

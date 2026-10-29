@@ -73,6 +73,8 @@ pub const ERR_OFFER_EXPIRED: &str = "ERR_OFFER_EXPIRED";
 pub const ERR_OFFER_EXPIRY: &str = "ERR_OFFER_EXPIRY";
 pub const ERR_OFFER_STALE: &str = "ERR_OFFER_STALE";
 pub const ERR_TOO_MANY_OFFERS: &str = "ERR_TOO_MANY_OFFERS";
+/// M-01: the call needs contract-paid storage that only escrow could pay (I-M1); the contract's own NEAR must be topped up.
+pub const ERR_INSOLVENT: &str = "ERR_INSOLVENT";
 
 /// Default human sentence for a code. Kept short: every byte is wasm.
 pub fn sentence(code: &str) -> &'static str {
@@ -106,6 +108,7 @@ pub fn sentence(code: &str) -> &'static str {
         ERR_OFFER_EXPIRY => "expires_at_ms must be in the future and at most 90 days away",
         ERR_OFFER_STALE => "sig_count or inside_epoch changed since the offer",
         ERR_TOO_MANY_OFFERS => "too many open offers",
+        ERR_INSOLVENT => "the contract's own NEAR can't pay this storage; top it up",
         ERR_NOTHING_OWED => "nothing to withdraw",
         ERR_MPC_DEPOSIT => "mpc_deposit must be in [1 yocto, 0.01 NEAR]",
         c if c.starts_with("ERR_EVM") => "only ETH and USDC transfers on the supported testnets are signed",

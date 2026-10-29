@@ -9,7 +9,7 @@
 #   1. every README command (tools/judge-snippets.sh, live)
 #   2. /s/1, /contract and /market no-JS HTML: the facts are present and outside hidden elements
 #   3. /api/satchels/1 and /api/contract return JSON
-#   4. the contract's free balance (amount − storage_usage × 1e19): FAIL (alert) < 3 NEAR, WARN < 5 NEAR (S-02)
+#   4. the contract's spare NEAR: free balance (amount − storage_usage × 1e19) − market_totals.escrow_near: FAIL (alert) < 3 NEAR, WARN < 5 NEAR (S-02, M-01)
 #   5. the MPC version() is 3.17.0
 #   6. the near-connect wallet manifest is unchanged (R-34): compare with SATCHEL_MANIFEST_SHA256
 #   7. the endpoints are up: dRPC, FastNEAR RPC and tx API, mempool.space/emzy testnet4, Sepolia, Solana devnet
@@ -99,9 +99,11 @@ else
   done
 fi
 
-echo; echo "[4] Contract free balance (alert < $ALERT_LIQUID_NEAR NEAR, floor $MIN_LIQUID_NEAR NEAR)"
+echo; echo "[4] Contract spare NEAR = free balance − escrow (alert < $ALERT_LIQUID_NEAR NEAR, floor $MIN_LIQUID_NEAR NEAR)"
 acct=$(rpc query "{\"request_type\":\"view_account\",\"finality\":\"final\",\"account_id\":\"$C\"}") || acct=""
-line=$(python3 tools/lib/free-balance.py "${acct:-{\}}" "$ALERT_LIQUID_NEAR" "$MIN_LIQUID_NEAR" 2>/dev/null || echo "FAIL no RPC answered")
+# M-01: escrow (inside NEAR, NEAR offers, storage credit, NEAR proceeds) is the users'; only the rest pays S-02 storage
+totals=$(rpc query "{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$C\",\"method_name\":\"market_totals\",\"args_base64\":\"e30=\"}") || totals=""
+line=$(python3 tools/lib/free-balance.py "${acct:-{\}}" "$ALERT_LIQUID_NEAR" "$MIN_LIQUID_NEAR" "${totals:-{\}}" 2>/dev/null || echo "FAIL no RPC answered")
 res "${line%% *}" "${line#* }"
 
 echo; echo "[5] MPC version"

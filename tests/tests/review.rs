@@ -198,12 +198,11 @@ async fn sr06_accept_offer_storage_delta() -> Result<()> {
     Ok(())
 }
 
-/// M-01 (proof; fix in progress on `fix/m01-solvency`): contract-paid storage (the S-02 class: `nft_transfer`, `buy`,
+/// M-01 (proof; fixed on `fix/m01-solvency` by `ensure_solvent`): contract-paid storage (the S-02 class: `nft_transfer`, `buy`,
 /// `accept_offer` to a first-time holder) comes out of the same balance that holds user escrow since C4/C6. Once the
 /// contract's own surplus is gone, transfers silently spend inside NEAR, I-M1 breaks, and the owner's
 /// `withdraw_near` of the whole balance fails. Passes when the transfers are refused or the escrow stays withdrawable.
 #[tokio::test]
-#[ignore = "M-01 proof: fails until fix/m01-solvency lands (then un-ignore)"]
 async fn m01_contract_paid_storage_never_consumes_escrow() -> Result<()> {
     let env = setup_with(Opts { usdc_enabled: false, fund_usdc: false, mint_to_alice: 4 }).await?;
     let r = env
