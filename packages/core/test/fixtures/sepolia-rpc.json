@@ -1,0 +1,55 @@
+{
+ "recorded_at": "2026-10-21T21:32:27Z",
+ "note": "read-only JSON-RPC against two Sepolia providers; the safe tag is min(head) - 3 (spec \u00a77.2)",
+ "addresses": {
+  "satchel_spike_unfunded": "0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d",
+  "eip7702_delegated": "0x1c3d8a18a12eaa7fef1b90e431fcbd49e12eca69",
+  "weth_contract": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9"
+ },
+ "providers": {
+  "publicnode": {
+   "eth_chainId": "0xaa36a7",
+   "eth_blockNumber": "0xb692b3",
+   "tag": "0xb692b0",
+   "accounts": {
+    "0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d": {
+     "count_at_tag": "0x0",
+     "count_latest": "0x0",
+     "code": "0x"
+    },
+    "0x1c3d8a18a12eaa7fef1b90e431fcbd49e12eca69": {
+     "count_at_tag": "0x1",
+     "count_latest": "0x1",
+     "code": "0xef0100a34e1e389097409aa65ff374af50b402e4a8f5c3"
+    },
+    "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9": {
+     "count_at_tag": "0x1",
+     "count_latest": "0x1",
+     "code": "0x6080604052600436106100a05760003560e01c8063313ce56711610064"
+    }
+   }
+  },
+  "drpc": {
+   "eth_chainId": "0xaa36a7",
+   "eth_blockNumber": "0xb692b3",
+   "tag": "0xb692b0",
+   "accounts": {
+    "0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d": {
+     "count_at_tag": "0x0",
+     "count_latest": "0x0",
+     "code": "0x"
+    },
+    "0x1c3d8a18a12eaa7fef1b90e431fcbd49e12eca69": {
+     "count_at_tag": "0x1",
+     "count_latest": "0x1",
+     "code": "0xef0100a34e1e389097409aa65ff374af50b402e4a8f5c3"
+    },
+    "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9": {
+     "count_at_tag": "0x1",
+     "count_latest": "0x1",
+     "code": "0x6080604052600436106100a05760003560e01c8063313ce56711610064"
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,112 @@
+{
+ "chunks": [
+  {
+   "text": "[Intro]",
+   "duration_ms": 15000,
+   "positive_styles": [
+    "120 BPM",
+    "punchy syncopated hits",
+    "tight percussion groove",
+    "bright marimba-like synth plucks",
+    "clean low-end support",
+    "cinematic product launch intro",
+    "wide stereo imaging",
+    "polished modern mix"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Build]",
+   "duration_ms": 20000,
+   "positive_styles": [
+    "120 BPM",
+    "driving four-on-the-floor kick",
+    "bright confident groove",
+    "layered synth ostinato",
+    "growing percussion intensity",
+    "subtle brass-like stabs",
+    "rising harmonic motion",
+    "sleek high-gloss production"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Lift]",
+   "duration_ms": 25000,
+   "positive_styles": [
+    "120 BPM",
+    "warm lifted chord progression",
+    "steady groove with airy claps",
+    "rounded analog synth pads",
+    "supportive bass foundation",
+    "anthemic upward motion",
+    "lush midrange layering",
+    "expansive cinematic mix"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Dark Tension]",
+   "duration_ms": 15000,
+   "positive_styles": [
+    "120 BPM",
+    "sudden low-register tension",
+    "minimal percussion hits",
+    "dark suspended harmony",
+    "stripped-back arrangement",
+    "heavy anticipation",
+    "tight transient detail",
+    "dramatic contrast in the mix"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Drop]",
+   "duration_ms": 30000,
+   "positive_styles": [
+    "120 BPM",
+    "riser into a big drop",
+    "driving warm groove",
+    "powerful kick and snare pattern",
+    "thick sub-bass impact",
+    "bold synth lead motif",
+    "full-energy cinematic peak",
+    "compressed punchy master feel"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Outro]",
+   "duration_ms": 29000,
+   "positive_styles": [
+    "120 BPM",
+    "warm resolved outro",
+    "gentle rhythmic fade",
+    "soft synth chords",
+    "clean ending",
+    "satisfying harmonic release",
+    "polished tail reverb",
+    "minimal closing texture"
+   ],
+   "negative_styles": [],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  }
+ ]
+}

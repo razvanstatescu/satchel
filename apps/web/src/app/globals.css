@@ -1,0 +1,385 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   Satchel 2.0, "Sticker S" (design-system-impl §1–3; motion-spec §1; rulings R12).
+
+   Theme: Day first, whatever the OS (R12.3, D-42). `:root` is Day (`color-scheme: light`); `<html data-theme="night">`
+   is Night. The head script (src/lib/theme.ts) resolves the stored choice (Day · Night · System) to data-theme before
+   first paint; with no JS there is no data-theme, so Day applies.
+
+   How light-dark() compiles: Next targets browsers without it, so Lightning CSS rewrites every `light-dark(A, B)` into
+   flags that it sets only on rules declaring `color-scheme`. A token therefore resolves on the element that declares
+   it: an island that switches scheme ([data-scheme="day|night"], e.g. an illustration field or the coral finale) shares
+   the token selector below, so it re-declares every token in its own scheme.
+
+   Rules (§0): colour only through these tokens (no hex in components, no `dark:`, no color-mix() or /opacity on
+   tokens); one coral *action* fill per view; text on coral is always `on-brand`; stickers (outline + hard drop) only
+   for what you own, press or celebrate; every state is icon + word. Utilities read the raw tokens (`var(--ink)`), so
+   CSS outside Tailwind should too: never `var(--color-*)`, which resolves on :root and ignores islands.
+   ───────────────────────────────────────────────────────────────────────────────────────────────────────────────── */
+
+/* 1. Colour: the brand's tokens.json (Day, Night) plus the derived tokens (§1.4). Nothing else. */
+:root,
+[data-scheme] {
+  --ground: light-dark(#f6f5fb, #120c26);
+  --surface: light-dark(#ffffff, #1c1538);
+  --surface-sunken: light-dark(#eceaf4, #29214b);
+  --line: light-dark(#e2dfee, #352c5c);
+  --line-strong: light-dark(#7f7999, #8a82ae);
+  --ink: light-dark(#1d1340, #f4f2ff);
+  --ink-muted: light-dark(#5e5776, #b7b0d1);
+  --brand: #ff5c4d;
+  --brand-deep: light-dark(#d9402f, #ff7a6c);
+  --brand-soft: light-dark(#ffe3df, #3a1f33);
+  --on-brand: #1d1340;
+  --link: light-dark(#c7301f, #ff8a7e);
+  --focus: light-dark(#1d1340, #ff8a7e);
+  --lemon: #ffd84d;
+  --sky: #8fd3ff;
+  --success: light-dark(#0b6e54, #4fd9b0);
+  --frozen: light-dark(#2a63c7, #8db8ff);
+  --danger: light-dark(#c61f45, #ff7a92);
+  --chain-btc: light-dark(#c96f00, #f7931a);
+  --chain-evm: light-dark(#5560b0, #a3abe0);
+  --chain-sol: light-dark(#8447d6, #c08cff);
+  /* derived (§1.4) */
+  --brand-hover: #ff6b5d; /* primary hover fill; on-brand on it 6.16:1 */
+  --brand-line: light-dark(#d9402f, #ff5c4d); /* coral strokes on grounds: tab underline, nav bar, progress */
+  --sticker-line: light-dark(#1d1340, #8a82ae); /* sticker outlines; Night = line-strong, 4.85:1 on the ground (R12.4) */
+  --sticker-shade: light-dark(#1d1340, #000000); /* the hard drop (shadow-sticker) */
+  --overlay-shade: light-dark(rgb(29 19 64 / 0.18), rgb(0 0 0 / 0.55));
+  --scrim: light-dark(rgb(29 19 64 / 0.4), rgb(0 0 0 / 0.4));
+  --overlay-edge: light-dark(transparent, #352c5c); /* 1 px edge on Night overlays */
+  /* illustration fills: the chain charms' own colours, fixed in both themes (§6) */
+  --charm-btc: #f7931a;
+  --charm-evm: #a3abe0;
+  --charm-sol: #c08cff;
+}
+:root {
+  color-scheme: light;
+}
+:root[data-theme="night"] {
+  color-scheme: dark;
+}
+[data-scheme="day"] {
+  color-scheme: light;
+}
+[data-scheme="night"] {
+  color-scheme: dark;
+}
+
+/* 2. Motion durations (motion-spec §1; WAAPI and CSS only, never the `motion` package, R10). Easings are in @theme. */
+:root {
+  --dur-press-in: 60ms; /* press down, --ease-out */
+  --dur-press: 140ms; /* release */
+  --dur-fast: 150ms; /* reduced-motion fades */
+  --dur-base: 220ms; /* small UI */
+  --dur-sheet: 360ms; /* sheet in; out is 240 */
+  --dur-sheet-out: 240ms;
+}
+
+/* `night:` styles the Night theme (never the OS: Day is the default, R12.3). `dark:` points at the same selector, so
+   Tailwind's media-query default can't slip back in. Neither is island-aware: never use them inside [data-scheme]. */
+@custom-variant night (&:where([data-theme="night"], [data-theme="night"] *));
+@custom-variant dark (&:where([data-theme="night"], [data-theme="night"] *));
+
+/* 3. Tailwind mapping (§1.2). The resets drop Tailwind's defaults (bg-white, shadow-md, text-xl, rounded-lg…). */
+@theme {
+  --color-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --text-*: initial;
+  --breakpoint-*: initial;
+  --breakpoint-sm: 30rem; /* 480 */
+  --breakpoint-md: 48rem; /* 768: sheets become dialogs */
+  --breakpoint-lg: 64rem; /* 1024: the side nav */
+  --breakpoint-xl: 80rem; /* 1280 */
+  --container-flow: 30rem; /* max-w-flow: sheets and dialogs */
+  --container-app: 75rem; /* max-w-app: the shell and landing sections */
+  --container-copy: 40rem; /* max-w-copy: long text (answers, contract commands) */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-card: 28px;
+  --radius-pill: 999px;
+  /* easings (motion-spec §1) */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.3, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-swing: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-carry: cubic-bezier(0.68, 0, 0.59, 1);
+  --ease-fall: cubic-bezier(0.55, 0, 1, 0.45);
+
+  /* Type (§1.3). Display styles carry no family: pair them with `font-display` (h1–h3 get it from the base layer). */
+  --text-balance-hero: 3rem; /* 48/52 800: the card total, wallet total */
+  --text-balance-hero--line-height: 3.25rem;
+  --text-balance-hero--letter-spacing: -0.03em;
+  --text-balance-hero--font-weight: 800;
+  --text-balance-hero-sm: 2.375rem; /* 38/42 800: below 480, the amount input */
+  --text-balance-hero-sm--line-height: 2.625rem;
+  --text-balance-hero-sm--letter-spacing: -0.03em;
+  --text-balance-hero-sm--font-weight: 800;
+  --text-title: 1.875rem; /* 30/34 750: page titles, flow sheet titles */
+  --text-title--line-height: 2.125rem;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 750;
+  --text-heading: 1.25rem; /* 20/26 700: section, dialog and confirm headings */
+  --text-heading--line-height: 1.625rem;
+  --text-heading--letter-spacing: -0.01em;
+  --text-heading--font-weight: 700;
+  --text-body: 1rem; /* 16/24 */
+  --text-body--line-height: 1.5rem;
+  --text-body--font-weight: 400;
+  --text-body-sm: 0.875rem; /* 14/20 */
+  --text-body-sm--line-height: 1.25rem;
+  --text-body-sm--font-weight: 400;
+  --text-label: 0.9375rem; /* 15/20 600: tabs, nav, field labels, row titles */
+  --text-label--line-height: 1.25rem;
+  --text-label--font-weight: 600;
+  --text-address: 0.8125rem; /* 13/18 450, mono: addresses, hashes */
+  --text-address--line-height: 1.125rem;
+  --text-address--font-weight: 450;
+  --text-button: 0.9375rem; /* 15/20 700: md buttons */
+  --text-button--line-height: 1.25rem;
+  --text-button--font-weight: 700;
+  --text-button-lg: 1rem; /* 16/20 700: lg and xl buttons */
+  --text-button-lg--line-height: 1.25rem;
+  --text-button-lg--font-weight: 700;
+  --text-caption: 0.8125rem; /* 13/18 500: chips (pills add font-semibold) */
+  --text-caption--line-height: 1.125rem;
+  --text-caption--font-weight: 500;
+  --text-badge: 0.75rem; /* 12/16 700: New, Yours, Testnet */
+  --text-badge--line-height: 1rem;
+  --text-badge--font-weight: 700;
+  /* landing (derived): text-display md:text-display-md xl:text-display-xl; text-section md:text-section-md;
+     text-lead md:text-lead-md */
+  --text-display: 2.5rem;
+  --text-display--line-height: 2.625rem;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 800;
+  --text-display-md: 3.5rem;
+  --text-display-md--line-height: 3.5rem;
+  --text-display-md--letter-spacing: -0.035em;
+  --text-display-md--font-weight: 800;
+  --text-display-xl: 4.5rem;
+  --text-display-xl--line-height: 4.375rem;
+  --text-display-xl--letter-spacing: -0.035em;
+  --text-display-xl--font-weight: 800;
+  --text-section: 2rem;
+  --text-section--line-height: 2.125rem;
+  --text-section--letter-spacing: -0.03em;
+  --text-section--font-weight: 800;
+  --text-section-md: 2.75rem;
+  --text-section-md--line-height: 2.875rem;
+  --text-section-md--letter-spacing: -0.03em;
+  --text-section-md--font-weight: 800;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.75rem;
+  --text-lead--font-weight: 400;
+  --text-lead-md: 1.25rem;
+  --text-lead-md--line-height: 1.875rem;
+  --text-lead-md--font-weight: 400;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-line: var(--brand-line);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-link: var(--link);
+  --color-focus: var(--focus);
+  --color-lemon: var(--lemon);
+  --color-sky: var(--sky);
+  --color-success: var(--success);
+  --color-frozen: var(--frozen);
+  --color-danger: var(--danger);
+  --color-chain-btc: var(--chain-btc);
+  --color-chain-evm: var(--chain-evm);
+  --color-chain-sol: var(--chain-sol);
+  --color-charm-btc: var(--charm-btc);
+  --color-charm-evm: var(--charm-evm);
+  --color-charm-sol: var(--charm-sol);
+  --color-sticker: var(--sticker-line);
+  --color-scrim: var(--scrim);
+  --color-overlay-edge: var(--overlay-edge);
+  --color-toast: var(--brand-soft);
+  --color-selected: var(--brand-soft);
+  --color-skeleton: var(--surface-sunken);
+  --color-disabled: var(--surface-sunken);
+  --color-on-disabled: var(--line-strong);
+  --color-inverse: var(--ink);
+  --color-on-inverse: var(--ground);
+  /* transparent, current and inherit stay Tailwind's static utilities */
+  --shadow-sticker: 0 4px 0 var(--sticker-shade);
+  --shadow-sticker-lift: 0 6px 0 var(--sticker-shade);
+  --shadow-pressed: 0 0 0 var(--sticker-shade);
+  --shadow-overlay: 0 16px 48px var(--overlay-shade);
+  /* next/font sets --font-funnel, --font-onest and --font-geist-mono on <html> (app/layout.tsx) */
+  --font-display: var(--font-funnel), var(--font-onest), system-ui, sans-serif;
+  --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* 4. Utilities */
+@utility t-num {
+  font-variant-numeric: tabular-nums;
+}
+/* A sticker: 3 px outline + the hard drop (the card, illustration panels). 2 px when it is 52 px tall or less. */
+@utility sticker {
+  border: 3px solid var(--sticker-line);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+}
+@utility sticker-sm {
+  border: 2px solid var(--sticker-line);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+}
+/* A flat panel: everything you don't own, press or celebrate (list and form groups, facts, banners use sunken). */
+@utility panel {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+}
+
+/* 5. Base layer */
+@layer base {
+  html {
+    background: var(--ground);
+    color: var(--ink);
+    scroll-padding-top: 72px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* an island re-declares the tokens (above), so its text follows its own scheme */
+  [data-scheme] {
+    color: var(--ink);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  a {
+    color: inherit;
+  }
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+  button,
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+/* 6. Morph (ui.tsx `Morph`; motion-spec §3 "Roll"): a label that rolls when it changes, every variant in one grid cell
+   so nothing resizes. Leaving: 8 px up or down and out, 140 ms ease-in; arriving: from 8 px the other side, 70 → 250 ms
+   ease-out. Reduced motion: a 200 ms cross-fade (layered !important beats the clamp below). */
+@layer components {
+  .morph {
+    display: inline-grid;
+    justify-items: center;
+    align-items: center;
+    font-variant-numeric: tabular-nums; /* the amount CTAs ("Send 0.0010 ETH", "Buy for 5.00 USDC") */
+    overflow: clip; /* the rolling label stays inside its own window */
+    overflow-clip-margin: 2px;
+  }
+  .morph > * {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition:
+      translate 140ms var(--ease-in),
+      opacity 140ms var(--ease-in);
+  }
+  .morph > [data-pos="before"] {
+    translate: 0 -8px;
+    opacity: 0;
+  }
+  .morph > [data-pos="after"] {
+    translate: 0 8px;
+    opacity: 0;
+  }
+  .morph > [data-pos="current"] {
+    transition:
+      translate 180ms var(--ease-out) 70ms,
+      opacity 180ms var(--ease-out) 70ms;
+  }
+  .morph [data-l]::before {
+    content: attr(data-l);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .morph > * {
+      translate: none !important;
+      transition: opacity 200ms linear !important;
+    }
+  }
+}
+
+/* 7. (S) A bar pinned to the bottom of the screen below 1024 (`[data-pinned-bar]`: the Wallet tab's offer, the Buy bar)
+   keeps the end of the page clear, with or without JS: the bar sets `--pinned-bar-h` on <html> to its height (safe area
+   included) once it mounts. The same height pads the viewport's scrollport, so a control that takes keyboard focus is
+   scrolled clear of the bar, never under it (WCAG 2.4.11). A route Next keeps hidden after a navigation (React
+   Activity: an inline `display: none`) doesn't count. */
+@media (max-width: 63.99rem) {
+  body:has([data-pinned-bar]:not([style*="display: none"] *)) {
+    padding-bottom: var(--pinned-bar-h, calc(132px + env(safe-area-inset-bottom)));
+  }
+  html:has([data-pinned-bar]:not([style*="display: none"] *)) {
+    scroll-padding-bottom: calc(var(--pinned-bar-h, calc(132px + env(safe-area-inset-bottom))) + 8px);
+  }
+}
+
+/* 8. The sticky bars (the top bar; the side nav's brand row, `[data-sticky-bar]`) are always on screen. html's
+   scroll-padding-top (72 px, so anchors and focused content land below the top bar) made Chrome scroll the page ~420 px
+   up whenever something in them took focus: Shift+Tab back to the header, or a sheet returning focus to Menu. A matching
+   negative scroll margin keeps them inside the snapport, so focusing them never scrolls the page. */
+[data-sticky-bar] * {
+  scroll-margin-top: -72px;
+}
+
+/* Reduced motion: CSS transitions and animations end at once (motion-spec §0 rule 7; the static CSS is the end state).
+   Meaning-carrying fades (overlays, toasts, the hand-off) run on WAAPI, which this doesn't touch. Unlayered on purpose:
+   a component that needs a CSS fade here can still win with a layered !important. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

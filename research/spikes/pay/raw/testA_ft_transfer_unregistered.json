@@ -1,0 +1,48 @@
+{
+ "at": "2026-10-21T11:38:19.047Z",
+ "ms_to_FINAL": 3993,
+ "tx_hash": "GrDXvEChNp87dgJ8feEZoPDTpmmmvUuz7oETPgoZQDyG",
+ "final_execution_status": "FINAL",
+ "status": {
+  "Failure": {
+   "ActionError": {
+    "index": 0,
+    "kind": {
+     "FunctionCallError": {
+      "ExecutionError": "Smart contract panicked: The account seller.satchel-spk-pay-e9ea1a.testnet is not registered"
+     }
+    }
+   }
+  }
+ },
+ "receipts": [
+  {
+   "id": "3kij9CjJsaaYP3BhsxF2gaCC3zBU5wsmk7dfbEqaZgom",
+   "executor": "usdc.fakes.testnet",
+   "block": "274090174",
+   "status": "Failure",
+   "fail": "{\"ActionError\":{\"index\":0,\"kind\":{\"FunctionCallError\":{\"ExecutionError\":\"Smart contract panicked: The account seller.satchel-spk-pay-e9ea1a.testnet is not registered\"}}}}",
+   "logs": [],
+   "tokens_burnt": "159829521782500000000",
+   "gas_burnt": 1598295217825
+  },
+  {
+   "id": "4mhwfgwxCPgsFHZ3j3fZqbGTUmR97tvDTuUiiyWM5Gfx",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090175",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  },
+  {
+   "id": "DbhZ9Sth1npyMwp9ZkoDS2KrwYPN5vMvsjfWKmPsx9ws",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090175",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+
+[1] EIP-1559 unsigned preimage -> keccak256 -> raw secp256k1 sign (MPC-style) -> assemble
+  unsigned preimage 0x02f283aa36a7078459682f008506fc23ac0082520894000000000000000000000000000000000000dead872bb2c8eabcc00080c0 (52 bytes)
+  keccak256(preimage) = 0x8cb1b816dd6087e2a2680a1e77be488ee50a63fe49b1f384537c399513f6a1a9
+  PASS preimage starts with type byte 0x02
+  PASS signature over keccak256(unsigned) recovers the sender
+  PASS assembling (unsigned fields + raw MPC-style signature) == wallet signTransaction (RFC6979 deterministic)
+  PASS recoverTransactionAddress(signed) == sender, i.e. a node computes the same signing hash
+  signed tx hash (what explorers show) = 0x4a7f8e79c8858b1ad2d6094cf8c130a79e697b1ede1f493fceddb75a5d0421c9 != payload hash
+  PASS tx hash (signed) differs from signing hash (unsigned) — log both
+
+[2] strict RLP parse of the preimage (mirrors on-chain parser)
+  PASS classifier accepts a plain Sepolia ETH transfer
+  PASS hand-rolled parse == viem.parseTransaction (chainId, nonce, to, value)
+  PASS classifier hash == keccak256(serializeTransaction(tx))
+  parsed: {"chainId":"11155111","nonce":"7","maxPriorityFeePerGas":"1500000000","maxFeePerGas":"30000000000","gas":"21000","to":"0x000000000000000000000000000000000000dead","value":"12300000000000000","dataLen":0,"erc20":null,"maxSpendWei":"12930000000000000"}
+
+[3] refusal cases
+  PASS our 0x05||rlp(...) preimage == viem hashAuthorization (sanity)
+  PASS EIP-191 preimage reproduces hashMessage (sanity)
+  PASS refuse legacy EIP-155 preimage -> legacy (untyped) tx: no type byte, maybe no chainId
+  PASS refuse legacy pre-EIP-155 preimage (no chainId) -> legacy (untyped) tx: no type byte, maybe no chainId
+  PASS refuse EIP-2930 type-1 tx -> EIP-2930 tx (type 1)
+  PASS refuse EIP-7702 type-4 tx -> EIP-7702 set-code tx (type 4)
+  PASS refuse EIP-7702 authorization preimage (0x05 MAGIC), chain_id=0 -> EIP-7702 authorization (MAGIC 0x05)
+  PASS refuse EIP-191 personal_sign preimage -> EIP-191 / EIP-712 signed data (0x19 prefix), not a tx
+  PASS refuse EIP-712 permit preimage (0x19 0x01 || domainSep || structHash) — only its first bytes matter -> EIP-191 / EIP-712 signed data (0x19 prefix), not a tx
+  PASS refuse non-canonical nonce (leading zero) -> nonce: non-canonical integer (leading zero)
+  PASS refuse trailing byte after RLP list -> trailing bytes after RLP list
+  PASS refuse chainId 1 (mainnet) not allowlisted -> chainId 1 not allowlisted
+  PASS refuse contract creation (to empty) -> to must be 20 bytes (contract creation refused)
+  PASS refuse ERC-20 approve(spender, max) — standing authorization -> selector 0x095ea7b3 not allowlisted (only transfer(address,uint256))
+  PASS ERC-20 transfer refused under MVP eth-only policy
+  PASS ERC-20 transfer(…) accepted under Phase-2 policy with amount parsed
+  erc20 preimage size 115 bytes; eth transfer preimage size 52 bytes
+
+[4] blind hashes: a raw 32-byte payload carries no type information
+  txSigningHash      0x8cb1b816dd6087e2a2680a1e77be488ee50a63fe49b1f384537c399513f6a1a9
+  personalSignHash   0x67e421eaeefb5bdd8aa7cc2ee19d2cef16857bad353e76840293a3864d7c29d0
+  permitDigest       0x07a58cd3ef2361a7308701fa119843858ab95185dbd5be1eb80463da46aa20ff
+  authHash           0x839182567789d1c16dd2a21730fd06d23f55c7da8fa8cdde1809dcfd784cf2b2
+  PASS a raw-hash signer happily produces a valid permit signature (no account nonce consumed)
+
+[5] replay: pre-EIP-155 signing hash has no chainId
+  PASS EIP-155 hashes differ per chain
+  PASS pre-155 hash is chain-independent (one signature valid on every EVM chain that still accepts unprotected txs)
+
+[6] EVM liveness rule: a signed nonce n is dead iff finalizedNonceCount(chainId) > n
+  PASS per-chain max signed nonce is a sufficient summary (O(1) storage per chain)
+
+ALL 28 CHECKS PASSED

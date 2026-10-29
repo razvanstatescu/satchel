@@ -1,0 +1,51 @@
+{
+ "key": "f77ee84accf12ec1",
+ "final": {
+  "id": "L02",
+  "scene": "S01",
+  "text": "An Ethereum wallet.",
+  "say": "An Ethereum wallet.",
+  "file": "vo/L02.mp3",
+  "duration": 1.29,
+  "words": [
+   {
+    "text": "An",
+    "start": 0.08,
+    "end": 0.14
+   },
+   {
+    "text": "Ethereum",
+    "start": 0.2,
+    "end": 0.76
+   },
+   {
+    "text": "wallet.",
+    "start": 0.86,
+    "end": 1.22
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "An Ethereum wallet"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "An Ethereum wallet.",
+ "prev": "A Bitcoin wallet.",
+ "next": "A Solana wallet."
+}

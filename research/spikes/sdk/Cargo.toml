@@ -1,0 +1,17 @@
+# THROWAWAY Phase-0 spike workspace (sdk agent). Not product code. Do not copy into the product repo.
+[workspace]
+resolver = "3"
+members = ["contracts/hello", "contracts/mock-signer", "contracts/nft-spike", "contracts/receiver", "tests"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.93"
+repository = "https://github.com/example/satchel-phase0-spike"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

@@ -1,0 +1,51 @@
+{
+  "inputs": [
+    {
+      "index": 0,
+      "r": "99367fc6272d554834560ed935e08fb6ed9d3e788f79cafb406e84a2f6556666",
+      "s": "52cb6adaf0a990b17a4782ed27e2eaf106746eac086ae4c01484b1c13f2a6c7f",
+      "recovery_id": 1,
+      "lowS_from_mpc": true,
+      "s_over_halfN": 0.6468,
+      "normalized": false,
+      "verifyStrict": true,
+      "recoveredPubMatches": true
+    },
+    {
+      "index": 1,
+      "r": "1223c8c55c7d51e7d0efd8e138d77fc0b81c9f47350bbef15f8aa7dafe359389",
+      "s": "37330d8ba50093a2f44b09d68c6b47f29a362a737bba0b4d19d839140067b984",
+      "recovery_id": 1,
+      "lowS_from_mpc": true,
+      "s_over_halfN": 0.4312,
+      "normalized": false,
+      "verifyStrict": true,
+      "recoveredPubMatches": true
+    }
+  ],
+  "validateAllStrict": true,
+  "txid": "5cbd4ff872dc16c1d1f5fcf2c9ea8e9047c9b20bec1cf4674532272e14a199a1",
+  "wtxid": "3fa5576fb8bff6356d18b247ef506939bde1b3d54575ead2d853687702860d4b",
+  "vsize": 209,
+  "weight": 833,
+  "fee": "418",
+  "feeRate": 2,
+  "derSigLens": [
+    72,
+    71
+  ],
+  "rawHex": "02000000000102a042e0f65eefdc375a5263997aa5a143bb3fadb0b16a0568404c4dcace6fea370000000000fdffffff72506aeca736d2a8cb895c143f4b7adfed4a9012738b2a58e426e989b57d2c090100000000fdffffff02409c000000000000160014fcb55e6920e2c6f37327a5bf4a24cf42ebbaf07cf638000000000000160014107ee19b91094c42d16e3457b5259907cef4b3120248304502210099367fc6272d554834560ed935e08fb6ed9d3e788f79cafb406e84a2f6556666022052cb6adaf0a990b17a4782ed27e2eaf106746eac086ae4c01484b1c13f2a6c7f0121021e857e1164787e91347a2f7e91b88b16d00a064963a50988798d7185e8bace2d0247304402201223c8c55c7d51e7d0efd8e138d77fc0b81c9f47350bbef15f8aa7dafe359389022037330d8ba50093a2f44b09d68c6b47f29a362a737bba0b4d19d839140067b9840121021e857e1164787e91347a2f7e91b88b16d00a064963a50988798d7185e8bace2d00000000",
+  "highS": {
+    "looseValidatorAccepts": true,
+    "strictValidatorAccepts": false,
+    "rawHex": "02000000000102a042e0f65eefdc375a5263997aa5a143bb3fadb0b16a0568404c4dcace6fea370000000000fdffffff72506aeca736d2a8cb895c143f4b7adfed4a9012738b2a58e426e989b57d2c090100000000fdffffff02409c000000000000160014fcb55e6920e2c6f37327a5bf4a24cf42ebbaf07cf638000000000000160014107ee19b91094c42d16e3457b5259907cef4b3120249304602210099367fc6272d554834560ed935e08fb6ed9d3e788f79cafb406e84a2f6556666022100ad3495250f566f4e85b87d12d81d150db43a6e3aa6ddbb7bab4daccb910bd4c20121021e857e1164787e91347a2f7e91b88b16d00a064963a50988798d7185e8bace2d0247304402201223c8c55c7d51e7d0efd8e138d77fc0b81c9f47350bbef15f8aa7dafe359389022037330d8ba50093a2f44b09d68c6b47f29a362a737bba0b4d19d839140067b9840121021e857e1164787e91347a2f7e91b88b16d00a064963a50988798d7185e8bace2d00000000"
+  },
+  "testmempoolaccept": {
+    "status": 200,
+    "body": "[{\"txid\":\"5cbd4ff872dc16c1d1f5fcf2c9ea8e9047c9b20bec1cf4674532272e14a199a1\",\"wtxid\":\"3fa5576fb8bff6356d18b247ef506939bde1b3d54575ead2d853687702860d4b\",\"allowed\":false,\"vsize\":null,\"fees\":null,\"reject-reason\":\"missing-inputs\"}]"
+  },
+  "testmempoolaccept_highS": {
+    "status": 200,
+    "body": "[{\"txid\":\"5cbd4ff872dc16c1d1f5fcf2c9ea8e9047c9b20bec1cf4674532272e14a199a1\",\"wtxid\":\"13c916bbac719f291925fe0e3fe79146ec1b99fa5dad46b14c180cf2a8da7a7e\",\"allowed\":false,\"vsize\":null,\"fees\":null,\"reject-reason\":\"missing-inputs\"}]"
+  }
+}

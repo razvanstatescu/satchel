@@ -1,0 +1,56 @@
+{
+ "key": "482b7385d43dfe97",
+ "final": {
+  "id": "L25",
+  "scene": "U1",
+  "text": "Gift a funded wallet.",
+  "say": "Gift a funded wallet.",
+  "file": "vo/L25.mp3",
+  "duration": 1.49,
+  "words": [
+   {
+    "text": "Gift",
+    "start": 0.08,
+    "end": 0.38
+   },
+   {
+    "text": "a",
+    "start": 0.44,
+    "end": 0.46
+   },
+   {
+    "text": "funded",
+    "start": 0.64,
+    "end": 0.96
+   },
+   {
+    "text": "wallet.",
+    "start": 1.08,
+    "end": 1.42
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Gift a funded wallet"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Gift a funded wallet.",
+ "prev": "Sell a whole position in one trade.",
+ "next": "Hand a treasury to the next team."
+}

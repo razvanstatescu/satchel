@@ -1,0 +1,35 @@
+{
+  "name": "satchel-hypermotion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Satchel hackathon hypermotion video (Remotion)",
+  "scripts": {
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render Main out/satchel-hypermotion.mp4",
+    "still": "remotion still"
+  },
+  "dependencies": {
+    "@remotion/captions": "4.0.537",
+    "@remotion/cli": "4.0.537",
+    "@remotion/fonts": "^4.0.537",
+    "@remotion/layout-utils": "4.0.537",
+    "@remotion/light-leaks": "4.0.537",
+    "@remotion/media": "4.0.537",
+    "@remotion/media-utils": "4.0.537",
+    "@remotion/motion-blur": "4.0.537",
+    "@remotion/noise": "4.0.537",
+    "@remotion/paths": "4.0.537",
+    "@remotion/shapes": "4.0.537",
+    "@remotion/transitions": "4.0.537",
+    "lucide-react": "1.61.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.537"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,4 @@
+(Use `node --trace-deprecation ...` to show where the warning was created)
+balance before 0
+AIRDROP ERROR airdrop to 6P6GgkFNQKcvCtsMncRF1VtFA6Q79LkcFyvaQz5NXPiA failed: Internal error
+balance after 0

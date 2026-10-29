@@ -1,0 +1,40 @@
+{
+  "name": "@satchel/tools",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "vectors": "tsx vectors/gen.ts",
+    "vectors:check": "tsx vectors/gen.ts --check",
+    "fuzz:corpus": "tsx fuzz/gen-corpus.ts",
+    "test": "vitest run && tsx vectors/gen.ts --check",
+    "test:unit": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "e2e:mint": "tsx e2e/mint.ts",
+    "e2e:evm": "tsx e2e/evm.ts",
+    "e2e:btc": "tsx e2e/btc.ts",
+    "e2e:sol": "tsx e2e/sol.ts",
+    "e2e:transfer": "tsx e2e/transfer.ts",
+    "e2e:sale-near": "tsx e2e/sale-near.ts",
+    "e2e:sale-usdc": "tsx e2e/sale-usdc.ts",
+    "e2e:clean-history": "tsx e2e/clean-history.ts",
+    "deploy:keyless-birth": "tsx deploy/keyless-birth.ts"
+  },
+  "dependencies": {
+    "@satchel/core": "workspace:*",
+    "@noble/hashes": "2.4.0",
+    "@scure/base": "2.4.0",
+    "@solana/web3.js": "1.99.0",
+    "bitcoinjs-lib": "7.0.4",
+    "@bitcoinerlab/secp256k1": "2.0.0",
+    "near-api-js": "7.3.1",
+    "viem": "2.57.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "js-yaml": "4.3.2",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "5.0.5"
+  }
+}

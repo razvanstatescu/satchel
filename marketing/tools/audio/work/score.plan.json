@@ -1,0 +1,234 @@
+{
+ "positive_global_styles": [
+  "120 BPM",
+  "4/4",
+  "instrumental",
+  "premium cinematic electronic",
+  "warm analog synths",
+  "felt piano",
+  "tight modern drums",
+  "deep sub bass",
+  "tactile, crafted, confident",
+  "polished modern tech launch film score",
+  "clean mix with space for a voiceover",
+  "continuous music from the first beat to the last, no gaps"
+ ],
+ "negative_global_styles": [
+  "vocals",
+  "singing",
+  "vocal chops",
+  "choir",
+  "EDM",
+  "big room",
+  "dubstep",
+  "cheesy",
+  "tempo changes",
+  "swing",
+  "lo-fi",
+  "risers that never resolve",
+  "long silent gaps",
+  "orchestral trailer braams"
+ ],
+ "sections": [
+  {
+   "section_name": "Hook (S01)",
+   "positive_local_styles": [
+    "punchy confident hits on every beat",
+    "deep kick with short warm analog synth stabs",
+    "full energy from the very first beat"
+   ],
+   "negative_local_styles": [
+    "intro",
+    "fade in",
+    "ambient pad intro"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "Groove (W1)",
+   "positive_local_styles": [
+    "a bright confident groove kicks in",
+    "kick, snare and shaker groove",
+    "plucky warm analog synth arpeggio",
+    "optimistic premium product launch"
+   ],
+   "negative_local_styles": [
+    "dark",
+    "heavy"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Groove builds (W2)",
+   "positive_local_styles": [
+    "the bright groove continues and builds",
+    "claps on two and four",
+    "warm analog bass line"
+   ],
+   "negative_local_styles": [
+    "dark",
+    "breakdown"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Build (W3)",
+   "positive_local_styles": [
+    "the groove keeps building",
+    "felt piano chords join",
+    "rising energy, confident and bright"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "drop"
+   ],
+   "duration_ms": 10000,
+   "lines": []
+  },
+  {
+   "section_name": "Groove (S04)",
+   "positive_local_styles": [
+    "full confident groove",
+    "warm analog bass",
+    "felt piano chords"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "gaps"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "Peak (S02)",
+   "positive_local_styles": [
+    "the groove at its brightest and fullest",
+    "a short drum fill on the last bar"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "gaps"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Chorus (U1)",
+   "positive_local_styles": [
+    "bigger, warmer chorus: the warmest moment of the track",
+    "warm major chords",
+    "felt piano melody on top",
+    "claps and full drums continue",
+    "uplifting"
+   ],
+   "negative_local_styles": [
+    "dark",
+    "minor key",
+    "breakdown"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  },
+  {
+   "section_name": "Dark turn (S05)",
+   "positive_local_styles": [
+    "sudden dark turn on the first beat",
+    "minor key",
+    "tense pulsing sub bass and ticking hi-hats",
+    "suspense building",
+    "for the last four seconds the drums stop and only one deep sub boom and a low drone remain"
+   ],
+   "negative_local_styles": [
+    "bright",
+    "major key",
+    "drop",
+    "melody"
+   ],
+   "duration_ms": 16000,
+   "lines": []
+  },
+  {
+   "section_name": "Riser (S06)",
+   "positive_local_styles": [
+    "riser: snare roll and noise swell crescendo for the whole section",
+    "builds straight into a big drop"
+   ],
+   "negative_local_styles": [
+    "drum groove",
+    "melody"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Drop (S07ab)",
+   "positive_local_styles": [
+    "big drop on the very first beat",
+    "driving warm four-on-the-floor groove",
+    "claps on two and four",
+    "warm analog bass",
+    "felt piano chords",
+    "full energy from start to end"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "build-up",
+    "quiet start",
+    "gaps"
+   ],
+   "duration_ms": 14000,
+   "lines": []
+  },
+  {
+   "section_name": "Drive (S07ce)",
+   "positive_local_styles": [
+    "the driving warm groove continues",
+    "an analog synth arpeggio layer joins",
+    "constant energy"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "drop",
+    "gaps",
+    "fade"
+   ],
+   "duration_ms": 22000,
+   "lines": []
+  },
+  {
+   "section_name": "Build and hit (S08)",
+   "positive_local_styles": [
+    "build-up: snare roll and rising filter sweep",
+    "then one big satisfying hit with a warm major chord",
+    "the groove returns"
+   ],
+   "negative_local_styles": [
+    "fade",
+    "gaps"
+   ],
+   "duration_ms": 10000,
+   "lines": []
+  },
+  {
+   "section_name": "Outro (S09)",
+   "positive_local_styles": [
+    "warm resolved outro",
+    "felt piano melody over a soft analog pad and gentle sub, playing through the whole section",
+    "calm, resolved, major key",
+    "the final chord rings out naturally over the last two seconds"
+   ],
+   "negative_local_styles": [
+    "abrupt cut",
+    "early ending",
+    "gaps",
+    "new drums",
+    "riser"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  }
+ ]
+}

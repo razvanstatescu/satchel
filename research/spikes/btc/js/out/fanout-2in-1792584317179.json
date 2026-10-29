@@ -1,0 +1,149 @@
+{
+  "contract": "fanout.satchel-spk-btc-e9ea1a.testnet",
+  "inFile": "out/unsigned-fanout-2.json",
+  "nInputs": 2,
+  "attachedTgas": 45,
+  "signGasTgas": 15,
+  "cbGasTgas": 10,
+  "startedAt": "2026-10-21T12:05:07.683Z",
+  "results": [
+    {
+      "hashes": [
+        "8a27532cbff6bf0efb6b9f500a8f3d860a77d7de5b0469dc3365b318bbf534d3",
+        "eb056b2e486fd6d0e26a1e4729681095d15c88080fcc9b4be3d96a241351755b"
+      ],
+      "sigs": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "03621ef6a222c1860d468930121d9f21680c51b9ed793dbbd335889a1dba82114c"
+          },
+          "s": {
+            "scalar": "23ffb81eec29b846d5e713de545be6699b68f4610388e059a9a5986d36ed5ead"
+          },
+          "recovery_id": 1
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "037da0b1848deeeaa1b63a29f00d181ac709620b460e56a7c44421625616ddbeb8"
+          },
+          "s": {
+            "scalar": "34e0d17b619843e893cd5189798007ea5cf8cf00f1d3de4e12b7f4ff4ae4a798"
+          },
+          "recovery_id": 1
+        }
+      ],
+      "txHash": "5NijqqmonfBY9WBKEmdvYRZ2dLTHbWmFda9jYK7mbdaH",
+      "ms": 9399,
+      "gasBurntTgas": 21.906680505271,
+      "tokensBurntNEAR": 0.0020567585130271,
+      "receipts": 12,
+      "status": "SuccessValue",
+      "perReceipt": [
+        {
+          "executor": "fanout.satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 3.125584164982,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "EVENT_JSON:{\"standard\":\"satchel_spike\",\"version\":\"0.0.1\",\"event\":\"btc_sign_requested\",\"data\":[{\"token_id\":\"1\",\"path\":\"satchel/1/btc\",\"inputs\":[{\"payload\":\"8a27532cbff6bf0efb6b9f500a8f3d860a77d7de5b0469dc3365b318bbf534d3\",\"txid\":\"37ea6fceca4d4c4068056ab1b0ad3fbb43a1a57a9963525a37dcef5ef6e042a0\",\"vout\":0,\"amount\":\"30000\",\"hash_outputs\":\"29228aeef69bce85f2a029ba18e63c18a3ade5e6fc39b9d31cebdebcd25ec9c9\"},{\"payload\":\"eb056b2e486fd6d0e26a1e4729681095d15c88080fcc9b4be3d96a241351755b\",\"txid\":\"092c7db589e926e4582a8b7312904aeddf7a4b3f145c89cba8d236a7ec6a5072\",\"vout\":1,\"amount\":\"25000\",\"hash_outputs\":\"29228aeef69bce85f2a029ba18e63c18a3ade5e6fc39b9d31cebdebcd25ec9c9\"}]}]}"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.338563168799,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [138, 39, 83, 44, 191, 246, 191, 14, 251, 107, 159, 80, 10, 143, 61, 134, 10, 119, 215, 222, 91, 4, 105, 220, 51, 101, 179, 24, 187, 245, 52, 211], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.523485208074,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.28976976833,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [235, 5, 107, 46, 72, 111, 214, 208, 226, 106, 30, 71, 41, 104, 16, 149, 209, 92, 136, 8, 15, 204, 155, 75, 227, 217, 106, 36, 19, 81, 117, 91], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.47561837217,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "fanout.satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 1.467785771336,
+          "status": "SuccessValue",
+          "logs": [
+            "EVENT_JSON:{\"standard\":\"satchel_spike\",\"version\":\"0.0.1\",\"event\":\"btc_sign_completed\",\"data\":[{\"ok\":2,\"failed\":0}]}"
+          ]
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        }
+      ],
+      "result": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "03621ef6a222c1860d468930121d9f21680c51b9ed793dbbd335889a1dba82114c"
+          },
+          "s": {
+            "scalar": "23ffb81eec29b846d5e713de545be6699b68f4610388e059a9a5986d36ed5ead"
+          },
+          "recovery_id": 1
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "037da0b1848deeeaa1b63a29f00d181ac709620b460e56a7c44421625616ddbeb8"
+          },
+          "s": {
+            "scalar": "34e0d17b619843e893cd5189798007ea5cf8cf00f1d3de4e12b7f4ff4ae4a798"
+          },
+          "recovery_id": 1
+        }
+      ]
+    }
+  ]
+}

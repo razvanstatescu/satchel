@@ -1,0 +1,82 @@
+{
+ "key": "4a93a5dc53c49955",
+ "final": {
+  "id": "L15",
+  "scene": "S07c",
+  "text": "Nonce used. Coin spent. Blockhash expired.",
+  "say": "Nonce used. Coin spent. Blockhash expired.",
+  "file": "vo/L15.mp3",
+  "duration": 4.4,
+  "words": [
+   {
+    "text": "Nonce",
+    "start": 0.08,
+    "end": 0.42
+   },
+   {
+    "text": "used.",
+    "start": 0.64,
+    "end": 0.98
+   },
+   {
+    "text": "Coin",
+    "start": 1.6,
+    "end": 1.84
+   },
+   {
+    "text": "spent.",
+    "start": 2.06,
+    "end": 2.36
+   },
+   {
+    "text": "Blockhash",
+    "start": 3.12,
+    "end": 3.7
+   },
+   {
+    "text": "expired.",
+    "start": 3.76,
+    "end": 4.36
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "period": 1.5,
+  "phraseGrid": [
+   0,
+   1.5,
+   3
+  ],
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": false,
+     "exact": false,
+     "heard": "Nonce used. Coins spent. Block hash expired"
+    },
+    {
+     "attempt": 1,
+     "ok": true,
+     "exact": false,
+     "heard": "Nonce used. Coin spent. Block hash expired"
+    }
+   ],
+   "chosen": 1
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.7,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Nonce used. Coin spent. Blockhash expired.",
+ "prev": "Then the buyer's browser checks every record against each chain.",
+ "next": "If one old signature could still move coins, Buy stays disabled.",
+ "respace": {
+  "phrases": 3,
+  "everyBeats": 2
+ }
+}

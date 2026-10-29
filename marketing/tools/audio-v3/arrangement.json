@@ -1,0 +1,47 @@
+{
+ "_comment": "Bar-line edit of v3 take 2 (music_v1, seed 3313) onto the v3 film clock. A new take needs a new edit list. Times are on the musical grid (bars on even seconds); beatOffset is added to every time. Raw take (tools/audio-v3/work/music/v3/score.music_v1.seed3313.raw.mp3, 120 BPM, beats at 0.025 + k/2): sparse glockenspiel intro 0-8; bright groove 8-64 (G-F-E-D loop); a sustained low drone 64-73.5 that fades to silence by 76; a 1-bar riser 76-78; DROP on 78 (exactly where the plan put it); driving groove 78-126; a held chord 126-129 and a clean ring-out to silence by 133.9. Missing from the take: the hard stop, the heartbeat/tick tension, the blocked dip, the build and landing - all made here.",
+ "source": "tools/audio-v3/work/music/v3/score.music_v1.seed3313.raw.mp3",
+ "out": "video/public/v2/music/score.mp3",
+ "beatOffset": 0.025,
+ "durationSec": 134,
+ "markers": { "hookLand": 2.5, "musicStop": 58, "subHit": 68, "drop": 76, "landing": 122, "endPress": 132 },
+ "segments": [
+  { "t0": 0, "t1": 2.5, "s0": 0, "why": "M1: the intro's glockenspiel pickup" },
+  { "t0": 2.5, "t1": 58, "s0": 8.5, "why": "M1-M3: the groove kicks in on hookLand (source bar 8 + 1 beat, so bars stay on even seconds) and runs to the hard stop" },
+  { "t0": 58, "t1": 60, "silence": true, "why": "M4: hard stop at musicStop; Night falls (the muted pluck is an SFX)" },
+  { "t0": 60, "t1": 64, "s0": 66, "why": "M4: the take's dark drone" },
+  { "t0": 64, "t1": 122, "s0": 66, "why": "drone again (sustained, the repeat is seamless), its fade to silence, the 1-bar riser, the DROP on 76, the tech groove" },
+  { "t0": 122, "t1": 134, "s0": 122, "why": "M8/M9: the landing repeats one groove bar, then the held chord on 126 and the ring-out" }
+ ],
+ "gain": [
+  { "t0": 60, "t1": 68, "db": -6, "why": "the drone sits under the heartbeat" },
+  { "t0": 68, "t1": 72, "db": -18, "why": "near silence after the sub hit (the take's own fade continues to 74)" },
+  { "t0": 72, "t1": 74, "db": -6, "ramp": true },
+  { "t0": 133.5, "t1": 134, "db": -120, "why": "silence in the last 0.5 s" }
+ ],
+ "sweeps": [
+  { "type": "lowpass", "t0": 60, "t1": 72, "fromHz": 380, "toHz": 380, "why": "Night: the drone darkened to a low pad" },
+  { "type": "strip", "t0": 110, "t1": 114, "bassHz": 220, "tickHz": 8000, "tickGain": 0.35, "ramp": 0.15, "why": "M7: the band drops to bass and tick for 2 bars" },
+  { "type": "highpass", "t0": 116, "t1": 122, "fromHz": 30, "toHz": 1200, "why": "M8: high-pass build, snapping back full on the landing" }
+ ],
+ "synth": [
+  { "type": "heartbeat", "t0": 60, "t1": 68, "every": 1.0, "db": -14, "why": "M4: low heartbeat pulse from musicStop + 2 s" },
+  { "type": "ticks", "t0": 60, "t1": 68, "every": 0.5, "db": -30, "why": "M4: ticking hi-hat" },
+  { "type": "thud", "t": 66, "db": -10, "why": "M4: dull thud when the slip is used" }
+ ],
+ "subHits": [
+  { "t": 68, "db": -8, "why": "M4: the deep sub hit (subHit) before 'So how does a buyer know it's clean?'" },
+  { "t": 122, "db": -12, "why": "M8: the landing" }
+ ],
+ "cues": [
+  { "id": "M1", "start": 0, "end": 12, "what": "glockenspiel pickup; the groove kicks in on hookLand 2.5" },
+  { "id": "M2", "start": 12, "end": 46, "what": "bright groove (no 8-bar builds or comic break in the take)" },
+  { "id": "M3", "start": 46, "end": 58, "what": "the same groove (the take has no separate chorus)" },
+  { "id": "M4", "start": 58, "end": 72, "what": "hard stop on 58, silence to 60, dark drone + heartbeat + ticks, thud 66, sub hit 68, near silence" },
+  { "id": "M5", "start": 72, "end": 76, "what": "fade to silence, 1-bar riser 74-76, DROP on 76" },
+  { "id": "M6", "start": 76, "end": 110, "what": "driving tech groove" },
+  { "id": "M7", "start": 110, "end": 116, "what": "bass + tick for 2 bars (110-114), band back 114-116" },
+  { "id": "M8", "start": 116, "end": 126, "what": "high-pass build 116-122, LANDING on 122 (sub hit, full band)" },
+  { "id": "M9", "start": 126, "end": 134, "what": "held chord on 126, clean ring-out, silent from 133.5" }
+ ]
+}

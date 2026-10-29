@@ -1,0 +1,71 @@
+{
+ "key": "0e387b8ef2abeb3e",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Whoever holds the Satchel holds everything inside.",
+ "prev": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+ "next": "Mint one on Near, and it gets its own Bitcoin, Ethereum and Solana addresses.",
+ "final": {
+  "id": "V04",
+  "scene": "H2",
+  "text": "Whoever holds the Satchel holds everything inside.",
+  "say": "Whoever holds the Satchel holds everything inside.",
+  "file": "v2/vo/V04.mp3",
+  "duration": 3.32,
+  "words": [
+   {
+    "text": "Whoever",
+    "start": 0.06,
+    "end": 0.4
+   },
+   {
+    "text": "holds",
+    "start": 0.5,
+    "end": 0.78
+   },
+   {
+    "text": "the",
+    "start": 0.82,
+    "end": 0.94
+   },
+   {
+    "text": "Satchel",
+    "start": 1.02,
+    "end": 1.5
+   },
+   {
+    "text": "holds",
+    "start": 1.7,
+    "end": 1.94
+   },
+   {
+    "text": "everything",
+    "start": 2.18,
+    "end": 2.64
+   },
+   {
+    "text": "inside.",
+    "start": 2.7,
+    "end": 3.26
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Whoever holds the satchel holds everything inside"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

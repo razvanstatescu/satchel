@@ -1,0 +1,5 @@
+{"payer":"2UWuPRCUZHgDt4PdiarRx8YPBD5gUMaVA5EcPeg1sVzL","payerLamports":5079099235958,"rentMin0":650240}
+{"label":"new recipient, amount = rentMin - 1","lamports":650239,"err":{"InsufficientFundsForRent":{"account_index":1}}}
+{"label":"new recipient, amount = rentMin","lamports":650240,"err":null}
+{"label":"sender left with 1..rentMin-1 lamports (non-zero, below rent)","lamports":5079099229958,"err":{"InsufficientFundsForRent":{"account_index":0}}}
+{"label":"sender drained to exactly 0 (Max = balance - fee)","lamports":5079099230958,"err":null}

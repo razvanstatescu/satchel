@@ -1,0 +1,90 @@
+{
+ "text": "Stick it on. Hand it over.\n\nSatchel keeps the receipts.\n\nAnd there's no admin key. Not even ours. So it can't sign anything off the record.",
+ "model": "eleven_v4",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "voices": {
+  "sarah": {
+   "id": "EXAVITQu4vr4xnSDxMaL",
+   "why": "premade; \"Mature, Reassuring, Confident\": young adult, warm and mature, professional",
+   "file": "notes/probe/v3-voice-sarah.mp3",
+   "durationSec": 10,
+   "words": 26,
+   "spanSec": 10.08,
+   "wpmOverall": 155,
+   "wpmArticulation": 161,
+   "pauses": [
+    "over.|0.40"
+   ],
+   "notEvenOurs": {
+    "pauseBefore": 0.24,
+    "durSec": 1.04
+   },
+   "wpmOffTarget": 0,
+   "heard": "Stick it on. Hand it over. Satchel keeps the receipts. And there's no admin key, not even ours, so it can't sign anything off the record",
+   "sttExact": true
+  },
+  "bella": {
+   "id": "hpp4J3VqNfWAUOO0d1Us",
+   "why": "premade; \"Professional, Bright, Warm\": polished narrative quality",
+   "file": "notes/probe/v3-voice-bella.mp3",
+   "durationSec": 9.6,
+   "words": 26,
+   "spanSec": 9.68,
+   "wpmOverall": 161,
+   "wpmArticulation": 161,
+   "pauses": [],
+   "notEvenOurs": {
+    "pauseBefore": 0.16,
+    "durSec": 1.12
+   },
+   "wpmOffTarget": 6,
+   "heard": "Stick it on, hand it over. Satchel keeps the receipts, and there's no admin key, not even ours, so it can't sign anything off the record",
+   "sttExact": true
+  },
+  "angela": {
+   "id": "PT4nqlKZfc06VW1BuClj",
+   "why": "professional; \"Friendly and warm\", middle-aged, made for apps and explainers",
+   "file": "notes/probe/v3-voice-angela.mp3",
+   "durationSec": 9.76,
+   "words": 26,
+   "spanSec": 9.84,
+   "wpmOverall": 159,
+   "wpmArticulation": 182,
+   "pauses": [
+    "over.|0.56",
+    "receipts.|0.40",
+    "key.|0.32"
+   ],
+   "notEvenOurs": {
+    "pauseBefore": 0.32,
+    "durSec": 1.16
+   },
+   "wpmOffTarget": 4,
+   "heard": "Stick it on. Hand it over. Satchel keeps the receipts, and there's no admin key, not even ours, so it can't sign anything off the record",
+   "sttExact": true
+  },
+  "chris": {
+   "id": "iP95p4xoKVk53GoZ742B",
+   "why": "premade; \"Charming, Down-to-Earth\": the male option with a natural wry warmth",
+   "file": "notes/probe/v3-voice-chris.mp3",
+   "durationSec": 9.12,
+   "words": 26,
+   "spanSec": 9.2,
+   "wpmOverall": 170,
+   "wpmArticulation": 177,
+   "pauses": [
+    "receipts.|0.40"
+   ],
+   "notEvenOurs": {
+    "pauseBefore": 0.08,
+    "durSec": 1.2
+   },
+   "wpmOffTarget": 15,
+   "heard": "Stick it on. Hand it over. Satchel keeps the receipts, and there's no admin key, not even ours, so it can't sign anything off the record",
+   "sttExact": true
+  }
+ }
+}

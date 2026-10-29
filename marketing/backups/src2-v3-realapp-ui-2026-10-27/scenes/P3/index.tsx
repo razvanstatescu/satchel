@@ -1,0 +1,327 @@
+import { AbsoluteFill, interpolate, Sequence, useCurrentFrame } from "remotion";
+import { C, type Chain } from "../../brand/tokens";
+import { boxCenter, ReceiveScreen, SEND_FORM_LAYOUT, SEND_LAYOUT, type SignStage, SIGNING_LAYOUT, SendScreen, SigningScreen, WALLET_LAYOUT, WalletApproveSheet } from "../../components/ui";
+import { Hand } from "../../illustration/characters";
+import { CoinSticker, ToastSticker } from "../../illustration/props";
+import { getScene } from "../../lib/timeline";
+import { Sfx } from "../../lib/Sfx";
+import { clamp, EASE2, flickAngle, pressAt, slapAt, SPRING2 } from "../../motion";
+import { P2_CAPTION_END, P2_CLOCK, P2T } from "../P2";
+import {
+  CaptionAt,
+  CHAINS3,
+  charmBlink,
+  charmPoint,
+  charmSpring,
+  type CharmSlot,
+  ease,
+  fr,
+  FPS,
+  lerp,
+  YoursSticker,
+  PagePush,
+  Phone,
+  PHONE,
+  releaseSwing,
+  sp,
+  type TagState,
+  TagsLayer,
+  ui,
+  WorldCard,
+} from "../P1/stage";
+
+/**
+ * P3 Send (24–33 s, V07 "Then send from it, on all three chains." + V08 "Approve in your NEAR wallet, and NEAR Chain
+ * Signatures signs a native transaction."). Opens on P2's last frame (same shot).
+ *   1. The phone pushes to "Send Bitcoin": 0.0100 BTC to bc1q…y8sd, "Network fee ~282 sats · paid by this Satchel".
+ *      On "all three chains" the charms answer in reaction order (SOL, ETH, BTC).
+ *   2. alice presses "Send 0.0100 BTC" into its shadow; the neutral "Your NEAR wallet" sheet slides up; she presses
+ *      Approve on "Approve…"; "Approved ✓"; the sheet drops.
+ *   3. The tracker: "Approved in your wallet ✓" → "Signing with NEAR's signer network · Usually about 10 seconds"
+ *      (frozen pulse; the timer jump-cuts 0:03 → 0:09) → "Signed" → "Broadcast to Bitcoin ✓" on "signs a native…".
+ *   4. The BTC charm flicks a coin off frame and the "Sent 0.0100 BTC" toast slaps in; then two quick flashes:
+ *      "Sent 0.05 ETH" (ETH flicks) and "Sent 1.25 SOL" (SOL flicks fastest). Each tag slaps to its new balance.
+ * Captions "Send on all three." → "NEAR Chain Signatures signs."
+ */
+
+const sc = getScene("P3");
+const W7 = (prefix: string) => fr(sc.wordAt("V07", prefix));
+const W8 = (prefix: string) => fr(sc.wordAt("V08", prefix));
+const P3_CLOCK = P2_CLOCK + P2T.end;
+
+const AFTER: Record<Chain, string> = { btc: "0.0412", evm: "0.85", sol: "12.4" };
+const FILL: Record<Chain, string> = { btc: "0.0513", evm: "0.90", sol: "13.65" };
+const SENT: Record<Chain, string> = { btc: "Sent 0.0100 BTC", evm: "Sent 0.05 ETH", sol: "Sent 1.25 SOL" };
+
+export const P3T = (() => {
+  const send = W7("send");
+  const all = W7("all");
+  const chains = W7("chains");
+  const approve = W8("Approve");
+  const nearSig = fr(sc.word("V08", 6)); // the second "NEAR" ("…and NEAR Chain Signatures")
+  const signatures = W8("Signatures");
+  const signs = W8("signs");
+  const native = W8("native");
+  const transaction = W8("transaction");
+  const push1 = 2;
+  const wave = [all, all + 4, all + 8]; // SOL, ETH, BTC answer "all three" in reaction order
+  const pressReview = all - 8; // step 1 (form) → step 2 (review) before "all three chains"
+  const review = pressReview + 3;
+  const pressSend = Math.round((chains + approve) / 2) - 8;
+  const walletCta = pressSend + 3;
+  const sheetUp = pressSend + 6;
+  const pressApprove = approve + 8;
+  const approved = pressApprove + 3;
+  const sheetDown = approved + 9;
+  const push2 = sheetDown + 6;
+  const jump = signatures; // the timer jump-cut 0:03 → 0:09
+  const signed = signs - 4;
+  const sent = native - 6;
+  // flicks: start of the wind-up; the coin launches 6 f later (SOL: 4 f)
+  const flicks = { btc: native - 6, evm: transaction - 3, sol: transaction + 11 };
+  return { pressReview, review, send, all, chains, approve, nearSig, signatures, signs, native, transaction, push1, wave, pressSend, walletCta, sheetUp, pressApprove, approved, sheetDown, push2, jump, signed, sent, flicks, cap1: send - 4, cap2: nearSig - 4, end: fr(sc.duration) };
+})();
+const T = P3T;
+const launchOf = (c: Chain) => T.flicks[c] + (c === "sol" ? 4 : 6);
+
+// taps land on each button's right part so its label stays readable (layout maps: screen px)
+const tapOn = (b: { x: number; y: number; w: number; h: number }, fx = 0.82) => ui(b.x + b.w * fx, boxCenter(b).y + 2);
+const REVIEW_TAP = tapOn(SEND_FORM_LAYOUT.button);
+const SEND_TAP = tapOn(SEND_LAYOUT.button);
+const APPROVE_TAP = tapOn(WALLET_LAYOUT.approve, 0.85);
+
+// toast stack (right column)
+const TOAST = { x: 1566, y: [470, 560, 650], scale: 1.36, h: 54 * 1.36 } as const;
+
+export default function P3() {
+  const f = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ background: C.ground }}>
+      <P3World f={f} />
+      <P3Captions />
+      <P3Sound />
+    </AbsoluteFill>
+  );
+}
+
+// ── the world ───────────────────────────────────────────────────────────────────────────────────────────────────
+function P3World({ f }: { f: number }) {
+  // camera: a slow push onto the phone through the approval and the signing, released for the flicks
+  const push = 0.045 * ease(f, T.pressSend - 10, T.push2 + 10, 0, 1, EASE2.pan) * (1 - ease(f, T.sent - 8, T.sent + 8, 0, 1, EASE2.pan));
+  const punch = f >= T.jump ? 0.03 * (1 - ease(f, T.jump, T.jump + 10, 0, 1, EASE2.out)) : 0; // sells the jump-cut
+  const cam = 1 + push + punch;
+  const focus = ui(boxCenter(SIGNING_LAYOUT.stepper).x, boxCenter(SIGNING_LAYOUT.stepper).y);
+
+  const p1 = sp(f, T.push1, SPRING2.land);
+  const p2 = sp(f, T.push2, SPRING2.land);
+  const sheet = f < T.sheetDown ? sp(f, T.sheetUp, SPRING2.land) : 1 - ease(f, T.sheetDown, T.sheetDown + 8, 0, 1, EASE2.fall);
+  const sendPress = pressAt(f, T.pressSend, 4, FPS).pressed;
+  const approvePress = pressAt(f, T.pressApprove, 4, FPS).pressed;
+  const stage: SignStage = f < T.signed ? "signing" : f < T.sent ? "broadcasting" : "sent";
+  const elapsed = f < T.jump ? 3 : 9;
+
+  const reviewPress = pressAt(f, T.pressReview, 4, FPS).pressed;
+  const pStep = sp(f, T.review, SPRING2.land);
+  const form = <SendScreen chain="btc" step={1} press={reviewPress} />;
+  const reviewScreen = (
+    <SendScreen
+      chain="btc"
+      step={2}
+      cta={f >= T.walletCta ? "wallet" : "idle"}
+      press={sendPress}
+      spin={(f % 24) / 24}
+      overlay={sheet > 0.001 ? <WalletApproveSheet open={sheet} press={approvePress} approved={f >= T.approved} chain="btc" /> : undefined}
+    />
+  );
+  const send = f < T.review ? form : <PagePush p={pStep} from={form} to={reviewScreen} />;
+  // the tracker in a taller box: its pinned footer (the coral "Done" once sent) sits below the phone's screen, so the
+  // frame keeps one coral (the card band); the receipt itself is the content
+  const tracker = (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 390, height: 844 + 200 }}>
+      <SigningScreen chain="btc" stage={stage} elapsedSec={elapsed} pulse={(f % 30) / 30} spin={(f % 24) / 24} />
+    </div>
+  );
+
+  const charms = sendCharms(f);
+  const tags: TagState[] = CHAINS3.map((c) => {
+    const L = launchOf(c);
+    return { amount: f < L ? FILL[c] : AFTER[c], amountPop: f >= L ? 1 - sp(f, L, SPRING2.quick) : 0 };
+  });
+  return (
+    <AbsoluteFill>
+      <AbsoluteFill style={{ scale: `${cam}`, transformOrigin: `${focus.x}px ${focus.y}px` }}>
+        <Phone>
+          {f < T.push2 ? <PagePush p={p1} from={<ReceiveScreen chain="btc" incoming="received" copied />} to={send} /> : <PagePush p={p2} from={send} to={tracker} />}
+        </Phone>
+        <SendHand f={f} />
+      </AbsoluteFill>
+      <WorldCard charms={charms} chips={CHAINS3.map((c) => ({ chain: c, amount: f < launchOf(c) ? FILL[c] : AFTER[c] }))}>
+        <YoursSticker />
+      </WorldCard>
+      <TagsLayer tags={tags} angles={charms.map((ch) => ch.angle ?? 0)} />
+      <FlickedCoins f={f} />
+      <Toasts f={f} />
+    </AbsoluteFill>
+  );
+}
+
+// ── alice's hand: Send, then Approve ────────────────────────────────────────────────────────────────────────────
+function SendHand({ f }: { f: number }) {
+  // Review (step 1) → Send (step 2) → Approve (the wallet sheet): the finger glides between the three
+  const taps = [
+    { at: T.pressReview, p: REVIEW_TAP },
+    { at: T.pressSend, p: SEND_TAP },
+    { at: T.pressApprove, p: APPROVE_TAP },
+  ];
+  const arrive = T.pressReview - 14;
+  if (f < arrive) return null;
+  const leave = T.pressApprove + 8;
+  const outP = ease(f, leave, leave + 10, 0, 1, EASE2.fall);
+  if (outP >= 1) return null;
+  const inP = sp(f, arrive, SPRING2.land);
+  const away = { x: 560, y: 330 };
+  // between taps it eases back a little (rests off the buttons), then lands on the next one
+  let base = taps[0].p;
+  let rest = 0;
+  for (let i = 1; i < taps.length; i++) {
+    const m = sp(f, taps[i].at - 14, SPRING2.land);
+    base = { x: lerp(base.x, taps[i].p.x, m), y: lerp(base.y, taps[i].p.y, m) };
+    rest = Math.max(rest, interpolate(f, [taps[i - 1].at + 4, taps[i - 1].at + 12, taps[i].at - 14, taps[i].at - 6], [0, 1, 1, 0], clamp));
+  }
+  const pressed = Math.max(...taps.map((t) => pressAt(f, t.at, 4, FPS).pressed));
+  const hover = Math.max(...taps.map((t) => (f < t.at ? 1 - ease(f, t.at - 4, t.at, 0, 1, EASE2.fall) : 0) * (f > t.at - 12 ? 1 : 0)));
+  const x = base.x + away.x * (1 - inP) + away.x * outP + 90 * rest;
+  const y = base.y + away.y * (1 - inP) + away.y * outP + 70 * rest - 16 * hover + 4 * PHONE.k * pressed;
+  return <Hand pose="tap" sleeve="alice" k={1.55} x={x} y={y} angle={-52} press={pressed} arm={8} tagTilt={-2} />;
+}
+
+// ── the charms ──────────────────────────────────────────────────────────────────────────────────────────────────
+function sendCharms(f: number): CharmSlot[] {
+  const order: Chain[] = ["sol", "evm", "btc"];
+  return CHAINS3.map((c, i) => {
+    const waveAt = T.wave[order.indexOf(c)];
+    const wave = releaseSwing(c, f, waveAt, i === 1 ? -9 : 9);
+    const hop = f >= waveAt ? -10 * Math.sin(Math.PI * Math.min(1, (f - waveAt) / 8)) : 0;
+    // the flick: wind back, snap toward the right (mirrored kit flickAngle: positive CSS angles swing the bob left)
+    const S = T.flicks[c];
+    const speed = c === "sol" ? 1.5 : 1;
+    const flick = f >= S ? -flickAngle((f - S) * speed, FPS, charmSpring(c)) : 0;
+    // watching the phone while alice sends and signs, then back to us after their own throw
+    const watch = interpolate(f, [T.pressSend - 8, T.pressSend - 2], [0, 1], clamp) * (1 - ease(f, S - 2, S + 2, 0, 1, EASE2.out));
+    const squint = interpolate(f - S, [0, 3, 5, 6], [0, 0.55, 0.55, 0], clamp);
+    const joy = interpolate(f - launchOf(c), [2, 5, 18, 22], [0, 1, 1, 0], clamp);
+    const waveJoy = interpolate(f - waveAt, [0, 2, 8, 11], [0, 1, 1, 0], clamp);
+    const blink = charmBlink(c, f + P3_CLOCK, [], "p1");
+    // the jump-cut gag: after the cut (0:03 → 0:09) the waiting charms have visibly shifted (ETH tilts its head, SOL
+    // has gone heavy-lidded, BTC hasn't moved: it's heavy and patient); "Signed" perks them up
+    const waited = f >= T.jump && f < T.signed ? 1 : 0;
+    const perk = interpolate(f - T.signed, [0, 2, 7, 10], [0, 1, 1, 0], clamp);
+    const bored = c === "sol" ? 0.42 * waited : 0;
+    return {
+      angle: wave + flick,
+      dy: hop,
+      face: {
+        blink: Math.max(blink * (1 - joy) * (1 - perk), squint, bored),
+        joy: Math.max(joy, waveJoy),
+        wide: 0.6 * perk,
+        tilt: c === "evm" ? 6 * waited : 0,
+        smile: 1 + 0.5 * Math.max(joy, waveJoy) - (c === "sol" ? 0.35 * waited : 0),
+        look: { x: -6 * watch + (c === "sol" ? 1.5 * waited : 0), y: -1.5 * watch - (c === "sol" ? 2 * waited : 0) },
+      },
+    };
+  });
+}
+
+// ── coins flicked off frame ────────────────────────────────────────────────────────────────────────────────────
+function FlickedCoins({ f }: { f: number }) {
+  return (
+    <>
+      {CHAINS3.map((c, i) => {
+        const L = launchOf(c);
+        const dur = c === "sol" ? 6 : 8;
+        if (f < L || f > L + dur) return null;
+        const at = (q: number) => {
+          const p = interpolate(q, [L, L + dur], [0, 1], clamp);
+          // out through its toast's slot: the "Sent" receipt slaps in as the coin zips past (and hides its exit)
+          const from = charmPoint(i, -20, "coin");
+          const to = { x: 2030, y: TOAST.y[i] + TOAST.h / 2 };
+          const arc = (i === 2 ? 18 : 32) * Math.sin(Math.PI * p);
+          return { x: lerp(from.x + 24, to.x, p), y: lerp(from.y - 12, to.y, EASE2.out(p)) - arc, p };
+        };
+        const a = at(f);
+        const b = at(f + 1);
+        const v = Math.hypot(b.x - a.x, b.y - a.y);
+        const along = 1 + Math.min(0.25, v / 500);
+        const ang = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+        const size = 70;
+        return (
+          <div key={c} style={{ position: "absolute", left: a.x - size / 2, top: a.y - size / 2, width: size, height: size, transform: `rotate(${ang}deg) scale(${along}, ${1 / along}) rotate(${-ang}deg) rotate(${-200 * a.p}deg)` }}>
+            <CoinSticker chain={c} size={size} k={1.9} flip={30 * Math.sin(a.p * 6)} drop={0.8} />
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── the Sent toasts: BTC, then two quick flashes (ETH, SOL) ────────────────────────────────────────────────────
+function Toasts({ f }: { f: number }) {
+  return (
+    <>
+      {CHAINS3.map((c, i) => {
+        const at = launchOf(c) + 2; // slap starts; contact 4 f later
+        if (f < at) return null;
+        const s = slapAt(f - at, FPS, 0, { from: 1.16, squash: 0.07, drop: 0 }); // a smaller overshoot: it lands near the frame edge
+        const check = interpolate(f - at, [4, 12], [0, 1], clamp);
+        return (
+          <div key={c} style={{ position: "absolute", left: TOAST.x, top: TOAST.y[i], opacity: s.opacity, scale: `${s.sx} ${s.sy}`, transformOrigin: "35% 50%" }}>
+            <ToastSticker text={SENT[c]} check={check} scale={TOAST.scale} tilt={i === 1 ? 1.5 : -1.5} />
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ── captions ────────────────────────────────────────────────────────────────────────────────────────────────────
+function P3Captions() {
+  return (
+    <>
+      {/* P2's last caption, held until "Send on all three." slaps over it (the same shot across the cut) */}
+      <Sequence from={-60} durationInFrames={60 + T.cap1} layout="none">
+        <CaptionAt text={P2_CAPTION_END.text} seed={P2_CAPTION_END.seed} />
+      </Sequence>
+      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1} layout="none">
+        <CaptionAt text="Send on all three." seed="p3-send" />
+      </Sequence>
+      <Sequence from={T.cap2} layout="none">
+        <CaptionAt text={"NEAR Chain\nSignatures signs."} seed="p3-signs" />
+      </Sequence>
+    </>
+  );
+}
+
+// ── sound ───────────────────────────────────────────────────────────────────────────────────────────────────────
+function P3Sound() {
+  const at = (frame: number) => frame / FPS;
+  return (
+    <>
+      <Sfx name="paper-slide" at={at(T.push1 + 5)} align="peak" gainDb={-8} />
+      <Sfx name="charm-jingle" at={at(T.wave[1] + 2)} align="peak" gainDb={-2} />
+      <Sfx name="button-thock" at={at(T.pressSend)} gainDb={-3} />
+      <Sfx name="whoosh-soft" at={at(T.sheetUp + 5)} align="peak" gainDb={-8} />
+      <Sfx name="button-thock" at={at(T.pressApprove)} gainDb={-4} />
+      <Sfx name="pop" at={at(T.approved)} gainDb={-6} />
+      <Sfx name="paper-slide" at={at(T.push2 + 5)} align="peak" gainDb={-10} />
+      <Sfx name="tick-soft" at={at(T.jump)} gainDb={-2} />
+      <Sfx name="pop-high" at={at(T.signed)} gainDb={-8} />
+      <Sfx name="success-marimba" at={at(T.sent)} gainDb={-6} />
+      {CHAINS3.map((c) => (
+        <Sfx key={`z${c}`} name="whoosh-zip" at={at(launchOf(c) + 2)} align="peak" gainDb={-11} />
+      ))}
+      {CHAINS3.map((c) => (
+        <Sfx key={`s${c}`} name="sticker-slap" at={at(launchOf(c) + 6)} gainDb={-11} />
+      ))}
+    </>
+  );
+}

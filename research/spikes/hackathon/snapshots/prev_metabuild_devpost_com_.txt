@@ -1,0 +1,254 @@
+NEAR MetaBUILD III Hackathon: Our world has changed. Meet new challenges in a way a true buidler would do – hack your way to the top.  Build the next big thing on NEAR. - Devpost
+We've detected that you are using an unsupported browser.  Please
+upgrade your browser
+to Internet Explorer 10 or higher.
+Log in
+Sign up
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Log in
+Sign up
+Descend
+Overview
+My projects
+Participants (3054)
+Resources
+Rules
+Project gallery
+Updates
+Discussions
+NEAR MetaBUILD III Hackathon
+Our world has changed. Meet new challenges in a way a true buidler would do – hack your way to the top.  Build the next big thing on NEAR.
+This hackathon has ended
+Find more hackathons
+View the winners
+Who can participate
+Ages 18+ only
+Specific
+countries/territories excluded
+×
+Specific countries/territories excluded
+Afghanistan
+Belarus
+Bolivia
+Brazil
+Cambodia
+Crimea
+Cuba
+Eritrea
+Iran Islamic Republic of
+Korea Democratic People's Republic of
+Lao People's Democratic Republic
+Nicaragua
+Palestinian Territory Occupied
+Quebec
+Russia
+Sudan
+Syrian Arab Republic
+Venezuela
+Yemen
+Zimbabwe
+No countries/territories match your search.
+View full rules
+View schedule
+Sep 23 – Nov 21, 2022
+Online
+Public
+$940,000
+in prizes
+3054
+participants
+NEAR Protocol
+Managed by Devpost
+Blockchain
+Web
+MetaBUILD will take you from idea to market ready in 8 weeks.
+Write, test and deploy scalable decentralized applications on the most developer-friendly blockchain using the languages you already know – even Javascript.
+NEAR is here to help reimagine your world and empower users to have full control and responsibility over their data. Build simple, scalable and secure dApps, DeFi, Web3, Gaming, Digital Art/Collectibles, infrastructure apps and tools, or migrate an existing EVM app to NEAR.
+Join the NEAR MetaBUILD Hackathon and start coding.
+Stay tuned for online meet-ups, educational workshops and mentor days!
+Requirements
+What to Build
+Build an app using NEAR in one of the below tracks.
+Native – For brand new projects. Only projects built completely during the submission period will be considered.
+Web2 to Web3 – For Web2 projects making the switch to Web3. Only for projects that are on the market already, but during this hackathon, added blockchain functionality.
+What to Submit
+Open source code repository. Provide a URL to your open source code repository for judging and testing. Your code must have an open source license like one of the below:
+MIT - https://opensource.org/licenses/MIT
+Apache 2.0 - https://opensource.org/licenses/Apache-2.0
+3-Clause BSD - https://opensource.org/licenses/BSD-3-Clause
+Demo Video. Include a video (under 3 minutes) that demonstrates your submission. Videos must be uploaded to YouTube, Vimeo, or Facebook Video and made public.
+Select Prize Tracks. Identify which track your project fits into and if you used and sponsor tools.
+Hackathon Sponsors
+Prizes
+$940,000
+in prizes
+Native Track Prizes | First Place
+1 winner
+$100,000 USD in NEAR
+Web2 to Web3 Track Prizes | First Place
+1 winner
+$100,000 USD in NEAR
+Native Track Prizes | Second Place
+1 winner
+$80,000 USD in NEAR
+Web2 to Web3 Track Prizes | Second Place
+1 winner
+$80,000 USD in NEAR
+Native Track Prizes | Third Place
+1 winner
+$50,000 USD in NEAR
+Web2 to Web3 Track Prizes | Third Place
+1 winner
+$50,000 USD in NEAR
+Native Track Prizes | Honorable Mentions
+18 winners
+$20,000 USD in NEAR
+Web2 to Web3 Track Prizes | Honorable Mentions
+6 winners
+$20,000 USD in NEAR
+Devpost Achievements
+Submitting to this hackathon could earn you:
+Judges
+Illia Polosukhin
+Co-Founder, NEAR Inc
+Marieke Flament
+CEO, NEAR Foundation
+Alex Shevchenko
+CEO, Aurora Labs
+Julie Bissinger
+CEO, Pagoda
+Sasha Hudzilin
+Co-creator, HumanGuild.io
+Carolin Wend
+COO, Mintbase
+Vadim Ilin
+Developer Relations Engineer, Pagoda
+Vlad Frolov
+Developer Relations Engineer, Pagoda
+Ben Kurrek
+Developer Relations Engineer, Pagoda
+Dorian Crutcher
+Developer Relations Engineer, Pagoda
+Guillermo Gallardo
+Developer Relations Engineer, Pagoda
+Max Harpunsky
+Developer Relations Engineer, Pagoda
+Maria Yarotska
+Hackathon Coordinator, Pagoda
+John Wang
+Blockchain Engine Labs, CEO
+Robert Yan
+Technical Due Diligence, MetaWeb VC
+Claudio Cossio
+Co-founder, Meta Pool
+Ken Miyachi
+Developer Relations Engineer, NEAR Foundation
+Damián Parrino
+Developer Relations Engineer, Pagoda
+Boris Polania
+Developer Relations Engineer, Aurora
+Judging Criteria
+Technological Implementation
+Does the interaction with NEAR demonstrate quality software development?
+Design
+Is the user experience and design of the project well thought out?
+Potential Impact
+Is the Project Open Source and how big of an impact could the project have on the NEAR ecosystem?
+Quality of the Idea
+How creative and unique is the project?
+Project Sustainability
+Is the plan for the Project thought out and realistic?
+Questions?
+Email the hackathon manager
+Tell your friends
+This site is protected by reCAPTCHA and the Google
+Privacy Policy
+and
+Terms of Service
+apply.
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+Twitter
+Discord
+Facebook
+LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service

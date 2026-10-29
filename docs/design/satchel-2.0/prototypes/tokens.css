@@ -1,0 +1,142 @@
+/* Satchel 2.0 prototype tokens (design lead, 2026-10-26).
+   Mirrors the planned apps/web globals.css (design-system-impl.md §1): same token names, same light-dark() mechanism.
+   Prototype-only differences: fonts load from assets/fonts (next/font in the app); plain CSS stands in for Tailwind's
+   @theme, so the composite and type tokens are custom properties here and the utilities live in components.css.
+
+   THEME (R2 is still open for Razvan; both answers work with this file):
+   - (a) brand 2.0, the default below: no data-theme = System (follows the OS); data-theme="day" | "night" forces one.
+   - (b) D-42 "Day whatever the OS": change the one line marked (b) to  :root { color-scheme: light; }  and let the
+         stored choice "system" set data-theme="system" (the rule for it is already here).
+   - Prototype pages force Day by default through assets/theme.js (?theme=day|night|system), as the brief asks.
+   - Islands that must keep one scheme (the coral final CTA, illustrations) use data-scheme="day" | "night".        */
+
+@font-face { font-family: "Funnel Display"; src: url("assets/fonts/FunnelDisplay.ttf") format("truetype");
+  font-weight: 300 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "Onest"; src: url("assets/fonts/Onest.ttf") format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Geist Mono"; src: url("assets/fonts/GeistMono.ttf") format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: swap; }
+
+/* 1. Colour: brand tokens.json (Day, Night) + the architect's derived tokens (§1.4). Nothing else. */
+:root, [data-scheme] {
+  --ground: light-dark(#f6f5fb, #120c26);
+  --surface: light-dark(#ffffff, #1c1538);
+  --surface-sunken: light-dark(#eceaf4, #29214b);
+  --line: light-dark(#e2dfee, #352c5c);
+  --line-strong: light-dark(#7f7999, #8a82ae);
+  --ink: light-dark(#1d1340, #f4f2ff);
+  --ink-muted: light-dark(#5e5776, #b7b0d1);
+  --brand: #ff5c4d;
+  --brand-deep: light-dark(#d9402f, #ff7a6c);
+  --brand-soft: light-dark(#ffe3df, #3a1f33);
+  --on-brand: #1d1340;
+  --link: light-dark(#c7301f, #ff8a7e);
+  --focus: light-dark(#1d1340, #ff8a7e);
+  --lemon: #ffd84d;
+  --sky: #8fd3ff;
+  --success: light-dark(#0b6e54, #4fd9b0);
+  --frozen: light-dark(#2a63c7, #8db8ff);
+  --danger: light-dark(#c61f45, #ff7a92);
+  --chain-btc: light-dark(#c96f00, #f7931a);
+  --chain-evm: light-dark(#5560b0, #a3abe0);
+  --chain-sol: light-dark(#8447d6, #c08cff);
+  /* derived (design-system-impl §1.4) */
+  --brand-hover: #ff6b5d;
+  --brand-line: light-dark(#d9402f, #ff5c4d);
+  --sticker-line: light-dark(#1d1340, #8a82ae);   /* R6: Night outline = line-strong, 4.85:1 on ground */
+  --sticker-shade: light-dark(#1d1340, #000000);
+  --overlay-shade: light-dark(rgb(29 19 64 / 0.18), rgb(0 0 0 / 0.55));
+  --scrim: light-dark(rgb(29 19 64 / 0.4), rgb(0 0 0 / 0.4));
+  --overlay-edge: light-dark(transparent, #352c5c);
+  /* aliases the Tailwind @theme maps (same names, minus the --color- prefix) */
+  --toast: var(--brand-soft);
+  --selected: var(--brand-soft);
+  --skeleton: var(--surface-sunken);
+  --disabled: var(--surface-sunken);
+  --on-disabled: var(--line-strong);
+  --inverse: var(--ink);
+  --on-inverse: var(--ground);
+  /* illustration fills: fixed in both themes (design-system-impl §6) */
+  --charm-btc: #f7931a; --charm-evm: #a3abe0; --charm-sol: #c08cff;
+}
+:root { color-scheme: light dark; }                                   /* (a) System: follows the OS, no JS needed */
+:root[data-theme="system"] { color-scheme: light dark; }               /* used by (b) only */
+:root[data-theme="day"], [data-scheme="day"] { color-scheme: light; }
+:root[data-theme="night"], [data-scheme="night"] { color-scheme: dark; }
+
+/* 2. Composites (Tailwind @theme inline in the app) */
+:root, [data-scheme] {
+  --shadow-sticker: 0 4px 0 var(--sticker-shade);
+  --shadow-sticker-lift: 0 6px 0 var(--sticker-shade);
+  --shadow-pressed: 0 0 0 var(--sticker-shade);
+  --shadow-overlay: 0 16px 48px var(--overlay-shade);
+}
+:root {
+  --font-display: "Funnel Display", "Onest", system-ui, sans-serif;
+  --font-sans: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* 3. Shape */
+  --radius-sm: 12px; --radius-md: 18px; --radius-card: 28px; --radius-pill: 999px;
+  --outline: 3px;                       /* sticker outline; 2px when the sticker is <= 52px tall */
+
+  /* 4. Space (brand space-1…12) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+  --space-16: 64px; --space-24: 96px; --space-32: 128px;   /* landing section rhythm (design-spec §3.2) */
+
+  /* 5. Layout (bp-* are media-query values; CSS can't use vars in @media, so components.css repeats them) */
+  --bp-sm: 480px; --bp-md: 768px; --bp-lg: 1024px; --bp-xl: 1280px;
+  --container-flow: 480px; --container-app: 1200px; --container-prose: 640px;
+  --gutter: 16px;                       /* 24 from md, 32 from lg (set in components.css) */
+  --topbar-h: 64px; --sidenav-w: 256px;
+
+  /* 6. Motion (design-system-impl §5; transform and opacity only) */
+  --ease-out: cubic-bezier(.2, 0, 0, 1);
+  --ease-in: cubic-bezier(.3, 0, 1, 1);
+  --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+  --ease-pop: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-swing: cubic-bezier(.37, 0, .63, 1);
+  --dur-press: 140ms; --dur-press-in: 70ms; --dur-fast: 150ms; --dur-base: 220ms; --dur-sheet: 320ms;
+
+  /* 7. Type (size / line-height / weight / tracking). Utilities .text-* in components.css carry the family. */
+  --text-balance-hero: 48px; --text-balance-hero--lh: 52px;      /* 800, -0.03em, display */
+  --text-balance-hero-sm: 38px; --text-balance-hero-sm--lh: 42px;
+  --text-title: 30px; --text-title--lh: 34px;                    /* 750, -0.02em, display */
+  --text-heading: 20px; --text-heading--lh: 26px;                /* 700, -0.01em, display */
+  --text-body: 16px; --text-body--lh: 24px;                      /* 400, sans */
+  --text-body-sm: 14px; --text-body-sm--lh: 20px;
+  --text-label: 15px; --text-label--lh: 20px;                    /* 600, sans */
+  --text-address: 13px; --text-address--lh: 18px;                /* 450, mono */
+  --text-button: 15px; --text-button-lg: 16px;                   /* 700, sans, lh 20 */
+  --text-caption: 13px; --text-caption--lh: 18px;                /* 500 (pills 600) */
+  --text-badge: 12px; --text-badge--lh: 16px;                    /* 700 */
+  --text-display: 40px; --text-display--lh: 42px;                /* landing H1, 800, -0.035em; 56 md, 72 xl */
+  --text-section: 32px; --text-section--lh: 34px;                /* landing H2, 800, -0.03em; 44 md */
+  --text-lead: 18px; --text-lead--lh: 28px;                      /* 20/30 md */
+}
+@media (min-width: 768px) {
+  :root { --gutter: 24px; --text-display: 56px; --text-display--lh: 56px; --text-section: 44px; --text-section--lh: 46px;
+    --text-lead: 20px; --text-lead--lh: 30px; }
+}
+@media (min-width: 1024px) { :root { --gutter: 32px; } }
+@media (min-width: 1280px) { :root { --text-display: 72px; --text-display--lh: 70px; } }
+
+/* 8. Base layer */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { background: var(--ground); color: var(--ink); }
+body { margin: 0; font-family: var(--font-sans); font-size: var(--text-body); line-height: var(--text-body--lh);
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+ul, ol { margin: 0; padding: 0; }
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+::selection { background: var(--brand); color: var(--on-brand); }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}

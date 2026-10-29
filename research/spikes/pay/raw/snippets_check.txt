@@ -1,0 +1,7 @@
+satchelEvents -> 4 events [{"tx":"ADFzVr5o9yCBD3rASyVywGJeRmsQxKGPY2Y5tjJfRN2a","block":274092360,"standard":"nep171","event":"nft_transfer"},{"tx":"ADFzVr5o9yCBD3rASyVywGJeRmsQxKGPY2Y5tjJfRN2a","block":274092360,"standard":"satchel","event":"signature_issued"},{"tx":"GUv6yR2DQdMGpai7992DRebY6knhWkevxBXwuUw9v2rc","block":274091855,"standard":"nep171","event":"nft_transfer"},{"tx":"GUv6yR2DQdMGpai7992DRebY6knhWkevxBXwuUw9v2rc","block":274091855,"standard":"satchel","event":"signature_issued"}]
+btcBalance sats -> 8980000293339
+ethBalanceWei -> 193392306133108250319783 ethNonce -> 0
+ethHistory -> 50 items
+solLamports -> 1 solSigs -> 20
+from1Click -> {"BTC":83463,"ETH":2465.47,"SOL":106.91,"NEAR":5.18,"USDC":0.999378} allNumbers true
+fromCoinGecko -> {"BTC":83455,"ETH":2465.82,"SOL":106.93,"NEAR":5.22,"USDC":0.999384} allNumbers true

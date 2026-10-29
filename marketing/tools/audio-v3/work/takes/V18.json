@@ -1,0 +1,106 @@
+{
+ "key": "4137626e52c664c2",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Every signature goes on the record, on Near, before Near's signer network makes it.",
+ "prev": "Satchel keeps the receipts.",
+ "next": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+ "final": {
+  "id": "V18",
+  "scene": "T1",
+  "text": "Every signature goes on the record, on NEAR, before NEAR's signer network makes it.",
+  "say": "Every signature goes on the record, on Near, before Near's signer network makes it.",
+  "file": "v2/vo/V18.mp3",
+  "duration": 5.75,
+  "words": [
+   {
+    "text": "Every",
+    "start": 0.1,
+    "end": 0.36
+   },
+   {
+    "text": "signature",
+    "start": 0.46,
+    "end": 0.96
+   },
+   {
+    "text": "goes",
+    "start": 1.1,
+    "end": 1.34
+   },
+   {
+    "text": "on",
+    "start": 1.38,
+    "end": 1.48
+   },
+   {
+    "text": "the",
+    "start": 1.52,
+    "end": 1.62
+   },
+   {
+    "text": "record,",
+    "start": 1.66,
+    "end": 2.08
+   },
+   {
+    "text": "on",
+    "start": 2.52,
+    "end": 2.68
+   },
+   {
+    "text": "NEAR,",
+    "start": 2.74,
+    "end": 3.08
+   },
+   {
+    "text": "before",
+    "start": 3.54,
+    "end": 3.92
+   },
+   {
+    "text": "NEAR's",
+    "start": 4.04,
+    "end": 4.36
+   },
+   {
+    "text": "signer",
+    "start": 4.44,
+    "end": 4.72
+   },
+   {
+    "text": "network",
+    "start": 4.8,
+    "end": 5.18
+   },
+   {
+    "text": "makes",
+    "start": 5.22,
+    "end": 5.48
+   },
+   {
+    "text": "it.",
+    "start": 5.54,
+    "end": 5.7
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Every signature goes on the record on NEAR before NEAR's signer network makes it"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

@@ -1,0 +1,72 @@
+{
+ "root0": "secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3",
+ "root1": "ed25519:6vSEtQxrQj6txUMh33WC4ERyCWmNMRTdufDWAaDY3Un2",
+ "vectors": [
+  {
+   "predecessor": "satchel.example.testnet",
+   "path": "satchel/1/evm",
+   "tweak": "fe2f71502c7726076e76912a09e73c856f719420cd5b196cbb676884dd384938",
+   "secp256k1_near": "secp256k1:amydARHfgNa4viJzVnexf4dkK39zV6Zb58Lwpy4RvLCkYCo2Bat4fVGWeiNmPdtm51CpjS9KjP7ixenSztKGDoZ",
+   "secp256k1_compressed": "021d206d588827f6e9e2950336ff5c33c0b81141083a43b9e403e1dccd53c2ead5",
+   "evm": "0x53f9e93e9cb431122872c3ee96848e97bff51c2a",
+   "btc_p2wpkh_testnet": "tb1qd9g8w875vjpyje6j8wlmtqtfz32aqataskyd48",
+   "ed25519_near": "ed25519:9Foi2ZkdoVDbZHPqC8ZSc2aqHJQJHxKLRXRQpnki5akZ",
+   "sol": "9Foi2ZkdoVDbZHPqC8ZSc2aqHJQJHxKLRXRQpnki5akZ"
+  },
+  {
+   "predecessor": "satchel.example.testnet",
+   "path": "satchel/1/btc",
+   "tweak": "08494c3a7dfb049f261f1405d7807406b2a74199ca9bb6c3cd34c9cc392ab695",
+   "secp256k1_near": "secp256k1:3TGqBkRYSwVNjcuw43Q1SUS1sKznwNCS7Tv97jK8vLTT7J2zvwrfMiDT9sACqmrGR93XcJUprX5oVsxhtVdEUXTn",
+   "secp256k1_compressed": "037ab0d767a8b45ab43b55ca0cf5a4c09b47a9ecc8b4c581b60b0ab56b83e66076",
+   "evm": "0xecac3a067ff709baa17ad0d694067ed697992971",
+   "btc_p2wpkh_testnet": "tb1qaanveslhw9mdcke8a3l0aqv5t9glfapwjfy8sd",
+   "ed25519_near": "ed25519:HZcwTUktCzfcDFjwP2Wpj7YUaEX7GZkV1r3PMJuLeWqN",
+   "sol": "HZcwTUktCzfcDFjwP2Wpj7YUaEX7GZkV1r3PMJuLeWqN"
+  },
+  {
+   "predecessor": "satchel.example.testnet",
+   "path": "satchel/1/sol",
+   "tweak": "766b6cb6cbc8e2b094efa558d810229177d1f5922b010cd186251aa099ffb527",
+   "secp256k1_near": "secp256k1:5KLCJroTkXS1NBecLqvY9f3L6wvXmLfzYWeZMc59cLi2W5EgaPrmDvpkcDieX7miC1QgnLnRrLq1GidieYbceci3",
+   "secp256k1_compressed": "02d7e03b706959fa1261e589e07c16618ef87e9d880923168b5928f84361d66b08",
+   "evm": "0x62a087ed0927c35935f39d728a8737fee6ad384c",
+   "btc_p2wpkh_testnet": "tb1qvr3g62spszpcnana3p2ayleetswpeuzdl8h7q8",
+   "ed25519_near": "ed25519:DvZuiQhGH32dTN5v8zRZRJJ4e5H4okwq6NjpfvoYbqGB",
+   "sol": "DvZuiQhGH32dTN5v8zRZRJJ4e5H4okwq6NjpfvoYbqGB"
+  },
+  {
+   "predecessor": "spike.satchel-spk-mpc-e9ea1a.testnet",
+   "path": "satchel/1/evm",
+   "tweak": "057276f42cf680d8e4cb80640ca0ec95ed44de26506d786342f7074d8c8bfcf2",
+   "secp256k1_near": "secp256k1:5MmZKamCJNNeBk3C7kpZDAoQynjJu9GqFEhnYsfAic6Q2GvdZ1eiePgto6osawezNAS5kNHmn8w3g8BZGmeaHd8v",
+   "secp256k1_compressed": "03d9fa4c35def6143692cced1d6737866592f6152b07c1aeef5fb5b341f45cec6c",
+   "evm": "0x6fafd4339ab28eb793b01c52a0f4d69123586e00",
+   "btc_p2wpkh_testnet": "tb1qvjpm7tngm59ctekq2z6rklfjyp88qj4n0y26tu",
+   "ed25519_near": "ed25519:CCVhSSnwVFQEPCL389cnU3kXcMBrgrr4AcU4t7e953SB",
+   "sol": "CCVhSSnwVFQEPCL389cnU3kXcMBrgrr4AcU4t7e953SB"
+  },
+  {
+   "predecessor": "spike.satchel-spk-mpc-e9ea1a.testnet",
+   "path": "satchel/1/btc",
+   "tweak": "e9de05a22aace9f2c2880284514c3b7a927f433324daddff58287f6495559ae7",
+   "secp256k1_near": "secp256k1:65W9wbjND2dyErH9kJCYMYGZMtRUqVPPzNcTLUj8qP9vGkeznG1zRLEJcTW2sT3zLk3yjuwfJayqPiraid7jgRma",
+   "secp256k1_compressed": "03fdf7c929338286076f54e518f4a370aeeb47f0d48e1fdebdc2e7a313ef709dbe",
+   "evm": "0x758da6a974caeb095fa72d60dca6b3aabdc82b08",
+   "btc_p2wpkh_testnet": "tb1qlknyvg3zsf5lhaqt2pzdu4m0tzehyzgvqe0md3",
+   "ed25519_near": "ed25519:F3GEeuwj6jZzDV7vdP76bKkXjNn7Q1YQy79oA66emrXg",
+   "sol": "F3GEeuwj6jZzDV7vdP76bKkXjNn7Q1YQy79oA66emrXg"
+  },
+  {
+   "predecessor": "spike.satchel-spk-mpc-e9ea1a.testnet",
+   "path": "satchel/1/sol",
+   "tweak": "1206d4ea15b83740fb07cc9309741cb033028ef0fa7439ddd67c522d0f85a941",
+   "secp256k1_near": "secp256k1:3AhJikNgnqR5HkJGiDFsC4NkLAddG7ayqo4wwXPn8TgLsh22K4fpMw7EjChCiBoTLe1LJtVrhcu1vBCKxqU3ysG5",
+   "secp256k1_compressed": "026c64ffebe23507a6dcbdad48f48978996a0666fd1fc58b045a16fd3a4e056186",
+   "evm": "0x4ad2f8ed43e8ab3b3774dd59f323774f10ce4145",
+   "btc_p2wpkh_testnet": "tb1q6q260v5f4hr55vlp8vqmnxqeajp5qk42r6nd5g",
+   "ed25519_near": "ed25519:Fd2wfz9FCe8CXD5oskcFzintw7M2nKhDXUiYTi77HvNc",
+   "sol": "Fd2wfz9FCe8CXD5oskcFzintw7M2nKhDXUiYTi77HvNc"
+  }
+ ]
+}

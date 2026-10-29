@@ -1,0 +1,122 @@
+/* Satchel 2.0 motion prototypes (motion designer). Builds on tokens.css + components.css; never edits them.
+   Static CSS here is always the END state of a motion (what no-JS and reduced motion show). The engine
+   (motion-kit.js) animates FROM earlier states with WAAPI, transform and opacity only, then cancels its
+   animations so the page rests on these rules again. */
+
+:root {
+  /* Proposed motion tokens (motion-spec.md §1). The lead's tokens.css names are kept; these add or retune. */
+  --ease-out: cubic-bezier(.2, 0, 0, 1);
+  --ease-in: cubic-bezier(.3, 0, 1, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-sheet: cubic-bezier(.32, .72, 0, 1);
+  --ease-swing: cubic-bezier(.37, 0, .63, 1);
+  --ease-carry: cubic-bezier(.68, 0, .59, 1);
+  --ease-fall: cubic-bezier(.55, 0, 1, .45);
+  --dur-press-in: 60ms; --dur-press: 140ms;
+}
+
+/* ── Press: down 4 px into the shadow; the shadow's bottom edge never moves (translate + shadow = 4 px). ─────── */
+.m-press { transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out),
+  background-color 120ms linear; }
+.m-press:active, .m-press[data-pressed] { transform: translateY(4px); box-shadow: var(--shadow-pressed);
+  transition-duration: var(--dur-press-in), var(--dur-press-in), 120ms; transition-timing-function: var(--ease-out); }
+/* Latched while busy: the press holds until the request settles, then pops back up (or the flow moves on). */
+.m-press[data-latched] { transform: translateY(4px); box-shadow: var(--shadow-pressed); cursor: progress; }
+.m-press[data-latched] .m-spin { animation: m-spin 1000ms linear infinite; }
+
+@keyframes m-spin { to { rotate: 360deg; } }
+.m-spin { transform-box: fill-box; transform-origin: center; }
+
+/* ── Label morph: every label stacked in one grid cell, so the button is as wide as its widest label. ───────── */
+.m-morph { display: inline-grid; justify-items: center; align-items: center; }
+.m-morph > * { grid-area: 1 / 1; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.m-morph > [aria-hidden="true"] { opacity: 0; }
+.btn .m-morph { overflow: clip; overflow-clip-margin: 2px; }   /* the rolling label stays inside the button face */
+
+/* ── The hand-off stage (Give success · Buy success · the seller's first look at a sale · the landing story) ─── */
+.handoff { container: handoff / inline-size; display: flex; flex-direction: column; gap: 8px; }
+.handoff__people { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.handoff__who { display: inline-flex; align-items: center; gap: 8px; min-width: 0; max-width: calc(50% - 6px);
+  padding: 4px 12px 4px 4px; border-radius: var(--radius-pill); background: var(--surface-sunken);
+  font: 600 14px/20px var(--font-sans); color: var(--ink-muted); }
+.handoff__who--to { flex-direction: row-reverse; padding: 4px 4px 4px 12px; color: var(--ink); }
+.handoff__who b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.handoff__who .avatar { width: 28px; height: 28px; font-size: 13px; }
+.handoff__who small { font: 400 12px/16px var(--font-sans); color: var(--ink-muted); }
+/* The track bleeds into the sheet's side padding (20 px) so the swing never clips or adds a scrollbar. The 10° arrival
+   swing reaches 0.17 × (card height + 16) past the card's right edge (23 px at 182 wide, 30 px at 240), so the card
+   rests --swing-room in from the edge; the 5.8° lag on the left stays inside the bleed. */
+.handoff__track { --bleed: 20px; --swing-room: 12px; position: relative; display: flex; justify-content: flex-end;
+  margin-inline: calc(-1 * var(--bleed)); padding: 34px calc(var(--bleed) + var(--swing-room)) 12px var(--bleed); overflow: clip; }
+.handoff__carrier { width: var(--card-w); flex: none; }
+.handoff { --card-w: clamp(168px, 52cqi, 240px); }
+.handoff__hanger { position: relative; transform-origin: 50% -16px; }   /* the hook: 16 px above the top centre */
+.handoff__plate { position: absolute; inset: 4px 0 -4px 0; border-radius: var(--radius-card); background: var(--sticker-shade); }
+.handoff .card { width: var(--card-w); max-width: none; box-shadow: none; position: relative; }
+.handoff .card__foot { display: none; }        /* the state pill lives under the stage */
+.handoff__after { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-top: 4px; }
+.handoff__sentence { font: 700 var(--text-heading)/var(--text-heading--lh) var(--font-display); letter-spacing: -0.01em; outline: none; }
+.handoff__sub { color: var(--ink-muted); }
+/* On the small stage card the "Yours" sticker sits across the card's bottom-right edge, where the body is empty
+   (outside the card's clip, so it swings with the card but never squeezes the name). The giver's peels off; the
+   buyer's sticks on. */
+.handoff__hanger > .badge { position: absolute; z-index: 1; right: 14px; bottom: -9px; font-size: 13px; line-height: 18px; padding: 1px 10px; }
+.handoff [data-peel] { opacity: 0; }           /* the giver's "Yours" sticker: gone in the end state */
+
+/* ── An amount that rolls to a new value: the old number overlays the new one's slot; the ticker slides with it. */
+.amt-roll { position: relative; display: inline-block; }
+.amt-roll__old { position: absolute; left: 0; top: 0; color: var(--ink-muted); opacity: 0; }
+
+/* ── Signing tracker: a success line that fills down the connector as each step completes. ─────────────────── */
+.m-tracker .tracker__step { --fill: 0; }
+.m-tracker .tracker__step::after { content: ""; position: absolute; left: 11px; top: 28px; bottom: 4px; width: 2px;
+  background: var(--success); transform-origin: top; scale: 1 var(--fill); }
+.m-tracker .tracker__step:last-child::after { display: none; }
+.m-tracker .tracker__step[data-state="done"] { --fill: 1; }
+.m-tracker .tracker__mark-stack { position: relative; width: 24px; height: 24px; display: grid; }
+.m-tracker .tracker__mark-stack > svg { grid-area: 1 / 1; width: 24px; height: 24px; }
+.m-mark--done { color: var(--success); } .m-mark--active { color: var(--frozen); } .m-mark--future { color: var(--line-strong); }
+.m-mark--failed { color: var(--danger); }
+.m-eta { position: relative; display: grid; }
+.m-eta > span { grid-area: 1 / 1; }
+
+/* ── Clean-history check rows ──────────────────────────────────────────────────────────────────────────────── */
+.m-check { list-style: none; display: flex; flex-direction: column; }
+.m-check__row { position: relative; display: grid; grid-template-columns: 24px 1fr auto; column-gap: 12px; align-items: center;
+  min-height: 56px; padding: 10px 16px; }
+.m-check__row + .m-check__row::before { content: ""; position: absolute; top: 0; left: 52px; right: 16px; height: 1px; background: var(--line); }
+.m-check__mark { position: relative; width: 24px; height: 24px; display: grid; }
+.m-check__mark > svg { grid-area: 1 / 1; width: 24px; height: 24px; }
+.m-check__main { min-width: 0; display: flex; flex-direction: column; }
+.m-check__title { font: 400 16px/24px var(--font-sans); color: var(--ink); }
+.m-check__meta { font: 450 13px/18px var(--font-mono); color: var(--ink-muted); }
+.m-check__word { position: relative; display: grid; justify-items: end; font: 600 13px/18px var(--font-sans); }
+.m-check__word > span { grid-area: 1 / 1; white-space: nowrap; }
+.m-check__bar { position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--danger); transform-origin: center; }   /* shown only on a "Needs attention" row */
+
+/* ── Chain charms on their bar (illustration) ──────────────────────────────────────────────────────────────── */
+.m-charms { position: relative; width: 100%; max-width: 280px; aspect-ratio: 480 / 236; }
+.m-charms svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.m-charms .m-charm { transform-box: fill-box; transform-origin: 50% 0; }   /* pivot: the top of the stem */
+
+/* ── Charm S loader: the S lifts and stamps into its own shadow, like a seal. The S never rotates. ───────────
+   The SVG's shadow path stays; .m-s-face (outline + white) moves. Units are the SVG's user units (viewBox 272 × 356):
+   the drop is 10 units, so +10 covers it exactly (pressed), -40 lifts it (the drop grows to 50). One 1.6 s cycle,
+   then a rest: calm, never jittery. Reduced motion: static. */
+.m-s-loader { display: inline-flex; flex-direction: column; align-items: center; gap: 12px; }
+.m-s-loader svg { height: 72px; width: auto; overflow: visible; }
+.m-s-face { transform-box: view-box; }
+:root[data-motion="full"] .m-s-loader[data-on] .m-s-face { animation: m-stamp 1600ms infinite; }
+@keyframes m-stamp {
+  0% { translate: 0 0; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+  24% { translate: 0 -40px; animation-timing-function: cubic-bezier(.55, 0, 1, .45); }
+  36% { translate: 0 10px; animation-timing-function: cubic-bezier(.2, 0, 0, 1); }
+  52%, 100% { translate: 0 0; }
+}
+
+/* Demo scaffolding (prototype only) */
+.m-demo { display: flex; flex-direction: column; gap: 14px; }
+.m-demo__bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.m-note { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); max-width: 62ch; }
+.m-k { font: 450 12px/16px var(--font-mono); color: var(--ink-muted); }

@@ -1,0 +1,51 @@
+{
+ "key": "49a762149a7d1488",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Hand it over.",
+ "prev": "Stick it on.",
+ "next": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+ "final": {
+  "id": "V02",
+  "scene": "H1",
+  "text": "Hand it over.",
+  "say": "Hand it over.",
+  "file": "v2/vo/V02.mp3",
+  "duration": 0.91,
+  "words": [
+   {
+    "text": "Hand",
+    "start": 0.1,
+    "end": 0.3
+   },
+   {
+    "text": "it",
+    "start": 0.34,
+    "end": 0.42
+   },
+   {
+    "text": "over.",
+    "start": 0.5,
+    "end": 0.82
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Hand it over"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

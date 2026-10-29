@@ -1,0 +1,56 @@
+{
+ "key": "55c5b3329677e5fc",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "But there's a catch.",
+ "prev": "Hand a treasury to the next team.",
+ "next": "A signature made before the sale can still be used after it.",
+ "final": {
+  "id": "V14",
+  "scene": "C1",
+  "text": "But there's a catch.",
+  "say": "But there's a catch.",
+  "file": "v2/vo/V14.mp3",
+  "duration": 1.21,
+  "words": [
+   {
+    "text": "But",
+    "start": 0.08,
+    "end": 0.2
+   },
+   {
+    "text": "there's",
+    "start": 0.24,
+    "end": 0.44
+   },
+   {
+    "text": "a",
+    "start": 0.5,
+    "end": 0.56
+   },
+   {
+    "text": "catch.",
+    "start": 0.64,
+    "end": 1.1
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "But there's a catch"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

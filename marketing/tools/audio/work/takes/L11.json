@@ -1,0 +1,76 @@
+{
+ "key": "c2d13c456be418ca",
+ "final": {
+  "id": "L11",
+  "scene": "S05",
+  "text": "So how does a buyer know it's clean?",
+  "say": "So how does a buyer know it's clean?",
+  "file": "vo/L11.mp3",
+  "duration": 2.18,
+  "words": [
+   {
+    "text": "So",
+    "start": 0.12,
+    "end": 0.44
+   },
+   {
+    "text": "how",
+    "start": 0.5,
+    "end": 0.62
+   },
+   {
+    "text": "does",
+    "start": 0.64,
+    "end": 0.78
+   },
+   {
+    "text": "a",
+    "start": 0.84,
+    "end": 0.96
+   },
+   {
+    "text": "buyer",
+    "start": 1,
+    "end": 1.26
+   },
+   {
+    "text": "know",
+    "start": 1.34,
+    "end": 1.5
+   },
+   {
+    "text": "it's",
+    "start": 1.52,
+    "end": 1.7
+   },
+   {
+    "text": "clean?",
+    "start": 1.74,
+    "end": 2.12
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "So how does a buyer know it's clean?"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "So how does a buyer know it's clean?",
+ "prev": "Sign it. Sell it. Broadcast it later. The coins are gone.",
+ "next": "Satchel writes down every signature before Near's signer network makes it."
+}

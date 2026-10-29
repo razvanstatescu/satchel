@@ -1,0 +1,52 @@
+{
+  "boing-soft": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "A subtle soft rubbery boing, a small rubber toy bouncing once on a table with a quick gentle pitch bend in the mid range, round and muted, starting immediately, single bounce, not a cartoon spring, no metal spring twang, clean, dry, no music, no reverb tail."
+  },
+  "button-thock-deep": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "One single deep soft button press, a large silicone keycap bottoming out with a low round thock and a crisp short attack, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail."
+  },
+  "bubble-tick-run": {
+    "gen": 1.0,
+    "influence": 0.75,
+    "prompt": "A steady run of soft bubbly interface ticks, twelve tiny rounded water-drop pops, evenly spaced and equally loud from start to end, fast steady rhythm, light and playful, like a number counting up, clean, no music."
+  },
+  "success-marimba": {
+    "gen": 0.9,
+    "influence": 0.8,
+    "prompt": "A marimba arpeggio of three separate short notes rising, ding-ding-ding, each note struck clearly about 0.15 seconds apart, warm soft mallets, a friendly short yes, no other instruments, no reverb tail."
+  },
+  "error-boop": {
+    "gen": 0.5,
+    "influence": 0.8,
+    "prompt": "A gentle two-note uh-oh in the mid range, two soft rounded mallet tones, the first note higher and the second note lower, clearly separated, friendly and quiet, not a buzzer, not harsh, no bass, no music."
+  },
+  "sneaky-pizz": {
+    "gen": 1.2,
+    "influence": 0.8,
+    "prompt": "Four separate staccato pizzicato plucks on violin, a sneaky tiptoeing motif, pluck, pluck, pluck-pluck, each note short and clearly separated, comedic suspense but subtle and classy, solo plucked strings only, dry, no reverb tail."
+  },
+  "magic-wand": {
+    "gen": 0.8,
+    "influence": 0.8,
+    "prompt": "A soft upward magic twinkle, a quick glissando of tiny bell and glass sparkles rising from low to high pitch and getting brighter, ending on a tiny high twinkle, gentle and tasteful, no music."
+  },
+  "drum-hit-soft": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "One punchy soft tom drum hit, a tight mid tom struck once with a felt mallet, a clear soft attack and a short warm round body, full and present, no other instruments, no reverb tail."
+  },
+  "riser-short": {
+    "gen": 2.4,
+    "influence": 0.75,
+    "prompt": "A playful rising synth swell lasting the full duration, a soft bubbly synth tone sweeping upward in pitch while growing louder and brighter until the very end, loudest at the end, then stopping cleanly, no impact, no drums, no other instruments."
+  },
+  "crowd-yay-tiny": {
+    "gen": 0.8,
+    "influence": 0.75,
+    "prompt": "A tiny distant cheer from a small group of four adults with different voices, a short overlapping yay and a little clapping, warm and genuine, very subtle, heard from across a room, no music."
+  }
+}

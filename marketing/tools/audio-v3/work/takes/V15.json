@@ -1,0 +1,96 @@
+{
+ "key": "30c4dcd80ad9195d",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "A signature made before the sale can still be used after it.",
+ "prev": "But there's a catch.",
+ "next": "So how does a buyer know it's clean?",
+ "final": {
+  "id": "V15",
+  "scene": "C1",
+  "text": "A signature made before the sale can still be used after it.",
+  "say": "A signature made before the sale can still be used after it.",
+  "file": "v2/vo/V15.mp3",
+  "duration": 4.06,
+  "words": [
+   {
+    "text": "A",
+    "start": 0.08,
+    "end": 0.14
+   },
+   {
+    "text": "signature",
+    "start": 0.22,
+    "end": 0.66
+   },
+   {
+    "text": "made",
+    "start": 0.76,
+    "end": 0.98
+   },
+   {
+    "text": "before",
+    "start": 1.02,
+    "end": 1.48
+   },
+   {
+    "text": "the",
+    "start": 1.52,
+    "end": 1.64
+   },
+   {
+    "text": "sale",
+    "start": 1.7,
+    "end": 1.98
+   },
+   {
+    "text": "can",
+    "start": 2.14,
+    "end": 2.32
+   },
+   {
+    "text": "still",
+    "start": 2.44,
+    "end": 2.64
+   },
+   {
+    "text": "be",
+    "start": 2.68,
+    "end": 2.82
+   },
+   {
+    "text": "used",
+    "start": 2.92,
+    "end": 3.2
+   },
+   {
+    "text": "after",
+    "start": 3.34,
+    "end": 3.62
+   },
+   {
+    "text": "it.",
+    "start": 3.7,
+    "end": 3.84
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "A signature made before the sale can still be used after it"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

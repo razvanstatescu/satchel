@@ -1,0 +1,368 @@
+{
+  "Abstract": {
+    "providers": {
+      "abstract-testnet": {
+        "auth_scheme": "None",
+        "base_url": "https://api.testnet.abs.xyz",
+        "chain_routing": "Embedded"
+      },
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://abstract-testnet.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.abstract-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Aptos": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://aptos-testnet.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "geomi": {
+        "auth_scheme": {
+          "Header": {
+            "name": "Authorization",
+            "scheme": "Bearer"
+          }
+        },
+        "base_url": "https://api.testnet.aptoslabs.com/v1",
+        "chain_routing": "Embedded"
+      },
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://fullnode.testnet.aptoslabs.com/v1",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.aptos-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Arbitrum": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://arb-sepolia.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.arbitrum-sepolia.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://arbitrum-one-sepolia.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Avalanche": {
+    "providers": {
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://api.avax-test.network/ext/bc/C/rpc",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.avalanche-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://avax-testnet.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Base": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://base-sepolia.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.base-sepolia.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://base-sepolia.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Bitcoin": {
+    "providers": {
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://bitcoin-testnet-rpc.publicnode.com",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 1
+  },
+  "Bnb": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://bnb-testnet.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.bsc-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://bsc-testnet.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Fogo": {
+    "providers": {
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://testnet.fogo.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 1
+  },
+  "HyperEvm": {
+    "providers": {
+      "chainstack": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://hyperliquid-testnet.core.chainstack.com/",
+        "chain_routing": "Embedded"
+      },
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://rpc.hyperliquid-testnet.xyz/evm",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.hype-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Polygon": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://polygon-amoy.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.matic-amoy.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://polygon-amoy.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Solana": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://solana-devnet.g.alchemy.com/v2/",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.solana-devnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      },
+      "tatum": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-api-key",
+            "scheme": null
+          }
+        },
+        "base_url": "https://solana-devnet.gateway.tatum.io",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Starknet": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{API_KEY}"
+          }
+        },
+        "base_url": "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_10/",
+        "chain_routing": "Embedded"
+      },
+      "publicnode": {
+        "auth_scheme": "None",
+        "base_url": "https://starknet-sepolia-rpc.publicnode.com",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Path": {
+            "placeholder": "{api_key}"
+          }
+        },
+        "base_url": "https://{}.strk-sepolia.quiknode.pro",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  },
+  "Sui": {
+    "providers": {
+      "alchemy": {
+        "auth_scheme": {
+          "Header": {
+            "name": "Authorization",
+            "scheme": "Bearer"
+          }
+        },
+        "base_url": "https://sui-testnet.g.alchemy.com",
+        "chain_routing": "Embedded"
+      },
+      "public": {
+        "auth_scheme": "None",
+        "base_url": "https://archive.testnet.sui.io",
+        "chain_routing": "Embedded"
+      },
+      "quicknode": {
+        "auth_scheme": {
+          "Header": {
+            "name": "x-token",
+            "scheme": null
+          }
+        },
+        "base_url": "https://{}.sui-testnet.quiknode.pro",
+        "chain_routing": "Embedded"
+      }
+    },
+    "quorum": 3
+  }
+}

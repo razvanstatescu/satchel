@@ -1,0 +1,2 @@
+{"evm":{"storedHex":"0x02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0","storedLen":98,"sameHashAfterRestore":true,"signedEqualsOriginal":true,"restoredKeys":["chainId","type","to","gas","nonce","value","maxFeePerGas","maxPriorityFeePerGas"]}}
+{"sol":{"storedBase64Len":288,"messageIdentical":true,"blockhashKept":true}}

@@ -1,0 +1,54 @@
+{
+  "generator": "tools/fuzz/gen-corpus.ts",
+  "seed": 1,
+  "chains": {
+    "evm": {
+      "cases": 1500,
+      "verdicts": {
+        "ERR_EVM_RLP": 835,
+        "ERR_HEX": 90,
+        "ok": 282,
+        "ERR_EVM_INT_WIDTH": 37,
+        "ERR_EVM_CHAIN_ID": 30,
+        "ERR_EVM_TYPE": 180,
+        "ERR_EVM_TOO_LONG": 12,
+        "ERR_EVM_ACCESS_LIST": 6,
+        "ERR_EVM_DATA": 15,
+        "ERR_EVM_TO": 13
+      }
+    },
+    "btc": {
+      "cases": 600,
+      "verdicts": {
+        "ok": 154,
+        "ERR_BTC_PREIMAGE_LEN": 85,
+        "ERR_BTC_OUTPUTS_MALFORMED": 78,
+        "ERR_BTC_INPUT_COUNT": 59,
+        "ERR_BTC_PREVOUTS_INCOMPLETE": 18,
+        "ERR_HEX": 31,
+        "ERR_BTC_LOCKTIME": 21,
+        "ERR_BTC_VERSION": 34,
+        "ERR_BTC_SCRIPTCODE": 30,
+        "ERR_BTC_MIXED_TX": 14,
+        "ERR_BTC_OUTPUTS_MISMATCH": 3,
+        "ERR_BTC_SIGHASH": 25,
+        "ERR_BTC_SEQUENCE": 37,
+        "ERR_BTC_DUPLICATE_INPUT": 9,
+        "ERR_BTC_SEQUENCES_MISMATCH": 2
+      }
+    },
+    "sol": {
+      "cases": 1500,
+      "verdicts": {
+        "ERR_SOL_MALFORMED": 595,
+        "ERR_HEX": 102,
+        "ERR_SOL_HEADER": 153,
+        "ok": 393,
+        "ERR_SOL_INSTRUCTION": 101,
+        "ERR_SOL_VERSION": 111,
+        "ERR_SOL_TOO_LONG": 27,
+        "ERR_SOL_DURABLE_NONCE": 18
+      }
+    }
+  }
+}

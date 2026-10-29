@@ -1,0 +1,3 @@
+ERROR after 3975 ms: ContractExecutionError Smart contract panicked: panicked at 'assertion failed: `(left == right)`
+  left: `0`,
+ right: `1`: Requires attached deposit of exactly 1 yoctoNEAR', /Users/haosun/.cargo/registry/src/mirrors.ustc.edu.cn-61ef6e0cd06fb9b8/near-sdk-3.1.0/src/utils/mod.rs:22:5

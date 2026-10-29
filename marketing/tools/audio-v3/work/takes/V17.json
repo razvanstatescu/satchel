@@ -1,0 +1,56 @@
+{
+ "key": "dc344a9c211e27a2",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Satchel keeps the receipts.",
+ "prev": "So how does a buyer know it's clean?",
+ "next": "Every signature goes on the record, on Near, before Near's signer network makes it.",
+ "final": {
+  "id": "V17",
+  "scene": "T0",
+  "text": "Satchel keeps the receipts.",
+  "say": "Satchel keeps the receipts.",
+  "file": "v2/vo/V17.mp3",
+  "duration": 1.7,
+  "words": [
+   {
+    "text": "Satchel",
+    "start": 0.14,
+    "end": 0.48
+   },
+   {
+    "text": "keeps",
+    "start": 0.62,
+    "end": 0.86
+   },
+   {
+    "text": "the",
+    "start": 0.9,
+    "end": 0.98
+   },
+   {
+    "text": "receipts.",
+    "start": 1.02,
+    "end": 1.6
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel keeps the receipts"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

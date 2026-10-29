@@ -1,0 +1,66 @@
+{
+ "key": "ec9892ae13dcb5fa",
+ "final": {
+  "id": "L09",
+  "scene": "S05",
+  "text": "…can still be used after it.",
+  "say": "…can still be used after it.",
+  "file": "vo/L09.mp3",
+  "duration": 1.73,
+  "words": [
+   {
+    "text": "…can",
+    "start": 0.04,
+    "end": 0.18
+   },
+   {
+    "text": "still",
+    "start": 0.34,
+    "end": 0.54
+   },
+   {
+    "text": "be",
+    "start": 0.58,
+    "end": 0.66
+   },
+   {
+    "text": "used",
+    "start": 0.82,
+    "end": 1.02
+   },
+   {
+    "text": "after",
+    "start": 1.24,
+    "end": 1.5
+   },
+   {
+    "text": "it.",
+    "start": 1.56,
+    "end": 1.68
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "can still be used after it"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "…can still be used after it.",
+ "prev": "But a signature made before the sale…",
+ "next": "Sign it. Sell it. Broadcast it later. The coins are gone."
+}

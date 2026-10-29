@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Micro-motion · Satchel motion prototype</title>
+<script src="assets/theme.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="motion/motion.css">
+<style>
+  /* prototype page scaffolding only */
+  .mm { max-width: 1180px; margin: 0 auto; padding: 24px 16px 96px; display: flex; flex-direction: column; gap: 56px; }
+  .mm-top { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+  .mm-top h1 { font: 800 34px/38px var(--font-display); letter-spacing: -0.03em; }
+  .mm-sec { display: flex; flex-direction: column; gap: 16px; }
+  .mm-sec > h2 { font: 800 26px/30px var(--font-display); letter-spacing: -0.02em; }
+  .mm-grid { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+  .mm-demo { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 16px 20px 20px; display: flex;
+    flex-direction: column; gap: 14px; min-width: 0; }
+  .mm-demo__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; }
+  .mm-demo__title { font: 600 15px/20px var(--font-sans); }
+  .mm-pad { padding: 8px 4px 12px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  html[data-capture] .mm-tools, html[data-capture] .mm-replay { visibility: hidden; }
+  html[data-capture] *, html[data-capture] *::before, html[data-capture] *::after { transition: none !important; }
+  .mm-iconstack { display: grid; } .mm-iconstack > * { grid-area: 1 / 1; }
+  /* frames that hold a phone or a desktop window, so both overlay styles show on one page */
+  .m-frame { position: relative; overflow: hidden; border-radius: 22px; border: 1px solid var(--line); background: var(--ground);
+    isolation: isolate; flex: none; }
+  .m-frame .scrim, .m-frame .sheet, .m-frame .toast-region { position: absolute; }
+  .m-frame--phone { width: 360px; height: 600px; }
+  .m-frame--phone .sheet { inset: auto 0 0 0; transform: none; width: auto; max-height: calc(100% - 16px);
+    border-radius: var(--radius-card) var(--radius-card) 0 0; border-bottom: 0; }
+  .m-frame--phone .sheet__grabber { display: block; }
+  .m-frame--desk { width: 620px; height: 470px; }
+  .m-frame--desk .sheet { inset: 0; margin: auto; width: 420px; height: fit-content; transform: none; border-radius: var(--radius-card);
+    border-bottom: 1px solid var(--overlay-edge); }   /* centred with inset + margin, so transform is free for motion */
+  .m-frame--desk .sheet__grabber { display: none; }
+  .m-frame .sheet__foot { border-radius: 0; }
+  .m-frame--desk .sheet__foot { border-radius: 0 0 var(--radius-card) var(--radius-card); }
+  .mini-page { padding: 18px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .mini-page h3 { font: 750 24px/28px var(--font-display); letter-spacing: -0.02em; }
+  .panes { display: grid; } .panes > * { grid-area: 1 / 1; } .panes > [aria-hidden="true"] { opacity: 0; visibility: hidden; }
+  .review-rows { display: grid; grid-template-columns: auto 1fr; gap: 8px 16px; font: 400 15px/22px var(--font-sans); }
+  .review-rows dt { color: var(--ink-muted); } .review-rows dd { margin: 0; text-align: right; }
+  .pinned { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px; background: var(--ground); border-top: 1px solid var(--line); }
+  .m-frame .toast-region { left: 0; right: 0; transform: none; bottom: 92px; }
+  /* tracker icon stacks: all marks are animated by the scene clock */
+  .m-tracker .tracker__step { padding-bottom: 22px; }
+  .m-tracker .tracker__step::before { top: 30px; }
+  .m-tracker .tracker__mark-stack { grid-row: 1 / span 2; align-self: start; }
+  .m-tracker .m-mk { opacity: 0; } .m-tracker .tracker__label { align-self: center; }
+  .m-tracker [data-state="future"] .m-mk--future, .m-tracker [data-state="active"] .m-mk--active, .m-tracker [data-state="done"] .m-mk--done { opacity: 1; }
+  .m-fill { position: absolute; left: 11px; top: 30px; bottom: 4px; width: 2px; background: var(--success); transform-origin: top; scale: 1 0; }
+  .m-tracker [data-state="done"] .m-fill { scale: 1 1; }
+  .m-tracker .tracker__step:last-child .m-fill { display: none; }
+  .m-tracker [data-state="future"] [data-timer] { visibility: hidden; }   /* the clock appears when its step starts */
+  .m-spinning { animation: m-spin 1000ms linear infinite; transform-box: fill-box; transform-origin: center; }
+  :root[data-motion="reduce"] .m-spinning { animation: none; }
+  .eta-row { display: flex; gap: 8px; align-items: center; color: var(--ink-muted); font: 400 14px/20px var(--font-sans); min-height: 28px; }
+  /* clean-history check panel */
+  .clean { width: min(100%, 420px); display: flex; flex-direction: column; gap: 12px; }
+  .clean__head { display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; align-items: start; padding: 16px; }
+  .clean__icon { width: 28px; height: 28px; display: grid; } .clean__icon > svg { grid-area: 1 / 1; width: 28px; height: 28px; }
+  .clean__text { display: grid; } .clean__text > * { grid-area: 1 / 1; }
+  .clean__verdict { font: 700 18px/24px var(--font-display); letter-spacing: -0.01em; }
+  .clean__sub { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); margin-top: 2px; }
+  .clean__eyebrow { font: 600 13px/18px var(--font-sans); color: var(--ink-muted); padding: 0 16px; }
+  .gate { display: flex; align-items: center; gap: 6px; font: 600 14px/20px var(--font-sans); min-height: 20px; }
+  .gate > .icon { width: 16px; height: 16px; }
+  .gate-stack { display: grid; } .gate-stack > * { grid-area: 1 / 1; }
+  .m-lift { position: relative; width: 300px; }
+  .m-lift__plate { position: absolute; inset: 4px 0 -4px 0; border-radius: var(--radius-card); background: var(--sticker-shade); }
+  .m-lift .card { box-shadow: none; position: relative; }
+  .m-lift > .badge { position: absolute; z-index: 1; right: 16px; bottom: -9px; font-size: 13px; line-height: 18px; padding: 1px 10px; }
+  .amt-stack { display: inline-grid; } .amt-stack > * { grid-area: 1 / 1; }
+  .incoming { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+  .s-caption { font: 600 14px/20px var(--font-sans); color: var(--ink-muted); }
+</style>
+</head>
+<body>
+<!--@sprite--><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-circle-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></symbol><symbol id="i-snowflake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 20-1.25-2.5L6 18"/><path d="M10 4 8.75 6.5 6 6"/><path d="m14 20 1.25-2.5L18 18"/><path d="m14 4 1.25 2.5L18 6"/><path d="m17 21-3-6h-4"/><path d="m17 3-3 6 1.5 3"/><path d="M2 12h6.5L10 9"/><path d="m20 10-1.5 2 1.5 2"/><path d="M22 12h-6.5L14 15"/><path d="m4 10 1.5 2L4 14"/><path d="m7 21 3-6-1.5-3"/><path d="m7 3 3 6h4"/></symbol><symbol id="i-loader-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol><symbol id="i-triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol><symbol id="i-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></symbol><symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol><symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol><symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol><symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol><symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol><symbol id="i-arrow-up-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol><symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol><symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5"/><rect x="3" y="7" width="18" height="4" rx="1"/></symbol><symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol><symbol id="i-qr-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="i-layout-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol><symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol><symbol id="i-file-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/></symbol><symbol id="i-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol><symbol id="i-user-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol><symbol id="i-users-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></symbol><symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol><symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol><symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol><symbol id="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/></symbol><symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></symbol><symbol id="i-key-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol><symbol id="i-circle-dot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="12" r="10"/></symbol><symbol id="i-circle-dashed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></symbol><symbol id="i-circle-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol><symbol id="i-circle-question-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol><symbol id="i-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol><symbol id="i-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol><symbol id="i-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></symbol><symbol id="i-scroll-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></symbol><symbol id="i-badge-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m16 9-5.5 5.5L8 12"/></symbol><symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol><symbol id="i-hourglass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol><symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V7"/><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"/></symbol><symbol id="i-arrow-down-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"/><path d="M17 17H7V7"/></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></symbol><symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.744 17.736a6 6 0 1 1-7.48-7.48"/><path d="M15 6h1v4"/><path d="m6.134 14.768.866-.5 2 3.464"/><circle cx="16" cy="8" r="6"/></symbol><symbol id="i-hand-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></symbol><symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></symbol><symbol id="i-rotate-ccw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol><symbol id="i-refresh-cw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="i-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/></symbol><symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol><symbol id="i-landmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18v-7"/><path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M3 22h18"/><path d="M6 18v-7"/></symbol><symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 21 9.6-9.6"/><path d="m7.5 15.5 2.3 2.3a1 1 0 0 1 0 1.4l-2.1 2.1a1 1 0 0 1-1.4 0L4 19"/><circle cx="15.5" cy="7.5" r="5.5"/></symbol><symbol id="i-signature" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284"/><path d="M3 21h18"/></symbol><symbol id="i-pen-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></symbol><symbol id="i-circle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></symbol><symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol><symbol id="i-wallet-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14h.01"/><path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14"/></symbol><symbol id="i-sticker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"/><path d="M15 3v5a1 1 0 0 0 1 1h5"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M10 16s.8 1 2 1c1.3 0 2-1 2-1"/></symbol><symbol id="i-scan-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></symbol><symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol><symbol id="i-undo-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></symbol><symbol id="i-clipboard-paste" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h10"/><path d="M16 4h2a2 2 0 0 1 2 2v1.344"/><path d="m17 18 4-4-4-4"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol><symbol id="i-minimize-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 10 7-7"/><path d="M20 10h-6V4"/><path d="m3 21 7-7"/><path d="M4 14h6v6"/></symbol><symbol id="i-shield-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol><symbol id="i-shield-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m14.5 9.5-5 5"/><path d="m9.5 9.5 5 5"/></symbol></svg><!--/@sprite-->
+<main class="mm">
+  <div class="mm-top">
+    <div><h1>Micro-motion</h1><p class="muted">Press, roll, sheets, toasts, signing, charms, coins, the clean-history check. Every replay button replays one scene.</p></div>
+    <div class="mm-tools cluster">
+      <div class="seg seg--sm" role="radiogroup" aria-label="Reduced motion">
+        <label class="seg__opt"><input type="radio" name="reduce" value="system" checked>Motion: system</label>
+        <label class="seg__opt"><input type="radio" name="reduce" value="off">Full</label>
+        <label class="seg__opt"><input type="radio" name="reduce" value="on">Reduced</label>
+      </div>
+      <div class="seg seg--sm" role="radiogroup" aria-label="Theme">
+        <label class="seg__opt"><input type="radio" name="theme" value="day">Day</label>
+        <label class="seg__opt"><input type="radio" name="theme" value="night">Night</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────────────────────── 1. Press, roll, copy ───────────────────────── -->
+  <section class="mm-sec" id="press">
+    <h2>Press and roll</h2>
+    <p class="m-note">The primary button is a sticker: it presses 4 px down into its own shadow and comes back. While a request runs it stays latched down and its label rolls to the busy verb; it pops back up when the request settles. Secondary buttons only change fill.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="press" style="width:360px">
+        <div class="mm-demo__head"><span class="mm-demo__title">Press · 4 px into the shadow</span><button class="btn btn--icon mm-replay" data-replay="press" aria-label="Replay the press"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad"><button class="btn btn--primary btn--lg m-press" type="button" id="p-press"><svg class="icon"><use href="#i-send"/></svg>Send 0.0010 ETH</button>
+          <span class="cluster"><button class="btn btn--primary btn--lg m-press" type="button">Try it</button><button class="btn btn--secondary btn--lg" type="button">Secondary</button></span></div>
+      </div>
+      <div class="mm-demo" data-scene="morph-ok" style="width:380px">
+        <div class="mm-demo__head"><span class="mm-demo__title">Latched while busy, then Given</span><button class="btn btn--icon mm-replay" data-replay="morph-ok" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad" style="align-items:stretch">
+          <button class="btn btn--primary btn--lg btn--block m-press" type="button" id="give-ok"><span class="m-morph">
+            <span data-label="idle">Give it to bob.testnet</span>
+            <span data-label="busy" aria-hidden="true"><svg class="icon m-spinning"><use href="#i-loader-circle"/></svg>Giving…</span>
+            <span data-label="done" aria-hidden="true"><svg class="icon"><use href="#i-circle-check"/></svg>Given</span></span></button>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="morph-cancel" style="width:380px">
+        <div class="mm-demo__head"><span class="mm-demo__title">Cancelled in the wallet: pops back up</span><button class="btn btn--icon mm-replay" data-replay="morph-cancel" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad" style="align-items:stretch">
+          <div class="banner" id="cancel-banner"><svg class="icon"><use href="#i-info"/></svg><div class="banner__main"><span class="banner__title">You cancelled in your wallet</span><span class="banner__body">Nothing changed. Satchel #7 is still yours.</span></div></div>
+          <button class="btn btn--primary btn--lg btn--block m-press" type="button" id="give-cancel"><span class="m-morph">
+            <span data-label="idle">Give it to bob.testnet</span>
+            <span data-label="busy" aria-hidden="true"><svg class="icon m-spinning"><use href="#i-loader-circle"/></svg>Giving…</span></span></button>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="card-hover" style="width:360px">
+        <div class="mm-demo__head"><span class="mm-demo__title">Card link · hover lift, press</span><button class="btn btn--icon mm-replay" data-replay="card-hover" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad">
+          <a class="card-link" href="#" id="card-link"><figure class="card card--md" aria-labelledby="cl-n">
+            <div class="card__band"><h3 class="card__name" id="cl-n">Satchel #3</h3><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+            <div class="card__body"><ul class="card__inside">
+              <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.0125</span><span class="card__tick">BTC</span></li>
+              <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.2400</span><span class="card__tick">ETH</span></li></ul>
+              <div class="card__foot"><span class="pill pill--frozen"><svg class="icon"><use href="#i-snowflake"/></svg>Paused for sale</span></div></div>
+          </figure></a>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="copy" style="width:300px">
+        <div class="mm-demo__head"><span class="mm-demo__title">Copy · the check sticks on</span><button class="btn btn--icon mm-replay" data-replay="copy" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad"><span class="copy-line"><span class="address" aria-label="tb1qtf95m2wfj8c4x3k7d2vgh0cwy5">tb1qtf95…cwy5</span>
+          <button class="btn btn--icon" type="button" aria-label="Copy address" id="copy-btn"><span class="mm-iconstack"><svg class="icon" id="copy-i"><use href="#i-copy"/></svg><svg class="icon" id="copy-ok" style="color:var(--success);opacity:0"><use href="#i-check"/></svg></span></button></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 2. Sheets and dialogs ───────────────────────── -->
+  <section class="mm-sec" id="overlays">
+    <h2>Sheets and dialogs</h2>
+    <p class="m-note">Below 768 a flow is a bottom sheet that rises from the edge it belongs to; from 768 it is a dialog that settles in place. Steps inside a flow slide 16 px in the reading direction. Exits are shorter than entrances.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="sheet-in"><div class="mm-demo__head"><span class="mm-demo__title">Sheet · in 360 ms, out 240 ms, step 280 ms</span>
+        <span class="cluster"><button class="btn btn--secondary mm-replay" data-replay="sheet-in" type="button">In</button><button class="btn btn--secondary mm-replay" data-replay="sheet-step" type="button">Next step</button><button class="btn btn--secondary mm-replay" data-replay="sheet-out" type="button">Out</button></span></div>
+        <div class="m-frame m-frame--phone" id="phone">
+          <div class="mini-page" aria-hidden="true"><h3>Satchel #1</h3><p class="muted">Owner page behind the sheet.</p></div>
+          <div class="scrim"></div>
+          <section class="sheet" role="dialog" aria-labelledby="ph-t">
+            <div class="sheet__grabber"></div>
+            <div class="sheet__head"><div class="sheet__titles"><h2 class="sheet__title" id="ph-t">Send Ethereum</h2><span class="sheet__step" data-steplabel>Step 1 of 3</span></div><button class="btn btn--icon" aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button></div>
+            <div class="sheet__body"><div class="panes">
+              <div data-pane="1"><div class="amount"><div class="amount__line"><input class="amount__value" value="0.0010" aria-label="Amount" inputmode="decimal"><span class="amount__tick">ETH</span><button class="btn btn--link" type="button">Max</button></div><span class="amount__avail">Available 0.048979&nbsp;ETH</span></div></div>
+              <div data-pane="2" aria-hidden="true"><dl class="review-rows"><dt>To</dt><dd class="address">0x7a3f…c91e</dd><dt>Network fee</dt><dd>~0.00002 ETH</dd><dt>Time</dt><dd>About 10 seconds</dd></dl></div>
+            </div></div>
+            <div class="sheet__foot"><button class="btn btn--primary btn--lg btn--block m-press" type="button">Review</button></div>
+          </section>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="dialog-in"><div class="mm-demo__head"><span class="mm-demo__title">Dialog · in 240 ms, out 160 ms</span>
+        <span class="cluster"><button class="btn btn--secondary mm-replay" data-replay="dialog-in" type="button">In</button><button class="btn btn--secondary mm-replay" data-replay="dialog-out" type="button">Out</button></span></div>
+        <div class="m-frame m-frame--desk" id="desk">
+          <div class="mini-page" aria-hidden="true"><h3>Satchel #1</h3><p class="muted">Owner page behind the dialog.</p></div>
+          <div class="scrim"></div>
+          <section class="sheet" role="dialog" aria-labelledby="dk-t">
+            <div class="sheet__head"><div class="sheet__titles"><h2 class="sheet__title" id="dk-t">Send Ethereum</h2><span class="sheet__step">Step 1 of 3</span></div><button class="btn btn--icon" aria-label="Close" type="button"><svg class="icon"><use href="#i-x"/></svg></button></div>
+            <div class="sheet__body"><div class="amount"><div class="amount__line"><input class="amount__value" value="0.0010" aria-label="Amount" inputmode="decimal"><span class="amount__tick">ETH</span><button class="btn btn--link" type="button">Max</button></div><span class="amount__avail">Available 0.048979&nbsp;ETH</span></div></div>
+            <div class="sheet__foot"><button class="btn btn--primary btn--lg btn--block m-press" type="button">Review</button></div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 3. Toasts ───────────────────────── -->
+  <section class="mm-sec" id="toasts">
+    <h2>Toasts</h2>
+    <p class="m-note">One at a time, above the pinned button, never on it. A toast rises 16 px and settles (260 ms), stays 4 s (paused on hover and focus), and leaves faster than it came (160 ms). A new toast waits for the old one to leave.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="toast"><div class="mm-demo__head"><span class="mm-demo__title">In, hold, out</span>
+        <span class="cluster"><button class="btn btn--secondary mm-replay" data-replay="toast" type="button">Sent</button><button class="btn btn--secondary mm-replay" data-replay="toast-swap" type="button">Swap</button></span></div>
+        <div class="m-frame m-frame--phone" style="height:420px" id="toast-frame">
+          <div class="mini-page" aria-hidden="true"><h3>Satchel #1</h3><p class="muted">0.048979 ETH</p></div>
+          <div class="toast-region" aria-hidden="true">
+            <span class="toast toast--success" id="toast-a"><svg class="icon"><use href="#i-circle-check"/></svg>Sent 0.0010&nbsp;ETH</span>
+          </div>
+          <div class="toast-region" aria-hidden="true">
+            <span class="toast toast--frozen" id="toast-b" style="opacity:0"><svg class="icon m-spinning"><use href="#i-loader-circle"/></svg>Still signing</span>
+          </div>
+          <div class="pinned"><button class="btn btn--primary btn--lg btn--block m-press" type="button">Done</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 4. Signing progress ───────────────────────── -->
+  <section class="mm-sec" id="signing">
+    <h2>Signing progress</h2>
+    <p class="m-note">Honest milestones, never a percentage. Each finished step gets its check stuck on and the line fills down to the next one. The only things that move while you wait are the spinner on the current step and the elapsed time. The waiting line changes at 20, 60 and 150 seconds by a quiet roll.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="signing" style="width:400px"><div class="mm-demo__head"><span class="mm-demo__title">A typical send (about 10 s)</span>
+        <button class="btn btn--icon mm-replay" data-replay="signing" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad" style="align-items:stretch">
+          <ol class="tracker m-tracker" id="trk"></ol>
+          <div class="eta-row"><span class="m-eta" id="trk-eta"><span data-eta="0">Usually about 10 seconds.</span><span data-eta="done" class="pill pill--success" style="opacity:0"><svg class="icon"><use href="#i-circle-check"/></svg>Sent 0.0010&nbsp;ETH</span></span></div>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="signing-long" style="width:400px"><div class="mm-demo__head"><span class="mm-demo__title">A slow network (played at 10×)</span>
+        <button class="btn btn--icon mm-replay" data-replay="signing-long" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad" style="align-items:stretch">
+          <ol class="tracker m-tracker" id="trk2"></ol>
+          <div class="eta-row"><span class="m-eta" id="trk2-eta"><span data-eta="0">Usually about 10 seconds.</span><span data-eta="20" style="opacity:0">Taking longer than usual.</span><span data-eta="60" style="opacity:0">Still working. The network allows up to about 2 minutes.</span><span data-eta="150" style="opacity:0">Still waiting for the network. We'll keep checking.</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 5. Charms ───────────────────────── -->
+  <section class="mm-sec" id="charms">
+    <h2>Charms</h2>
+    <p class="m-note">The chain charms hang from their bar, so they swing about the top of their stems: once when they come into view, and once when the pointer brushes one. Never an idle loop. The charm S never rotates; as a loader it lifts and stamps into its own shadow.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="charms" style="width:360px"><div class="mm-demo__head"><span class="mm-demo__title">Swing on view and on hover</span>
+        <button class="btn btn--icon mm-replay" data-replay="charms" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="illo" style="padding:24px 28px 30px"><div class="m-charms" id="charms-svg">
+          <svg viewBox="40 20 480 236" aria-hidden="true">
+            <rect x="60" y="40" width="440" height="22" rx="11" fill="#1D1340"/>
+            <g class="m-charm" data-i="0"><rect x="114" y="74" width="12" height="40" rx="6" fill="#1D1340"/><circle cx="120" cy="170" r="64" fill="#F7931A" stroke="#1D1340" stroke-width="12"/><circle cx="98" cy="164" r="9" fill="#1D1340"/><circle cx="142" cy="164" r="9" fill="#1D1340"/><path d="M104 188 Q120 202 136 188" fill="none" stroke="#1D1340" stroke-width="9" stroke-linecap="round"/></g>
+            <g class="m-charm" data-i="1"><rect x="274" y="74" width="12" height="40" rx="6" fill="#1D1340"/><circle cx="280" cy="170" r="64" fill="#A3ABE0" stroke="#1D1340" stroke-width="12"/><circle cx="258" cy="164" r="9" fill="#1D1340"/><circle cx="302" cy="164" r="9" fill="#1D1340"/><path d="M264 188 Q280 202 296 188" fill="none" stroke="#1D1340" stroke-width="9" stroke-linecap="round"/></g>
+            <g class="m-charm" data-i="2"><rect x="434" y="74" width="12" height="40" rx="6" fill="#1D1340"/><circle cx="440" cy="170" r="64" fill="#C08CFF" stroke="#1D1340" stroke-width="12"/><circle cx="418" cy="164" r="9" fill="#1D1340"/><circle cx="462" cy="164" r="9" fill="#1D1340"/><path d="M424 188 Q440 202 456 188" fill="none" stroke="#1D1340" stroke-width="9" stroke-linecap="round"/></g>
+          </svg></div></div>
+      </div>
+      <div class="mm-demo" data-scene="s-loader" style="width:300px"><div class="mm-demo__head"><span class="mm-demo__title">Charm S loader · lift and stamp</span>
+        <button class="btn btn--icon mm-replay" data-replay="s-loader" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="illo illo--white" style="display:grid;place-items:center;padding:28px 20px">
+          <div class="m-s-loader" data-on role="status">
+            <svg viewBox="120 80 272 356" aria-hidden="true"><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" transform="translate(0 10)" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><g class="m-s-face" id="s-face"><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/></g></svg>
+            <span class="s-caption">Opening Satchel #7</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 6. Coins sticking on ───────────────────────── -->
+  <section class="mm-sec" id="coins">
+    <h2>Coins sticking on</h2>
+    <p class="m-note">When coins arrive, the chain's charm sticks itself back onto the card and the amount rolls to the new number. At mint, the new card drops into its shadow, then each chain's coin sticks on, then the Yours sticker.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="receive" style="width:360px"><div class="mm-demo__head"><span class="mm-demo__title">Receive · Bitcoin arrives</span>
+        <button class="btn btn--icon mm-replay" data-replay="receive" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad">
+          <figure class="card card--md" aria-labelledby="rc-n" id="rc-card">
+            <div class="card__band"><h3 class="card__name" id="rc-n">Satchel #6</h3><span class="badge badge--yours">Yours</span><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+            <div class="card__body"><ul class="card__inside">
+              <li class="card__coin" id="rc-btc"><img class="coin" id="rc-coin" src="assets/chain-btc.svg" alt=""><span class="card__amt amt-roll"><span id="rc-new">0.0012</span><span id="rc-old" class="amt-roll__old" aria-hidden="true">0</span></span><span class="card__tick" id="rc-tick">BTC</span></li>
+              <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.85</span><span class="card__tick">ETH</span></li></ul>
+              <div class="card__foot"><span class="pill pill--success"><svg class="icon"><use href="#i-check"/></svg>Active</span></div></div>
+          </figure>
+          <div class="incoming"><span class="gate-stack"><span class="pill pill--frozen" id="rc-p1" style="opacity:0"><svg class="icon m-spinning"><use href="#i-loader-circle"/></svg>+0.0012&nbsp;BTC · confirming</span><span class="pill pill--success" id="rc-p2"><svg class="icon"><use href="#i-circle-check"/></svg>Received 0.0012&nbsp;BTC</span></span></div>
+        </div>
+      </div>
+      <div class="mm-demo" data-scene="mint" style="width:360px"><div class="mm-demo__head"><span class="mm-demo__title">Mint · the card, its coins, then Yours</span>
+        <button class="btn btn--icon mm-replay" data-replay="mint" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="mm-pad" style="padding-top:20px">
+          <div class="m-lift" id="mint-lift"><div class="m-lift__plate" id="mint-plate"></div>
+            <span class="badge badge--yours" id="mint-yours">Yours</span>
+            <figure class="card card--md" aria-labelledby="mt-n" id="mint-card">
+              <div class="card__band"><h3 class="card__name" id="mt-n">Satchel #8</h3><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+              <div class="card__body"><ul class="card__inside">
+                <li class="card__coin" data-zero><img class="coin" id="mint-c1" src="assets/chain-btc.svg" alt=""><span class="card__amt">0</span><span class="card__tick">BTC</span></li>
+                <li class="card__coin" data-zero><img class="coin" id="mint-c2" src="assets/chain-eth.svg" alt=""><span class="card__amt">0</span><span class="card__tick">ETH</span></li></ul>
+                <div class="card__foot"><span class="pill pill--success"><svg class="icon"><use href="#i-check"/></svg>Active</span></div></div>
+            </figure></div>
+          <p class="text-heading" id="mint-line" style="margin-top:8px">Satchel #8 is yours.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────────────── 7. Clean-history check ───────────────────────── -->
+  <section class="mm-sec" id="clean">
+    <h2>Clean-history check</h2>
+    <p class="m-note">The buyer's browser checks each past signature; results are revealed in list order, at least 220 ms apart, as they arrive (never held back longer). A finished row gets its mark stuck on and its word rolls in. Clean: the verdict sticks on and Buy rises out of the page. Needs attention: the row gets a danger bar, the verdict arrives without celebration, Buy stays flat, and pressing it nudges once and points at the reason.</p>
+    <div class="mm-grid">
+      <div class="mm-demo" data-scene="clean-ok"><div class="mm-demo__head"><span class="mm-demo__title">Clean</span>
+        <button class="btn btn--icon mm-replay" data-replay="clean-ok" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button></div>
+        <div class="clean" id="clean-a"></div>
+      </div>
+      <div class="mm-demo" data-scene="clean-attention"><div class="mm-demo__head"><span class="mm-demo__title">Needs attention</span>
+        <span class="cluster"><button class="btn btn--icon mm-replay" data-replay="clean-attention" aria-label="Replay"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button><button class="btn btn--secondary mm-replay" data-replay="clean-nudge" type="button">Press Buy</button></span></div>
+        <div class="clean" id="clean-b"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<template id="clean-tpl">
+  <div class="panel">
+    <div class="clean__head">
+      <span class="clean__icon"><svg class="m-spinning" data-h="run" style="color:var(--frozen)"><use href="#i-loader-circle"/></svg><svg data-h="ok" style="color:var(--success);opacity:0"><use href="#i-circle-check"/></svg><svg data-h="bad" style="color:var(--danger);opacity:0"><use href="#i-triangle-alert"/></svg></span>
+      <span class="clean__text">
+        <span data-v="run"><span class="clean__verdict">Checking 3 past signatures…</span><span class="clean__sub" style="display:block">Reading Bitcoin testnet4 and Ethereum Sepolia from your browser.</span></span>
+        <span data-v="ok" style="opacity:0"><span class="clean__verdict">Clean. No past signature can move these coins.</span><span class="clean__sub" style="display:block">Checked in your browser just now · 3 signatures</span></span>
+        <span data-v="bad" style="opacity:0"><span class="clean__verdict">1 past signature could still move coins.</span><span class="clean__sub" style="display:block">Would send 0.2 ETH to 0x51c0…9a2e. The seller has to clear it first.</span></span>
+      </span>
+    </div>
+    <ul class="m-check" style="border-top:1px solid var(--line)">
+      <li class="m-check__row" data-r="0"><span class="m-check__mark"><svg class="m-spinning" data-m="run" style="color:var(--frozen)"><use href="#i-loader-circle"/></svg><svg data-m="ok" style="color:var(--success);opacity:0"><use href="#i-circle-check"/></svg></span>
+        <span class="m-check__main"><span class="m-check__title">Would send 0.01 ETH</span><span class="m-check__meta">Nonce 3 used</span></span>
+        <span class="m-check__word"><span data-w="run" class="muted">Checking…</span><span data-w="ok" style="color:var(--success);opacity:0">Used</span></span></li>
+      <li class="m-check__row" data-r="1"><span class="m-check__mark"><svg class="m-spinning" data-m="run" style="color:var(--frozen)"><use href="#i-loader-circle"/></svg><svg data-m="ok" style="color:var(--success);opacity:0"><use href="#i-circle-check"/></svg></span>
+        <span class="m-check__main"><span class="m-check__title">Would send 0.0005 BTC</span><span class="m-check__meta">Spent in 9c1e…77ab</span></span>
+        <span class="m-check__word"><span data-w="run" class="muted">Checking…</span><span data-w="ok" style="color:var(--success);opacity:0">Used</span></span></li>
+      <li class="m-check__row" data-r="2"><span class="m-check__bar" style="opacity:0"></span><span class="m-check__mark"><svg class="m-spinning" data-m="run" style="color:var(--frozen)"><use href="#i-loader-circle"/></svg><svg data-m="ok" style="color:var(--success);opacity:0"><use href="#i-circle-check"/></svg><svg data-m="bad" style="color:var(--danger);opacity:0"><use href="#i-triangle-alert"/></svg></span>
+        <span class="m-check__main"><span class="m-check__title">Would send 0.2 ETH</span><span class="m-check__meta" data-meta>Nonce 5 used</span></span>
+        <span class="m-check__word"><span data-w="run" class="muted">Checking…</span><span data-w="ok" style="color:var(--success);opacity:0">Used</span><span data-w="bad" style="color:var(--danger);opacity:0">Unused</span></span></li>
+    </ul>
+  </div>
+  <button class="btn btn--primary btn--lg btn--block m-press" type="button" data-buy aria-describedby="">Buy for 5.00 USDC</button>
+  <span class="gate gate-stack" data-gate><span data-g="run" class="muted" style="display:inline-flex;gap:6px;align-items:center"><svg class="icon icon--16 m-spinning"><use href="#i-loader-circle"/></svg>Checking history…</span><span data-g="ok" style="color:var(--success);display:inline-flex;gap:6px;align-items:center;opacity:0"><svg class="icon icon--16"><use href="#i-circle-check"/></svg>Clean history · checked just now</span><span data-g="bad" style="color:var(--danger);display:inline-flex;gap:6px;align-items:center;opacity:0"><svg class="icon icon--16"><use href="#i-triangle-alert"/></svg>Blocked: 1 unused signature</span></span>
+</template>
+
+<script src="motion/motion-kit.js"></script>
+<script>
+(function () {
+  const M = window.SatchelMotion, E = M.EASE;
+  const qs = new URLSearchParams(location.search);
+  if (qs.has("capture")) document.documentElement.setAttribute("data-capture", "");
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const hide = (el) => el.setAttribute("aria-hidden", "true");
+  const show = (el) => el.removeAttribute("aria-hidden");
+  const S = {};
+
+  /* 1. Press */
+  S.press = M.scene({ name: "press", T: 760, tracks: () => M.pressTracks($("#p-press"), 140, 420) });
+  const okBtn = $("#give-ok"), okL = (k) => $(`[data-label="${k}"]`, okBtn);
+  S["morph-ok"] = M.scene({ name: "morph-ok", T: 2300,
+    reset() { okBtn.removeAttribute("data-latched"); show(okL("idle")); hide(okL("busy")); hide(okL("done")); },
+    tracks: () => [...M.pressTracks(okBtn, 200, 1800), ...M.morphTracks(okL("idle"), okL("busy"), 260), ...M.morphTracks(okL("busy"), okL("done"), 1800)],
+    marks: [[260, () => { okBtn.setAttribute("data-latched", ""); hide(okL("idle")); show(okL("busy")); }],
+            [1800, () => { okBtn.removeAttribute("data-latched"); hide(okL("busy")); show(okL("done")); }]] });
+  const cBtn = $("#give-cancel"), cL = (k) => $(`[data-label="${k}"]`, cBtn), banner = $("#cancel-banner");
+  S["morph-cancel"] = M.scene({ name: "morph-cancel", T: 2200,
+    reset() { cBtn.removeAttribute("data-latched"); show(cL("idle")); hide(cL("busy")); },
+    tracks: () => [...M.pressTracks(cBtn, 200, 1500), ...M.morphTracks(cL("idle"), cL("busy"), 260), ...M.morphTracks(cL("busy"), cL("idle"), 1500), ...M.appearTracks(banner, 1580, 220, 8)],
+    marks: [[260, () => { cBtn.setAttribute("data-latched", ""); hide(cL("idle")); show(cL("busy")); }],
+            [1500, () => { cBtn.removeAttribute("data-latched"); hide(cL("busy")); show(cL("idle")); }]] });
+  S["card-hover"] = M.scene({ name: "card-hover", T: 1100, tracks: () => {
+    const c = $("#card-link .card"), s = getComputedStyle(c).getPropertyValue("--sticker-shade").trim();
+    const r = M.reduced();
+    return [
+      { el: c, prop: "translate", frames: r ? [[0, "0 0"], [449, "0 0"], [450, "0 4px"], [649, "0 4px"], [650, "0 0"]]
+        : [[0, "0 0"], [120, "0 0", E.out], [240, "0 -2px"], [450, "0 -2px", E.out], [510, "0 4px"], [650, "0 4px", E.out], [790, "0 -2px"], [900, "0 -2px", E.out], [1020, "0 0"]] },
+      { el: c, prop: "boxShadow", frames: [[0, `0 4px 0 ${s}`], [120, `0 4px 0 ${s}`, E.out], [240, `0 6px 0 ${s}`], [450, `0 6px 0 ${s}`, E.out], [510, `0 0 0 ${s}`], [650, `0 0 0 ${s}`, E.out], [790, `0 6px 0 ${s}`], [900, `0 6px 0 ${s}`, E.out], [1020, `0 4px 0 ${s}`]] },
+    ]; } });
+  S.copy = M.scene({ name: "copy", T: 2100, tracks: () => [
+    ...M.vanishTracks($("#copy-i"), 120, 90, 0), ...M.stickTracks($("#copy-ok"), 120, { from: 1.5, turn: 0 }),
+    ...M.vanishTracks($("#copy-ok"), 1620, 140, 0), ...M.appearTracks($("#copy-i"), 1700, 160, 0)] });
+
+  /* 2. Overlays */
+  const ph = $("#phone"), phSheet = $(".sheet", ph), phScrim = $(".scrim", ph);
+  const dk = $("#desk"), dkSheet = $(".sheet", dk), dkScrim = $(".scrim", dk);
+  const sheetTr = (inn, kind, sheet, scrim) => {
+    if (M.reduced()) return inn ? [{ el: sheet, prop: "opacity", frames: [[0, 0, E.out], [150, 1]] }, { el: scrim, prop: "opacity", frames: [[0, 0], [150, 1]] }]
+      : [{ el: sheet, prop: "opacity", frames: [[0, 1, E.in], [150, 0]] }, { el: scrim, prop: "opacity", frames: [[0, 1], [150, 0]] }];
+    if (kind === "sheet") return inn
+      ? [{ el: sheet, prop: "translate", frames: [[0, "0 100%", E.sheet], [360, "0 0"]] }, { el: scrim, prop: "opacity", frames: [[0, 0, "linear"], [240, 1]] }]
+      : [{ el: sheet, prop: "translate", frames: [[0, "0 0", "cubic-bezier(.32, 0, .67, 0)"], [240, "0 100%"]] }, { el: scrim, prop: "opacity", frames: [[0, 1, "linear"], [200, 0]] }];
+    return inn
+      ? [{ el: sheet, prop: "opacity", frames: [[0, 0, "linear"], [140, 1]] }, { el: sheet, prop: "scale", frames: [[0, "0.96", E.out], [240, "1"]] }, { el: sheet, prop: "translate", frames: [[0, "0 12px", E.out], [240, "0 0"]] }, { el: scrim, prop: "opacity", frames: [[0, 0, "linear"], [200, 1]] }]
+      : [{ el: sheet, prop: "opacity", frames: [[0, 1, E.in], [160, 0]] }, { el: sheet, prop: "scale", frames: [[0, "1", E.in], [160, "0.98"]] }, { el: scrim, prop: "opacity", frames: [[0, 1, "linear"], [160, 0]] }];
+  };
+  const p1 = $('[data-pane="1"]', ph), p2 = $('[data-pane="2"]', ph), stepL = $("[data-steplabel]", ph);
+  const resetPanes = () => { show(p1); hide(p2); stepL.textContent = "Step 1 of 3"; };
+  S["sheet-in"] = M.scene({ name: "sheet-in", T: 400, reset: resetPanes, tracks: () => sheetTr(true, "sheet", phSheet, phScrim) });
+  S["sheet-out"] = M.scene({ name: "sheet-out", T: 280, reset: resetPanes, tracks: () => sheetTr(false, "sheet", phSheet, phScrim) });
+  S["sheet-step"] = M.scene({ name: "sheet-step", T: 320, reset: resetPanes,
+    tracks: () => { p2.removeAttribute("aria-hidden"); const r = M.reduced(), d = 16;
+      const tr = r ? [{ el: p1, prop: "opacity", frames: [[0, 1], [100, 0]] }, { el: p2, prop: "opacity", frames: [[0, 0], [80, 0, E.out], [200, 1]] }]
+        : [{ el: p1, prop: "opacity", frames: [[0, 1, E.in], [120, 0]] }, { el: p1, prop: "translate", frames: [[0, "0 0", E.in], [120, `${-d}px 0`]] },
+           { el: p2, prop: "opacity", frames: [[0, 0], [80, 0, E.out], [280, 1]] }, { el: p2, prop: "translate", frames: [[0, `${d}px 0`], [80, `${d}px 0`, E.out], [280, "0 0"]] }];
+      hide(p2); return tr; },
+    marks: [[0, () => { show(p2); }], [120, () => { hide(p1); stepL.textContent = "Step 2 of 3"; }]] });
+  S["dialog-in"] = M.scene({ name: "dialog-in", T: 280, tracks: () => sheetTr(true, "dialog", dkSheet, dkScrim) });
+  S["dialog-out"] = M.scene({ name: "dialog-out", T: 200, tracks: () => sheetTr(false, "dialog", dkSheet, dkScrim) });
+
+  /* 3. Toasts */
+  const ta = $("#toast-a"), tb = $("#toast-b");
+  const toastInTr = (el, at) => M.reduced() ? [{ el, prop: "opacity", frames: [[0, 0], [at, 0, E.out], [at + 150, 1]] }]
+    : [{ el, prop: "opacity", frames: [[0, 0], [at, 0, E.out], [at + 120, 1]] }, { el, prop: "translate", frames: [[0, "0 16px"], [at, "0 16px", E.out], [at + 260, "0 0"]] }, { el, prop: "scale", frames: [[0, "0.94"], [at, "0.94", E.out], [at + 260, "1"]] }];
+  const toastOutTr = (el, at) => M.reduced() ? [{ el, prop: "opacity", frames: [[0, 1], [at, 1, E.in], [at + 150, 0]] }]
+    : [{ el, prop: "opacity", frames: [[0, 1], [at, 1, E.in], [at + 160, 0]] }, { el, prop: "translate", frames: [[0, "0 0"], [at, "0 0", E.in], [at + 160, "0 8px"]] }];
+  S.toast = M.scene({ name: "toast", T: 1300, tracks: () => [...toastInTr(ta, 0), ...toastOutTr(ta, 1000), { el: tb, prop: "opacity", frames: [[0, 0], [1300, 0]] }] });
+  S["toast-swap"] = M.scene({ name: "toast-swap", T: 760, tracks: () => [...toastOutTr(ta, 100), ...toastInTr(tb, 300)] });
+
+  /* 4. Signing tracker */
+  const STEPS = [
+    { f: "Approve in your wallet", a: "Approve in your wallet", d: "Approved in your wallet" },
+    { f: "Sign with NEAR's signer network", a: "Signing with NEAR's signer network", d: "Signed by NEAR's signer network", timer: true },
+    { f: "Broadcast to Sepolia", a: "Broadcasting to Sepolia", d: "Broadcast to Sepolia" },
+    { f: "Confirmation", a: "Waiting for 1 confirmation", d: "Confirmed" },
+  ];
+  function buildTracker(ol) {
+    ol.innerHTML = STEPS.map((s, i) => `<li class="tracker__step" data-state="future" data-i="${i}"><span class="m-fill"></span>
+      <span class="tracker__mark-stack"><svg class="m-mk m-mk--future m-mark--future"><use href="#i-circle-dashed"/></svg><svg class="m-mk m-mk--active m-mark--active m-spinning"><use href="#i-loader-circle"/></svg><svg class="m-mk m-mk--done m-mark--done"><use href="#i-circle-check"/></svg></span>
+      <span class="tracker__label">${s.f}</span>${s.timer ? '<span class="tracker__meta t-num" data-timer>0:00</span>' : ""}</li>`).join("");
+  }
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  function trackerScene(ol, plan, extra) {
+    // plan: [[stepIndex, activateAt, doneAt|null]]
+    const steps = () => $$(".tracker__step", ol);
+    const marks = [];
+    plan.forEach(([i, a, d]) => {
+      marks.push([a, () => { const s = steps()[i]; s.dataset.state = "active"; s.setAttribute("aria-current", "step"); $(".tracker__label", s).textContent = STEPS[i].a; }]);
+      if (d != null) marks.push([d, () => { const s = steps()[i]; s.dataset.state = "done"; s.removeAttribute("aria-current"); $(".tracker__label", s).textContent = STEPS[i].d; }]);
+      if (STEPS[i].timer) { const end = d == null ? (extra.T) : d; for (let k = 1; a + k * 1000 <= end; k++) marks.push([a + k * 1000, () => { $("[data-timer]", steps()[i]).textContent = fmt(k); }]); }
+    });
+    return {
+      reset() { steps().forEach((s, i) => { s.dataset.state = "future"; s.removeAttribute("aria-current"); $(".tracker__label", s).textContent = STEPS[i].f; const tm = $("[data-timer]", s); if (tm) tm.textContent = "0:00"; }); },
+      marks: marks.concat(extra.marks || []),
+      tracks: () => {
+        const tr = [];
+        plan.forEach(([i, a, d]) => {
+          const s = steps()[i], fut = $(".m-mk--future", s), act = $(".m-mk--active", s), done = $(".m-mk--done", s), fill = $(".m-fill", s);
+          tr.push({ el: fut, prop: "opacity", frames: [[0, 1], [a, 1, E.in], [a + 120, 0]] });
+          tr.push({ el: act, prop: "opacity", frames: d == null ? [[0, 0], [a, 0, E.out], [a + 160, 1]] : [[0, 0], [a, 0, E.out], [a + 160, 1], [d, 1, E.in], [d + 100, 0]] });
+          if (d != null) {
+            tr.push(...M.stickTracks(done, d, { from: 1.5, turn: 0 }));
+            if (M.reduced()) tr.push({ el: fill, prop: "scale", frames: [[0, "1 0"], [d, "1 0"], [d + 1, "1 1"]] });
+            else tr.push({ el: fill, prop: "scale", frames: [[0, "1 0"], [d + 60, "1 0", E.inOut], [d + 360, "1 1"]] });
+          } else tr.push({ el: done, prop: "opacity", frames: [[0, 0], [1, 0]] });
+        });
+        return tr.concat(extra.tracks ? extra.tracks() : []);
+      },
+    };
+  }
+  const trk = $("#trk"), trkEta = $("#trk-eta");
+  buildTracker(trk); buildTracker($("#trk2"));
+  const t1 = trackerScene(trk, [[0, 0, 600], [1, 640, 9700], [2, 9760, 10600], [3, 10640, 12300]], { T: 12900,
+    tracks: () => [...M.vanishTracks($('[data-eta="0"]', trkEta), 12300, 140, -6), ...M.stickTracks($('[data-eta="done"]', trkEta), 12440, { from: 1.3, turn: 0 })] });
+  S.signing = M.scene({ name: "signing", T: 12900, reset: t1.reset, marks: t1.marks, tracks: t1.tracks });
+  const t2eta = $("#trk2-eta"), etaEl = (k) => $(`[data-eta="${k}"]`, t2eta);
+  const roll = (a, b, at) => M.morphTracks(etaEl(a), etaEl(b), at);
+  const t2 = trackerScene($("#trk2"), [[0, 0, 600], [1, 640, null]], { T: 152000,
+    tracks: () => [...roll("0", "20", 20640), ...roll("20", "60", 60640), ...roll("60", "150", 150640)] });
+  S["signing-long"] = M.scene({ name: "signing-long", T: 152000, reset: t2.reset, marks: t2.marks, tracks: t2.tracks });
+
+  /* 5. Charms */
+  const charms = $$("#charms-svg .m-charm");
+  const charmTracks = (amps, delays) => charms.map((g, i) => ({ el: g, prop: "rotate", frames: M.swingFrames(delays[i], amps[i], M.SWING.halfMs, M.SWING.ratio, M.SWING.n) }));
+  S.charms = M.scene({ name: "charms", T: 180 + M.SWING.n * M.SWING.halfMs, tracks: () => M.reduced() ? [] : charmTracks([9, 7.5, 8.5], [0, 90, 180]) });
+  // live: once on view, and a nudge when the pointer brushes a charm (direction from the pointer)
+  const seen = new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting && e.intersectionRatio >= 0.6) { seen.disconnect(); if (!qs.has("capture")) S.charms.start(); } }, { threshold: [0.6] });
+  seen.observe($("#charms-svg"));
+  charms.forEach((g) => g.addEventListener("pointerenter", (e) => M.swing(g, { amp: 5, dir: e.movementX < 0 ? -1 : 1 })));
+  const face = $("#s-face");
+  // one cycle of the CSS loop on a scene clock (a WAAPI animation outranks the CSS one while it exists)
+  S["s-loader"] = M.scene({ name: "s-loader", T: 1600,
+    tracks: () => M.reduced() ? [] : [{ el: face, prop: "translate", frames: [[0, "0 0", E.out], [384, "0 -30px", E.fall], [576, "0 10px", E.out], [832, "0 0"]] }] });
+
+  /* 6. Coins */
+  const rcCoin = $("#rc-coin"), rcOld = $("#rc-old"), rcNew = $("#rc-new"), rcP1 = $("#rc-p1"), rcP2 = $("#rc-p2");
+  S.receive = M.scene({ name: "receive", T: 1300, tracks: () => {
+    // the ticker slides from where it sat after "0" to where it sits after "0.0012" (one layout read)
+    const dx = rcOld.getBoundingClientRect().width - rcNew.getBoundingClientRect().width;
+    const tick = $("#rc-tick");
+    return [
+      { el: rcP1, prop: "opacity", frames: [[0, 1], [300, 1, E.in], [420, 0]] },
+      ...M.stickTracks(rcP2, 320, { from: 1.25, turn: 0 }),
+      ...M.morphTracks(rcOld, rcNew, 420),
+      { el: tick, prop: "translate", frames: M.reduced() ? [[0, `${dx}px 0`], [489, `${dx}px 0`], [490, "0 0"]] : [[0, `${dx}px 0`], [420, `${dx}px 0`, E.out], [640, "0 0"]] },
+      ...M.hopTracks(rcCoin, 420)]; } });
+  const lift = $("#mint-lift"), plate = $("#mint-plate"), mCard = $("#mint-card");
+  S.mint = M.scene({ name: "mint", T: 1500, tracks: () => {
+    if (M.reduced()) return [{ el: lift, prop: "opacity", frames: [[0, 0, E.out], [200, 1]] }, ...M.stickTracks($("#mint-c1"), 260), ...M.stickTracks($("#mint-c2"), 320), ...M.stickTracks($("#mint-yours"), 400), ...M.appearTracks($("#mint-line"), 500, 200, 0)];
+    return [
+      // the card drops into its shadow: from 16 px up (shadow light, far below), lands 2 px into it, settles
+      { el: mCard, prop: "translate", frames: [[0, "0 -16px", E.fall], [240, "0 2px", E.out], [360, "0 0"]] },
+      { el: mCard, prop: "opacity", frames: [[0, 0, E.out], [100, 1]] },
+      { el: mCard, prop: "scale", frames: [[0, "1.04", E.fall], [240, "1"]] },
+      { el: plate, prop: "opacity", frames: [[0, 0, E.out], [240, 1]] },
+      { el: plate, prop: "translate", frames: [[0, "0 0", E.fall], [240, "0 -2px", E.out], [360, "0 0"]] },
+      ...M.stickTracks($("#mint-c1"), 420, { from: 1.7, turn: -18 }),
+      ...M.stickTracks($("#mint-c2"), 540, { from: 1.7, turn: 18 }),
+      ...M.stickTracks($("#mint-yours"), 720),
+      ...M.appearTracks($("#mint-line"), 900, 220, 6),
+    ]; } });
+
+  /* 7. Clean-history check */
+  function buildClean(el) { el.innerHTML = ""; el.appendChild($("#clean-tpl").content.cloneNode(true)); }
+  buildClean($("#clean-a")); buildClean($("#clean-b"));
+  function cleanScene(el, bad) {
+    const q = (s) => $(s, el);
+    const rowsAt = [600, 820, 1040], verdictAt = 1360, buyAt = 1520;
+    return M.scene({ name: bad ? "clean-attention" : "clean-ok", T: 1900,
+      reset() { const b = q("[data-buy]"); b.setAttribute("aria-disabled", "true"); b.setAttribute("aria-describedby", "gate-" + (bad ? "b" : "a")); q("[data-gate]").id = "gate-" + (bad ? "b" : "a"); if (bad) q('[data-r="2"] [data-meta]').textContent = "Nonce 6 isn't used yet"; },
+      marks: [[buyAt, () => { if (!bad) q("[data-buy]").removeAttribute("aria-disabled"); }]],
+      tracks: () => {
+        const tr = [];
+        rowsAt.forEach((at, i) => {
+          const row = q(`[data-r="${i}"]`), isBad = bad && i === 2;
+          tr.push({ el: $('[data-m="run"]', row), prop: "opacity", frames: [[0, 1], [at, 1, E.in], [at + 100, 0]] });
+          tr.push(...M.stickTracks($(isBad ? '[data-m="bad"]' : '[data-m="ok"]', row), at, isBad ? { from: 1.3, turn: 0 } : { from: 1.5, turn: 0 }));
+          tr.push(...M.morphTracks($('[data-w="run"]', row), $(isBad ? '[data-w="bad"]' : '[data-w="ok"]', row), at));
+          if (isBad) {
+            const bar = $(".m-check__bar", row);
+            tr.push({ el: bar, prop: "opacity", frames: [[0, 0], [at, 0], [at + 1, 1]] });
+            tr.push({ el: bar, prop: "scale", frames: M.reduced() ? [[0, "1 1"]] : [[0, "1 0"], [at + 80, "1 0", E.out], [at + 300, "1 1"]] });
+          }
+        });
+        tr.push({ el: q('[data-h="run"]'), prop: "opacity", frames: [[0, 1], [verdictAt, 1, E.in], [verdictAt + 100, 0]] });
+        if (bad) {
+          tr.push(...M.appearTracks(q('[data-h="bad"]'), verdictAt, 160, 0));
+          tr.push({ el: q('[data-h="bad"]'), prop: "scale", frames: M.reduced() ? [[0, "1"]] : [[0, "1.15"], [verdictAt, "1.15", E.out], [verdictAt + 220, "1"]] });
+        } else tr.push(...M.stickTracks(q('[data-h="ok"]'), verdictAt, { from: 1.5, turn: 0 }));
+        tr.push(...M.morphTracks(q('[data-v="run"]'), q(bad ? '[data-v="bad"]' : '[data-v="ok"]'), verdictAt));
+        tr.push(...M.morphTracks(q('[data-g="run"]'), q(bad ? '[data-g="bad"]' : '[data-g="ok"]'), verdictAt));
+        if (!bad) {
+          // Buy rises out of the page: from flat (no shadow, 3 px down) into its sticker shadow
+          const b = q("[data-buy]"), s = getComputedStyle(b).getPropertyValue("--sticker-shade").trim();
+          tr.push({ el: b, prop: "translate", frames: M.reduced() ? [[0, "0 0"]] : [[0, "0 0"], [buyAt - 1, "0 0"], [buyAt, "0 3px", E.out], [buyAt + 220, "0 0"]] });
+          tr.push({ el: b, prop: "boxShadow", frames: M.reduced() ? [[0, "none"], [buyAt - 1, "none"], [buyAt, `0 4px 0 ${s}`]] : [[0, "none"], [buyAt - 1, "none"], [buyAt, `0 0 0 ${s}`, E.out], [buyAt + 220, `0 4px 0 ${s}`]] });
+        }
+        return tr;
+      } });
+  }
+  S["clean-ok"] = cleanScene($("#clean-a"), false);
+  S["clean-attention"] = cleanScene($("#clean-b"), true);
+  S["clean-nudge"] = M.scene({ name: "clean-nudge", T: 420, tracks: () => {
+    const b = $("#clean-b [data-buy]");
+    return M.reduced() ? [] : [{ el: b, prop: "translate", frames: [[0, "0 0"], [40, "0 0", E.inOut], [90, "-4px 0", E.inOut], [150, "4px 0", E.inOut], [210, "-3px 0", E.inOut], [260, "2px 0", E.out], [300, "0 0"]] }]; } });
+
+  /* wiring */
+  function readReduce() { const v = ($('input[name="reduce"]:checked') || {}).value || "system"; return v === "system" ? null : v === "on"; }
+  M.setReduce(qs.has("reduce") ? qs.get("reduce") === "1" : readReduce());
+  document.addEventListener("change", (e) => { if (e.target.name === "reduce") M.setReduce(readReduce()); });
+  $$("[data-replay]").forEach((b) => b.addEventListener("click", () => {
+    const k = b.dataset.replay;
+    if (k === "clean-nudge") { S["clean-attention"].seek(1900); }
+    S[k].start({ rate: k === "signing-long" ? 10 : 1 });
+  }));
+  // live buttons: the morph CTAs run their scenes on click; the copy button too
+  okBtn.addEventListener("click", () => S["morph-ok"].start());
+  cBtn.addEventListener("click", () => S["morph-cancel"].start());
+  $("#copy-btn").addEventListener("click", () => S.copy.start());
+  M.pressable(document);
+  // captures
+  window.__scenes = S;
+  window.__scene = (name, ms, prep) => { if (prep) S[prep.name].seek(prep.at); S[name].seek(ms); };
+  window.__T = (name) => S[name].T;
+  if (!qs.has("capture")) document.fonts.ready.then(() => { S["clean-ok"].start(); S["clean-attention"].start(); S.signing.start(); S.mint.start(); });
+})();
+</script>
+</body>
+</html>

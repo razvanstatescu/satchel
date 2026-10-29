@@ -1,0 +1,17 @@
+{
+ "unsignedHex": "0x02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0",
+ "lengthBytes": 48,
+ "typeByte": "0x02",
+ "keccak": "0xbc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377",
+ "fields": {
+  "chain_id": "0xaa36a7",
+  "nonce": "0x",
+  "max_priority_fee_per_gas": "0x030d48",
+  "max_fee_per_gas": "0x030d5c",
+  "gas_limit": "0x5208",
+  "to": "0x61739f33adbb7f76c1b5b222e4119085257528be",
+  "value": "0x5af3107a4000",
+  "data": "0x",
+  "access_list": []
+ }
+}

@@ -1,0 +1,39 @@
+{
+ "at": "2026-10-21T12:03:54.262Z",
+ "ms_to_FINAL": 3880,
+ "tx_hash": "J17rn4CvvpLLmbVJCaRTBuoPU5EjPNNuC5Sjzx3FP6Rk",
+ "final_execution_status": "FINAL",
+ "status": {
+  "Failure": {
+   "ActionError": {
+    "index": 0,
+    "kind": {
+     "FunctionCallError": {
+      "ExecutionError": "Smart contract panicked: panicked at 'assertion failed: `(left == right)`\n  left: `\"satchel-spk-pay-e9ea1a.testnet\"`,\n right: `\"usdc.fakes.testnet\"`: NO PERMISSION', test-token/src/lib.rs:56:9"
+     }
+    }
+   }
+  }
+ },
+ "receipts": [
+  {
+   "id": "24paepSfJsoKh2YqdiduUFrFA8sknwTiUX5gChvzgdmV",
+   "executor": "usdc.fakes.testnet",
+   "block": "274092890",
+   "status": "Failure",
+   "fail": "{\"ActionError\":{\"index\":0,\"kind\":{\"FunctionCallError\":{\"ExecutionError\":\"Smart contract panicked: panicked at 'assertion failed: `(left == right)`\\n  left: `\\\"satchel-spk-pay-e9ea1a.testnet\\\"`,\\n right: `\\\"usdc.fakes.testnet\\\"`: NO PERMISSION', test-token/src/lib.rs:56:9\"}}}}",
+   "logs": [],
+   "tokens_burnt": "139321534147800000000",
+   "gas_burnt": 1393215341478
+  },
+  {
+   "id": "BE9bzUJzGhLopbau9amXiSLyHTQjf3m9bukJSjDcnTxL",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274092891",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+{
+ "key": "02725c718120c09a",
+ "final": {
+  "id": "L19",
+  "scene": "S09",
+  "text": "Satchel. Hand over the wallet. Let the buyer check every signature.",
+  "say": "Satchel. Hand over the wallet. Let the buyer check every signature.",
+  "file": "vo/L19.mp3",
+  "duration": 4.34,
+  "words": [
+   {
+    "text": "Satchel.",
+    "start": 0.1,
+    "end": 0.5
+   },
+   {
+    "text": "Hand",
+    "start": 0.98,
+    "end": 1.18
+   },
+   {
+    "text": "over",
+    "start": 1.26,
+    "end": 1.4
+   },
+   {
+    "text": "the",
+    "start": 1.44,
+    "end": 1.5
+   },
+   {
+    "text": "wallet.",
+    "start": 1.6,
+    "end": 1.94
+   },
+   {
+    "text": "Let",
+    "start": 2.36,
+    "end": 2.48
+   },
+   {
+    "text": "the",
+    "start": 2.52,
+    "end": 2.64
+   },
+   {
+    "text": "buyer",
+    "start": 2.68,
+    "end": 2.98
+   },
+   {
+    "text": "check",
+    "start": 3.04,
+    "end": 3.38
+   },
+   {
+    "text": "every",
+    "start": 3.46,
+    "end": 3.66
+   },
+   {
+    "text": "signature.",
+    "start": 3.8,
+    "end": 4.26
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel, hand over the wallet. Let the buyer check every signature"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8,
+  "speed": 0.95
+ },
+ "say": "Satchel. Hand over the wallet. Let the buyer check every signature.",
+ "prev": "If it's clean, one transaction, bound to that exact history, pays the seller."
+}

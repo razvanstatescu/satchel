@@ -1,0 +1,13 @@
+HTTP/2 200 
+server: nginx/1.31.6
+date: Wed, 21 Oct 2026 11:28:41 GMT
+content-type: application/json
+content-length: 293
+cache-control: public, max-age=1
+x-credits-used: 1
+vary: accept-encoding
+vary: origin, access-control-request-method, access-control-request-headers
+access-control-allow-origin: *
+access-control-expose-headers: *
+alt-svc: h3=":443"; ma=86400
+

@@ -1,0 +1,56 @@
+{
+ "key": "62139101180d381e",
+ "final": {
+  "id": "L04",
+  "scene": "S01",
+  "text": "It's all one NFT.",
+  "say": "It's all one NFT.",
+  "file": "vo/L04.mp3",
+  "duration": 1.69,
+  "words": [
+   {
+    "text": "It's",
+    "start": 0.08,
+    "end": 0.28
+   },
+   {
+    "text": "all",
+    "start": 0.38,
+    "end": 0.54
+   },
+   {
+    "text": "one",
+    "start": 0.68,
+    "end": 0.86
+   },
+   {
+    "text": "NFT.",
+    "start": 1.02,
+    "end": 1.54
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "It's all one NFT"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "It's all one NFT.",
+ "prev": "A Solana wallet.",
+ "next": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens."
+}

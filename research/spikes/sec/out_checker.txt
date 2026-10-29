@@ -1,0 +1,8 @@
+evm: signed nonce already finalized                        {"status":"spent","why":"finalized nonce 69 > max signed 68"}
+evm: signed nonce far in future                            {"status":"unspent","why":"nonce 1000068 not yet consumed (latest count 70)"}
+btc: input of a confirmed tx (outpoint spent)              {"status":"spent","why":"spent by 19cfbc1c11… with 21 confirmations"}
+btc: still-unspent output                                  {"status":"unspent","why":"outpoint unspent"}
+btc: outpoint of a tx that does not exist                  {"status":"unspent","why":"outpoint does not exist (yet) — a pre-signed spend of a future output is still live"}
+sol: fresh blockhash                                       {"status":"unspent","why":"blockhash still valid (≤150 blocks old)"}
+sol: blockhash ~500 slots old, record 10 min old           {"status":"expired","why":"blockhash no longer valid and record older than 5 min"}
+sol: blockhash ~500 slots old, record 1 min old            {"status":"settling","why":"blockhash not valid at processed, but record younger than 5 min (lagging RPC?)"}

@@ -1,0 +1,33 @@
+HTTP/2 200 
+date: Wed, 21 Oct 2026 11:47:29 GMT
+content-type: application/json
+content-length: 61
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+access-control-allow-headers: Authorization, Content-Type, Accept, Second-Factor-Proof-Token, Client-Id, Access-Token, X-Cb-Project-Name, X-Cb-Is-Logged-In, X-Cb-Platform, X-Cb-Session-Uuid, X-Cb-Pagekey, X-Cb-UJS, Fingerprint-Tokens, X-Cb-Device-Id, X-Cb-Version-Name, X-Subaccount-Uuid
+access-control-allow-methods: GET,POST,DELETE,PUT
+access-control-allow-origin: *
+access-control-allow-private-network: true
+access-control-expose-headers: 
+access-control-max-age: 7200
+cache-control: no-store
+grpc-metadata-cache-control: public, max-age=60
+grpc-metadata-content-type: application/grpc
+grpc-metadata-vary: Accept-Language
+server: cloudflare
+x-xss-protection: 1; mode=block
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+trace-id: 5562405971340759001
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-forwarded-for: asset-stats.cbhq.net
+x-forwarded-port: 8001
+x-frame-options: SAMEORIGIN
+accept-ranges: bytes
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=LLG1fOvyjRJcLino63imZSg5WdKJ5LKL3advheBTzqSW3514UZsFLQQszaOUGchAq1EerBEICh21Nt9lfywkvdweQBgRK5AUFHpaVr5rYOJ2JhuBhIzRISduj4ikoT4dnMBNNwF8zD%2FtsVd2UJk%3D"}]}
+last-modified: Wed, 21 Oct 2026 11:47:29 GMT
+cf-cache-status: MISS
+vary: accept-encoding
+set-cookie: __cf_bm=XjaZSvtG5AClVA5iBh8KQIUx59MHulefcWY7d18mthM-1792583248.9726489-1.0.1.1-9hnQsIc2U_iiyF2u3Xao3sfljJaIqDUBWHBc7547Dg0GnE548BZKImITl1V2mczdnqR85O_k65AVT1UGrlRxEeCpARo9BT83HiiC2eM_YtemMdelae18wSm7mttldUz1; HttpOnly; SameSite=None; Secure; Path=/; Domain=coinbase.com; Expires=Wed, 21 Oct 2026 12:17:29 GMT
+cf-ray: a4e0071a1b58c9e0-OTP
+

@@ -1,0 +1,91 @@
+{
+ "key": "a85b99648f2fbb4b",
+ "final": {
+  "id": "L12",
+  "scene": "S07a",
+  "text": "Satchel writes down every signature before NEAR's signer network makes it.",
+  "say": "Satchel writes down every signature before Near's signer network makes it.",
+  "file": "vo/L12.mp3",
+  "duration": 4.21,
+  "words": [
+   {
+    "text": "Satchel",
+    "start": 0.12,
+    "end": 0.44
+   },
+   {
+    "text": "writes",
+    "start": 0.52,
+    "end": 0.82
+   },
+   {
+    "text": "down",
+    "start": 0.84,
+    "end": 1.18
+   },
+   {
+    "text": "every",
+    "start": 1.24,
+    "end": 1.46
+   },
+   {
+    "text": "signature",
+    "start": 1.62,
+    "end": 2.08
+   },
+   {
+    "text": "before",
+    "start": 2.18,
+    "end": 2.56
+   },
+   {
+    "text": "NEAR's",
+    "start": 2.62,
+    "end": 2.92
+   },
+   {
+    "text": "signer",
+    "start": 2.98,
+    "end": 3.24
+   },
+   {
+    "text": "network",
+    "start": 3.32,
+    "end": 3.72
+   },
+   {
+    "text": "makes",
+    "start": 3.78,
+    "end": 4
+   },
+   {
+    "text": "it.",
+    "start": 4.059,
+    "end": 4.16
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel writes down every signature before Near's signer network makes it"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Satchel writes down every signature before Near's signer network makes it.",
+ "prev": "So how does a buyer know it's clean?",
+ "next": "List it, and signing pauses. The history stops growing."
+}

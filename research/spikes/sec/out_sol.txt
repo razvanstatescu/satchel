@@ -1,0 +1,33 @@
+
+[1] legacy message: recentBlockhash extraction + Ed25519 over the message bytes
+  PASS parser extracts recentBlockhash cGfHiC6K… from 194-byte message
+  PASS transfer amount and destination parsed
+  PASS Ed25519 signature over the raw message bytes is the transaction signature (web3.js verifySignatures)
+  PASS message 194 B fits MPC EDDSA_PAYLOAD_SIZE_UPPER_BOUND_BYTES=1232
+
+[2] durable-nonce detection (never-expiring signatures)
+  PASS first ix = SystemProgram AdvanceNonceAccount detected; "recentBlockhash" field holds the nonce value
+  PASS refused: durable-nonce tx (never expires) refused
+  PASS variant with seller as nonce authority: 2 signers; only the seller could ever advance (kill) it
+  PASS AdvanceNonceAccount data is exactly 04000000 when built normally
+  note: agave get_durable_nonce checks data.get(..4) == 4u32 LE (prefix) => contract must use the same prefix rule
+  PASS AdvanceNonce in position >0: not durable for the runtime, still refused by the allowlist
+
+[3] v0 messages and address lookup tables
+  PASS v0 message starts with 0x80 version prefix
+  PASS v0 without lookups: parsed + accepted
+  PASS with an ALT the destination is NOT in the message bytes (only a table index) — contract cannot log it
+  PASS v0 with ALT refused in MVP: address lookup tables refused in MVP (hidden accounts)
+  PASS v0: signature is over 0x80||message bytes
+
+[4] allowlist refusals (standing authorizations / account takeover)
+  PASS SystemProgram.Assign (hands the wallet account to a program) refused: instruction refused: program 11111111… tag 1
+  PASS CreateAccount refused
+  PASS SPL Token Approve (delegate) refused
+  PASS off-chain message (\xffsolana offchain…) refused: unsupported message version 127
+  PASS trailing byte refused
+  PASS multi-signer message refused in MVP (Satchel must be the only signer)
+
+ALL 20 CHECKS PASSED
+(node:45987) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)

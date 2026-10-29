@@ -1,0 +1,27 @@
+{
+  "stitch-run": {
+    "gen": 1.0,
+    "influence": 0.8,
+    "prompt": "Leather saddle stitching foley: a sharp needle rapidly punching through thick vegetable-tanned leather, six crisp ticks in a steady fast rhythm, evenly spaced about six per second, tick-tick-tick-tick-tick-tick, each tick a dry punchy puncture with a tiny thread tug, close-mic, intimate, satisfying, no music, no reverb."
+  },
+  "stitch-single": {
+    "gen": 0.5,
+    "influence": 0.8,
+    "prompt": "A single sharp needle puncture through thick leather, one loud crisp dry tick at the very start, close-mic foley, no music, no reverb."
+  },
+  "heartbeat-tension": {
+    "gen": 2.0,
+    "influence": 0.8,
+    "prompt": "Two slow heartbeats, deep muffled low thumps in a lub-dub pattern, one heartbeat at the start and another one second later, dark tense cinematic pulse, no music, nothing else."
+  },
+  "riser-4s": {
+    "gen": 4.5,
+    "influence": 0.7,
+    "prompt": "Cinematic tension riser lasting the full four and a half seconds, starting quiet and rising steadily in pitch and intensity until the very end, cutting off abruptly at its loudest point, no impact, no drums, no music."
+  },
+  "approve-chime": {
+    "gen": 0.7,
+    "influence": 0.8,
+    "prompt": "A subtle two-note confirmation chime for a wallet approval: two soft warm mallet notes, a lower note then a higher note a fifth above about 0.15 seconds later, ding-ding, gentle and quiet, short natural decay, clean, dry, no music, no reverb tail."
+  }
+}

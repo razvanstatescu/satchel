@@ -1,0 +1,259 @@
+{
+  "Running": {
+    "add_domains_votes": {
+      "proposal_by_account": {}
+    },
+    "domains": {
+      "domains": [
+        {
+          "id": 0,
+          "protocol": "CaitSith",
+          "purpose": "Sign",
+          "reconstruction_threshold": 11
+        },
+        {
+          "id": 1,
+          "protocol": "Frost",
+          "purpose": "Sign",
+          "reconstruction_threshold": 11
+        },
+        {
+          "id": 2,
+          "protocol": "ConfidentialKeyDerivation",
+          "purpose": "CKD",
+          "reconstruction_threshold": 11
+        },
+        {
+          "id": 3,
+          "protocol": "CaitSith",
+          "purpose": "ForeignTx",
+          "reconstruction_threshold": 11
+        }
+      ],
+      "next_domain_id": 4
+    },
+    "keyset": {
+      "domains": [
+        {
+          "attempt": 1,
+          "domain_id": 0,
+          "key": {
+            "Secp256k1": {
+              "near_public_key": "secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3"
+            }
+          }
+        },
+        {
+          "attempt": 0,
+          "domain_id": 1,
+          "key": {
+            "Ed25519": {
+              "edwards_point": [
+                87,
+                250,
+                193,
+                125,
+                62,
+                246,
+                7,
+                222,
+                13,
+                52,
+                179,
+                58,
+                18,
+                195,
+                58,
+                130,
+                12,
+                149,
+                243,
+                102,
+                186,
+                172,
+                40,
+                227,
+                40,
+                252,
+                15,
+                7,
+                157,
+                181,
+                179,
+                127
+              ],
+              "near_public_key_compressed": "ed25519:6vSEtQxrQj6txUMh33WC4ERyCWmNMRTdufDWAaDY3Un2"
+            }
+          }
+        },
+        {
+          "attempt": 2,
+          "domain_id": 2,
+          "key": {
+            "Bls12381": {
+              "public_key": "bls12381g2:xeYho48G2Sr9oJz4gw9sLGZGspeeKpHZvMDAwWvoNTRnVMFJH96GxX98TT2MRhTtsot1wcGR1Ti2Xh8PCsbYJ2enbLNdJXDvTYSK8aTE3nJ5NZXU7Kt1F6mFtReWs5pR4kj"
+            }
+          }
+        },
+        {
+          "attempt": 0,
+          "domain_id": 3,
+          "key": {
+            "Secp256k1": {
+              "near_public_key": "secp256k1:2KGCoy2pZt7n85QfJnQzCT1eHySuNpquUfNc8ySpRbr15F5kqU7agJYjfo5RkrzNd4tZimDFv2wAZri7RRZ32qj1"
+            }
+          }
+        }
+      ],
+      "epoch_id": 25
+    },
+    "parameters": {
+      "participants": {
+        "next_id": 26,
+        "participants": [
+          [
+            "mpc-lgns.testnet",
+            4,
+            {
+              "tls_public_key": "ed25519:3WRrF9mJDdEMqCf4a3ppDmkfj4Je2BJQaiJo1jpQPL42",
+              "url": "http://185.100.234.36:80"
+            }
+          ],
+          [
+            "near-mpc-staking4all-01.testnet",
+            5,
+            {
+              "tls_public_key": "ed25519:3ubAfCDP8PSuuZdhBn7ga1DTkkzzG4WAXUQuA52qw4t7",
+              "url": "http://multichain-testnet-01.staking4all.org"
+            }
+          ],
+          [
+            "n1-multichain.testnet",
+            8,
+            {
+              "tls_public_key": "ed25519:CQiCLGcysAhxtobgc74TTGWLN2mtpvye9Uy4ZKs3hB1S",
+              "url": "http://91.134.92.20:80"
+            }
+          ],
+          [
+            "nodemonster.testnet",
+            10,
+            {
+              "tls_public_key": "ed25519:CxF9YRspHctsWXNdGe71goUFF6UQWZXYwTRFSyyUWbDe",
+              "url": "http://near-mpc-test.node.monster:80"
+            }
+          ],
+          [
+            "everstake-mpc.testnet",
+            12,
+            {
+              "tls_public_key": "ed25519:7uRz67qvG1FJin1hUtSjycDZBDzMcruXc6jrQcFo9q2L",
+              "url": "http://45.82.67.106:80"
+            }
+          ],
+          [
+            "stakin-mpc2.testnet",
+            13,
+            {
+              "tls_public_key": "ed25519:5DSXubzHiCRGSTzZDaBAYmFmj3paz69A2X68NpBskbZR",
+              "url": "http://near-mpc-testnet-1.stakin-nodes.com"
+            }
+          ],
+          [
+            "bst-near.testnet",
+            14,
+            {
+              "tls_public_key": "ed25519:BejVE2zzb4SRTm24ofAMWu8EZEhD2CFniWCg8XXv98Lj",
+              "url": "http://near-mpc-testnet.svc.blacksand.xyz"
+            }
+          ],
+          [
+            "aurora-multichain.testnet",
+            15,
+            {
+              "tls_public_key": "ed25519:BU4MSD2foE7gr11A77PFHzKnAMa5wGZEs8YMFvGSbU1e",
+              "url": "http://near.mpc.testnet.aurora.dev"
+            }
+          ],
+          [
+            "mpch-01.testnet",
+            16,
+            {
+              "tls_public_key": "ed25519:DXzu1tDdvQtcQGHtv1HZyy3L8RsJ7ozkmz7i9nrka31h",
+              "url": "http://mpch-mpc-near-t-01.near.testnet.mpch.io"
+            }
+          ],
+          [
+            "greenfield-keeper.testnet",
+            18,
+            {
+              "tls_public_key": "ed25519:GfQyJVbiZ79C3TFd6w5SnBqqKbYR98m8AVUihdRdbE3Y",
+              "url": "http://near-mpc-testnet2.greenfield.xyz:80"
+            }
+          ],
+          [
+            "svrn-01.testnet",
+            19,
+            {
+              "tls_public_key": "ed25519:9sBcGSuX882tnHzZiso9XjGNaxw4Gw4eNTbB2PSW8pXh",
+              "url": "http://svrn-mpc-near-t-01.near.testnet.ssgllc.io"
+            }
+          ],
+          [
+            "hashkeycloud_mpc.testnet",
+            20,
+            {
+              "tls_public_key": "ed25519:5Gdh1wt5ycSSgt5KsriwE6s3yUyXbMEg84C1DPsYWr2p",
+              "url": "http://near-mpc-testnet-1.hashkey.cloud"
+            }
+          ],
+          [
+            "nansen-validator-01.testnet",
+            21,
+            {
+              "tls_public_key": "ed25519:6TDToaVVmE7ijTcQ2ntHHo1ySu2uNAqohtr7mymQA1np",
+              "url": "http://mpc.near.staking.banansen.dev"
+            }
+          ],
+          [
+            "klever-nearmpc-01.testnet",
+            22,
+            {
+              "tls_public_key": "ed25519:J8eJWzhxvGWasQSaBByT6giD727wECBqVMZNYpzcMvXn",
+              "url": "http://multichain-testnet-01.klever.io"
+            }
+          ],
+          [
+            "bitwise-mpc01.testnet",
+            23,
+            {
+              "tls_public_key": "ed25519:BDQof7X7Levc1iPBBUWq72ZTtzveUNagZXdaGx7dFq8j",
+              "url": "http://near-mpc-testnet01.testnet.validators.bitwiseinvestments.com"
+            }
+          ],
+          [
+            "natsai-mpc.testnet",
+            24,
+            {
+              "tls_public_key": "ed25519:J6Nw6Fe1bH24Fjs2WEprhzf6cyZK5KLwbAGAFATFFRSG",
+              "url": "http://173.231.48.2:80"
+            }
+          ],
+          [
+            "astrostakers.testnet",
+            25,
+            {
+              "tls_public_key": "ed25519:32zyc7q4H9MpnRoDjFVFCJKuKk1x7QcthLBZ8qmNRuNe",
+              "url": "http://near-testnet-mpc.astrostakers.com"
+            }
+          ]
+        ]
+      },
+      "threshold": 11
+    },
+    "parameters_votes": {
+      "proposal_by_account": {}
+    },
+    "previously_cancelled_resharing_epoch_id": null
+  }
+}

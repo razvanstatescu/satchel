@@ -1,0 +1,76 @@
+{
+ "key": "0b035372429bbe8e",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Then send from it, on all three chains.",
+ "prev": "Fill it from any wallet or exchange, straight to its addresses.",
+ "next": "Approve in your Near wallet, and Near Chain Signatures signs a native transaction.",
+ "final": {
+  "id": "V07",
+  "scene": "P3",
+  "text": "Then send from it, on all three chains.",
+  "say": "Then send from it, on all three chains.",
+  "file": "v2/vo/V07.mp3",
+  "duration": 2.86,
+  "words": [
+   {
+    "text": "Then",
+    "start": 0.1,
+    "end": 0.28
+   },
+   {
+    "text": "send",
+    "start": 0.46,
+    "end": 0.72
+   },
+   {
+    "text": "from",
+    "start": 0.74,
+    "end": 0.9
+   },
+   {
+    "text": "it,",
+    "start": 0.96,
+    "end": 1.1
+   },
+   {
+    "text": "on",
+    "start": 1.36,
+    "end": 1.6
+   },
+   {
+    "text": "all",
+    "start": 1.68,
+    "end": 1.88
+   },
+   {
+    "text": "three",
+    "start": 1.92,
+    "end": 2.12
+   },
+   {
+    "text": "chains.",
+    "start": 2.24,
+    "end": 2.78
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Then send from it on all three chains"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

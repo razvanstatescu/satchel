@@ -1,0 +1,14 @@
+<!doctype html><html><body><pre id="out">pending</pre>
+<script>
+window.__errs=[];
+window.addEventListener('error', e => { window.__errs.push('error: ' + e.message); document.getElementById('out').textContent = 'LOAD-ERROR ' + JSON.stringify(window.__errs) });
+window.addEventListener('unhandledrejection', e => { window.__errs.push('rejection: ' + (e.reason && e.reason.message || e.reason)); });
+</script>
+<script src="iife-minimal.js"></script>
+<script>
+(async () => {
+  const o = document.getElementById('out');
+  try { const t0 = performance.now(); const r = await window.__run(); o.textContent = 'OK ' + JSON.stringify(r) + ' ms=' + (performance.now()-t0).toFixed(1) + ' hasBuffer=' + (typeof Buffer) + ' errs=' + JSON.stringify(window.__errs) }
+  catch (e) { o.textContent = 'RUN-ERROR ' + (e && e.message) + ' hasBuffer=' + (typeof Buffer) + ' errs=' + JSON.stringify(window.__errs) }
+})();
+</script></body></html>

@@ -1,0 +1,121 @@
+{
+ "key": "ad808844ba185f70",
+ "final": {
+  "id": "L07",
+  "scene": "S04",
+  "text": "Satchel has no seed phrase. Through NEAR Chain Signatures, it signs only for the NFT's current owner.",
+  "say": "Satchel has no seed phrase. Through Near Chain Signatures, it signs only for the NFT's current owner.",
+  "file": "vo/L07.mp3",
+  "duration": 6.73,
+  "words": [
+   {
+    "text": "Satchel",
+    "start": 0.12,
+    "end": 0.54
+   },
+   {
+    "text": "has",
+    "start": 0.62,
+    "end": 0.86
+   },
+   {
+    "text": "no",
+    "start": 0.92,
+    "end": 1.1
+   },
+   {
+    "text": "seed",
+    "start": 1.16,
+    "end": 1.38
+   },
+   {
+    "text": "phrase.",
+    "start": 1.4,
+    "end": 1.8
+   },
+   {
+    "text": "Through",
+    "start": 2.36,
+    "end": 2.58
+   },
+   {
+    "text": "NEAR",
+    "start": 2.62,
+    "end": 2.76
+   },
+   {
+    "text": "Chain",
+    "start": 2.88,
+    "end": 3.08
+   },
+   {
+    "text": "Signatures,",
+    "start": 3.22,
+    "end": 3.78
+   },
+   {
+    "text": "it",
+    "start": 4.08,
+    "end": 4.2
+   },
+   {
+    "text": "signs",
+    "start": 4.26,
+    "end": 4.66
+   },
+   {
+    "text": "only",
+    "start": 4.74,
+    "end": 5.02
+   },
+   {
+    "text": "for",
+    "start": 5.04,
+    "end": 5.14
+   },
+   {
+    "text": "the",
+    "start": 5.18,
+    "end": 5.28
+   },
+   {
+    "text": "NFT's",
+    "start": 5.36,
+    "end": 5.94
+   },
+   {
+    "text": "current",
+    "start": 6,
+    "end": 6.28
+   },
+   {
+    "text": "owner.",
+    "start": 6.4,
+    "end": 6.66
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel has no seed phrase. Through NEAR Chain signatures, it signs only for the NFT's current owner"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Satchel has no seed phrase. Through Near Chain Signatures, it signs only for the NFT's current owner.",
+ "prev": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+ "next": "But a signature made before the sale…"
+}

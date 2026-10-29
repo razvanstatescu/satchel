@@ -1,0 +1,126 @@
+{
+ "key": "0c474cb895b3ab61",
+ "final": {
+  "id": "L12",
+  "scene": "S07",
+  "text": "Satchel signs only plain transfers it can read, and records each one before NEAR's signer network signs it.",
+  "say": "Satchel signs only plain transfers it can read, and records each one before Near's signer network signs it.",
+  "file": "vo/L12.mp3",
+  "duration": 6.72,
+  "words": [
+   {
+    "text": "Satchel",
+    "start": 0.1,
+    "end": 0.42
+   },
+   {
+    "text": "signs",
+    "start": 0.54,
+    "end": 0.92
+   },
+   {
+    "text": "only",
+    "start": 0.98,
+    "end": 1.3
+   },
+   {
+    "text": "plain",
+    "start": 1.36,
+    "end": 1.62
+   },
+   {
+    "text": "transfers",
+    "start": 1.72,
+    "end": 2.26
+   },
+   {
+    "text": "it",
+    "start": 2.3,
+    "end": 2.4
+   },
+   {
+    "text": "can",
+    "start": 2.44,
+    "end": 2.58
+   },
+   {
+    "text": "read,",
+    "start": 2.64,
+    "end": 2.94
+   },
+   {
+    "text": "and",
+    "start": 3.34,
+    "end": 3.44
+   },
+   {
+    "text": "records",
+    "start": 3.48,
+    "end": 3.98
+   },
+   {
+    "text": "each",
+    "start": 4.04,
+    "end": 4.22
+   },
+   {
+    "text": "one",
+    "start": 4.34,
+    "end": 4.62
+   },
+   {
+    "text": "before",
+    "start": 4.66,
+    "end": 5
+   },
+   {
+    "text": "NEAR's",
+    "start": 5.12,
+    "end": 5.42
+   },
+   {
+    "text": "signer",
+    "start": 5.48,
+    "end": 5.72
+   },
+   {
+    "text": "network",
+    "start": 5.78,
+    "end": 6.18
+   },
+   {
+    "text": "signs",
+    "start": 6.24,
+    "end": 6.5
+   },
+   {
+    "text": "it.",
+    "start": 6.56,
+    "end": 6.66
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel signs only plain transfers it can read and records each one before NEAR's signer network signs it"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Satchel signs only plain transfers it can read, and records each one before Near's signer network signs it.",
+ "prev": "So how does a buyer know it's clean?",
+ "next": "List it, and signing pauses. The history stops growing."
+}

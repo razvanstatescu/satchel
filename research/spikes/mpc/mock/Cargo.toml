@@ -1,0 +1,20 @@
+[package]
+name = "mpc-mock"
+description = "THROWAWAY Phase 0 spike: mock signer mirroring MPC yield/timeout path. Never import."
+version = "0.0.1"
+edition = "2021"
+repository = "https://example.invalid/throwaway"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "=5.29.1"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

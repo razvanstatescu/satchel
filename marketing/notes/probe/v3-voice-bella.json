@@ -1,0 +1,149 @@
+{
+ "id": "hpp4J3VqNfWAUOO0d1Us",
+ "why": "premade; \"Professional, Bright, Warm\": polished narrative quality",
+ "file": "notes/probe/v3-voice-bella.mp3",
+ "durationSec": 9.6,
+ "words": [
+  {
+   "text": "Stick",
+   "start": 0,
+   "end": 0.288
+  },
+  {
+   "text": "it",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "on.",
+   "start": 0.4,
+   "end": 0.72
+  },
+  {
+   "text": "Hand",
+   "start": 0.92,
+   "end": 1.28
+  },
+  {
+   "text": "it",
+   "start": 1.32,
+   "end": 1.36
+  },
+  {
+   "text": "over.",
+   "start": 1.44,
+   "end": 2.04
+  },
+  {
+   "text": "Satchel",
+   "start": 2.32,
+   "end": 2.64
+  },
+  {
+   "text": "keeps",
+   "start": 2.72,
+   "end": 2.96
+  },
+  {
+   "text": "the",
+   "start": 3,
+   "end": 3.04
+  },
+  {
+   "text": "receipts.",
+   "start": 3.28,
+   "end": 3.92
+  },
+  {
+   "text": "And",
+   "start": 4.16,
+   "end": 4.24
+  },
+  {
+   "text": "there's",
+   "start": 4.28,
+   "end": 4.48
+  },
+  {
+   "text": "no",
+   "start": 4.56,
+   "end": 4.72
+  },
+  {
+   "text": "admin",
+   "start": 4.88,
+   "end": 5.2
+  },
+  {
+   "text": "key.",
+   "start": 5.28,
+   "end": 5.76
+  },
+  {
+   "text": "Not",
+   "start": 5.92,
+   "end": 6.08
+  },
+  {
+   "text": "even",
+   "start": 6.2,
+   "end": 6.32
+  },
+  {
+   "text": "ours.",
+   "start": 6.56,
+   "end": 7.04
+  },
+  {
+   "text": "So",
+   "start": 7.28,
+   "end": 7.36
+  },
+  {
+   "text": "it",
+   "start": 7.44,
+   "end": 7.52
+  },
+  {
+   "text": "can't",
+   "start": 7.6,
+   "end": 7.76
+  },
+  {
+   "text": "sign",
+   "start": 7.84,
+   "end": 8.16
+  },
+  {
+   "text": "anything",
+   "start": 8.24,
+   "end": 8.64
+  },
+  {
+   "text": "off",
+   "start": 8.72,
+   "end": 8.8
+  },
+  {
+   "text": "the",
+   "start": 8.88,
+   "end": 8.92
+  },
+  {
+   "text": "record.",
+   "start": 8.96,
+   "end": 9.68
+  }
+ ],
+ "spanSec": 9.68,
+ "wpmOverall": 161,
+ "wpmArticulation": 161,
+ "pauses": [],
+ "notEvenOurs": {
+  "pauseBefore": 0.16,
+  "durSec": 1.12
+ },
+ "wpmOffTarget": 6,
+ "heard": "Stick it on, hand it over. Satchel keeps the receipts, and there's no admin key, not even ours, so it can't sign anything off the record",
+ "sttExact": true
+}

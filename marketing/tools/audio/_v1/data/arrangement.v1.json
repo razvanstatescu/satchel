@@ -1,0 +1,139 @@
+{
+ "_comment": "Bar-aligned edit of the raw Eleven Music take onto the timeline. Specific to take 2 (music_v1, seed 2026); a new take needs a new edit list. Times are on the musical grid (multiples of 0.5 s); the source's beat grid offset (beatOffset, measured by beats.mjs + phase check) is added to every time. Analysis of the raw take (tools/audio/work/music/score.take2.raw.mp3): 0-8 hits, 8-20 groove, 20-24 sparse dropout, 24-44 lighter groove (F# minor), 44-52 breakdown, 52-56 riser, DROP at 56, full groove 56-92, drumless F# major outro 92-104 that decays to silence. The model put the drop 8 s late (it asked for 48), so the edit removes 8 s before the drop and repeats 4 groove bars after it.",
+ "source": "tools/audio/work/music/score.take2.raw.mp3",
+ "out": "video/public/music/score.mp3",
+ "beatOffset": 0.0316,
+ "durationSec": 104,
+ "segments": [
+  {
+   "t0": 0,
+   "t1": 40,
+   "s0": 0,
+   "why": "S01-S05a as composed"
+  },
+  {
+   "t0": 40,
+   "t1": 48,
+   "s0": 48,
+   "why": "S05b falls away into the breakdown tail, S06 = the composed riser (s52-56)"
+  },
+  {
+   "t0": 48,
+   "t1": 80,
+   "s0": 56,
+   "why": "the composed DROP lands on the logo/S07 boundary (T48)"
+  },
+  {
+   "t0": 80,
+   "t1": 88,
+   "s0": 80,
+   "why": "repeat 4 groove bars (s80-88) to give back the 8 s"
+  },
+  {
+   "t0": 88,
+   "t1": 104,
+   "s0": 88,
+   "why": "groove to 92, then the composed drumless F# major outro for S09"
+  }
+ ],
+ "gain": [
+  {
+   "t0": 40,
+   "t1": 43.5,
+   "db": -14,
+   "why": "S05b near silence under 'So how does a buyer know it's clean?'"
+  },
+  {
+   "t0": 43.5,
+   "t1": 44,
+   "db": 0,
+   "ramp": true
+  }
+ ],
+ "sweeps": [
+  {
+   "type": "lowpass",
+   "t0": 28,
+   "t1": 40,
+   "fromHz": 1000,
+   "toHz": 18000,
+   "why": "S05a rising tension: filter opens over 6 bars"
+  },
+  {
+   "type": "highpass",
+   "t0": 84,
+   "t1": 88,
+   "fromHz": 30,
+   "toHz": 900,
+   "why": "S08 lift: groove thins out, snaps back full on the stitch hit"
+  }
+ ],
+ "subHits": [
+  {
+   "t": 40,
+   "db": -6,
+   "why": "S05: single deep sub hit as everything falls away"
+  },
+  {
+   "t": 88,
+   "db": -12,
+   "why": "S08: the stitch lands (marker stitchLand)"
+  }
+ ],
+ "cues": [
+  {
+   "id": "S01",
+   "start": 0,
+   "end": 8,
+   "what": "punchy hits on every beat (kick + stabs)"
+  },
+  {
+   "id": "S02-S04",
+   "start": 8,
+   "end": 28,
+   "what": "groove, F# minor; sparse dropout 20-24 (under L07)"
+  },
+  {
+   "id": "S05a",
+   "start": 28,
+   "end": 40,
+   "what": "groove under a low-pass opening 1 kHz -> 18 kHz (rising tension)"
+  },
+  {
+   "id": "S05b",
+   "start": 40,
+   "end": 44,
+   "what": "falls away: deep sub hit on 40, then near silence (-14 dB breakdown tail)"
+  },
+  {
+   "id": "S06",
+   "start": 44,
+   "end": 48,
+   "what": "riser"
+  },
+  {
+   "id": "S07",
+   "start": 48,
+   "end": 84,
+   "what": "DROP on 48, driving four-on-the-floor groove, claps on 2 and 4"
+  },
+  {
+   "id": "S08a",
+   "start": 84,
+   "end": 88,
+   "what": "lift: groove thins (high-pass sweep 30 Hz -> 900 Hz)"
+  },
+  {
+   "id": "S08b",
+   "start": 88,
+   "end": 92,
+   "what": "stitch hit on 88: full groove slams back + sub hit"
+  },
+  {
+   "id": "S09",
+   "start": 92,
+   "end": 104,
+   "what": "drumless F# major outro; swell on 96, decays to silence by ~103.5"
+  }
+ ]
+}

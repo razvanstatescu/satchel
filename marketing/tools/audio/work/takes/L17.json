@@ -1,0 +1,86 @@
+{
+ "key": "2a0f441c18946011",
+ "final": {
+  "id": "L17",
+  "scene": "S07",
+  "text": "And the contract has no admin key. Not even ours.",
+  "say": "And the contract has no admin key. Not even ours.",
+  "file": "vo/L17.mp3",
+  "duration": 3.44,
+  "words": [
+   {
+    "text": "And",
+    "start": 0.06,
+    "end": 0.14
+   },
+   {
+    "text": "the",
+    "start": 0.18,
+    "end": 0.26
+   },
+   {
+    "text": "contract",
+    "start": 0.32,
+    "end": 0.84
+   },
+   {
+    "text": "has",
+    "start": 0.88,
+    "end": 1.1
+   },
+   {
+    "text": "no",
+    "start": 1.2,
+    "end": 1.4
+   },
+   {
+    "text": "admin",
+    "start": 1.5,
+    "end": 1.86
+   },
+   {
+    "text": "key.",
+    "start": 1.92,
+    "end": 2.14
+   },
+   {
+    "text": "Not",
+    "start": 2.58,
+    "end": 2.72
+   },
+   {
+    "text": "even",
+    "start": 2.78,
+    "end": 2.96
+   },
+   {
+    "text": "ours.",
+    "start": 3.04,
+    "end": 3.38
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "And the contract has no admin key, not even ours"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "And the contract has no admin key. Not even ours.",
+ "prev": "If one old signature could still move coins, Buy stays disabled.",
+ "next": "If it's clean, one transaction, bound to that exact history, pays the seller."
+}

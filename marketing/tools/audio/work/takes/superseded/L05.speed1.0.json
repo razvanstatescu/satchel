@@ -1,0 +1,111 @@
+{
+ "key": "d2b0db2dff9c3f8a",
+ "final": {
+  "id": "L05",
+  "scene": "S02",
+  "text": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+  "say": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+  "file": "vo/L05.mp3",
+  "duration": 5.84,
+  "words": [
+   {
+    "text": "Transfer",
+    "start": 0.08,
+    "end": 0.5
+   },
+   {
+    "text": "the",
+    "start": 0.56,
+    "end": 0.66
+   },
+   {
+    "text": "NFT,",
+    "start": 0.74,
+    "end": 1.3
+   },
+   {
+    "text": "and",
+    "start": 1.58,
+    "end": 1.66
+   },
+   {
+    "text": "the",
+    "start": 1.7,
+    "end": 1.84
+   },
+   {
+    "text": "whole",
+    "start": 1.92,
+    "end": 2.12
+   },
+   {
+    "text": "wallet",
+    "start": 2.24,
+    "end": 2.58
+   },
+   {
+    "text": "goes",
+    "start": 2.62,
+    "end": 2.84
+   },
+   {
+    "text": "with",
+    "start": 2.88,
+    "end": 3.02
+   },
+   {
+    "text": "it.",
+    "start": 3.06,
+    "end": 3.18
+   },
+   {
+    "text": "No",
+    "start": 3.74,
+    "end": 3.84
+   },
+   {
+    "text": "bridge.",
+    "start": 3.94,
+    "end": 4.32
+   },
+   {
+    "text": "No",
+    "start": 4.7,
+    "end": 4.84
+   },
+   {
+    "text": "wrapped",
+    "start": 4.92,
+    "end": 5.24
+   },
+   {
+    "text": "tokens.",
+    "start": 5.3,
+    "end": 5.78
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Transfer the NFT and the whole wallet goes with it. No bridge, no wrapped tokens"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+ "prev": "There's no seed phrase to copy. The contract signs only for whoever owns the NFT.",
+ "next": "Sell a whole position in one trade."
+}

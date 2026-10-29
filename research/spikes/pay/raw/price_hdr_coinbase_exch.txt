@@ -1,0 +1,24 @@
+HTTP/2 200 
+date: Wed, 21 Oct 2026 11:47:29 GMT
+content-type: application/json; charset=utf-8
+set-cookie: __cf_bm=MwSPROj0IqodZP_DTtU78uhldu4M4_QOnsd65s10Lh0-1792583249.205281-1.0.1.1-SK05Z8NLLT.e3fTHtkXJ_YK2kIA2IOwNkzo6I3wHNweFs2CuAk_rrB61sUbGon64gJaQG.AMrBPB5EKHo89t8vpEFyxthCZBaZTi.f3NLjTQWOhcXgmBUqnzXnqywNYS; HttpOnly; SameSite=None; Secure; Path=/; Domain=exchange.coinbase.com; Expires=Wed, 21 Oct 2026 12:17:29 GMT
+access-control-allow-headers: Content-Type, Accept, cb-session, cb-fp, cb-form-factor
+access-control-allow-methods: GET,POST,DELETE,PUT
+access-control-allow-origin: *
+access-control-expose-headers: cb-before, cb-after, cb-gdpr
+access-control-max-age: 7200
+cache-control: public, max-age=1, must-revalidate
+report-to: {"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=J6TUOWwYT4YR%2Fk8W8%2BRsjJIu5NdUdghB5EIrWCs%2F7sr2nci%2FDX5pH2%2FVJNNawuieYNOLOQB3gTqjyYIiusVCGH61Ql0XtVnl%2FUSjFirYRGj5bOQc1GHKf8izV5alAc%2BMMipiHnU%2BVC4HoBs8W%2Bn007ijLp3nOx4%3D"}]}
+etag: W/"97-PJYpeReSuqnULYGikvm6wcUDP+0"
+strict-transport-security: max-age=15552000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-xss-protection: 1; mode=block
+nel: {"report_to":"cf-nel","success_fraction":0.01,"max_age":604800}
+vary: accept-encoding
+cf-cache-status: MISS
+server: cloudflare
+cf-ray: a4e0071b8c8ab8d9-OTP
+

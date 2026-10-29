@@ -1,0 +1,21 @@
+[package]
+name = "btc-fanout-spike"
+description = "THROWAWAY Phase-0 spike (2026-10-21): BTC BIP143 preimage -> on-chain sha256d -> N parallel MPC sign promises joined with .and(). Never import into the product."
+version = "0.0.1"
+edition = "2021"
+repository = "https://example.invalid/throwaway"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+near-sdk = "=5.29.1"
+hex = "0.4"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true

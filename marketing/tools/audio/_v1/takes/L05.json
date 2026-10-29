@@ -1,0 +1,106 @@
+{
+ "key": "b271a0cc26ace3f6",
+ "final": {
+  "id": "L05",
+  "scene": "S02",
+  "text": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+  "say": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+  "file": "vo/L05.mp3",
+  "duration": 5.5,
+  "words": [
+   {
+    "text": "Sell",
+    "start": 0.12,
+    "end": 0.32
+   },
+   {
+    "text": "the",
+    "start": 0.36,
+    "end": 0.5
+   },
+   {
+    "text": "NFT,",
+    "start": 0.56,
+    "end": 1.14
+   },
+   {
+    "text": "and",
+    "start": 1.44,
+    "end": 1.54
+   },
+   {
+    "text": "you",
+    "start": 1.6,
+    "end": 1.7
+   },
+   {
+    "text": "hand",
+    "start": 1.76,
+    "end": 1.96
+   },
+   {
+    "text": "over",
+    "start": 2.04,
+    "end": 2.18
+   },
+   {
+    "text": "the",
+    "start": 2.22,
+    "end": 2.32
+   },
+   {
+    "text": "wallet.",
+    "start": 2.38,
+    "end": 2.72
+   },
+   {
+    "text": "No",
+    "start": 3.32,
+    "end": 3.44
+   },
+   {
+    "text": "bridge.",
+    "start": 3.54,
+    "end": 3.9
+   },
+   {
+    "text": "No",
+    "start": 4.34,
+    "end": 4.46
+   },
+   {
+    "text": "wrapped",
+    "start": 4.56,
+    "end": 4.88
+   },
+   {
+    "text": "tokens.",
+    "start": 4.94,
+    "end": 5.42
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Sell the NFT and you hand over the wallet. No bridge, no wrapped tokens"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+ "prev": "It's all one NFT.",
+ "next": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy."
+}

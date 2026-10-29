@@ -1,0 +1,266 @@
+{
+  "whoosh-fast": {
+    "file": "sfx/whoosh-fast.mp3",
+    "duration": 0.469,
+    "peakSec": 0.115,
+    "prompt": "Fast short air whoosh pass-by, a quick rush of air sweeping past the microphone, rising to a peak then falling away, clean, dry, no music, no reverb tail.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "whoosh-deep": {
+    "file": "sfx/whoosh-deep.mp3",
+    "duration": 0.867,
+    "peakSec": 0.165,
+    "prompt": "Heavy deep cinematic whoosh, a large object passing by fast with low-end rumble, swells to a peak in the middle then fades out quickly, clean, dry, no music, no reverb tail.",
+    "gainDb": -4,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "swish-short": {
+    "file": "sfx/swish-short.mp3",
+    "duration": 0.3,
+    "peakSec": 0.045,
+    "prompt": "Very short swish, a thin cane swiping through the air once, single quick swipe, clean, dry, no music, no reverb tail.",
+    "gainDb": -7,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "whip-pan": {
+    "file": "sfx/whip-pan.mp3",
+    "duration": 0.328,
+    "peakSec": 0.025,
+    "prompt": "Bright quick whip pan whoosh transition, airy high-frequency swipe, snappy and fast, clean, dry, no music, no reverb tail.",
+    "gainDb": -2.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "impact-deep": {
+    "file": "sfx/impact-deep.mp3",
+    "duration": 1.2,
+    "peakSec": 0.065,
+    "prompt": "Deep cinematic impact hit, a punchy transient at the very start then a powerful sub bass boom that decays within one second, single trailer hit, no riser before it, no music.",
+    "gainDb": -3,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "impact-brass": {
+    "file": "sfx/impact-brass.mp3",
+    "duration": 0.8,
+    "peakSec": 0.015,
+    "prompt": "A solid brass plate struck once with a mallet, sharp metallic transient then a short warm metallic ring that decays fast, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": 1.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "impact-soft": {
+    "file": "sfx/impact-soft.mp3",
+    "duration": 0.414,
+    "peakSec": 0.025,
+    "prompt": "Soft felt thud, a padded mallet hitting a thick leather cushion once, muffled low dull impact, clean, dry, no music, no reverb tail.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "ui-tick": {
+    "file": "sfx/ui-tick.mp3",
+    "duration": 0.089,
+    "peakSec": 0.005,
+    "prompt": "One single crisp tiny click, a precise small mechanical switch tick, extremely short, one click only, clean, dry, no music, no reverb tail.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "ui-click": {
+    "file": "sfx/ui-click.mp3",
+    "duration": 0.2,
+    "peakSec": 0.015,
+    "prompt": "One single soft premium button press, a tactile muted click of a high-end device button, one press only, clean, dry, no music, no reverb tail.",
+    "gainDb": -6.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "type-tick-run": {
+    "file": "sfx/type-tick-run.mp3",
+    "duration": 1.156,
+    "peakSec": 0.445,
+    "prompt": "Fast run of crisp mechanical keyboard key ticks, rapid typing of a short string, about fifteen quick evenly spaced clicks, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "gainDb": -1.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "stitch-run": {
+    "file": "sfx/stitch-run.mp3",
+    "duration": 0.975,
+    "peakSec": 0.515,
+    "prompt": "Close-up foley of a sewing needle punching through thick leather by hand, rhythmic tick-tick-tick, about six evenly spaced crisp punctures with a slight thread pull, satisfying, intimate, clean, dry, no music, no reverb tail.",
+    "gainDb": -2.5,
+    "source": "composite",
+    "hitsSec": [
+      0.01,
+      0.17,
+      0.34,
+      0.505,
+      0.675,
+      0.84
+    ],
+    "note": "Composite (tools/sfx/composite.mjs): 6 layered punctures ~165 ms apart; the body grain is from stitch-run v1, the crisp grain from stitch-single v2. Both stitch-run generations returned only 1-2 hits."
+  },
+  "stitch-single": {
+    "file": "sfx/stitch-single.mp3",
+    "duration": 0.149,
+    "peakSec": 0.025,
+    "prompt": "One single sewing needle punching through thick leather, a crisp tiny puncture tick, close-mic foley, one puncture only, clean, dry, no music, no reverb tail.",
+    "gainDb": -4.5,
+    "source": "composite",
+    "note": "Composite: body grain (stitch-run v1) + crisp grain (stitch-single v2); matches the punctures in stitch-run. v1 was near-silent."
+  },
+  "leather-creak": {
+    "file": "sfx/leather-creak.mp3",
+    "duration": 0.6,
+    "peakSec": 0.175,
+    "prompt": "Thick leather creaking as it is bent, a short low stretched creak of a leather satchel strap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -5.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "paper-slide": {
+    "file": "sfx/paper-slide.mp3",
+    "duration": 0.6,
+    "peakSec": 0.305,
+    "prompt": "A sheet of heavy paper sliding across a leather surface, one smooth short slide, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -10.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "pocket-slip": {
+    "file": "sfx/pocket-slip.mp3",
+    "duration": 0.685,
+    "peakSec": 0.235,
+    "prompt": "A paper slip being slid into a tight leather jacket pocket, short friction slide ending in a soft settle, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -6,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "riser-4s": {
+    "file": "sfx/riser-4s.mp3",
+    "duration": 3.995,
+    "peakSec": 3.845,
+    "prompt": "Cinematic tension riser lasting the full four and a half seconds, starting quiet and rising steadily in pitch and intensity until the very end, cutting off abruptly at its loudest point, no impact, no drums, no music.",
+    "gainDb": -10,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "v2 (4.5 s generation), last 4.0 s kept so it ends at full level. v1 built for only ~3.6 s."
+  },
+  "downlifter": {
+    "file": "sfx/downlifter.mp3",
+    "duration": 1.485,
+    "peakSec": 0.685,
+    "prompt": "Cinematic downlifter, a falling pitch sweep that starts loud then descends and fades out smoothly, no drums, no music.",
+    "gainDb": -16.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "sub-drop": {
+    "file": "sfx/sub-drop.mp3",
+    "duration": 1.485,
+    "peakSec": 1.145,
+    "prompt": "Deep sub bass drop, a low boom that pitches down and decays, clean, no music, no other sounds.",
+    "gainDb": -15.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "freeze-shimmer": {
+    "file": "sfx/freeze-shimmer.mp3",
+    "duration": 1.2,
+    "peakSec": 0.095,
+    "prompt": "Subtle icy crystalline shimmer, delicate glassy sparkle like frost forming on glass, soft and short, no music.",
+    "gainDb": -13,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "success-brass": {
+    "file": "sfx/success-brass.mp3",
+    "duration": 1,
+    "peakSec": 0.025,
+    "prompt": "A warm small brass bell chime struck once, elegant positive confirmation tone, clear pleasant ring that decays naturally, no other instruments, no music.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "error-low": {
+    "file": "sfx/error-low.mp3",
+    "duration": 0.485,
+    "peakSec": 0.015,
+    "prompt": "A low muted negative tone, a soft dull descending two-note blip signalling denial, gentle, not a buzzer, not harsh, no music.",
+    "gainDb": -15.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "counter-roll": {
+    "file": "sfx/counter-roll.mp3",
+    "duration": 0.93,
+    "peakSec": 0.715,
+    "prompt": "Fast descending digital ticks, a rapid number counter rolling down like a balance draining, quick tiny clicks, clean, no music.",
+    "gainDb": -10,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "scanner-sweep": {
+    "file": "sfx/scanner-sweep.mp3",
+    "duration": 0.958,
+    "peakSec": 0.505,
+    "prompt": "Photocopier scanner light bar sweeping across the glass, a smooth electric motor hum moving from one end to the other, clean, no music.",
+    "gainDb": -8,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "glitch-short": {
+    "file": "sfx/glitch-short.mp3",
+    "duration": 0.3,
+    "peakSec": 0.005,
+    "prompt": "Subtle short digital glitch stutter, a quick data corruption blip, clean, no music.",
+    "gainDb": -7.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "heartbeat-tension": {
+    "file": "sfx/heartbeat-tension.mp3",
+    "duration": 1.98,
+    "peakSec": 0.045,
+    "prompt": "Slow low tension heartbeat pulse, deep muffled thumps, dark and ominous, no music.",
+    "gainDb": -7,
+    "source": "composite",
+    "hitsSec": [
+      0.025,
+      0.34,
+      1.025,
+      1.34
+    ],
+    "note": "Composite: the v2 lub-dub repeated 1.0 s later (60 bpm). v1 was one decaying hit."
+  },
+  "lock-clunk": {
+    "file": "sfx/lock-clunk.mp3",
+    "duration": 0.485,
+    "peakSec": 0.085,
+    "prompt": "A heavy satisfying mechanical latch locking, solid metal clunk of a vault bolt sliding shut, single action, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -1.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "deposit-ping": {
+    "file": "sfx/deposit-ping.mp3",
+    "duration": 0.6,
+    "peakSec": 0.025,
+    "prompt": "A bright, soft, premium notification ping for an incoming payment, one single clear note like a small tuned metal bar struck gently with a soft mallet, a delicate airy sparkle on top, quick attack and short smooth decay, elegant and modern, not a cash register, not a video game coin, no music.",
+    "gainDb": -4,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "count-up": {
+    "file": "sfx/count-up.mp3",
+    "duration": 0.9,
+    "peakSec": 0.725,
+    "prompt": "Fast descending digital ticks, a rapid number counter rolling down like a balance draining, quick tiny clicks, clean, no music.",
+    "gainDb": -9,
+    "source": "composite",
+    "note": "Composite: counter-roll's ticks under a rising varispeed (0.72x to 1.0x), so it pairs with counter-roll (same tick sound, rising ~5.7 semitones, accelerating). The generated count-up (warmer, 2-8 kHz, also ascending) is kept as tools/sfx/_raw/count-up.mp3."
+  },
+  "approve-chime": {
+    "file": "sfx/approve-chime.mp3",
+    "duration": 0.641,
+    "peakSec": 0.145,
+    "prompt": "A subtle two-note confirmation chime for an approval, two soft warm mallet tones rising a gentle interval, the second note shortly after the first, quiet and reassuring, clean, dry, no music, no reverb tail.",
+    "gainDb": -12,
+    "source": "composite",
+    "hitsSec": [
+      0.005,
+      0.135
+    ],
+    "note": "Composite: the v1 note (C5, ~523 Hz) then the same note a fifth up (G5, ~785 Hz) 130 ms later. Both generations (v1, and v2 with an explicit two-note prompt) returned one sustained note."
+  },
+  "card-flick": {
+    "file": "sfx/card-flick.mp3",
+    "duration": 0.35,
+    "peakSec": 0.135,
+    "prompt": "A quick crisp flick of a stiff leather card sliding into place, one short snappy friction swipe ending in a tiny soft tap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": 0,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  }
+}

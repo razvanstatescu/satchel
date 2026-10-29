@@ -1,0 +1,126 @@
+{
+  "mode": "batch",
+  "path": "satchel/1/btc",
+  "predecessor": "satchel-spk-btc-e9ea1a.testnet",
+  "rpc": "https://near-testnet.drpc.org",
+  "gasPerSignTgas": 50,
+  "startedAt": "2026-10-21T11:38:34.548Z",
+  "hashes": [
+    "b7f0149bd692c47910c985754062e405405f9a5eda60acdf58b0dc5204339496",
+    "16f39ad5240e1ef0ad805bf78a225151026c1b44e53cbfec4d03e0988b15e40e"
+  ],
+  "results": [
+    {
+      "hashes": [
+        "b7f0149bd692c47910c985754062e405405f9a5eda60acdf58b0dc5204339496",
+        "16f39ad5240e1ef0ad805bf78a225151026c1b44e53cbfec4d03e0988b15e40e"
+      ],
+      "submitMs": 68,
+      "txHash": "9afVH1GCZibSeJwPNEofmj1R5rQPxbDPfCN7ge6Z2yC6",
+      "ms": 118776,
+      "gasBurntTgas": 22.371456056097,
+      "tokensBurntNEAR": 0.0021255543243597,
+      "receipts": 10,
+      "status": "Failure",
+      "failures": [
+        {
+          "ActionError": {
+            "index": 0,
+            "kind": {
+              "FunctionCallError": {
+                "ExecutionError": "Smart contract panicked: Request has timed out."
+              }
+            }
+          }
+        },
+        {
+          "ActionError": {
+            "index": 0,
+            "kind": {
+              "FunctionCallError": {
+                "ExecutionError": "Smart contract panicked: Request has timed out."
+              }
+            }
+          }
+        }
+      ],
+      "sigs": [],
+      "perReceipt": [
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 8.508794516609,
+          "status": "SuccessReceiptId",
+          "block": "5PahP674UK3mSVDWhV8bZsxHSwfzRUN4bFMxGFPycu7Z"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.920485378388,
+          "status": "SuccessReceiptId",
+          "block": "8bfFrSrvdZf8f9Fg1YrRuu5PVavspx7MoevBnQ1sDKKN"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 2.192009235266,
+          "status": "Failure",
+          "block": "AxNet5eaLZoE1HxEq2RNqLccNBQHG5GHDcjE1KrGAYbz"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "GV9QfDjvCnq1gzhwxQUWgyMquEnCN4KXd87subGTa7N5"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "AxNet5eaLZoE1HxEq2RNqLccNBQHG5GHDcjE1KrGAYbz"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.920452468148,
+          "status": "SuccessReceiptId",
+          "block": "8bfFrSrvdZf8f9Fg1YrRuu5PVavspx7MoevBnQ1sDKKN"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 2.192009235266,
+          "status": "Failure",
+          "block": "AxNet5eaLZoE1HxEq2RNqLccNBQHG5GHDcjE1KrGAYbz"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "GV9QfDjvCnq1gzhwxQUWgyMquEnCN4KXd87subGTa7N5"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "AxNet5eaLZoE1HxEq2RNqLccNBQHG5GHDcjE1KrGAYbz"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "7n9d8uQL2uc2S9MvP3g3d6WCZWfyaSionupcYfLeyArj"
+        }
+      ],
+      "result": {
+        "Failure": {
+          "ActionError": {
+            "index": 0,
+            "kind": {
+              "FunctionCallError": {
+                "ExecutionError": "Smart contract panicked: Request has timed out."
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "totalMs": 118877,
+  "rpcCalls": 32
+}

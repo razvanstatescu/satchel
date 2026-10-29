@@ -1,0 +1,32 @@
+{
+ "at": "2026-10-21T12:19:07.471Z",
+ "ms_to_FINAL": 3224,
+ "tx_hash": "52aCkXrun7PvjJvGbdx4K1WbUtxqzB2V2gBwAzpBQRVJ",
+ "final_execution_status": "FINAL",
+ "status": {
+  "SuccessValue": "net0000\""
+ },
+ "receipts": [
+  {
+   "id": "4thMbu2ruyeKE3UjDNdgh5KyLUFMeGGyUaK5H4PM3iAC",
+   "executor": "recv.satchel-spk-pay-e9ea1a.testnet",
+   "block": "274094435",
+   "status": "SuccessValue",
+   "logs": [
+    "pred=satchel-spk-pay-e9ea1a.testnet",
+    "input={\"sender_id\":\"attacker.testnet\",\"amount\":\"999999999\",\"msg\":\"{\\\"buy\\\":\\\"1\\\"}\"}"
+   ],
+   "tokens_burnt": "96593720903300000000",
+   "gas_burnt": 965937209033
+  },
+  {
+   "id": "9DsQghSAqNWbHs2vW3d1jN5uX3gWXuQrcsx746L34qKK",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274094436",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

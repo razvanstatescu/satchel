@@ -1,0 +1,121 @@
+{
+ "key": "b9e9b31e71efc8e5",
+ "final": {
+  "id": "L23",
+  "scene": "W3",
+  "text": "Approve in your NEAR wallet, and NEAR Chain Signatures signs a native Bitcoin, Ethereum or Solana transaction.",
+  "say": "Approve in your Near wallet, and Near Chain Signatures signs a native Bitcoin, Ethereum or Solana transaction.",
+  "file": "vo/L23.mp3",
+  "duration": 6.72,
+  "words": [
+   {
+    "text": "Approve",
+    "start": 0.08,
+    "end": 0.46
+   },
+   {
+    "text": "in",
+    "start": 0.48,
+    "end": 0.58
+   },
+   {
+    "text": "your",
+    "start": 0.62,
+    "end": 0.72
+   },
+   {
+    "text": "NEAR",
+    "start": 0.84,
+    "end": 1.02
+   },
+   {
+    "text": "wallet,",
+    "start": 1.14,
+    "end": 1.44
+   },
+   {
+    "text": "and",
+    "start": 1.66,
+    "end": 1.78
+   },
+   {
+    "text": "NEAR",
+    "start": 1.84,
+    "end": 2
+   },
+   {
+    "text": "Chain",
+    "start": 2.12,
+    "end": 2.32
+   },
+   {
+    "text": "Signatures",
+    "start": 2.44,
+    "end": 2.98
+   },
+   {
+    "text": "signs",
+    "start": 3.06,
+    "end": 3.32
+   },
+   {
+    "text": "a",
+    "start": 3.38,
+    "end": 3.46
+   },
+   {
+    "text": "native",
+    "start": 3.52,
+    "end": 3.8
+   },
+   {
+    "text": "Bitcoin,",
+    "start": 3.92,
+    "end": 4.42
+   },
+   {
+    "text": "Ethereum",
+    "start": 4.64,
+    "end": 5.18
+   },
+   {
+    "text": "or",
+    "start": 5.36,
+    "end": 5.44
+   },
+   {
+    "text": "Solana",
+    "start": 5.56,
+    "end": 5.94
+   },
+   {
+    "text": "transaction.",
+    "start": 6.02,
+    "end": 6.68
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Approve in your NEAR wallet and NEAR Chain Signatures signs a native Bitcoin, Ethereum, or Solana transaction"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Approve in your Near wallet, and Near Chain Signatures signs a native Bitcoin, Ethereum or Solana transaction.",
+ "prev": "Then spend it like any wallet.",
+ "next": "There's no seed phrase to copy. The contract signs only for whoever owns the NFT."
+}

@@ -1,0 +1,247 @@
+{
+ "positive_global_styles": [
+  "120 BPM",
+  "4/4",
+  "instrumental",
+  "bright premium indie-pop",
+  "handclaps",
+  "plucked bass",
+  "glockenspiel",
+  "whistled hook melody (whistling, no singing)",
+  "playful but grown-up",
+  "warm, crisp modern mix",
+  "clean mix with space for a voiceover",
+  "continuous music, no gaps"
+ ],
+ "negative_global_styles": [
+  "vocals",
+  "singing",
+  "choir",
+  "childish",
+  "nursery rhyme",
+  "kazoo",
+  "cartoon sound effects",
+  "EDM",
+  "dubstep",
+  "trap",
+  "cheesy",
+  "tempo changes",
+  "swing feel",
+  "lo-fi",
+  "long silent gaps"
+ ],
+ "sections": [
+  {
+   "section_name": "Intro (M1a)",
+   "positive_local_styles": [
+    "glockenspiel pickup notes",
+    "three light finger snaps",
+    "sparse and bright",
+    "a playful lift into the groove"
+   ],
+   "negative_local_styles": [
+    "drums",
+    "bass"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Hook groove (M1b)",
+   "positive_local_styles": [
+    "the groove kicks in on the first beat: handclaps, plucked bass, tight kick and snare",
+    "glockenspiel and a whistled hook melody",
+    "bright and confident"
+   ],
+   "negative_local_styles": [
+    "slow build",
+    "fade in"
+   ],
+   "duration_ms": 10000,
+   "lines": []
+  },
+  {
+   "section_name": "Product build (M2a)",
+   "positive_local_styles": [
+    "the groove continues and builds",
+    "glockenspiel plinks on eighth notes",
+    "warm plucked bass",
+    "shaker"
+   ],
+   "negative_local_styles": [
+    "breakdown"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  },
+  {
+   "section_name": "Product send (M2b)",
+   "positive_local_styles": [
+    "a fuller groove",
+    "an extra synth pluck layer",
+    "confident and bright"
+   ],
+   "negative_local_styles": [
+    "breakdown"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "Comic break (M2c)",
+   "positive_local_styles": [
+    "one bar of stop-time with a short descending glide",
+    "then the groove comes back"
+   ],
+   "negative_local_styles": [
+    "cartoon",
+    "kazoo"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Give lift (M2d)",
+   "positive_local_styles": [
+    "lift: rising energy toward the chorus",
+    "a snare build on the last bar"
+   ],
+   "negative_local_styles": [
+    "breakdown"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "Chorus (M3)",
+   "positive_local_styles": [
+    "the chorus: the warmest and fullest part of the track",
+    "big handclaps",
+    "the whistled hook in full",
+    "warm major chords",
+    "glockenspiel sparkle",
+    "ends abruptly on the last beat"
+   ],
+   "negative_local_styles": [
+    "minor key",
+    "breakdown"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  },
+  {
+   "section_name": "Catch (M4)",
+   "positive_local_styles": [
+    "the band stops dead on the first beat",
+    "only a soft low heartbeat kick and a quiet ticking hi-hat remain",
+    "dark minor key, very sparse and tense",
+    "one dull thud and one deep sub hit near the end"
+   ],
+   "negative_local_styles": [
+    "bright",
+    "major key",
+    "melody",
+    "handclaps",
+    "chords",
+    "bass line"
+   ],
+   "duration_ms": 14000,
+   "lines": []
+  },
+  {
+   "section_name": "Riser (M5)",
+   "positive_local_styles": [
+    "two-bar riser: snare roll and a rising noise swell building into a big drop"
+   ],
+   "negative_local_styles": [
+    "melody"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Tech drop (M6a)",
+   "positive_local_styles": [
+    "the drop on the first beat: a driving groove on a heavier kit",
+    "the whistled hook melody in a confident register",
+    "plucked bass and handclaps",
+    "full energy"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "build-up",
+    "quiet start"
+   ],
+   "duration_ms": 14000,
+   "lines": []
+  },
+  {
+   "section_name": "Tech groove (M6b)",
+   "positive_local_styles": [
+    "the driving confident groove continues",
+    "glockenspiel accents",
+    "constant energy"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "gaps"
+   ],
+   "duration_ms": 20000,
+   "lines": []
+  },
+  {
+   "section_name": "Blocked (M7)",
+   "positive_local_styles": [
+    "everything drops out except the bass and a ticking hi-hat",
+    "sparse and deflated",
+    "a short build back on the last bar"
+   ],
+   "negative_local_styles": [
+    "full drums",
+    "melody",
+    "handclaps"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Hand-off build (M8a)",
+   "positive_local_styles": [
+    "build-up: a rising filter sweep and a snare roll building to a big hit",
+    "anticipation"
+   ],
+   "negative_local_styles": [
+    "fade",
+    "breakdown"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Landing (M8b)",
+   "positive_local_styles": [
+    "a big crash and landing hit on the first beat",
+    "the full band returns with handclaps and glockenspiel"
+   ],
+   "negative_local_styles": [
+    "gaps"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Outro (M9)",
+   "positive_local_styles": [
+    "the whistled hook resolves on a warm major chord",
+    "a final short hit, then a natural ring-out",
+    "ends cleanly"
+   ],
+   "negative_local_styles": [
+    "abrupt cut",
+    "new drums"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  }
+ ]
+}

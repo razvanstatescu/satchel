@@ -1,0 +1,9 @@
+# Satchel marketing video workspace
+.env*
+node_modules/
+out/
+video/out/
+video/.remotion/
+notes/probe/*.mp3
+*.log
+.DS_Store

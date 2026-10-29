@@ -1,0 +1,26 @@
+{
+  "name": "chains-spike",
+  "private": true,
+  "type": "module",
+  "description": "THROWAWAY Phase 0 spike (chains agent). Never import into product.",
+  "dependencies": {
+    "@near-js/accounts": "^2.5.1",
+    "@near-js/crypto": "^2.5.1",
+    "@near-js/providers": "^2.5.1",
+    "@near-js/signers": "^2.5.1",
+    "@near-js/transactions": "^2.5.1",
+    "@near-js/utils": "^2.5.1",
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "@solana/web3.js": "^1.99.0",
+    "bitcoinjs-lib": "^6.1.9",
+    "bs58": "^6.0.0",
+    "chainsig.js": "^1.1.16",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "viem": "^2.57.7"
+  },
+  "devDependencies": {
+    "buffer": "^6.0.3"
+  }
+}

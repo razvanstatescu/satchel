@@ -1,0 +1,158 @@
+{
+ "_comment": "Bar-line edit of the raw v2 take onto the v2 timeline. Specific to v2 take 2 (music_v1, seed 777); a new take needs a new edit list. Times are on the musical grid; beatOffset (measured) is added to every time. Raw take analysis (tools/audio/work/music/v2/score.music_v1.seed777.raw.mp3): 120.000 BPM, beats at 0.025 + k/2 (high-band onsets on every beat). 0-8 hits; 8-30 bright groove; 30-32 break (= the S04 cut); 32-46 groove; 46-48 break; 48-60 groove; 60-64 dark turn (bass out, C# minor); 64-76 dark drone; 76-80 dip and short rise; DROP at 80; driving groove 80-122 (fills at 87.5, 95.5, 103.5, 111.5, 119.5); drumless outro 122-132 that stops dead at 132.0. Everything from the 46-48 break to the drop sits 4 s late, so the edit removes 2 bars before the break and repeats 2 groove bars before S08, which keeps the outro on 122.",
+ "_tempo": "The raw take is exactly 120.000 BPM: its strong kick/snare transients sit on 0.02 + k/2 s from 2 s to 121.5 s. (beats.mjs mis-fit it as 120.33 BPM and band-onset folds as 119.73 BPM because of the 12 s drumless drone; an early version of this edit wrongly resampled it.) No tempo correction is applied.",
+ "source": "tools/audio/work/music/v2/score.music_v1.seed777.raw.mp3",
+ "out": "video/public/music/score.mp3",
+ "beatOffset": 0.02,
+ "durationSec": 134,
+ "markers": {
+  "subHit": 68,
+  "logoDrop": 76,
+  "stitchLand": 118
+ },
+ "segments": [
+  {
+   "t0": 0,
+   "t1": 40,
+   "s0": 0,
+   "why": "S01 hits, W1-S04 groove (the 30-32 break lands on the S04 cut)"
+  },
+  {
+   "t0": 40,
+   "t1": 44,
+   "s0": 44,
+   "why": "skip 2 bars so the 46-48 break becomes the S02 -> U1 transition (42-44)"
+  },
+  {
+   "t0": 44,
+   "t1": 108,
+   "s0": 48,
+   "why": "U1 groove, S05 dark turn on 56, drone, S06 rise, DROP on 76 (S07 start)"
+  },
+  {
+   "t0": 108,
+   "t1": 112,
+   "s0": 112,
+   "why": "jump forward 2 bars"
+  },
+  {
+   "t0": 112,
+   "t1": 134,
+   "s0": 112,
+   "why": "repeat those 2 bars under the S08 lift, then the fill at 119.5 and the outro on 122"
+  }
+ ],
+ "gain": [
+  {
+   "t0": 68.0,
+   "t1": 68.6,
+   "db": -20,
+   "ramp": true,
+   "curve": "db",
+   "why": "the drone falls away under the sub hit"
+  },
+  {
+   "t0": 68.6,
+   "t1": 73.2,
+   "db": -20,
+   "why": "S05 near silence after the subHit, through the start of S06 (the sub hit itself is added after the gain)"
+  },
+  {
+   "t0": 73.2,
+   "t1": 74,
+   "db": 0,
+   "ramp": true
+  },
+  {
+   "t0": 129.6,
+   "t1": 131.98,
+   "db": -60,
+   "ramp": true,
+   "curve": "db",
+   "why": "the raw outro stops dead at 132.0: fade it out instead"
+  },
+  {
+   "t0": 131.98,
+   "t1": 134,
+   "db": -120
+  }
+ ],
+ "sweeps": [
+  {
+   "type": "highpass",
+   "t0": 112,
+   "t1": 118,
+   "fromHz": 30,
+   "toHz": 900,
+   "why": "S08 lift: groove thins out, snaps back full on the stitch hit"
+  }
+ ],
+ "subHits": [
+  {
+   "t": 68,
+   "db": -9,
+   "why": "S05: one deep sub hit as everything falls away (subHit)"
+  },
+  {
+   "t": 118,
+   "db": -12,
+   "why": "S08: the stitch lands (stitchLand)"
+  }
+ ],
+ "cues": [
+  {
+   "id": "S01",
+   "start": 0,
+   "end": 8,
+   "what": "punchy hits on every beat"
+  },
+  {
+   "id": "W1-S02",
+   "start": 8,
+   "end": 44,
+   "what": "bright groove, brightens from 16; 2-bar breaks at 30-32 (S04 cut) and 42-44 (into U1)"
+  },
+  {
+   "id": "U1",
+   "start": 44,
+   "end": 56,
+   "what": "groove after the break (the take's chorus position)"
+  },
+  {
+   "id": "S05",
+   "start": 56,
+   "end": 72,
+   "what": "dark turn on 56 (bass out, C# minor), dark drone 60-68, deep sub hit on 68 then near silence"
+  },
+  {
+   "id": "S06",
+   "start": 72,
+   "end": 76,
+   "what": "near silence, short rise in the last second (the scene's riser SFX carries it)"
+  },
+  {
+   "id": "S07",
+   "start": 76,
+   "end": 112,
+   "what": "DROP on 76, driving warm groove"
+  },
+  {
+   "id": "S08a",
+   "start": 112,
+   "end": 118,
+   "what": "lift: high-pass sweep 30 Hz -> 900 Hz"
+  },
+  {
+   "id": "S08b",
+   "start": 118,
+   "end": 122,
+   "what": "stitch hit on 118: full groove back + sub hit; fill at 119.5"
+  },
+  {
+   "id": "S09",
+   "start": 122,
+   "end": 134,
+   "what": "drumless outro, faded out by 132 (silent 132-134)"
+  }
+ ]
+}

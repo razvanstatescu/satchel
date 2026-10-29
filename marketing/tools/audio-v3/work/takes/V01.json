@@ -1,0 +1,50 @@
+{
+ "key": "8ee34ba4fffa3f3f",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Stick it on.",
+ "next": "Hand it over.",
+ "final": {
+  "id": "V01",
+  "scene": "H1",
+  "text": "Stick it on.",
+  "say": "Stick it on.",
+  "file": "v2/vo/V01.mp3",
+  "duration": 0.93,
+  "words": [
+   {
+    "text": "Stick",
+    "start": 0.14,
+    "end": 0.38
+   },
+   {
+    "text": "it",
+    "start": 0.42,
+    "end": 0.5
+   },
+   {
+    "text": "on.",
+    "start": 0.58,
+    "end": 0.84
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Stick it on"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

@@ -1,0 +1,46 @@
+
+[1] sha256d(BIP143 preimage) == bitcoinjs hashForWitnessV0, for every input
+  PASS input 0: sha256d(preimage) == hashForWitnessV0 (f6277b0eee022134…), preimage 182 bytes
+  PASS input 1: sha256d(preimage) == hashForWitnessV0 (02cc14fb61727e02…), preimage 182 bytes
+
+[2] fixed-layout parse of the preimage
+  PASS input 0: outpoint aaaaaaaa…:0 and amount 150000 recovered (txid reversed to display order)
+  PASS input 1: outpoint bbbbbbbb…:3 and amount 70000 recovered (txid reversed to display order)
+
+[3] MPC-style raw signature over sha256d(preimage) produces a valid witness; PSBT agrees
+  PASS input 0: ECDSA verify(pubkey, sha256d(preimage), sig)
+  PASS input 1: ECDSA verify(pubkey, sha256d(preimage), sig)
+  PASS PSBT signatures validate
+  PASS same txid from manual-preimage path and PSBT path (4eb55b9a66463841…)
+  PASS byte-identical signed tx (RFC6979 deterministic signatures)
+
+[4] refusal of non-ALL sighash types and non-P2WPKH scriptCodes
+  PASS preimage for NONE matches bitcoinjs
+  PASS refuse NONE: sighash type 0x2 refused (only SIGHASH_ALL); hashPrevouts zero? false, hashOutputs zero? true
+  PASS preimage for SINGLE matches bitcoinjs
+  PASS refuse SINGLE: sighash type 0x3 refused (only SIGHASH_ALL); hashPrevouts zero? false, hashOutputs zero? false
+  PASS preimage for ALL|ANYONECANPAY matches bitcoinjs
+  PASS refuse ALL|ANYONECANPAY: sighash type 0x81 refused (only SIGHASH_ALL); hashPrevouts zero? true, hashOutputs zero? false
+  PASS preimage for NONE|ANYONECANPAY matches bitcoinjs
+  PASS refuse NONE|ANYONECANPAY: sighash type 0x82 refused (only SIGHASH_ALL); hashPrevouts zero? true, hashOutputs zero? true
+  PASS preimage for SINGLE|ANYONECANPAY matches bitcoinjs
+  PASS refuse SINGLE|ANYONECANPAY: sighash type 0x83 refused (only SIGHASH_ALL); hashPrevouts zero? true, hashOutputs zero? false
+  PASS refuse 0x41 (BCH FORKID style): sighash type 0x41 refused (only SIGHASH_ALL); hashPrevouts zero? false, hashOutputs zero? false
+  PASS refuse altered scriptCode
+  PASS refuse wrong length (183 bytes)
+  PASS refuse scriptCode for a different pkh (optional check once the contract knows its pkh)
+
+[5] why raw hashes are dangerous on BTC: the legacy SIGHASH_SINGLE "hash = 1" bug
+  PASS legacy hashForSignature(SINGLE, index>=outputs) is the same constant for unrelated txs (0000000000000000000000000000000000000000000000000000000000000001 in bitcoinjs byte order) — one signature over it spends legacy P2PKH coins of the key in any tx
+  PASS the preimage-in contract can never be asked to sign that constant (32 bytes is not a 182-byte BIP143 preimage)
+
+[6] outspend semantics (what the checker relies on)
+  Under any sighash type the BIP143 preimage commits to *this* input's outpoint (bytes 68..104).
+  => once that outpoint is spent (confirmed, deep enough), every signature over it is dead.
+  SIGHASH_ALL is still required: NONE/SINGLE/ANYONECANPAY signatures are bearer instruments while unspent.
+
+[7] frontend helper: BIP143 preimage from a PSBT (what chainsig.js builds), checked against the hash a mock signer captures
+  PASS input 0: sha256d(preimageFromPsbt) == hash captured by mock signer (chainsig.js style); classifier accepts
+  PASS input 1: sha256d(preimageFromPsbt) == hash captured by mock signer (chainsig.js style); classifier accepts
+
+ALL 27 CHECKS PASSED

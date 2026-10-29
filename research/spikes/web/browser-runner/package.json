@@ -1,0 +1,1 @@
+{"name":"web-spike-browser-runner","private":true,"type":"module","description":"THROWAWAY spike: drive system Chrome with playwright-core","dependencies":{"playwright-core":"1.64.1"}}

@@ -1,0 +1,9 @@
+{
+  "name": "web-spike-rpc-lifecycle",
+  "private": true,
+  "type": "module",
+  "description": "THROWAWAY Phase 0 spike: MPC sign tx lifecycle over NEAR RPC. Never import into product.",
+  "dependencies": {
+    "near-api-js": "7.3.1"
+  }
+}

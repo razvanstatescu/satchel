@@ -1,0 +1,116 @@
+{
+ "key": "068d319b258a5abf",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+ "prev": "Every signature goes on the record, on Near, before Near's signer network makes it.",
+ "next": "It only signs plain transfers it can read, so each one can be checked later.",
+ "final": {
+  "id": "V19",
+  "scene": "T2",
+  "text": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+  "say": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+  "file": "v2/vo/V19.mp3",
+  "duration": 5.63,
+  "words": [
+   {
+    "text": "And",
+    "start": 0.06,
+    "end": 0.14
+   },
+   {
+    "text": "there's",
+    "start": 0.18,
+    "end": 0.42
+   },
+   {
+    "text": "no",
+    "start": 0.5,
+    "end": 0.78
+   },
+   {
+    "text": "admin",
+    "start": 0.9,
+    "end": 1.26
+   },
+   {
+    "text": "key.",
+    "start": 1.32,
+    "end": 1.6
+   },
+   {
+    "text": "Not",
+    "start": 2.02,
+    "end": 2.18
+   },
+   {
+    "text": "even",
+    "start": 2.22,
+    "end": 2.4
+   },
+   {
+    "text": "ours.",
+    "start": 2.5,
+    "end": 2.86
+   },
+   {
+    "text": "So",
+    "start": 3.3,
+    "end": 3.4
+   },
+   {
+    "text": "it",
+    "start": 3.46,
+    "end": 3.54
+   },
+   {
+    "text": "can't",
+    "start": 3.62,
+    "end": 3.9
+   },
+   {
+    "text": "sign",
+    "start": 3.96,
+    "end": 4.3
+   },
+   {
+    "text": "anything",
+    "start": 4.38,
+    "end": 4.8
+   },
+   {
+    "text": "off",
+    "start": 4.88,
+    "end": 5
+   },
+   {
+    "text": "the",
+    "start": 5.04,
+    "end": 5.12
+   },
+   {
+    "text": "record.",
+    "start": 5.16,
+    "end": 5.58
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "And there's no admin key, not even ours, so it can't sign anything off the record"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

@@ -1,0 +1,237 @@
+// brand2/script.tsx
+// Moves the locked v3 script needs (concepts-v2 §4.1, §4.3): records, stamps, frost, the Night blind, the flip,
+// caption slaps and charm actions. Numbers at 30 fps; px are video px unless a k (UI → video scale) is passed.
+import React from "react";
+import { AbsoluteFill, Easing, interpolate, random, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { evolvePath, getLength } from "@remotion/paths";
+import { makeRect } from "@remotion/shapes";
+import { C, FONT } from "./tokens";
+import { clamp, EASE2, slapAt, SPRING2 } from "./motion";
+
+// ---------------------------------------------------------------------------------------------
+// 1. A record outline that draws itself, dash by dash (the card's back: 2 px ink, dash 8/6 at UI scale).
+//    The dash pattern sits on the visible path and the reveal in a mask, so the two never fight; the reveal is
+//    quantised to whole dashes. With round caps, draw [8 - w, 6 + w] so the visible dash stays 8/6.
+// ---------------------------------------------------------------------------------------------
+export const RecordOutline: React.FC<{ w: number; h: number; k: number; progress: number; id: string; color?: string }> = ({
+  w,
+  h,
+  k,
+  progress,
+  id,
+  color = C.ink,
+}) => {
+  const sw = 2 * k;
+  const dash: [number, number] = [8 * k - sw, 6 * k + sw];
+  const { path } = makeRect({ width: w, height: h, cornerRadius: 12 * k });
+  if (progress <= 0.001) return null;
+  const len = getLength(path);
+  const pitch = dash[0] + dash[1];
+  const shown = Math.min(len, Math.ceil((progress * len) / pitch) * pitch);
+  const reveal = evolvePath(shown / len, path);
+  return (
+    <svg width={w} height={h} style={{ overflow: "visible" }}>
+      <defs>
+        <mask id={id} maskUnits="userSpaceOnUse" x={-w} y={-h} width={3 * w} height={3 * h}>
+          <path d={path} fill="none" stroke="#fff" strokeWidth={sw * 4} strokeDasharray={reveal.strokeDasharray} strokeDashoffset={reveal.strokeDashoffset} />
+        </mask>
+      </defs>
+      <path d={path} fill="none" stroke={color} strokeWidth={sw} strokeLinecap="round" strokeDasharray={dash.join(" ")} mask={`url(#${id})`} />
+    </svg>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 2. The stamp (T5): a charm winds back, swings up and bonks its outline; the stamp slaps on at contact.
+//    contact = the V23 phrase onset. Charm: -25° wind-up (6 f, out), strike to +55° (3 f, in), then its
+//    personality spring brings it home. Stamp: scale 1.25 → 1 with a 6% squash, tilt -7° → -4°, ink spreads
+//    (stroke 1.4× → 1× in 3 f). SFX stamp-thunk on contact, success-marimba 2 f later.
+// ---------------------------------------------------------------------------------------------
+export const STAMP = { windUp: 6, strike: 3 } as const; // the bonk starts STAMP.windUp + STAMP.strike before contact
+
+export const bonkAngle = (f: number, contact: number, homeSpring: { mass: number; stiffness: number; damping: number }, fps: number) => {
+  const start = contact - STAMP.windUp - STAMP.strike;
+  if (f < start + STAMP.windUp) return interpolate(f, [start, start + STAMP.windUp], [0, -25], { ...clamp, easing: EASE2.out });
+  if (f < contact) return interpolate(f, [start + STAMP.windUp, contact], [-25, 55], { ...clamp, easing: EASE2.fall });
+  return spring({ frame: f - contact, fps, from: 55, to: 0, config: homeSpring });
+};
+
+export const Stamp: React.FC<{ word: string; contact: number; k: number; color?: string }> = ({ word, contact, k, color = C.success }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (frame < contact) return null;
+  const { sx, sy } = slapAt(frame - contact + 4, fps, 0, { from: 1.25, squash: 0.06, drop: 0 }); // enters at its contact frame
+  const tilt = interpolate(frame - contact, [0, 6], [-7, -4], { ...clamp, easing: EASE2.out });
+  const spread = interpolate(frame - contact, [0, 3], [1.4, 1], clamp);
+  return (
+    <div
+      style={{
+        display: "inline-block",
+        padding: `${4 * k}px ${12 * k}px`,
+        border: `${2 * k * spread}px solid ${color}`,
+        borderRadius: 10 * k,
+        fontFamily: FONT.sans,
+        fontWeight: 700,
+        fontSize: 15 * k,
+        color,
+        scale: `${sx} ${sy}`,
+        rotate: `${tilt}deg`,
+        whiteSpace: "nowrap",
+      }}
+    >
+      {word}
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 3. Frost laminate (T4) and its melt (T7): a flat sheet, never glass. Sky at 35% + two flat white stripes at
+//    45%, the card's radius, a squeegee wipe left → right in 10 f (out) on freeze-chime; melt = wiped off top →
+//    bottom in 8 f (fall) while three droplets drop 30 px and pop.
+// ---------------------------------------------------------------------------------------------
+export const FrostLaminate: React.FC<{ w: number; h: number; radius: number; inAt: number; meltAt?: number; k: number }> = ({
+  w,
+  h,
+  radius,
+  inAt,
+  meltAt,
+  k,
+}) => {
+  const frame = useCurrentFrame();
+  const wipe = interpolate(frame, [inAt, inAt + 10], [100, 0], { ...clamp, easing: EASE2.out }); // % hidden on the right
+  const melt = meltAt === undefined ? 0 : interpolate(frame, [meltAt, meltAt + 8], [0, 100], { ...clamp, easing: EASE2.fall });
+  const drops = meltAt === undefined ? [] : [0.25, 0.55, 0.8];
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: w, height: h }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: radius,
+          overflow: "hidden",
+          clipPath: `inset(${melt}% ${wipe}% 0 0)`,
+          background: "rgba(143, 211, 255, 0.35)",
+        }}
+      >
+        <div style={{ position: "absolute", top: "-20%", bottom: "-20%", left: "18%", width: "12%", background: "rgba(255,255,255,0.45)", rotate: "28deg" }} />
+        <div style={{ position: "absolute", top: "-20%", bottom: "-20%", left: "36%", width: "5%", background: "rgba(255,255,255,0.45)", rotate: "28deg" }} />
+      </div>
+      {drops.map((x, i) => {
+        const t = frame - (meltAt ?? 0) - 2 * i;
+        const y = interpolate(t, [0, 10], [h * 0.9, h * 0.9 + 30 * (k / 2.5)], { ...clamp, easing: EASE2.fall });
+        const s = interpolate(t, [0, 1, 9, 12], [0, 1, 1, 0], clamp);
+        return <div key={i} style={{ position: "absolute", left: w * x, top: y, width: 12 * k, height: 12 * k, borderRadius: 99, background: C.sky, border: `${k}px solid ${C.ink}`, scale: `${s}` }} />;
+      })}
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 4. Night falls (C1): a roller blind from the top. The Night sheet's edge falls 0 → H in 18 f (fall) on the
+//    music stop and lands with a 2% bounce (rebound); its edge casts a hard 10 px black shadow onto the Day frame.
+// ---------------------------------------------------------------------------------------------
+export const NightBlind: React.FC<{ at: number; night?: string }> = ({ at, night = "#120c26" }) => {
+  const frame = useCurrentFrame();
+  const { fps, height } = useVideoConfig();
+  const drop = frame < at + 18
+    ? interpolate(frame, [at, at + 18], [0, 1], { ...clamp, easing: EASE2.fall })
+    : 1 + 0.02 * Math.sin(Math.PI * Math.min(1, spring({ frame: frame - at - 18, fps, config: SPRING2.rebound })));
+  const edge = Math.min(height + 12, drop * height);
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: edge, background: night, boxShadow: `0 10px 0 #000000` }} />
+    </AbsoluteFill>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 5. The flip (T0, and back in T7): the film's one 3D move. rotateY 0 → 180° on SPRING2.quick (it overshoots to
+//    about 196° and settles in 10 f), perspective 2400 px, the card lifts 12 px before and slaps down after,
+//    scale 1.06 at edge-on, faces swap at 90°, no lighting or gloss. whoosh-soft peaks on the 90° frame.
+//    Day sweeps back with the rotation: the Day wipe's edge x = (θ / 180) · width, in the flip's direction.
+// ---------------------------------------------------------------------------------------------
+export const flipAt = (f: number, at: number, fps: number) => {
+  const p = spring({ frame: f - at, fps, config: SPRING2.quick }); // 0 → 1 (+9%)
+  const deg = 180 * p;
+  const rad = (deg * Math.PI) / 180;
+  return { deg, back: Math.cos(rad) < 0, scale: 1 + 0.06 * Math.abs(Math.sin(rad)), dayWipe: Math.min(1, Math.max(0, deg / 180)) };
+};
+
+export const FlipCard: React.FC<{ at: number; w: number; h: number; front: React.ReactNode; back: React.ReactNode }> = ({ at, w, h, front, back }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const m = flipAt(frame, at, fps);
+  return (
+    <div style={{ width: w, height: h, perspective: 2400 }}>
+      <div style={{ width: w, height: h, transformStyle: "preserve-3d", transform: `rotateY(${m.deg}deg) scale(${m.scale})` }}>
+        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden" }}>{front}</div>
+        <div style={{ position: "absolute", inset: 0, backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}>{back}</div>
+      </div>
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 6. Caption slap (concepts-v2 §4.1): Funnel Display 800, sentence case, 110–160 px. Scale 1.2 → 1, contact f4,
+//    a seeded tilt within ±2° (captions only, never the logo). Hook and end captions get the sticker treatment:
+//    white fill, ink outline, and a hard shadow that snaps 0 → 8 px on contact. Others are plain ink.
+// ---------------------------------------------------------------------------------------------
+export const CaptionSlap: React.FC<{ text: string; size?: number; sticker?: boolean; seed: string; color?: string }> = ({
+  text,
+  size = 140,
+  sticker = false,
+  seed,
+  color = C.ink,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const { sx, sy, opacity } = slapAt(frame, fps, 0, { from: 1.2, squash: 0.05, drop: 0 });
+  const tilt = (random(`caption-${seed}`) - 0.5) * 4; // −2° … +2°
+  const shadow = frame >= 4 ? 8 : 0;
+  return (
+    <div
+      style={{
+        display: "inline-block",
+        fontFamily: FONT.display,
+        fontWeight: 800,
+        fontSize: size,
+        lineHeight: 1,
+        letterSpacing: "-0.035em",
+        color,
+        opacity,
+        scale: `${sx} ${sy}`,
+        rotate: `${tilt}deg`,
+        ...(sticker
+          ? { background: C.surface, border: `6px solid ${C.ink}`, borderRadius: 28, padding: "0.12em 0.32em 0.18em", boxShadow: `0 ${shadow}px 0 ${C.ink}` }
+          : {}),
+      }}
+    >
+      {text}
+    </div>
+  );
+};
+
+// ---------------------------------------------------------------------------------------------
+// 7. Charm and card actions (keyframes; f = frames since the action starts).
+// ---------------------------------------------------------------------------------------------
+/** "No" wobble (P4): the card shakes sideways, never rotates (its band carries the S). ±12 px, 3 swings, 12 f. */
+export const noWobbleX = (f: number) => (f < 0 || f > 12 ? 0 : 12 * Math.exp(-f / 5) * Math.sin((f / 12) * 3 * 2 * Math.PI));
+
+/** Gulp (P2): stretch up 1.08 (3 f), squash 0.85 × 1.15 as the coin goes in (2 f), cheeks puff 1.1 wide (4 f), settle. */
+export const gulpScale = (f: number) => ({
+  x: interpolate(f, [0, 3, 5, 9, 14], [1, 0.94, 1.15, 1.1, 1], { ...clamp, easing: Easing.inOut(Easing.quad) }),
+  y: interpolate(f, [0, 3, 5, 9, 14], [1, 1.08, 0.85, 0.96, 1], { ...clamp, easing: Easing.inOut(Easing.quad) }),
+});
+
+/** Flick (P3): wind back -15° (4 f), snap to +20° (2 f, the coin launches on f6 with whoosh-zip), home on its spring. */
+export const flickAngle = (f: number, fps: number, home: { mass: number; stiffness: number; damping: number }) =>
+  f < 4
+    ? interpolate(f, [0, 4], [0, -15], { ...clamp, easing: EASE2.out })
+    : f < 6
+      ? interpolate(f, [4, 6], [-15, 20], { ...clamp, easing: EASE2.fall })
+      : spring({ frame: f - 6, fps, from: 20, to: 0, config: home });
+
+/** ETH's curious head tilt: ±6° about the coin centre, in on SPRING2.quick, held while it looks, out on land. */
+export const headTilt = (f: number, fps: number, holdF: number, dir = 1) =>
+  dir * 6 * (spring({ frame: f, fps, config: SPRING2.quick }) - spring({ frame: f - holdF, fps, config: SPRING2.land }));
+

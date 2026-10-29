@@ -1,0 +1,66 @@
+{
+ "key": "f13a1dcae0fb6b6f",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "and the buyer gets everything inside.",
+ "prev": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+ "next": "Satchel. Stick it on. Hand it over.",
+ "final": {
+  "id": "V26",
+  "scene": "T7",
+  "text": "and the buyer gets everything inside.",
+  "say": "and the buyer gets everything inside.",
+  "file": "v2/vo/V26.mp3",
+  "duration": 2.42,
+  "words": [
+   {
+    "text": "and",
+    "start": 0.06,
+    "end": 0.16
+   },
+   {
+    "text": "the",
+    "start": 0.2,
+    "end": 0.32
+   },
+   {
+    "text": "buyer",
+    "start": 0.36,
+    "end": 0.7
+   },
+   {
+    "text": "gets",
+    "start": 0.82,
+    "end": 1.18
+   },
+   {
+    "text": "everything",
+    "start": 1.26,
+    "end": 1.7
+   },
+   {
+    "text": "inside.",
+    "start": 1.76,
+    "end": 2.34
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "And the buyer gets everything inside"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

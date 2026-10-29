@@ -1,0 +1,49 @@
+{
+ "at": "2026-10-21T11:38:44.118Z",
+ "ms_to_FINAL": 4119,
+ "tx_hash": "2BdsDcgxVUFJufkorqaPkd9k6twcZRUYHGV3eMJEG2Rd",
+ "final_execution_status": "FINAL",
+ "status": {
+  "SuccessValue": "{\"total\":\"1250000000000000000000\",\"available\":\"0\"}"
+ },
+ "receipts": [
+  {
+   "id": "DX1A3zeC8hSyj9y2aUZfEcVgqApqCisvEfPW9k8pDgbp",
+   "executor": "usdc.fakes.testnet",
+   "block": "274090217",
+   "status": "SuccessValue",
+   "logs": [
+    "The account is already registered, refunding the deposit"
+   ],
+   "tokens_burnt": "192003862023000000000",
+   "gas_burnt": 1920038620230
+  },
+  {
+   "id": "HFQw3aj7NisQcLps7xAvJsX41ab8qaDmG8YJYBCSktGi",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090218",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "22318256250000000000",
+   "gas_burnt": 223182562500
+  },
+  {
+   "id": "Db7cegwJ66mLXeRnyGCPS7TutHaYeZi3x865PAAhNTMj",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090219",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  },
+  {
+   "id": "8hnRzHVTwtM8gYhHqyKFkYWUfwFZDsTfnCQfhuGWxRqX",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090218",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

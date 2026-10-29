@@ -1,0 +1,126 @@
+{
+ "key": "a406d1f997acb6f1",
+ "masterKey": "d016eb57c7a0d69a",
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1.08
+ },
+ "say": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+ "prev": "There's no seed phrase to copy. The contract signs only for whoever owns the NFT.",
+ "next": "Sell a whole position in one trade.",
+ "final": {
+  "id": "L05",
+  "scene": "S02",
+  "text": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+  "say": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+  "file": "vo/L05.mp3",
+  "duration": 5.43,
+  "words": [
+   {
+    "text": "Transfer",
+    "start": 0.08,
+    "end": 0.52
+   },
+   {
+    "text": "the",
+    "start": 0.56,
+    "end": 0.66
+   },
+   {
+    "text": "NFT,",
+    "start": 0.74,
+    "end": 1.28
+   },
+   {
+    "text": "and",
+    "start": 1.56,
+    "end": 1.64
+   },
+   {
+    "text": "the",
+    "start": 1.68,
+    "end": 1.8
+   },
+   {
+    "text": "whole",
+    "start": 1.9,
+    "end": 2.08
+   },
+   {
+    "text": "wallet",
+    "start": 2.2,
+    "end": 2.54
+   },
+   {
+    "text": "goes",
+    "start": 2.58,
+    "end": 2.8
+   },
+   {
+    "text": "with",
+    "start": 2.86,
+    "end": 2.98
+   },
+   {
+    "text": "it.",
+    "start": 3.02,
+    "end": 3.14
+   },
+   {
+    "text": "No",
+    "start": 3.38,
+    "end": 3.5
+   },
+   {
+    "text": "bridge.",
+    "start": 3.6,
+    "end": 3.96
+   },
+   {
+    "text": "No",
+    "start": 4.28,
+    "end": 4.42
+   },
+   {
+    "text": "wrapped",
+    "start": 4.52,
+    "end": 4.84
+   },
+   {
+    "text": "tokens.",
+    "start": 4.9,
+    "end": 5.36
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "pausesRemoved": [
+   [
+    1.45,
+    1.47
+   ],
+   [
+    3.26,
+    3.56
+   ],
+   [
+    4.45,
+    4.51
+   ]
+  ],
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Transfer the NFT and the whole wallet goes with it. No bridge, no wrapped tokens"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

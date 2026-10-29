@@ -1,0 +1,81 @@
+{
+ "key": "799a891786c778e1",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "List it, and signing pauses. The history stops growing.",
+ "prev": "It only signs plain transfers it can read, so each one can be checked later.",
+ "next": "Then the buyer's browser checks every record against each chain.",
+ "final": {
+  "id": "V21",
+  "scene": "T4",
+  "text": "List it, and signing pauses. The history stops growing.",
+  "say": "List it, and signing pauses. The history stops growing.",
+  "file": "v2/vo/V21.mp3",
+  "duration": 4.42,
+  "words": [
+   {
+    "text": "List",
+    "start": 0.08,
+    "end": 0.34
+   },
+   {
+    "text": "it,",
+    "start": 0.4,
+    "end": 0.56
+   },
+   {
+    "text": "and",
+    "start": 0.88,
+    "end": 0.98
+   },
+   {
+    "text": "signing",
+    "start": 1.12,
+    "end": 1.46
+   },
+   {
+    "text": "pauses.",
+    "start": 1.58,
+    "end": 2.14
+   },
+   {
+    "text": "The",
+    "start": 2.64,
+    "end": 2.72
+   },
+   {
+    "text": "history",
+    "start": 2.78,
+    "end": 3.2
+   },
+   {
+    "text": "stops",
+    "start": 3.34,
+    "end": 3.62
+   },
+   {
+    "text": "growing.",
+    "start": 3.72,
+    "end": 4.16
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "List it and signing pauses. The history stops growing"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

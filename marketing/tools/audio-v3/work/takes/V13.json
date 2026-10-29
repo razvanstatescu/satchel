@@ -1,0 +1,71 @@
+{
+ "key": "e442fda18009e5cf",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Hand a treasury to the next team.",
+ "prev": "Sell a whole position in one trade.",
+ "next": "But there's a catch.",
+ "final": {
+  "id": "V13",
+  "scene": "P6",
+  "text": "Hand a treasury to the next team.",
+  "say": "Hand a treasury to the next team.",
+  "file": "v2/vo/V13.mp3",
+  "duration": 2.03,
+  "words": [
+   {
+    "text": "Hand",
+    "start": 0.1,
+    "end": 0.3
+   },
+   {
+    "text": "a",
+    "start": 0.36,
+    "end": 0.42
+   },
+   {
+    "text": "treasury",
+    "start": 0.48,
+    "end": 1
+   },
+   {
+    "text": "to",
+    "start": 1.04,
+    "end": 1.12
+   },
+   {
+    "text": "the",
+    "start": 1.16,
+    "end": 1.24
+   },
+   {
+    "text": "next",
+    "start": 1.28,
+    "end": 1.54
+   },
+   {
+    "text": "team.",
+    "start": 1.58,
+    "end": 1.96
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Hand a treasury to the next team"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

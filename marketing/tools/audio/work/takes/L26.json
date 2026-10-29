@@ -1,0 +1,71 @@
+{
+ "key": "4422e24613e780af",
+ "final": {
+  "id": "L26",
+  "scene": "U1",
+  "text": "Hand a treasury to the next team.",
+  "say": "Hand a treasury to the next team.",
+  "file": "vo/L26.mp3",
+  "duration": 1.92,
+  "words": [
+   {
+    "text": "Hand",
+    "start": 0.06,
+    "end": 0.26
+   },
+   {
+    "text": "a",
+    "start": 0.3,
+    "end": 0.4
+   },
+   {
+    "text": "treasury",
+    "start": 0.46,
+    "end": 0.98
+   },
+   {
+    "text": "to",
+    "start": 1.02,
+    "end": 1.12
+   },
+   {
+    "text": "the",
+    "start": 1.14,
+    "end": 1.22
+   },
+   {
+    "text": "next",
+    "start": 1.26,
+    "end": 1.46
+   },
+   {
+    "text": "team.",
+    "start": 1.56,
+    "end": 1.86
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Hand a treasury to the next team"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Hand a treasury to the next team.",
+ "prev": "Gift a funded wallet.",
+ "next": "But a signature made before the sale…"
+}

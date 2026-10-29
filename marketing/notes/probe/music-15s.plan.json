@@ -1,0 +1,61 @@
+{
+ "positive_global_styles": [
+  "minimal electronic",
+  "dark pulse",
+  "120 BPM",
+  "felt piano",
+  "sub bass",
+  "cinematic tech",
+  "launch atmosphere",
+  "tension",
+  "sleek",
+  "instrumental"
+ ],
+ "negative_global_styles": [
+  "vocals",
+  "bright pop",
+  "acoustic guitar",
+  "heavy rock",
+  "busy arrangement"
+ ],
+ "sections": [
+  {
+   "section_name": "Launch Pulse",
+   "positive_local_styles": [
+    "subtle felt piano motif",
+    "deep sub bass drone",
+    "tight minimal kick",
+    "soft metallic ticks",
+    "slow cinematic tension build"
+   ],
+   "negative_local_styles": [
+    "vocals",
+    "melodic lead synth",
+    "complex drum fills",
+    "bright chords",
+    "busy percussion"
+   ],
+   "duration_ms": 7000,
+   "lines": []
+  },
+  {
+   "section_name": "System Ignition",
+   "positive_local_styles": [
+    "slightly wider stereo image",
+    "pulsing low end",
+    "piano notes spaced with restraint",
+    "rising filter movement",
+    "clean tech finish"
+   ],
+   "negative_local_styles": [
+    "vocals",
+    "anthemic drop",
+    "orchestral swells",
+    "aggressive distortion",
+    "dense layering"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  }
+ ]
+}

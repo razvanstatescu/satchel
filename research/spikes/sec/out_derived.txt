@@ -1,0 +1,4 @@
+satchel/1/evm domain 0 -> secp256k1:amydARHfgNa4vi… evmAddress=0x53f9e93e9cb431122872c3Ee96848e97BFf51C2A compressed=021d206d588827f6e9e2950336ff5c33c0b81141083a43b9e403e1dccd53c2ead5
+satchel/1/btc domain 0 -> secp256k1:3TGqBkRYSwVNjc… evmAddress=0xEcAC3a067Ff709BaA17AD0D694067ED697992971 compressed=037ab0d767a8b45ab43b55ca0cf5a4c09b47a9ecc8b4c581b60b0ab56b83e66076
+satchel/1/sol domain 1 -> ed25519:DvZuiQhGH32dTN5v… solAddress=DvZuiQhGH32dTN5v8zRZRJJ4e5H4okwq6NjpfvoYbqGB
+different predecessor => different key: true

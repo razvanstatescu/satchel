@@ -1,0 +1,120 @@
+------------------------------------------------------------------------------------------------------
+ v1.signer-prod.testnet     At block #274092894 
+                            (58kHCR9iXjRtLr9ThT5mRJqDL2wVAvW2gv4JaBEHGoYR) 
+------------------------------------------------------------------------------------------------------
+ Local Contract              
+------------------------------------------------------------------------------------------------------
+ SHA-256 checksum [hex]     b4a9434bd80a446dd2a45fe93d5b444acffff78da6ca517aec11ca8dbe1b4b7c 
+------------------------------------------------------------------------------------------------------
+ SHA-256 checksum [base58]  DAE5ng4ZFR2ctMx9SizQBqmGkVbKUutgZ4ZECD4R8Sm9 
+------------------------------------------------------------------------------------------------------
+ Storage used               1.4 MB (1.2 MB Wasm + 195.5 KB data) 
+------------------------------------------------------------------------------------------------------
+ Access keys                4 full access keys and 0 function-call-only access keys 
+------------------------------------------------------------------------------------------------------
+ Contract version           3.17.0 
+------------------------------------------------------------------------------------------------------
+ Contract link              https://github.com/near/mpc/tree/d0fc87b19e2643299e7becdd7d9611afcd5d5a78 
+------------------------------------------------------------------------------------------------------
+ Supported standards        nep330 (1.3.0) 
+------------------------------------------------------------------------------------------------------
+ NEAR ABI version           0.4.0 
+------------------------------------------------------------------------------------------------------
+
+ Functions: (hint: you can download full JSON Schema using `download-abi` command)
+  
+ fn allowed_docker_image_hashes(...) -> ... (read-only function)  
+  Returns all allowed code hashes in descending order of their expiry 
+  date. Note that the expiration depends on the contract configuration 
+  (c.f. [`dtos::Config::tee_upgrade_deadline_duration_seconds`]). 
+ ... Arguments (JSON Schema):
+       No arguments needed
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "array",
+           "items": {
+             "$ref": "#/definitions/AllowedMpcDockerImageHash"
+           }
+         }
+       }
+  
+ fn allowed_foreign_chain_providers(...) -> ... (read-only function)  
+  On-chain RPC provider whitelist keyed by [`ForeignChain`](dtos::ForeignChain). Nodes read this at 
+  startup to validate their local `foreign_chains.yaml`. 
+ ... Arguments (JSON Schema):
+       No arguments needed
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "object",
+           "additionalProperties": {
+             "$ref": "#/definitions/ChainEntry"
+           }
+         }
+       }
+  
+ fn allowed_launcher_compose_hashes(...) -> ... (read-only function)  
+ ... Arguments (JSON Schema):
+       No arguments needed
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "array",
+           "items": {
+             "$ref": "#/definitions/LauncherDockerComposeHash"
+           }
+         }
+       }
+  
+ fn allowed_launcher_image_hashes(...) -> ... (read-only function)  
+ ... Arguments (JSON Schema):
+       No arguments needed
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "array",
+           "items": {
+             "$ref": "#/definitions/LauncherImageHash"
+           }
+         }
+       }
+  
+ fn allowed_os_measurements(...) -> ... (read-only function)  
+  Returns all currently allowed OS measurements. 
+ ... Arguments (JSON Schema):
+       No arguments needed
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "array",
+           "items": {
+             "$ref": "#/definitions/ExpectedMeasurements"
+           }
+         }
+       }
+  
+ fn available_attestation_grants(...) -> ... (read-only function)  
+ ... Arguments (JSON Schema):
+       {
+         "serialization_type": "json",
+         "args": [
+           {
+             "name": "account_id",
+             "type_schema": {
+               "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+               "type": "string"
+             }
+           }
+         ]
+       }
+ ... Return Value (JSON Schema):
+       {
+         "serialization_type": "json",
+         "type_schema": {
+           "type": "integer",

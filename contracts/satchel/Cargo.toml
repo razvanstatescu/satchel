@@ -1,0 +1,31 @@
+[package]
+name = "satchel"
+version = "1.0.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+crate-type = ["cdylib"]                 # NOT ["cdylib","rlib"]: +27–55 % wasm (kb/20 §TL;DR 12)
+
+[dependencies]
+near-sdk = "=5.29.1"                    # default features (wee_alloc smaller, kb/20 §Cargo.toml)
+near-contract-standards = "=5.29.1"     # enables near-sdk "legacy" (NFT uses near_sdk::collections)
+hex = { version = "0.4", default-features = false, features = ["alloc"] }   # [ASSUMED] exact patch pinned by Cargo.lock on Nov 1
+
+[dev-dependencies]
+near-sdk = { version = "=5.29.1", features = ["unit-testing"] }   # does not change the wasm hash (kb/20 §Cargo.toml)
+proptest = { version = "1", default-features = false, features = ["std"] }   # parser fuzzing (docs/security/fuzzing.md); dev-only, wasm unchanged
+sha2 = "0.10"                           # independent oracle hashes in fuzz tests (dev-only)
+sha3 = "0.10"                           # independent keccak256 in fuzz tests (dev-only)
+
+[package.metadata.near.reproducible_build]          # kb/22 §TL;DR 7, verified bit-identical twice
+image = "sourcescan/cargo-near:0.22.0-rust-1.99.1"
+image_digest = "sha256:c9655eaf7436b90c87ea8b25739f91063032c5c30ba24cfeafe72c142943b5bb"
+passed_env = []
+container_build_command = ["cargo", "near", "build", "non-reproducible-wasm", "--locked"]
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(near)']

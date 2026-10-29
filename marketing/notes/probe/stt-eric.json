@@ -1,0 +1,184 @@
+{
+ "language_code": "eng",
+ "language_probability": 1,
+ "text": "This NFT is a wallet. Sell it and the wallet goes with it",
+ "words": [
+  {
+   "text": "This",
+   "start": 0.1,
+   "end": 0.26,
+   "type": "word",
+   "logprob": -0.00009548207890475169
+  },
+  {
+   "text": " ",
+   "start": 0.26,
+   "end": 0.38,
+   "type": "spacing",
+   "logprob": -0.00005006664650863968
+  },
+  {
+   "text": "NFT",
+   "start": 0.38,
+   "end": 0.98,
+   "type": "word",
+   "logprob": -0.00005006664650863968
+  },
+  {
+   "text": " ",
+   "start": 0.98,
+   "end": 1.04,
+   "type": "spacing",
+   "logprob": -4.768370445162873e-7
+  },
+  {
+   "text": "is",
+   "start": 1.04,
+   "end": 1.12,
+   "type": "word",
+   "logprob": -4.768370445162873e-7
+  },
+  {
+   "text": " ",
+   "start": 1.12,
+   "end": 1.18,
+   "type": "spacing",
+   "logprob": 0
+  },
+  {
+   "text": "a",
+   "start": 1.18,
+   "end": 1.26,
+   "type": "word",
+   "logprob": 0
+  },
+  {
+   "text": " ",
+   "start": 1.26,
+   "end": 1.32,
+   "type": "spacing",
+   "logprob": -0.000019550132492440753
+  },
+  {
+   "text": "wallet.",
+   "start": 1.32,
+   "end": 1.7,
+   "type": "word",
+   "logprob": -0.007300121279903189
+  },
+  {
+   "text": " ",
+   "start": 1.7,
+   "end": 1.7,
+   "type": "spacing",
+   "logprob": -0.000033854863431770355
+  },
+  {
+   "text": "Sell",
+   "start": 2.22,
+   "end": 2.38,
+   "type": "word",
+   "logprob": -0.000033854863431770355
+  },
+  {
+   "text": " ",
+   "start": 2.38,
+   "end": 2.42,
+   "type": "spacing",
+   "logprob": -0.0000014305104514278355
+  },
+  {
+   "text": "it",
+   "start": 2.42,
+   "end": 2.56,
+   "type": "word",
+   "logprob": -0.0000014305104514278355
+  },
+  {
+   "text": " ",
+   "start": 2.56,
+   "end": 2.88,
+   "type": "spacing",
+   "logprob": -0.16022512316703796
+  },
+  {
+   "text": "and",
+   "start": 2.88,
+   "end": 2.96,
+   "type": "word",
+   "logprob": -0.16022512316703796
+  },
+  {
+   "text": " ",
+   "start": 2.96,
+   "end": 3,
+   "type": "spacing",
+   "logprob": -3.576278118089249e-7
+  },
+  {
+   "text": "the",
+   "start": 3,
+   "end": 3.08,
+   "type": "word",
+   "logprob": -3.576278118089249e-7
+  },
+  {
+   "text": " ",
+   "start": 3.08,
+   "end": 3.12,
+   "type": "spacing",
+   "logprob": -0.000012040065485052764
+  },
+  {
+   "text": "wallet",
+   "start": 3.12,
+   "end": 3.4,
+   "type": "word",
+   "logprob": -0.000012040065485052764
+  },
+  {
+   "text": " ",
+   "start": 3.4,
+   "end": 3.44,
+   "type": "spacing",
+   "logprob": -0.000002264974000354414
+  },
+  {
+   "text": "goes",
+   "start": 3.44,
+   "end": 3.64,
+   "type": "word",
+   "logprob": -0.000002264974000354414
+  },
+  {
+   "text": " ",
+   "start": 3.64,
+   "end": 3.7,
+   "type": "spacing",
+   "logprob": -4.768370445162873e-7
+  },
+  {
+   "text": "with",
+   "start": 3.7,
+   "end": 3.82,
+   "type": "word",
+   "logprob": -4.768370445162873e-7
+  },
+  {
+   "text": " ",
+   "start": 3.82,
+   "end": 3.88,
+   "type": "spacing",
+   "logprob": -7.152555099310121e-7
+  },
+  {
+   "text": "it",
+   "start": 3.88,
+   "end": 3.96,
+   "type": "word",
+   "logprob": -7.152555099310121e-7
+  }
+ ],
+ "transcription_id": "2UY6GKN5UDMHHHAxQbuu",
+ "audio_duration_secs": 4.16
+}

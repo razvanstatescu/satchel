@@ -1,0 +1,317 @@
+[
+  {
+    "name": "whoosh-fast",
+    "version": 1,
+    "prompt": "Fast short air whoosh pass-by, a quick rush of air sweeping past the microphone, rising to a peak then falling away, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:38.566Z"
+  },
+  {
+    "name": "whoosh-deep",
+    "version": 1,
+    "prompt": "Heavy deep cinematic whoosh, a large object passing by fast with low-end rumble, swells to a peak in the middle then fades out quickly, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:45:40.539Z"
+  },
+  {
+    "name": "swish-short",
+    "version": 1,
+    "prompt": "Very short swish, a thin cane swiping through the air once, single quick swipe, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:42.516Z"
+  },
+  {
+    "name": "whip-pan",
+    "version": 1,
+    "prompt": "Bright quick whip pan whoosh transition, airy high-frequency swipe, snappy and fast, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:44.574Z"
+  },
+  {
+    "name": "impact-deep",
+    "version": 1,
+    "prompt": "Deep cinematic impact hit, a punchy transient at the very start then a powerful sub bass boom that decays within one second, single trailer hit, no riser before it, no music.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-10-22T08:45:46.293Z"
+  },
+  {
+    "name": "impact-brass",
+    "version": 1,
+    "prompt": "A solid brass plate struck once with a mallet, sharp metallic transient then a short warm metallic ring that decays fast, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-22T08:45:47.873Z"
+  },
+  {
+    "name": "impact-soft",
+    "version": 1,
+    "prompt": "Soft felt thud, a padded mallet hitting a thick leather cushion once, muffled low dull impact, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:49.462Z"
+  },
+  {
+    "name": "ui-tick",
+    "version": 1,
+    "prompt": "One single crisp tiny click, a precise small mechanical switch tick, extremely short, one click only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:51.043Z"
+  },
+  {
+    "name": "ui-click",
+    "version": 1,
+    "prompt": "One single soft premium button press, a tactile muted click of a high-end device button, one press only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:52.809Z"
+  },
+  {
+    "name": "type-tick-run",
+    "version": 1,
+    "prompt": "Fast run of crisp mechanical keyboard key ticks, rapid typing of a short string, about fifteen quick evenly spaced clicks, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-10-22T08:45:54.683Z"
+  },
+  {
+    "name": "stitch-run",
+    "version": 1,
+    "prompt": "Close-up foley of a sewing needle punching through thick leather by hand, rhythmic tick-tick-tick, about six evenly spaced crisp punctures with a slight thread pull, satisfying, intimate, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:45:56.362Z"
+  },
+  {
+    "name": "stitch-single",
+    "version": 1,
+    "prompt": "One single sewing needle punching through thick leather, a crisp tiny puncture tick, close-mic foley, one puncture only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:58.344Z"
+  },
+  {
+    "name": "leather-creak",
+    "version": 1,
+    "prompt": "Thick leather creaking as it is bent, a short low stretched creak of a leather satchel strap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-22T08:45:59.986Z"
+  },
+  {
+    "name": "paper-slide",
+    "version": 1,
+    "prompt": "A sheet of heavy paper sliding across a leather surface, one smooth short slide, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-22T08:46:02.076Z"
+  },
+  {
+    "name": "pocket-slip",
+    "version": 1,
+    "prompt": "A paper slip being slid into a tight leather jacket pocket, short friction slide ending in a soft settle, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-10-22T08:46:03.872Z"
+  },
+  {
+    "name": "riser-4s",
+    "version": 1,
+    "prompt": "Cinematic tension riser, pitch and intensity rising steadily for four seconds and cutting off abruptly at its loudest point, no impact at the end, no drums, no music.",
+    "durationSeconds": 4,
+    "bytes": 97845,
+    "characterCost": 22,
+    "at": "2026-10-22T08:46:06.052Z"
+  },
+  {
+    "name": "downlifter",
+    "version": 1,
+    "prompt": "Cinematic downlifter, a falling pitch sweep that starts loud then descends and fades out smoothly, no drums, no music.",
+    "durationSeconds": 1.5,
+    "bytes": 37032,
+    "characterCost": 8,
+    "at": "2026-10-22T08:46:07.663Z"
+  },
+  {
+    "name": "sub-drop",
+    "version": 1,
+    "prompt": "Deep sub bass drop, a low boom that pitches down and decays, clean, no music, no other sounds.",
+    "durationSeconds": 1.5,
+    "bytes": 37032,
+    "characterCost": 8,
+    "at": "2026-10-22T08:46:09.296Z"
+  },
+  {
+    "name": "freeze-shimmer",
+    "version": 1,
+    "prompt": "Subtle icy crystalline shimmer, delicate glassy sparkle like frost forming on glass, soft and short, no music.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-10-22T08:46:10.797Z"
+  },
+  {
+    "name": "success-brass",
+    "version": 1,
+    "prompt": "A warm small brass bell chime struck once, elegant positive confirmation tone, clear pleasant ring that decays naturally, no other instruments, no music.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:46:12.783Z"
+  },
+  {
+    "name": "error-low",
+    "version": 1,
+    "prompt": "A low muted negative tone, a soft dull descending two-note blip signalling denial, gentle, not a buzzer, not harsh, no music.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:46:14.513Z"
+  },
+  {
+    "name": "counter-roll",
+    "version": 1,
+    "prompt": "Fast descending digital ticks, a rapid number counter rolling down like a balance draining, quick tiny clicks, clean, no music.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:46:16.209Z"
+  },
+  {
+    "name": "scanner-sweep",
+    "version": 1,
+    "prompt": "Photocopier scanner light bar sweeping across the glass, a smooth electric motor hum moving from one end to the other, clean, no music.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:46:17.690Z"
+  },
+  {
+    "name": "glitch-short",
+    "version": 1,
+    "prompt": "Subtle short digital glitch stutter, a quick data corruption blip, clean, no music.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:46:19.228Z"
+  },
+  {
+    "name": "heartbeat-tension",
+    "version": 1,
+    "prompt": "Slow low tension heartbeat pulse, deep muffled thumps, dark and ominous, no music.",
+    "durationSeconds": 2,
+    "bytes": 49571,
+    "characterCost": 11,
+    "at": "2026-10-22T08:46:20.790Z"
+  },
+  {
+    "name": "lock-clunk",
+    "version": 1,
+    "prompt": "A heavy satisfying mechanical latch locking, solid metal clunk of a vault bolt sliding shut, single action, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:46:22.477Z"
+  },
+  {
+    "name": "stitch-run",
+    "version": 2,
+    "prompt": "Leather saddle stitching foley: a sharp needle rapidly punching through thick vegetable-tanned leather, six crisp ticks in a steady fast rhythm, evenly spaced about six per second, tick-tick-tick-tick-tick-tick, each tick a dry punchy puncture with a tiny thread tug, close-mic, intimate, satisfying, no music, no reverb.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-22T08:48:37.546Z"
+  },
+  {
+    "name": "stitch-single",
+    "version": 2,
+    "prompt": "A single sharp needle puncture through thick leather, one loud crisp dry tick at the very start, close-mic foley, no music, no reverb.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T08:48:39.353Z"
+  },
+  {
+    "name": "riser-4s",
+    "version": 2,
+    "prompt": "Cinematic tension riser lasting the full four and a half seconds, starting quiet and rising steadily in pitch and intensity until the very end, cutting off abruptly at its loudest point, no impact, no drums, no music.",
+    "durationSeconds": 4.5,
+    "bytes": 109130,
+    "characterCost": 25,
+    "at": "2026-10-22T08:48:41.333Z"
+  },
+  {
+    "name": "heartbeat-tension",
+    "version": 2,
+    "prompt": "Two slow heartbeats, deep muffled low thumps in a lub-dub pattern, one heartbeat at the start and another one second later, dark tense cinematic pulse, no music, nothing else.",
+    "durationSeconds": 2,
+    "bytes": 49571,
+    "characterCost": 11,
+    "at": "2026-10-22T08:48:43.162Z"
+  },
+  {
+    "name": "deposit-ping",
+    "version": 1,
+    "prompt": "A bright, soft, premium notification ping for an incoming payment, one single clear note like a small tuned metal bar struck gently with a soft mallet, a delicate airy sparkle on top, quick attack and short smooth decay, elegant and modern, not a cash register, not a video game coin, no music.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-22T09:41:35.644Z"
+  },
+  {
+    "name": "count-up",
+    "version": 1,
+    "prompt": "Fast ascending digital ticks, a rapid number counter rolling up like a balance increasing, quick tiny clicks rising slightly in pitch, clean, no music.",
+    "durationSeconds": 0.9,
+    "bytes": 22612,
+    "characterCost": 5,
+    "at": "2026-10-22T09:41:37.481Z"
+  },
+  {
+    "name": "approve-chime",
+    "version": 1,
+    "prompt": "A subtle two-note confirmation chime for an approval, two soft warm mallet tones rising a gentle interval, the second note shortly after the first, quiet and reassuring, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-10-22T09:41:39.130Z"
+  },
+  {
+    "name": "card-flick",
+    "version": 1,
+    "prompt": "A quick crisp flick of a stiff leather card sliding into place, one short snappy friction swipe ending in a tiny soft tap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-22T09:41:40.799Z"
+  },
+  {
+    "name": "approve-chime",
+    "version": 2,
+    "prompt": "A subtle two-note confirmation chime for a wallet approval: two soft warm mallet notes, a lower note then a higher note a fifth above about 0.15 seconds later, ding-ding, gentle and quiet, short natural decay, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-10-22T09:43:17.074Z"
+  }
+]

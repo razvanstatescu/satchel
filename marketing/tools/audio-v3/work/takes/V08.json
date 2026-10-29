@@ -1,0 +1,101 @@
+{
+ "key": "ecb94befb0baebac",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Approve in your Near wallet, and Near Chain Signatures signs a native transaction.",
+ "prev": "Then send from it, on all three chains.",
+ "next": "There's no seed phrase to copy. The contract signs only for the holder.",
+ "final": {
+  "id": "V08",
+  "scene": "P3",
+  "text": "Approve in your NEAR wallet, and NEAR Chain Signatures signs a native transaction.",
+  "say": "Approve in your Near wallet, and Near Chain Signatures signs a native transaction.",
+  "file": "v2/vo/V08.mp3",
+  "duration": 5.22,
+  "words": [
+   {
+    "text": "Approve",
+    "start": 0.06,
+    "end": 0.52
+   },
+   {
+    "text": "in",
+    "start": 0.62,
+    "end": 0.7
+   },
+   {
+    "text": "your",
+    "start": 0.74,
+    "end": 0.84
+   },
+   {
+    "text": "NEAR",
+    "start": 0.96,
+    "end": 1.14
+   },
+   {
+    "text": "wallet,",
+    "start": 1.26,
+    "end": 1.66
+   },
+   {
+    "text": "and",
+    "start": 1.96,
+    "end": 2.08
+   },
+   {
+    "text": "NEAR",
+    "start": 2.16,
+    "end": 2.34
+   },
+   {
+    "text": "Chain",
+    "start": 2.44,
+    "end": 2.64
+   },
+   {
+    "text": "Signatures",
+    "start": 2.76,
+    "end": 3.34
+   },
+   {
+    "text": "signs",
+    "start": 3.46,
+    "end": 3.76
+   },
+   {
+    "text": "a",
+    "start": 3.88,
+    "end": 3.94
+   },
+   {
+    "text": "native",
+    "start": 4.059,
+    "end": 4.32
+   },
+   {
+    "text": "transaction.",
+    "start": 4.4,
+    "end": 5.16
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Approve in your NEAR Wallet and NEAR Chain Signatures signs a native transaction"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

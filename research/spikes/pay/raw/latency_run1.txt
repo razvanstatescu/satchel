@@ -1,0 +1,9 @@
+deploy tx 82WUm7F7ebqXNKMMcnv96drv8c43ebyGp9eobNPqASDY {"SuccessValue":""}
+emit tx GUv6yR2DQdMGpai7992DRebY6knhWkevxBXwuUw9v2rc ms_to_FINAL 3664 logs ["EVENT_JSON:{\"standard\":\"nep171\",\"version\":\"1.2.0\",\"event\":\"nft_transfe","EVENT_JSON:{\"standard\":\"satchel\",\"version\":\"1.0.0\",\"event\":\"signature_"]
+  txapi_receiver: visible 435 ms after FINAL
+  txapi_seller_event_log: visible 682 ms after FINAL
+  fastnear_nft_index_seller: visible 924 ms after FINAL
+  nearblocks_tx: NOT visible within 240 s
+fastnear nft index for seller: {"account_id":"seller.satchel-spk-pay-e9ea1a.testnet","tokens":[{"contract_id":"recv.satchel-spk-pay-e9ea1a.testnet","last_update_block_height":274091855}]}
+
+[exited with code 0]

@@ -1,0 +1,316 @@
+{
+  "sticker-slap": {
+    "file": "v2/sfx/sticker-slap.mp3",
+    "duration": 0.276,
+    "peakSec": 0.005,
+    "prompt": "A thick vinyl sticker slapped flat onto a smooth aluminium laptop lid with an open palm, one soft flat thwap with a tiny papery snap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": 2,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "sticker-peel": {
+    "file": "v2/sfx/sticker-peel.mp3",
+    "duration": 0.485,
+    "peakSec": 0.235,
+    "prompt": "A vinyl sticker peeled off a smooth plastic surface, a slow sticky crackling peel that speeds up and ends with a quick light snap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -1,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "pop": {
+    "file": "v2/sfx/pop.mp3",
+    "duration": 0.15,
+    "peakSec": 0.015,
+    "prompt": "One single clean soft mouth pop, the round hollow pop of a finger flicked out of the cheek, short and tidy, close-mic, one pop only, clean, dry, no music, no reverb tail.",
+    "gainDb": -5.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "pop-high": {
+    "file": "v2/sfx/pop-high.mp3",
+    "duration": 0.12,
+    "peakSec": 0.015,
+    "prompt": "One single tiny high-pitched bubble pop, a small bright round pop like a soap bubble bursting, very short, close-mic, one pop only, clean, dry, no music, no reverb tail.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "boing-soft": {
+    "file": "v2/sfx/boing-soft.mp3",
+    "duration": 0.19,
+    "peakSec": 0.005,
+    "prompt": "A subtle soft rubbery boing, a small rubber toy bouncing once on a table with a quick gentle pitch bend in the mid range, round and muted, starting immediately, single bounce, not a cartoon spring, no metal spring twang, clean, dry, no music, no reverb tail.",
+    "gainDb": -3.5,
+    "source": "composite",
+    "note": "Composite: the v2 bounce raised x2.5 (to ~300 Hz) with a quick downward bend and a slight wobble. Both takes sat at 86-130 Hz, inaudible on laptops and phones."
+  },
+  "charm-jingle": {
+    "file": "v2/sfx/charm-jingle.mp3",
+    "duration": 0.6,
+    "peakSec": 0.385,
+    "prompt": "Three small enamel-coated metal keychain charms clinking together as they swing, a light bright jingle of a few delicate clinks, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -11,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "chain-clink": {
+    "file": "v2/sfx/chain-clink.mp3",
+    "duration": 0.3,
+    "peakSec": 0.135,
+    "prompt": "A light metal ball chain keychain clinking once, a short delicate rattle of tiny steel beads, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -9.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "swing-swish": {
+    "file": "v2/sfx/swing-swish.mp3",
+    "duration": 0.444,
+    "peakSec": 0.195,
+    "prompt": "A soft gentle air swish of a small keychain charm swinging past the microphone once, smooth and light, clean, dry, no music, no reverb tail.",
+    "gainDb": -9,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "button-thock": {
+    "file": "v2/sfx/button-thock.mp3",
+    "duration": 0.12,
+    "peakSec": 0.005,
+    "prompt": "One single satisfying soft button press, a rubbery silicone key pressed down with a muted rounded thock, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "gainDb": -0.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "button-thock-deep": {
+    "file": "v2/sfx/button-thock-deep.mp3",
+    "duration": 0.17,
+    "peakSec": 0.015,
+    "prompt": "One single satisfying soft button press, a rubbery silicone key pressed down with a muted rounded thock, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "gainDb": -0.5,
+    "source": "composite",
+    "note": "Composite: button-thock slowed to 0.72x (about -5.7 semitones), so the two thocks are one family. v1 was barely deeper than button-thock; v2 was brighter."
+  },
+  "tick-soft": {
+    "file": "v2/sfx/tick-soft.mp3",
+    "duration": 0.08,
+    "peakSec": 0.015,
+    "prompt": "One single tiny soft tick, a gentle rounded plastic click, very short and quiet, close-mic, one tick only, clean, dry, no music, no reverb tail.",
+    "gainDb": -5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "bubble-tick-run": {
+    "file": "v2/sfx/bubble-tick-run.mp3",
+    "duration": 0.977,
+    "peakSec": 0.275,
+    "prompt": "A steady run of soft bubbly interface ticks, twelve tiny rounded water-drop pops, evenly spaced and equally loud from start to end, fast steady rhythm, light and playful, like a number counting up, clean, no music.",
+    "gainDb": -8,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "hitsSec": [
+      0.005,
+      0.07,
+      0.125,
+      0.195,
+      0.24,
+      0.28,
+      0.345,
+      0.405,
+      0.47,
+      0.52,
+      0.625,
+      0.67,
+      0.765,
+      0.9
+    ],
+    "note": "v2: ticks spread over the full second; in v1 they faded to -40 dB by halfway."
+  },
+  "type-run": {
+    "file": "v2/sfx/type-run.mp3",
+    "duration": 1,
+    "peakSec": 0.655,
+    "prompt": "Soft rounded keyboard typing, a fast short burst of about ten muted rubber-dome key presses, gentle and cozy, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "gainDb": -8.5,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "hitsSec": [
+      0.01,
+      0.125,
+      0.215,
+      0.31,
+      0.44,
+      0.51,
+      0.63,
+      0.78
+    ]
+  },
+  "pen-scribble": {
+    "file": "v2/sfx/pen-scribble.mp3",
+    "duration": 0.662,
+    "peakSec": 0.525,
+    "prompt": "A felt-tip marker pen scribbling a quick signature on thick paper, fast soft strokes with a final flick, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -15,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "paper-slide": {
+    "file": "v2/sfx/paper-slide.mp3",
+    "duration": 0.481,
+    "peakSec": 0.225,
+    "prompt": "A stiff paper card sliding across a smooth table, one short smooth slide, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -11.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "pocket-slip": {
+    "file": "v2/sfx/pocket-slip.mp3",
+    "duration": 0.6,
+    "peakSec": 0.385,
+    "prompt": "A paper card slipped into a soft cotton fabric pocket, a short brushing slide ending in a soft settle, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -15,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "stamp-thunk": {
+    "file": "v2/sfx/stamp-thunk.mp3",
+    "duration": 0.35,
+    "peakSec": 0.015,
+    "prompt": "A rubber stamp pressed firmly onto paper on a wooden desk, one short soft thunk with a slight rubbery squish, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -2,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "lock-click": {
+    "file": "v2/sfx/lock-click.mp3",
+    "duration": 0.25,
+    "peakSec": 0.075,
+    "prompt": "A small metal latch clicking shut, one crisp tidy click of a little clasp closing, close-mic foley, clean, dry, no music, no reverb tail.",
+    "gainDb": -3,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "whoosh-soft": {
+    "file": "v2/sfx/whoosh-soft.mp3",
+    "duration": 0.404,
+    "peakSec": 0.105,
+    "prompt": "A gentle airy whoosh, a soft quick pass of air rising to a peak then falling away, smooth and light, clean, dry, no music, no reverb tail.",
+    "gainDb": -8,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "whoosh-zip": {
+    "file": "v2/sfx/whoosh-zip.mp3",
+    "duration": 0.3,
+    "peakSec": 0.075,
+    "prompt": "A quick bright zip-past whoosh, a fast thin airy zip passing by the microphone, snappy, clean, dry, no music, no reverb tail.",
+    "gainDb": -10.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "swoop-up": {
+    "file": "v2/sfx/swoop-up.mp3",
+    "duration": 0.503,
+    "peakSec": 0.125,
+    "prompt": "A playful rising swoosh, a smooth soft airy whoosh sweeping upward in pitch, light and refined, not a slide whistle, clean, dry, no music, no reverb tail.",
+    "gainDb": -10.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "swoop-down": {
+    "file": "v2/sfx/swoop-down.mp3",
+    "duration": 0.6,
+    "peakSec": 0.065,
+    "prompt": "A playful falling swoosh, a smooth soft airy whoosh sweeping downward in pitch, light and refined, not a slide whistle, clean, dry, no music, no reverb tail.",
+    "gainDb": -10.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "sparkle": {
+    "file": "v2/sfx/sparkle.mp3",
+    "duration": 0.6,
+    "peakSec": 0.015,
+    "prompt": "A tiny tasteful glittery shimmer, a few delicate high glass chime sparkles, soft and quick, no music.",
+    "gainDb": -12.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "success-marimba": {
+    "file": "v2/sfx/success-marimba.mp3",
+    "duration": 0.598,
+    "peakSec": 0.195,
+    "prompt": "One single marimba note, middle register, struck once with a soft rubber mallet, warm wooden tone with a natural short decay, one note only, no other instruments, no reverb tail.",
+    "gainDb": -12,
+    "source": "composite",
+    "hitsSec": [
+      0.005,
+      0.095,
+      0.185
+    ],
+    "note": "Composite: one generated marimba note (f0 ~298 Hz) played G4-C5-E5, 90 ms apart. Both takes were one struck cluster (with a semitone clash), not a flourish."
+  },
+  "coin-ding": {
+    "file": "v2/sfx/coin-ding.mp3",
+    "duration": 0.4,
+    "peakSec": 0.015,
+    "prompt": "One soft bright ding, a small metal bell struck lightly once like a payment arriving, clean and pleasant, not a slot machine, not a video game coin, no music, no reverb tail.",
+    "gainDb": -7.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "error-boop": {
+    "file": "v2/sfx/error-boop.mp3",
+    "duration": 0.42,
+    "peakSec": 0.195,
+    "prompt": "A gentle two-note uh-oh in the mid range, two soft rounded mallet tones, the first note higher and the second note lower, clearly separated, friendly and quiet, not a buzzer, not harsh, no bass, no music.",
+    "gainDb": -15,
+    "source": "composite",
+    "hitsSec": [
+      0.005,
+      0.145
+    ],
+    "note": "Composite: the v2 boop (~237 Hz) as 'uh-oh', first a minor third up, then the original. v1 sat at 65-86 Hz (inaudible on laptops and phones); v2 was one note."
+  },
+  "sneaky-pizz": {
+    "file": "v2/sfx/sneaky-pizz.mp3",
+    "duration": 1.2,
+    "peakSec": 0.745,
+    "prompt": "Four separate staccato pizzicato plucks on violin, a sneaky tiptoeing motif, pluck, pluck, pluck-pluck, each note short and clearly separated, comedic suspense but subtle and classy, solo plucked strings only, dry, no reverb tail.",
+    "gainDb": -10.5,
+    "source": "composite",
+    "hitsSec": [
+      0.01,
+      0.29,
+      0.57,
+      0.715
+    ],
+    "note": "Composite: the v2 pluck (f0 ~390 Hz) as a tiptoe motif, 0, +1, +2 semitones, then a plunk a fourth below (hits at hitsSec). Both takes were a single pluck."
+  },
+  "tension-tick": {
+    "file": "v2/sfx/tension-tick.mp3",
+    "duration": 1.485,
+    "peakSec": 0.265,
+    "prompt": "A light clock-tick pulse, a small wooden clock ticking evenly about three ticks per second, steady and slightly tense, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -6,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "hitsSec": [
+      0.02,
+      0.25,
+      0.5,
+      0.75,
+      1,
+      1.245
+    ]
+  },
+  "freeze-chime": {
+    "file": "v2/sfx/freeze-chime.mp3",
+    "duration": 0.8,
+    "peakSec": 0.315,
+    "prompt": "An icy crystalline glint, a short bright shimmering chime like frost crackling on glass with one sparkling ring, delicate, no music.",
+    "gainDb": -17,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "magic-wand": {
+    "file": "v2/sfx/magic-wand.mp3",
+    "duration": 0.798,
+    "peakSec": 0.205,
+    "prompt": "A soft upward twinkle, a quick rising run of tiny bell and glass sparkles, gentle and tasteful, no music.",
+    "gainDb": -12,
+    "source": "composite",
+    "note": "Composite: v1 sparkles under a rising varispeed (0.7x to 1.3x) with a 200 ms swell; both takes fell or stayed flat in pitch."
+  },
+  "drum-hit-soft": {
+    "file": "v2/sfx/drum-hit-soft.mp3",
+    "duration": 0.4,
+    "peakSec": 0.015,
+    "prompt": "One punchy soft tom drum hit, a tight mid tom struck once with a felt mallet, a clear soft attack and a short warm round body, full and present, no other instruments, no reverb tail. + One single satisfying soft button press, a rubbery silicone key pressed down with a muted rounded thock, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "gainDb": -6.5,
+    "source": "composite",
+    "note": "Composite: v2 felt tom (~151 Hz) + the button-thock attack at -9 dB + light saturation, so it reads on small speakers. v1 was near-silent (raw -40 dBFS) at 86 Hz."
+  },
+  "riser-short": {
+    "file": "v2/sfx/riser-short.mp3",
+    "duration": 1.93,
+    "peakSec": 0.465,
+    "prompt": "A playful rising synth swell lasting the full duration, a soft bubbly synth tone sweeping upward in pitch while growing louder and brighter until the very end, loudest at the end, then stopping cleanly, no impact, no drums, no other instruments.",
+    "gainDb": -18.5,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "v2 (2.4 s generation), cut at 1.925 s where the glide tops out at full level, 12 ms fade. v1 got quieter as it rose."
+  }
+}

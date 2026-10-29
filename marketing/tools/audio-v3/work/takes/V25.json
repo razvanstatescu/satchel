@@ -1,0 +1,101 @@
+{
+ "key": "cf36bfb265ba5c37",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+ "prev": "If one old signature could still move coins, Buy stays off.",
+ "next": "and the buyer gets everything inside.",
+ "final": {
+  "id": "V25",
+  "scene": "T7",
+  "text": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+  "say": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+  "file": "v2/vo/V25.mp3",
+  "duration": 5.63,
+  "words": [
+   {
+    "text": "When",
+    "start": 0.08,
+    "end": 0.18
+   },
+   {
+    "text": "it's",
+    "start": 0.22,
+    "end": 0.4
+   },
+   {
+    "text": "clean,",
+    "start": 0.46,
+    "end": 0.86
+   },
+   {
+    "text": "one",
+    "start": 1.28,
+    "end": 1.44
+   },
+   {
+    "text": "transaction,",
+    "start": 1.54,
+    "end": 2.34
+   },
+   {
+    "text": "bound",
+    "start": 2.64,
+    "end": 2.9
+   },
+   {
+    "text": "to",
+    "start": 2.94,
+    "end": 3.04
+   },
+   {
+    "text": "that",
+    "start": 3.08,
+    "end": 3.22
+   },
+   {
+    "text": "exact",
+    "start": 3.26,
+    "end": 3.76
+   },
+   {
+    "text": "history,",
+    "start": 3.8,
+    "end": 4.28
+   },
+   {
+    "text": "pays",
+    "start": 4.7,
+    "end": 4.96
+   },
+   {
+    "text": "the",
+    "start": 5.02,
+    "end": 5.12
+   },
+   {
+    "text": "seller,",
+    "start": 5.18,
+    "end": 5.52
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "When it's clean, one transaction bound to that exact history pays the seller"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

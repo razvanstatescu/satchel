@@ -1,0 +1,86 @@
+{
+ "key": "e57c794838aa34c3",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Then the buyer's browser checks every record against each chain.",
+ "prev": "List it, and signing pauses. The history stops growing.",
+ "next": "Nonce used. Coin spent. Blockhash expired.",
+ "final": {
+  "id": "V22",
+  "scene": "T5",
+  "text": "Then the buyer's browser checks every record against each chain.",
+  "say": "Then the buyer's browser checks every record against each chain.",
+  "file": "v2/vo/V22.mp3",
+  "duration": 3.97,
+  "words": [
+   {
+    "text": "Then",
+    "start": 0.1,
+    "end": 0.28
+   },
+   {
+    "text": "the",
+    "start": 0.32,
+    "end": 0.38
+   },
+   {
+    "text": "buyer's",
+    "start": 0.46,
+    "end": 0.82
+   },
+   {
+    "text": "browser",
+    "start": 0.9,
+    "end": 1.34
+   },
+   {
+    "text": "checks",
+    "start": 1.5,
+    "end": 1.88
+   },
+   {
+    "text": "every",
+    "start": 1.96,
+    "end": 2.2
+   },
+   {
+    "text": "record",
+    "start": 2.3,
+    "end": 2.7
+   },
+   {
+    "text": "against",
+    "start": 2.74,
+    "end": 3.14
+   },
+   {
+    "text": "each",
+    "start": 3.2,
+    "end": 3.46
+   },
+   {
+    "text": "chain.",
+    "start": 3.52,
+    "end": 3.9
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Then the buyer's browser checks every record against each chain"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

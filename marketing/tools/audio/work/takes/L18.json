@@ -1,0 +1,101 @@
+{
+ "key": "83589fd0ba35c337",
+ "final": {
+  "id": "L18",
+  "scene": "S08",
+  "text": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+  "say": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+  "file": "vo/L18.mp3",
+  "duration": 4.93,
+  "words": [
+   {
+    "text": "If",
+    "start": 0.06,
+    "end": 0.12
+   },
+   {
+    "text": "it's",
+    "start": 0.18,
+    "end": 0.34
+   },
+   {
+    "text": "clean,",
+    "start": 0.4,
+    "end": 0.76
+   },
+   {
+    "text": "one",
+    "start": 1.14,
+    "end": 1.26
+   },
+   {
+    "text": "transaction,",
+    "start": 1.36,
+    "end": 2.04
+   },
+   {
+    "text": "bound",
+    "start": 2.34,
+    "end": 2.58
+   },
+   {
+    "text": "to",
+    "start": 2.62,
+    "end": 2.7
+   },
+   {
+    "text": "that",
+    "start": 2.76,
+    "end": 2.88
+   },
+   {
+    "text": "exact",
+    "start": 2.92,
+    "end": 3.38
+   },
+   {
+    "text": "history,",
+    "start": 3.42,
+    "end": 3.84
+   },
+   {
+    "text": "pays",
+    "start": 4.12,
+    "end": 4.36
+   },
+   {
+    "text": "the",
+    "start": 4.4,
+    "end": 4.5
+   },
+   {
+    "text": "seller.",
+    "start": 4.56,
+    "end": 4.86
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "If it's clean, one transaction bound to that exact history pays the seller"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+ "prev": "And the contract was born with no keys, so every signature leaves a record.",
+ "next": "Satchel. Hand over the wallet. Let the buyer check every signature."
+}

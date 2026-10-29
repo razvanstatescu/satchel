@@ -1,0 +1,257 @@
+NEARCON IRL Hackathon: Building beyond the hype - Devpost
+We've detected that you are using an unsupported browser.  Please
+upgrade your browser
+to Internet Explorer 10 or higher.
+Log in
+Sign up
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Log in
+Sign up
+Descend
+Overview
+My projects
+Participants (499)
+Resources
+Rules
+Project gallery
+Updates
+Discussions
+NEARCON IRL Hackathon
+Building beyond the hype
+This hackathon has ended
+Find more hackathons
+View the winners
+Who can participate
+Developers and students who are able to attend IRL
+Above legal age of majority in country of residence
+All countries/territories, excluding
+standard exceptions
+View full rules
+View schedule
+Sep 12 – 14, 2022
+NEARCON Warehouse
+Invite only
+$182,300
+in prizes
+499
+participants
+NEAR
+Blockchain
+Cybersecurity
+Fintech
+NEARCON hackathon is a 48-hour IRL hacking session for those who want to team up, get familiar with NEAR, build a prototype for their project, pitch it, and win.
+This hackathon could be a great start for something amazing, or a way to fail fast with an unsuccessful hypothesis. We appreciate both, because the best way to build the next big thing is to fail enough times to find just the right idea.
+Requirements
+What to build?
+Submit a solution for one of the sponsored challenges
+!
+The hackers are expected
+to build on NEAR and present an MVP of a product that focuses on one of the 7 NEARCON’s panels:
+Future of finance – DeFi apps and features
+Sustainability – blockchain solutions for green tech and environment
+Governance – decentralizing NEAR protocol; making DAO useful in real world
+Future of work – edu tech on blockchain; job market solutions for Web3 professionals and beyond
+Web2 to Web3 – bootstrapping “traditional” apps and tools on blockchain
+Technical content – tooling, documentation and tutorials
+Creators – utility on top of NFTs
+The submission must be created or substantially modified during the hackathon. At least one of the team members must be present at the hackathon in person to consult the mentors and pitch the project during the finale. The code of the submission must be open source – please check the rules or ask a mentor if you have any questions!
+How to win?
+The judges will be looking for technical excellence, bright ideas, bold approach, and solid team spirit. We’re looking for committed builders who understand their market and are intended to stay in the NEAR ecosystem long term.
+Our mentors will be tracking the teams’ progress to make sure that the winners have the energy and experience to keep building when the hackathon is over.
+Finally, top-10 teams will be invited to a pitch competition to crashtest their ideas in front of a live audience of founders, VC’s and core ecosystem experts.
+Incentivized hacking
+We want the best builders, not best managers to win, and that’s why we
+agiled the structure
+of the hackathon. Each team will receive an incentivized checklist to guide them through the submission process earning some tokens along the way.
+The items on this checklist aren’t obligatory, but in order to win and successfully pitch their projects, the hackers are invited to follow through, report their progress at daily checkpoints, run their presentations during the pitch drill, and earn a participation bonus regardless of their final score.
+The checklist includes:
+Forming a team
+Making a GitHub repo
+Creating a pitch deck from template or scratch
+Attending mentor sessions
+Visiting Pagoda’s workshop
+…and more items to make their work at the hackathon effective, and meaningful.
+Hackathon Sponsors
+Prizes
+$182,300
+in prizes
+1st Place Winner
+1 winner
+2nd Place Winner
+1 winner
+3rd Place Winner
+1 winner
+Future of finance track winner
+1 winner
+Sustainability track winner
+1 winner
+Governance track winner
+1 winner
+Future of work track winner
+1 winner
+Web2 to Web3 track winner
+1 winner
+Technical content track winner
+1 winner
+Creators track winner
+1 winner
+Pagoda bounty winner
+2 winners
+Mintbase bounty winner
+3 winners
+Covalent bounty winner
+1 winner
+Roketo bounty winner
+1 winner
+Ref finance bounty
+1 winner
+Dragon's Den – Best Pitch winner
+1 winner
+Devpost Achievements
+Submitting to this hackathon could earn you:
+Judges
+Marieke Flament
+CEO, NEAR Foundation
+Illia Polosukhin
+Co-Founder, NEAR Inc
+Julie Bissinger
+CEO, Pagoda
+Sasha Hudzilin
+Co-creator, Human Guild
+Kirill Abramov
+Team Leader, Aurora
+Carolin Wend
+COO, Mintbase
+Taras Dovgal
+CEO, Kikimora Labs
+Yuliia Skofenko
+COO, Near UA
+Sampson
+Sr. DevRel Specialist, Brave
+Didier Pironi
+Product Manager, Ref Finance
+Paul Veradittakit
+Partner, Pantera Capital
+Janice Chok
+Ecosystem Growth, Covalent
+Warren Jones
+Sail GP, Director of Technology
+Matt Lockyer
+Developer Relations Engineer, Proximity
+Vasilisa Versus
+CTO, Roketo
+Ben Kurrek
+Developer Relations Engineer, Pagoda
+Max Harpunsky
+Developer Relations Engineer, Pagoda
+Vlad Frolov
+Developer Relations Engineer, Pagoda
+Dorian Crutcher
+Developer Relations Engineer, Pagoda
+Guillermo Gallardo
+Developer Relations Engineer, Pagoda
+Judging Criteria
+Technological Implementation
+Does the interaction with NEAR demonstrate quality software development?
+Design
+Is the user experience and design of the project well thought out?
+Potential Impact
+Is the Project Open Source and how big of an impact could the project have on the NEAR ecosystem?
+Quality of the Idea
+How creative and unique is the project?
+Project Sustainability
+Is the plan for the Project thought out and realistic?
+Questions?
+Email the hackathon manager
+Tell your friends
+This site is protected by reCAPTCHA and the Google
+Privacy Policy
+and
+Terms of Service
+apply.
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+Twitter
+Discord
+Facebook
+LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service

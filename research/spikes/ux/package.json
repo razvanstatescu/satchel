@@ -1,0 +1,15 @@
+{
+  "name": "ux",
+  "version": "1.0.0",
+  "description": "Calculation scripts only: they produce numbers that kb/80-ux-spec.md and kb/81-design-tokens.md cite (Motion spring timings, WCAG contrast ratios, card-gradient test vectors). Not product code; never import into the product repo. Re-implement the algorithms from the spec on/after Nov 1.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "motion": "^14.5.0"
+  }
+}

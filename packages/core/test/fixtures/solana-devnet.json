@@ -1,0 +1,47 @@
+{
+ "recorded_at": "2026-10-21T21:32:42Z",
+ "provider": "https://api.devnet.solana.com",
+ "isBlockhashValid": {
+  "2HH5kZtig6m9qyNPHKy1fmWVmfpq61WzcrA8XnDQhyiW": {
+   "context": {
+    "apiVersion": "4.4.0-beta.1",
+    "slot": 513659462
+   },
+   "value": false
+  },
+  "3eZkWr3zAitEdfhnUeCy3xvyMnVJCT2iFJP34xKASU7J": {
+   "context": {
+    "apiVersion": "4.4.0-beta.1",
+    "slot": 513659463
+   },
+   "value": true
+  }
+ },
+ "fresh_blockhash": "3eZkWr3zAitEdfhnUeCy3xvyMnVJCT2iFJP34xKASU7J",
+ "getAccountInfo": {
+  "6P6GgkFNQKcvCtsMncRF1VtFA6Q79LkcFyvaQz5NXPiA": {
+   "context": {
+    "apiVersion": "4.4.0-beta.1",
+    "slot": 513659462
+   },
+   "value": null
+  },
+  "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA": {
+   "context": {
+    "apiVersion": "4.4.0-beta.1",
+    "slot": 513659462
+   },
+   "value": {
+    "data": [
+     "",
+     "base64"
+    ],
+    "executable": true,
+    "lamports": 20381277856,
+    "owner": "BPFLoaderUpgradeab1e11111111111111111111111",
+    "rentEpoch": 18446744073709551615,
+    "space": 36
+   }
+  }
+ }
+}

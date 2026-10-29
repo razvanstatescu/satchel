@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Satchel #1 · Satchel</title>
+<script src="assets/theme.js"></script>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="app.css">
+<script src="assets/app-states.js" defer></script>
+</head>
+<body>
+<!--@sprite--><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol><symbol id="i-circle-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></symbol><symbol id="i-snowflake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m10 20-1.25-2.5L6 18"/><path d="M10 4 8.75 6.5 6 6"/><path d="m14 20 1.25-2.5L18 18"/><path d="m14 4 1.25 2.5L18 6"/><path d="m17 21-3-6h-4"/><path d="m17 3-3 6 1.5 3"/><path d="M2 12h6.5L10 9"/><path d="m20 10-1.5 2 1.5 2"/><path d="M22 12h-6.5L14 15"/><path d="m4 10 1.5 2L4 14"/><path d="m7 21 3-6-1.5-3"/><path d="m7 3 3 6h4"/></symbol><symbol id="i-loader-circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol><symbol id="i-triangle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol><symbol id="i-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/></symbol><symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></symbol><symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol><symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></symbol><symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol><symbol id="i-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol><symbol id="i-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></symbol><symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol><symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol><symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol><symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol><symbol id="i-arrow-up-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol><symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol><symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"/><path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5"/><rect x="3" y="7" width="18" height="4" rx="1"/></symbol><symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol><symbol id="i-qr-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></symbol><symbol id="i-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="i-layout-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol><symbol id="i-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"/><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"/><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"/></symbol><symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></symbol><symbol id="i-file-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 12.5 8 15l2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/></symbol><symbol id="i-shield-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol><symbol id="i-user-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol><symbol id="i-users-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 21a8 8 0 0 0-16 0"/><circle cx="10" cy="8" r="5"/><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"/></symbol><symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol><symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol><symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol><symbol id="i-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol><symbol id="i-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="3" width="5" height="18" rx="1"/><rect x="5" y="3" width="5" height="18" rx="1"/></symbol><symbol id="i-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/></symbol><symbol id="i-key-round" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></symbol><symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol><symbol id="i-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></symbol><symbol id="i-circle-dot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="12" r="10"/></symbol><symbol id="i-circle-dashed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></symbol><symbol id="i-circle-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol><symbol id="i-circle-question-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol><symbol id="i-external-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol><symbol id="i-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></symbol><symbol id="i-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></symbol><symbol id="i-scroll-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 12h-5"/><path d="M15 8h-5"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></symbol><symbol id="i-badge-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m16 9-5.5 5.5L8 12"/></symbol><symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></symbol><symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol><symbol id="i-hourglass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol><symbol id="i-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V7"/><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"/></symbol><symbol id="i-arrow-down-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7 7 17"/><path d="M17 17H7V7"/></symbol><symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></symbol><symbol id="i-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13.744 17.736a6 6 0 1 1-7.48-7.48"/><path d="M15 6h1v4"/><path d="m6.134 14.768.866-.5 2 3.464"/><circle cx="16" cy="8" r="6"/></symbol><symbol id="i-hand-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></symbol><symbol id="i-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></symbol><symbol id="i-rotate-ccw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol><symbol id="i-refresh-cw" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol><symbol id="i-ellipsis" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="i-book-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/></symbol><symbol id="i-file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol><symbol id="i-landmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18v-7"/><path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M3 22h18"/><path d="M6 18v-7"/></symbol><symbol id="i-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 21 9.6-9.6"/><path d="m7.5 15.5 2.3 2.3a1 1 0 0 1 0 1.4l-2.1 2.1a1 1 0 0 1-1.4 0L4 19"/><circle cx="15.5" cy="7.5" r="5.5"/></symbol><symbol id="i-signature" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 17-2.156-1.868A.5.5 0 0 0 18 15.5v.5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1c0-2.545-3.991-3.97-8.5-4a1 1 0 0 0 0 5c4.153 0 4.745-11.295 5.708-13.5a2.5 2.5 0 1 1 3.31 3.284"/><path d="M3 21h18"/></symbol><symbol id="i-pen-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></symbol><symbol id="i-circle-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></symbol><symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol><symbol id="i-wallet-minimal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14h.01"/><path d="M7 7h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14"/></symbol><symbol id="i-sticker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"/><path d="M15 3v5a1 1 0 0 0 1 1h5"/><path d="M8 13h.01"/><path d="M16 13h.01"/><path d="M10 16s.8 1 2 1c1.3 0 2-1 2-1"/></symbol><symbol id="i-scan-line" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></symbol><symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol><symbol id="i-undo-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/></symbol><symbol id="i-clipboard-paste" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 14h10"/><path d="M16 4h2a2 2 0 0 1 2 2v1.344"/><path d="m17 18 4-4-4-4"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 1.793-1.113"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol><symbol id="i-minimize-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 10 7-7"/><path d="M20 10h-6V4"/><path d="m3 21 7-7"/><path d="M4 14h6v6"/></symbol><symbol id="i-shield-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol><symbol id="i-shield-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m14.5 9.5-5 5"/><path d="m9.5 9.5 5 5"/></symbol></svg><!--/@sprite-->
+<script type="application/json" id="proto-states">[
+ {"id":"owner","nav":"satchels","label":"Owner · #1 (Active)","auth":"in","title":"Satchel #1 · Satchel"},
+ {"id":"visitor","label":"Visitor or judge · #1","auth":"out","title":"Satchel #1 · Satchel"},
+ {"id":"visitor-listed","label":"Visitor · #3 for sale","auth":"out","title":"Satchel #3 · Satchel"},
+ {"id":"owner-listed","nav":"satchels","label":"Owner · #5 for sale","auth":"in","title":"Satchel #5 · Satchel"},
+ {"id":"owner-zero","nav":"satchels","label":"Owner · #8 just minted, empty","auth":"in","title":"Satchel #8 · Satchel"},
+ {"id":"owner-signing","nav":"satchels","label":"Owner · #1 signing","auth":"in","title":"(1) Signing… · Satchel"},
+ {"id":"owner-attention","nav":"satchels","label":"Owner · #1 needs attention","auth":"in","title":"Satchel #1 · Satchel"},
+ {"id":"seller-sold","label":"Seller after the sale · #3","auth":"in","title":"Satchel #3 · Satchel"},
+ {"id":"unavailable","label":"Visitor · balances unavailable","auth":"out","title":"Satchel #1 · Satchel"},
+ {"id":"sol-flag","nav":"satchels","label":"Owner · #1, SOL flag on","auth":"in","title":"Satchel #1 · Satchel"}
+]</script>
+<!--@app-shell-start nav="none" pending="owner-signing" pendingtext="Sending 0.0010&nbsp;ETH · 0:14"--><a class="skip-link" href="#main">Skip to content</a>
+<div class="app">
+<header class="topbar" data-topbar><div class="container topbar__inner">
+<a class="brand-link" href="landing.html" aria-label="Satchel home"><!--@lockup--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2220 512" class="lockup" role="img" aria-label="Satchel" focusable="false"><rect width="512" height="512" rx="112" fill="#FF5C4D"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" transform="translate(0 10)" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/><g transform="translate(609.31 372.00) scale(0.38667)"><path d="M334 12Q199 12 121.5 -45.0Q44 -102 38 -204H215Q223 -164 253.5 -145.0Q284 -126 342 -126Q432 -126 432 -173Q432 -192 418.5 -203.5Q405 -215 374 -221L240 -247Q56 -283 56 -419Q56 -507 127.0 -559.5Q198 -612 323 -612Q448 -612 520.0 -558.0Q592 -504 598 -406H421Q411 -445 385.5 -462.5Q360 -480 311 -480Q271 -480 249.5 -469.0Q228 -458 228 -436Q228 -420 241.0 -409.0Q254 -398 280 -393L418 -366Q514 -347 559.0 -304.0Q604 -261 604 -188Q604 -94 534.5 -41.0Q465 12 334 12Z M891 11Q783 11 722.5 -40.5Q662 -92 662 -178Q662 -267 725.5 -315.5Q789 -364 907 -364H1068V-386Q1068 -468 964 -468Q872 -468 852 -406H670Q691 -508 765.0 -560.0Q839 -612 963 -612Q1100 -612 1172.0 -551.5Q1244 -491 1244 -375V-180H1330V0H1146V-100H1104Q1073 -46 1022.0 -17.5Q971 11 891 11ZM919 -127Q963 -127 996.5 -142.0Q1030 -157 1049.0 -183.0Q1068 -209 1068 -241V-244H915Q838 -244 838 -187Q838 -158 859.5 -142.5Q881 -127 919 -127Z M1615 0Q1545 0 1506.5 -35.5Q1468 -71 1468 -144V-456H1368V-600H1470V-780H1650V-600H1782V-456H1652V-144H1796V0Z M2166 12Q2072 12 2000.5 -26.5Q1929 -65 1888.5 -135.0Q1848 -205 1848 -300Q1848 -395 1888.0 -465.0Q1928 -535 2000.0 -573.5Q2072 -612 2166 -612Q2288 -612 2366.5 -550.0Q2445 -488 2463 -382H2279Q2267 -415 2238.5 -433.5Q2210 -452 2166 -452Q2107 -452 2069.5 -412.5Q2032 -373 2032 -300Q2032 -227 2070.0 -187.5Q2108 -148 2166 -148Q2261 -148 2282 -227H2466Q2450 -116 2372.0 -52.0Q2294 12 2166 12Z M2530 0V-840H2714V-518H2718Q2747 -564 2794.5 -587.5Q2842 -611 2909 -611Q3022 -611 3088.0 -542.0Q3154 -473 3154 -357V0H2970V-321Q2970 -383 2937.5 -415.0Q2905 -447 2842 -447Q2779 -447 2746.5 -415.0Q2714 -383 2714 -321V0Z M3562 12Q3463 12 3390.0 -26.5Q3317 -65 3277.5 -135.5Q3238 -206 3238 -302Q3238 -398 3276.5 -467.5Q3315 -537 3386.5 -574.5Q3458 -612 3555 -612Q3651 -612 3720.0 -575.5Q3789 -539 3825.5 -471.0Q3862 -403 3862 -308V-249H3415Q3426 -191 3463.0 -161.5Q3500 -132 3561 -132Q3610 -132 3637.5 -147.5Q3665 -163 3677 -197H3861Q3842 -99 3763.0 -43.5Q3684 12 3562 12ZM3418 -369H3686Q3677 -419 3644.5 -443.5Q3612 -468 3556 -468Q3501 -468 3466.0 -443.0Q3431 -418 3418 -369Z M3953 0V-840H4137V0Z" fill="currentColor"/></g></svg><!--/@lockup--></a>
+<span class="badge" title="Satchel runs on NEAR testnet, Bitcoin testnet4 and Ethereum Sepolia. Coins here have no value.">Testnet</span>
+<div class="topbar__actions"><a class="pending-pill" href="app-send.html?state=tracker-15" data-show="owner-signing"><svg class="icon spin" aria-hidden="true"><use href="#i-loader-circle"/></svg>Sending 0.0010&nbsp;ETH · 0:14</a>
+<button class="btn btn--secondary" type="button" data-when="out" data-connect aria-label="Connect NEAR wallet"><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg><span>Connect<span class="hide-sm"> NEAR wallet</span></span></button>
+<button class="account account--icon" type="button" data-when="in" aria-haspopup="true" aria-label="Account alice.satchelhq.testnet"><span class="avatar avatar--28" aria-hidden="true">A</span></button>
+<button class="btn btn--icon btn--icon-24" type="button" data-menu-button aria-label="Open menu" aria-expanded="false"><svg class="icon icon--24" aria-hidden="true"><use href="#i-menu"/></svg></button>
+</div></div></header>
+<nav class="sidenav" aria-label="Main">
+<div class="sidenav__brand"><a class="brand-link" href="landing.html" aria-label="Satchel home"><!--@lockup--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2220 512" class="lockup" role="img" aria-label="Satchel" focusable="false"><rect width="512" height="512" rx="112" fill="#FF5C4D"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" transform="translate(0 10)" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/><g transform="translate(609.31 372.00) scale(0.38667)"><path d="M334 12Q199 12 121.5 -45.0Q44 -102 38 -204H215Q223 -164 253.5 -145.0Q284 -126 342 -126Q432 -126 432 -173Q432 -192 418.5 -203.5Q405 -215 374 -221L240 -247Q56 -283 56 -419Q56 -507 127.0 -559.5Q198 -612 323 -612Q448 -612 520.0 -558.0Q592 -504 598 -406H421Q411 -445 385.5 -462.5Q360 -480 311 -480Q271 -480 249.5 -469.0Q228 -458 228 -436Q228 -420 241.0 -409.0Q254 -398 280 -393L418 -366Q514 -347 559.0 -304.0Q604 -261 604 -188Q604 -94 534.5 -41.0Q465 12 334 12Z M891 11Q783 11 722.5 -40.5Q662 -92 662 -178Q662 -267 725.5 -315.5Q789 -364 907 -364H1068V-386Q1068 -468 964 -468Q872 -468 852 -406H670Q691 -508 765.0 -560.0Q839 -612 963 -612Q1100 -612 1172.0 -551.5Q1244 -491 1244 -375V-180H1330V0H1146V-100H1104Q1073 -46 1022.0 -17.5Q971 11 891 11ZM919 -127Q963 -127 996.5 -142.0Q1030 -157 1049.0 -183.0Q1068 -209 1068 -241V-244H915Q838 -244 838 -187Q838 -158 859.5 -142.5Q881 -127 919 -127Z M1615 0Q1545 0 1506.5 -35.5Q1468 -71 1468 -144V-456H1368V-600H1470V-780H1650V-600H1782V-456H1652V-144H1796V0Z M2166 12Q2072 12 2000.5 -26.5Q1929 -65 1888.5 -135.0Q1848 -205 1848 -300Q1848 -395 1888.0 -465.0Q1928 -535 2000.0 -573.5Q2072 -612 2166 -612Q2288 -612 2366.5 -550.0Q2445 -488 2463 -382H2279Q2267 -415 2238.5 -433.5Q2210 -452 2166 -452Q2107 -452 2069.5 -412.5Q2032 -373 2032 -300Q2032 -227 2070.0 -187.5Q2108 -148 2166 -148Q2261 -148 2282 -227H2466Q2450 -116 2372.0 -52.0Q2294 12 2166 12Z M2530 0V-840H2714V-518H2718Q2747 -564 2794.5 -587.5Q2842 -611 2909 -611Q3022 -611 3088.0 -542.0Q3154 -473 3154 -357V0H2970V-321Q2970 -383 2937.5 -415.0Q2905 -447 2842 -447Q2779 -447 2746.5 -415.0Q2714 -383 2714 -321V0Z M3562 12Q3463 12 3390.0 -26.5Q3317 -65 3277.5 -135.5Q3238 -206 3238 -302Q3238 -398 3276.5 -467.5Q3315 -537 3386.5 -574.5Q3458 -612 3555 -612Q3651 -612 3720.0 -575.5Q3789 -539 3825.5 -471.0Q3862 -403 3862 -308V-249H3415Q3426 -191 3463.0 -161.5Q3500 -132 3561 -132Q3610 -132 3637.5 -147.5Q3665 -163 3677 -197H3861Q3842 -99 3763.0 -43.5Q3684 12 3562 12ZM3418 -369H3686Q3677 -419 3644.5 -443.5Q3612 -468 3556 -468Q3501 -468 3466.0 -443.0Q3431 -418 3418 -369Z M3953 0V-840H4137V0Z" fill="currentColor"/></g></svg><!--/@lockup--></a><span class="badge">Testnet</span></div>
+<ul class="sidenav__list"><li><a class="nav-item" href="app-misc.html?state=satchels"><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg>My Satchels</a></li><li><a class="nav-item" href="app-market.html"><svg class="icon" aria-hidden="true"><use href="#i-store"/></svg>Market</a></li><li><a class="nav-item" href="app-mint.html"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg>Mint</a></li><li><a class="nav-item" href="app-misc.html?state=contract"><svg class="icon" aria-hidden="true"><use href="#i-file-code"/></svg>Contract facts</a></li></ul>
+<div class="sidenav__foot"><div class="sidenav__account">
+<button class="btn btn--secondary btn--block" type="button" data-when="out" data-connect><svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg>Connect NEAR wallet</button>
+<button class="account" type="button" data-when="in" aria-haspopup="true"><span class="avatar avatar--28" aria-hidden="true">A</span><span class="account__name">alice.satchelhq.testnet</span><svg class="icon" aria-hidden="true" style="margin-left:auto"><use href="#i-chevron-up"/></svg></button>
+<div class="theme-control"><span class="theme-control__label" id="t-side">Theme</span>
+<div class="seg seg--sm" role="radiogroup" aria-labelledby="t-side">
+<label class="seg__opt"><input type="radio" name="theme-side" value="system"><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg>System</label>
+<label class="seg__opt"><input type="radio" name="theme-side" value="day"><svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>Day</label>
+<label class="seg__opt"><input type="radio" name="theme-side" value="night"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg>Night</label></div></div>
+<p class="sidenav__note">Testnet only. Coins here have no value.</p>
+</div></div>
+</nav>
+<div class="app__main"><a class="pending-card" href="app-send.html?state=tracker-15" data-show="owner-signing"><svg class="icon spin" aria-hidden="true"><use href="#i-loader-circle"/></svg><span><b class="text-label">Sending 0.0010&nbsp;ETH · 0:14</b><br><span class="text-body-sm muted">Signing with NEAR's signer network</span></span></a>
+<main id="main" class="container app__content" tabindex="-1"><!--/@app-shell-start-->
+
+<article class="obj" data-judge-facts data-satchel="1">
+  <!-- ── page head: the h1 (one per page), the tabs ─────────────────────────────── -->
+  <header class="obj__head">
+    <div class="obj__title" data-show="owner owner-signing owner-attention sol-flag"><h1>Satchel #1</h1></div>
+    <div class="obj__title" data-show="owner-listed"><h1>Satchel #5</h1></div>
+    <div class="obj__title" data-show="owner-zero"><h1>Satchel #8</h1></div>
+    <div class="obj__title" data-show="visitor unavailable">
+      <h1>This NFT is a wallet.</h1>
+      <p class="obj__sub">Whoever owns Satchel #1 controls the coins at the Bitcoin and Ethereum addresses below.</p>
+    </div>
+    <div class="obj__title" data-show="visitor-listed seller-sold">
+      <h1>This NFT is a wallet.</h1>
+      <p class="obj__sub">Whoever owns Satchel #3 controls the coins at the Bitcoin and Ethereum addresses below.</p>
+    </div>
+    <nav class="tabs" aria-label="Satchel sections">
+      <a class="tab" aria-current="page" href="#">Wallet</a>
+      <a class="tab" href="app-activity.html">Activity</a>
+      <a class="tab" href="app-sale.html?state=owner-not-listed" data-show="owner owner-zero owner-signing owner-attention sol-flag">Sell</a>
+      <a class="tab" href="app-sale.html?state=owner-listed" data-show="owner-listed">Sell</a>
+      <a class="tab" href="app-sale.html?state=buy-clean" data-show="visitor-listed">Buy</a>
+      <a class="tab" href="app-sale.html?state=sold-paid" data-show="seller-sold">Sold</a>
+    </nav>
+  </header>
+
+  <!-- ── the object column: the card and this page's main block (sticky from 1024) ─ -->
+  <div class="obj__col">
+    <!-- Needs attention: the one thing to do first -->
+    <div class="banner banner--danger" data-show="owner-attention" id="notsent-1">
+      <svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"/></svg>
+      <div class="banner__main">
+        <span class="banner__title">Signed, not sent</span>
+        <span class="banner__body">mempool.space isn't responding. Nothing has left Satchel #1 yet.</span>
+        <span class="text-body-sm muted">The signed transaction is saved. Until it's broadcast or replaced, it counts as an unused signature in this Satchel's history.</span>
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn btn--primary" type="button" data-testid="broadcast-again"><svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Broadcast again</button>
+          <a class="btn btn--link" href="app-send.html?state=signed-not-sent">Details</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card #1, owner -->
+    <figure class="card" data-card="1" data-owned="true" aria-labelledby="c1o" data-show="owner owner-signing owner-attention">
+      <div class="card__band"><h2 class="card__name" id="c1o">Satchel #1</h2><span class="badge badge--yours" data-yours>Yours</span><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.00189718</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.048979</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot">
+          <span class="pill pill--success" data-show="owner"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Active</span>
+          <span class="pill pill--frozen" data-show="owner-signing"><svg class="icon spin" aria-hidden="true"><use href="#i-loader-circle"/></svg>Signing</span>
+          <span class="pill pill--danger" data-show="owner-attention"><svg class="icon" aria-hidden="true"><use href="#i-triangle-alert"/></svg>Needs attention</span>
+        </div>
+      </div>
+    </figure>
+    <!-- Card #1, visitor (judge) -->
+    <figure class="card" data-card="1" data-owned="false" aria-labelledby="c1v" data-show="visitor">
+      <div class="card__band"><h2 class="card__name" id="c1v">Satchel #1</h2><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.00189718</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.048979</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot"><span class="pill pill--success"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Active</span></div>
+      </div>
+    </figure>
+    <!-- Card #1, balances unavailable -->
+    <figure class="card" data-card="1" data-owned="false" aria-labelledby="c1u" data-show="unavailable">
+      <div class="card__band"><h2 class="card__name" id="c1u">Satchel #1</h2><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin" data-unavailable title="Balance unavailable"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">—</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin" data-unavailable title="Balance unavailable"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">—</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot"><span class="pill pill--success"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Active</span></div>
+      </div>
+    </figure>
+    <!-- Card #1, SOL flag on (three coins) -->
+    <figure class="card" data-card="1" data-owned="true" data-coins="3" aria-labelledby="c1s" data-show="sol-flag">
+      <div class="card__band"><h2 class="card__name" id="c1s">Satchel #1</h2><span class="badge badge--yours" data-yours>Yours</span><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.00189718</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.048979</span><span class="card__tick">ETH</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-sol.svg" alt=""><span class="card__amt">0.5000</span><span class="card__tick">SOL</span></li>
+        </ul>
+        <div class="card__foot"><span class="pill pill--success"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Active</span></div>
+      </div>
+    </figure>
+    <!-- Card #3 (for sale; or sold, in the seller's view) -->
+    <figure class="card" data-card="3" data-owned="false" aria-labelledby="c3" data-show="visitor-listed seller-sold">
+      <div class="card__band"><h2 class="card__name" id="c3">Satchel #3</h2><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.0005</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.014979</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot">
+          <span class="pill pill--frozen" data-show="visitor-listed"><svg class="icon" aria-hidden="true"><use href="#i-snowflake"/></svg>Paused for sale</span>
+          <span class="pill pill--muted" data-show="seller-sold"><svg class="icon" aria-hidden="true"><use href="#i-handshake"/></svg>Sold</span>
+        </div>
+      </div>
+    </figure>
+    <!-- Card #5, owner, for sale -->
+    <figure class="card" data-card="5" data-owned="true" aria-labelledby="c5" data-show="owner-listed">
+      <div class="card__band"><h2 class="card__name" id="c5">Satchel #5</h2><span class="badge badge--yours" data-yours>Yours</span><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin"><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0.00019718</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin"><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0.0100</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot"><span class="pill pill--frozen"><svg class="icon" aria-hidden="true"><use href="#i-snowflake"/></svg>Paused for sale</span></div>
+      </div>
+    </figure>
+    <!-- Card #8, owner, just minted and empty -->
+    <figure class="card" data-card="8" data-owned="true" aria-labelledby="c8" data-show="owner-zero">
+      <div class="card__band"><h2 class="card__name" id="c8">Satchel #8</h2><span class="badge badge--yours" data-yours>Yours</span><img class="card__charm" src="assets/brand/satchel-charm.svg" alt=""></div>
+      <div class="card__body">
+        <ul class="card__inside">
+          <li class="card__coin" data-zero><img class="coin" src="assets/chain-btc.svg" alt=""><span class="card__amt">0</span><span class="card__tick">BTC</span></li>
+          <li class="card__coin" data-zero><img class="coin" src="assets/chain-eth.svg" alt=""><span class="card__amt">0</span><span class="card__tick">ETH</span></li>
+        </ul>
+        <div class="card__foot"><span class="pill pill--success"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Active</span></div>
+      </div>
+    </figure>
+
+    <p class="card-note" data-show="seller-sold"><svg class="icon icon--16" aria-hidden="true"><use href="#i-handshake"/></svg><span>You sold it to carol.satchelhq.testnet. <a href="app-sale.html?state=sold-paid" style="color:var(--link)">See the receipt</a></span></p>
+
+    <!-- Owner, for sale: the one panel about the sale (the FreezeBanner and the ListedPanel merge here) -->
+    <section class="sale-panel" id="freeze" data-show="owner-listed" aria-labelledby="fs-t">
+      <div class="stack" style="--stack:2px">
+        <p class="sale-panel__title" id="fs-t"><svg class="icon" aria-hidden="true"><use href="#i-tag"/></svg>For sale at 1&nbsp;NEAR</p>
+        <p class="text-body-sm muted">Listing #5 · listed 22 min ago. Anyone can buy it right away.</p>
+      </div>
+      <p class="gate gate--success"><svg class="icon" aria-hidden="true"><use href="#i-shield-check"/></svg><span>Buyers see: Clean history, checked 8&nbsp;s ago.</span></p>
+      <a class="btn btn--link" href="app-sale.html?state=owner-listed" style="align-self:flex-start;margin-block:-8px">See the listing</a>
+    </section>
+
+    <!-- Visitor, for sale: the offer (inline from 1024; a pinned bar on phones) -->
+    <section class="offer offer--overview" data-show="visitor-listed" aria-labelledby="of-t">
+      <p class="eyebrow" id="of-t"><svg class="icon icon--16" aria-hidden="true"><use href="#i-tag"/></svg>For sale</p>
+      <p class="offer__price">5.00&nbsp;USDC</p>
+      <p class="offer__meta">Listing #3 · listed 4 min ago by alice.satchelhq.testnet</p>
+      <div class="offer__buy buybar">
+        <div class="buybar__row">
+          <p class="buybar__price"><b>5.00&nbsp;USDC</b><span>Listing #3</span></p>
+          <a class="btn btn--primary btn--lg" href="app-sale.html?state=buy-clean">Buy<svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+        </div>
+        <p class="buybar__note"><svg class="icon" aria-hidden="true"><use href="#i-shield-check"/></svg>Your browser checks its history before you buy.</p>
+      </div>
+    </section>
+
+    <!-- Visitor (not for sale), from 1024: what a visitor can do here -->
+    <section class="panel panel--pad stack lg-only" style="--stack:12px" data-show="visitor unavailable" aria-labelledby="add-t">
+      <h2 class="text-heading" id="add-t">Add coins to this Satchel</h2>
+      <p class="muted">Anyone can send testnet coins to its addresses. Only its owner can send them out.</p>
+      <div class="btn-row"><a class="btn btn--secondary" href="app-receive.html?state=btc"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a>
+      <a class="btn btn--link" href="app-mint.html">Mint your own Satchel</a></div>
+    </section>
+
+    <!-- Owner actions: four labelled buttons, one coral -->
+    <div class="actions" data-testid="action-row" data-show="owner owner-signing owner-attention sol-flag">
+      <div class="actions-grid">
+        <a class="btn btn--primary btn--lg" data-show="owner owner-signing sol-flag" href="app-send.html?state=form-empty"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>Send</a>
+        <a class="btn btn--secondary btn--lg" data-show="owner-attention" href="app-send.html?state=guard-unsent"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>Send</a>
+        <a class="btn btn--secondary btn--lg" href="app-receive.html?state=btc"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a>
+        <a class="btn btn--secondary btn--lg" href="app-give.html?state=recipient-empty"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg>Give</a>
+        <a class="btn btn--secondary btn--lg" href="app-sale.html?state=sell-ready"><svg class="icon" aria-hidden="true"><use href="#i-tag"/></svg>Sell</a>
+      </div>
+    </div>
+    <div class="actions" data-testid="action-row" data-show="owner-listed">
+      <div class="actions-grid">
+        <span class="btn btn--secondary btn--lg" role="link" aria-disabled="true" aria-describedby="why-listed"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>Send</span>
+        <a class="btn btn--secondary btn--lg" href="app-receive.html?state=btc"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a>
+        <span class="btn btn--secondary btn--lg" role="link" aria-disabled="true" aria-describedby="why-listed"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg>Give</span>
+        <button class="btn btn--secondary btn--lg" type="button" data-testid="delist"><svg class="icon" aria-hidden="true"><use href="#i-undo-2"/></svg>Stop selling</button>
+      </div>
+      <p class="why" id="why-listed"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Sending and giving are paused while it's for sale.</p>
+    </div>
+    <div class="actions" data-testid="action-row" data-show="owner-zero">
+      <div class="actions-grid">
+        <span class="btn btn--secondary btn--lg" role="link" aria-disabled="true" aria-describedby="why-zero"><svg class="icon" aria-hidden="true"><use href="#i-arrow-up"/></svg>Send</span>
+        <a class="btn btn--primary btn--lg" href="app-receive.html?state=btc"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a>
+        <a class="btn btn--secondary btn--lg" href="app-give.html?state=recipient-empty"><svg class="icon" aria-hidden="true"><use href="#i-gift"/></svg>Give</a>
+        <a class="btn btn--secondary btn--lg" href="app-sale.html?state=sell-ready"><svg class="icon" aria-hidden="true"><use href="#i-tag"/></svg>Sell</a>
+      </div>
+      <p class="why" id="why-zero"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Nothing to send yet. Add coins first.</p>
+    </div>
+  </div>
+
+  <!-- ── the tab content ──────────────────────────────────────────────────────── -->
+  <div class="obj__main">
+    <!-- Inside: one row per chain, the full address (the judge's data-full-address lives here) -->
+    <section aria-labelledby="inside-t">
+      <div class="section-h">
+        <h2 id="inside-t">Inside</h2>
+        <a class="btn btn--secondary lg-hide" href="app-receive.html?state=btc" data-show="visitor unavailable visitor-listed seller-sold"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a>
+        <span class="proto-flag" data-show="sol-flag">Flag: SOL_UI_ENABLED</span>
+      </div>
+
+      <!-- #1 -->
+      <ul class="inside" aria-label="Holdings" data-show="owner visitor owner-signing owner-attention unavailable sol-flag">
+        <li class="inside-row" data-chain-row="btc">
+          <div class="inside-row__top">
+            <img class="coin" src="assets/chain-btc.svg" alt="">
+            <div class="inside-row__name"><h3>Bitcoin</h3><span>testnet4</span></div>
+            <p class="inside-row__amt" data-balance="btc" data-show="!unavailable">0.00189718&nbsp;BTC</p>
+            <p class="inside-row__amt" data-zero data-show="unavailable">Balance unavailable</p>
+          </div>
+          <p class="inside-row__addr"><!--@addr tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5 data-full-address="btc"--><span class="address address--grouped" data-full-address="btc"><span data-key>tb1q</span><span data-key>tf95</span><span>jlrr</span><span>yxd2</span><span>kfrs</span><span>2ug0</span><span>3p4a</span><span>wlww</span><span>m2wf</span><span>rjcw</span><span data-key>y5</span></span><!--/@addr--></p>
+          <div class="tools">
+            <button class="tool" type="button" aria-label="Copy Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button>
+            <a class="tool" href="app-receive.html?state=btc" aria-label="Show QR code for Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a>
+            <a class="tool tool--link" href="#">mempool.space<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg><span class="visually-hidden"> (opens in a new tab)</span></a>
+            <button class="tool" type="button" data-show="unavailable"><svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Retry</button>
+          </div>
+        </li>
+        <li class="inside-row" data-chain-row="evm">
+          <div class="inside-row__top">
+            <img class="coin" src="assets/chain-eth.svg" alt="">
+            <div class="inside-row__name"><h3>Ethereum</h3><span>Sepolia</span></div>
+            <p class="inside-row__amt" data-balance="evm" data-show="!unavailable">0.048979&nbsp;ETH</p>
+            <p class="inside-row__amt" data-zero data-show="unavailable">Balance unavailable</p>
+          </div>
+          <p class="inside-row__addr"><!--@addr 0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad data-full-address="evm"--><span class="address address--grouped" data-full-address="evm"><span data-key>0xD0</span><span data-key>CdbF</span><span>830B</span><span>82Fa</span><span>Bf6a</span><span>ee04</span><span>D1a2</span><span>633A</span><span>51F6</span><span>b2d5</span><span data-key>ad</span></span><!--/@addr--></p>
+          <div class="tools">
+            <button class="tool" type="button" aria-label="Copy Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button>
+            <a class="tool" href="app-receive.html?state=evm" aria-label="Show QR code for Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a>
+            <a class="tool tool--link" href="#">Etherscan<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg><span class="visually-hidden"> (opens in a new tab)</span></a>
+            <button class="tool" type="button" data-show="unavailable"><svg class="icon" aria-hidden="true"><use href="#i-refresh-cw"/></svg>Retry</button>
+          </div>
+        </li>
+        <li class="inside-row" data-chain-row="sol" data-show="sol-flag">
+          <div class="inside-row__top">
+            <img class="coin" src="assets/chain-sol.svg" alt="">
+            <div class="inside-row__name"><h3>Solana</h3><span>devnet</span></div>
+            <p class="inside-row__amt" data-balance="sol">0.5000&nbsp;SOL</p>
+          </div>
+          <p class="inside-row__addr"><!--@addr AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd--><span class="address address--grouped" ><span data-key>AGSU</span><span data-key>q86q</span><span>gpp1</span><span>eB53</span><span>UaL8</span><span>iRsc</span><span>RjJz</span><span>sQfr</span><span>NKsK</span><span>oxPX</span><span data-key>TXTd</span></span><!--/@addr--></p>
+          <div class="tools">
+            <button class="tool" type="button" aria-label="Copy Solana address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button>
+            <a class="tool" href="app-receive.html?state=sol" aria-label="Show QR code for Solana address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a>
+            <a class="tool tool--link" href="#">Solana Explorer<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a>
+          </div>
+        </li>
+      </ul>
+
+      <!-- #3 -->
+      <ul class="inside" aria-label="Holdings" data-show="visitor-listed seller-sold">
+        <li class="inside-row" data-chain-row="btc">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-btc.svg" alt=""><div class="inside-row__name"><h3>Bitcoin</h3><span>testnet4</span></div><p class="inside-row__amt">0.0005&nbsp;BTC</p></div>
+          <p class="inside-row__addr"><!--@addr tb1qylyljhhghv7xpqa5vw5e8v5dgjrsg6s6a3dngd data-full-address="btc"--><span class="address address--grouped" data-full-address="btc"><span data-key>tb1q</span><span data-key>ylyl</span><span>jhhg</span><span>hv7x</span><span>pqa5</span><span>vw5e</span><span>8v5d</span><span>gjrs</span><span>g6s6</span><span>a3dn</span><span data-key>gd</span></span><!--/@addr--></p>
+          <div class="tools"><button class="tool" type="button" aria-label="Copy Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool" href="app-receive.html?state=btc" aria-label="Show QR code for Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a><a class="tool tool--link" href="#">mempool.space<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+        <li class="inside-row" data-chain-row="evm">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-eth.svg" alt=""><div class="inside-row__name"><h3>Ethereum</h3><span>Sepolia</span></div><p class="inside-row__amt">0.014979&nbsp;ETH</p></div>
+          <p class="inside-row__addr"><!--@addr 0x456D0c7e3f16B64385C9241FdE45098aef2e997D data-full-address="evm"--><span class="address address--grouped" data-full-address="evm"><span data-key>0x45</span><span data-key>6D0c</span><span>7e3f</span><span>16B6</span><span>4385</span><span>C924</span><span>1FdE</span><span>4509</span><span>8aef</span><span>2e99</span><span data-key>7D</span></span><!--/@addr--></p>
+          <div class="tools"><button class="tool" type="button" aria-label="Copy Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool" href="app-receive.html?state=evm" aria-label="Show QR code for Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a><a class="tool tool--link" href="#">Etherscan<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+      </ul>
+
+      <!-- #5 -->
+      <ul class="inside" aria-label="Holdings" data-show="owner-listed">
+        <li class="inside-row" data-chain-row="btc">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-btc.svg" alt=""><div class="inside-row__name"><h3>Bitcoin</h3><span>testnet4</span></div><p class="inside-row__amt">0.00019718&nbsp;BTC</p></div>
+          <p class="inside-row__addr"><!--@addr tb1q70288g5fzuzdnawruykutg0ts9vrcfpaecfj55 data-full-address="btc"--><span class="address address--grouped" data-full-address="btc"><span data-key>tb1q</span><span data-key>7028</span><span>8g5f</span><span>zuzd</span><span>nawr</span><span>uyku</span><span>tg0t</span><span>s9vr</span><span>cfpa</span><span>ecfj</span><span data-key>55</span></span><!--/@addr--></p>
+          <div class="tools"><button class="tool" type="button" aria-label="Copy Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool" href="app-receive.html?state=btc" aria-label="Show QR code for Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a><a class="tool tool--link" href="#">mempool.space<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+        <li class="inside-row" data-chain-row="evm">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-eth.svg" alt=""><div class="inside-row__name"><h3>Ethereum</h3><span>Sepolia</span></div><p class="inside-row__amt">0.0100&nbsp;ETH</p></div>
+          <p class="inside-row__addr"><!--@addr 0x630c522694cD9863a2770716D005a490d022F624 data-full-address="evm"--><span class="address address--grouped" data-full-address="evm"><span data-key>0x63</span><span data-key>0c52</span><span>2694</span><span>cD98</span><span>63a2</span><span>7707</span><span>16D0</span><span>05a4</span><span>90d0</span><span>22F6</span><span data-key>24</span></span><!--/@addr--></p>
+          <div class="tools"><button class="tool" type="button" aria-label="Copy Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool" href="app-receive.html?state=evm" aria-label="Show QR code for Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-qr-code"/></svg>QR</a><a class="tool tool--link" href="#">Etherscan<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+      </ul>
+
+      <!-- #8: zero rows get "Add coins" -->
+      <ul class="inside" aria-label="Holdings" data-show="owner-zero">
+        <li class="inside-row" data-chain-row="btc">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-btc.svg" alt=""><div class="inside-row__name"><h3>Bitcoin</h3><span>testnet4</span></div><p class="inside-row__amt" data-zero>0&nbsp;BTC</p></div>
+          <p class="inside-row__addr"><!--@addr tb1qfzadtfgjfyg55ksd03xgyarwpw22gflnwh9742 data-full-address="btc"--><span class="address address--grouped" data-full-address="btc"><span data-key>tb1q</span><span data-key>fzad</span><span>tfgj</span><span>fyg5</span><span>5ksd</span><span>03xg</span><span>yarw</span><span>pw22</span><span>gfln</span><span>wh97</span><span data-key>42</span></span><!--/@addr--></p>
+          <div class="tools"><a class="tool" href="app-receive.html?state=btc"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a><button class="tool" type="button" aria-label="Copy Bitcoin address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool tool--link" href="#">mempool.space<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+        <li class="inside-row" data-chain-row="evm">
+          <div class="inside-row__top"><img class="coin" src="assets/chain-eth.svg" alt=""><div class="inside-row__name"><h3>Ethereum</h3><span>Sepolia</span></div><p class="inside-row__amt" data-zero>0&nbsp;ETH</p></div>
+          <p class="inside-row__addr"><!--@addr 0x986fa4b9c95bfCA3BAD7aB82A03075c49872DBE9 data-full-address="evm"--><span class="address address--grouped" data-full-address="evm"><span data-key>0x98</span><span data-key>6fa4</span><span>b9c9</span><span>5bfC</span><span>A3BA</span><span>D7aB</span><span>82A0</span><span>3075</span><span>c498</span><span>72DB</span><span data-key>E9</span></span><!--/@addr--></p>
+          <div class="tools"><a class="tool" href="app-receive.html?state=evm"><svg class="icon" aria-hidden="true"><use href="#i-arrow-down"/></svg>Add coins</a><button class="tool" type="button" aria-label="Copy Ethereum address"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copy</button><a class="tool tool--link" href="#">Etherscan<svg class="icon" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></div>
+        </li>
+      </ul>
+      <p class="fresh">Read from NEAR testnet and each chain 12&nbsp;s ago.</p>
+    </section>
+
+    <!-- Facts: the judge's summary, one dl -->
+    <section aria-labelledby="facts-t">
+      <div class="section-h"><h2 id="facts-t">Facts</h2></div>
+      <dl class="facts" data-show="owner visitor owner-signing owner-attention unavailable sol-flag">
+        <div data-fact="owner"><dt>Owner</dt><dd class="mono">alice.satchelhq.testnet</dd></div>
+        <div data-fact="status"><dt>Status</dt><dd data-show="!owner-signing !owner-attention">Active</dd><dd data-show="owner-signing">Signing</dd><dd data-show="owner-attention">Needs attention</dd></div>
+        <div data-fact="signatures"><dt>Signatures</dt><dd><span data-fact-sig-count>2</span> <span class="muted">· last one Oct 20, 02:40 UTC (block 274,240,000)</span></dd></div>
+        <div data-fact="token"><dt>Token</dt><dd>#1 · NEP-171 · NEAR testnet</dd></div>
+        <div data-fact="contract"><dt>Contract</dt><dd><a class="mono" href="#" style="color:var(--link)">satchel.satchelhq.testnet</a></dd></div>
+        <div data-fact="keys"><dt>Contract keys</dt><dd><a href="app-misc.html?state=contract" style="color:var(--link)">none since birth</a></dd></div>
+        <div data-fact="code-hash"><dt>Code hash</dt><dd><!--@hash c1b4f8e97fade5c74ab3d91c7fa3db579b20b28fe42b3fa13a769f135435d692--><span class="hash"><span>c1b4f8e9</span><span>7fade5c7</span><span>4ab3d91c</span><span>7fa3db57</span><span>9b20b28f</span><span>e42b3fa1</span><span>3a769f13</span><span>5435d692</span></span><!--/@hash--> <span class="muted">(matches the published build)</span></dd></div>
+        <div data-fact="address-sol" data-show="!sol-flag"><dt>Solana devnet</dt><dd><!--@addr AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd data-full-address="sol"--><span class="address address--grouped" data-full-address="sol"><span data-key>AGSU</span><span data-key>q86q</span><span>gpp1</span><span>eB53</span><span>UaL8</span><span>iRsc</span><span>RjJz</span><span>sQfr</span><span>NKsK</span><span>oxPX</span><span data-key>TXTd</span></span><!--/@addr--><br><span class="muted">Derived and signable by the contract; sending from the app comes later.</span></dd></div>
+      </dl>
+      <dl class="facts" data-show="visitor-listed seller-sold">
+        <div data-fact="owner"><dt>Owner</dt><dd class="mono" data-show="visitor-listed">alice.satchelhq.testnet</dd><dd class="mono" data-show="seller-sold">carol.satchelhq.testnet</dd></div>
+        <div data-fact="status"><dt>Status</dt><dd data-show="visitor-listed">Paused for sale</dd><dd data-show="seller-sold">Active</dd></div>
+        <div data-fact="signatures"><dt>Signatures</dt><dd><span data-fact-sig-count>1</span> <span class="muted">· last one Oct 20, 08:53 UTC (block 274,280,000)</span></dd></div>
+        <div data-fact="token"><dt>Token</dt><dd>#3 · NEP-171 · NEAR testnet</dd></div>
+        <div data-fact="contract"><dt>Contract</dt><dd><a class="mono" href="#" style="color:var(--link)">satchel.satchelhq.testnet</a></dd></div>
+        <div data-fact="keys"><dt>Contract keys</dt><dd><a href="app-misc.html?state=contract" style="color:var(--link)">none since birth</a></dd></div>
+        <div data-fact="code-hash"><dt>Code hash</dt><dd><!--@hash c1b4f8e97fade5c74ab3d91c7fa3db579b20b28fe42b3fa13a769f135435d692--><span class="hash"><span>c1b4f8e9</span><span>7fade5c7</span><span>4ab3d91c</span><span>7fa3db57</span><span>9b20b28f</span><span>e42b3fa1</span><span>3a769f13</span><span>5435d692</span></span><!--/@hash--> <span class="muted">(matches the published build)</span></dd></div>
+        <div data-fact="address-sol"><dt>Solana devnet</dt><dd><!--@addr AM6HVA7mygEZSPe6BswPcnE8RM2TpHNHHiH3iZa1citj data-full-address="sol"--><span class="address address--grouped" data-full-address="sol"><span data-key>AM6H</span><span data-key>VA7m</span><span>ygEZ</span><span>SPe6</span><span>BswP</span><span>cnE8</span><span>RM2T</span><span>pHNH</span><span>HiH3</span><span>iZa1</span><span data-key>citj</span></span><!--/@addr--><br><span class="muted">Derived and signable by the contract; sending from the app comes later.</span></dd></div>
+      </dl>
+      <dl class="facts" data-show="owner-listed">
+        <div data-fact="owner"><dt>Owner</dt><dd class="mono">alice.satchelhq.testnet</dd></div>
+        <div data-fact="status"><dt>Status</dt><dd>Paused for sale</dd></div>
+        <div data-fact="signatures"><dt>Signatures</dt><dd><span data-fact-sig-count>1</span> <span class="muted">· last one Oct 20, 10:36 UTC (block 274,291,000)</span></dd></div>
+        <div data-fact="token"><dt>Token</dt><dd>#5 · NEP-171 · NEAR testnet</dd></div>
+        <div data-fact="contract"><dt>Contract</dt><dd><a class="mono" href="#" style="color:var(--link)">satchel.satchelhq.testnet</a></dd></div>
+        <div data-fact="keys"><dt>Contract keys</dt><dd><a href="app-misc.html?state=contract" style="color:var(--link)">none since birth</a></dd></div>
+        <div data-fact="code-hash"><dt>Code hash</dt><dd><!--@hash c1b4f8e97fade5c74ab3d91c7fa3db579b20b28fe42b3fa13a769f135435d692--><span class="hash"><span>c1b4f8e9</span><span>7fade5c7</span><span>4ab3d91c</span><span>7fa3db57</span><span>9b20b28f</span><span>e42b3fa1</span><span>3a769f13</span><span>5435d692</span></span><!--/@hash--> <span class="muted">(matches the published build)</span></dd></div>
+        <div data-fact="address-sol"><dt>Solana devnet</dt><dd><!--@addr C57DF5rkbw4ucCuDZUfG7suxXsrL5chtAsCsQrjeGhHb data-full-address="sol"--><span class="address address--grouped" data-full-address="sol"><span data-key>C57D</span><span data-key>F5rk</span><span>bw4u</span><span>cCuD</span><span>ZUfG</span><span>7sux</span><span>XsrL</span><span>5cht</span><span>AsCs</span><span>Qrje</span><span data-key>GhHb</span></span><!--/@addr--><br><span class="muted">Derived and signable by the contract; sending from the app comes later.</span></dd></div>
+      </dl>
+      <dl class="facts" data-show="owner-zero">
+        <div data-fact="owner"><dt>Owner</dt><dd class="mono">alice.satchelhq.testnet</dd></div>
+        <div data-fact="status"><dt>Status</dt><dd>Active</dd></div>
+        <div data-fact="signatures"><dt>Signatures</dt><dd><span data-fact-sig-count>0</span> <span class="muted">· none yet</span></dd></div>
+        <div data-fact="token"><dt>Token</dt><dd>#8 · NEP-171 · NEAR testnet</dd></div>
+        <div data-fact="contract"><dt>Contract</dt><dd><a class="mono" href="#" style="color:var(--link)">satchel.satchelhq.testnet</a></dd></div>
+        <div data-fact="keys"><dt>Contract keys</dt><dd><a href="app-misc.html?state=contract" style="color:var(--link)">none since birth</a></dd></div>
+        <div data-fact="code-hash"><dt>Code hash</dt><dd><!--@hash c1b4f8e97fade5c74ab3d91c7fa3db579b20b28fe42b3fa13a769f135435d692--><span class="hash"><span>c1b4f8e9</span><span>7fade5c7</span><span>4ab3d91c</span><span>7fa3db57</span><span>9b20b28f</span><span>e42b3fa1</span><span>3a769f13</span><span>5435d692</span></span><!--/@hash--> <span class="muted">(matches the published build)</span></dd></div>
+        <div data-fact="address-sol"><dt>Solana devnet</dt><dd><!--@addr EmPUSWm76CvvQZVGajaDUvvGqSXiFgEudGmKd5AYum52 data-full-address="sol"--><span class="address address--grouped" data-full-address="sol"><span data-key>EmPU</span><span data-key>SWm7</span><span>6Cvv</span><span>QZVG</span><span>ajaD</span><span>UvvG</span><span>qSXi</span><span>FgEu</span><span>dGmK</span><span>d5AY</span><span data-key>um52</span></span><!--/@addr--><br><span class="muted">Derived and signable by the contract; sending from the app comes later.</span></dd></div>
+      </dl>
+    </section>
+
+    <details class="disclosure">
+      <summary>Verify these addresses<svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+      <div class="disclosure__body">
+        <ul>
+          <li>Contract <span class="mono">satchel.satchelhq.testnet</span></li>
+          <li>Keys: none since birth</li>
+          <li>Code hash: matches the published build</li>
+          <li><span class="mono">Path satchel/1/btc</span> derives the Bitcoin address above.</li>
+          <li><span class="mono">Path satchel/1/evm</span> derives the Ethereum address above.</li>
+          <li>Anyone can re-derive these addresses. Only the current owner can get signatures for them.</li>
+        </ul>
+        <a class="btn btn--link" href="app-misc.html?state=contract" style="align-self:flex-start">Verify it yourself</a>
+      </div>
+    </details>
+
+    <section aria-labelledby="how-t" data-show="visitor visitor-listed unavailable seller-sold">
+      <div class="section-h"><h2 id="how-t">How it works</h2></div>
+      <ol class="how">
+        <li><div><h3>Mint a Satchel</h3><p>The NFT gets its own Bitcoin and Ethereum addresses. They're derived from the NFT, so they stay the same when it changes hands.</p></div></li>
+        <li><div><h3>Only the owner can sign</h3><p>To move coins, the owner asks the Satchel contract. It checks who owns the NFT, then asks NEAR's signer network for a signature.</p></div></li>
+        <li><div><h3>Give it or sell it</h3><p>The new owner gets everything inside. No bridge, no wrapped tokens, no seed phrase.</p></div></li>
+      </ol>
+    </section>
+  </div>
+</article>
+
+<!--@app-shell-end--><footer class="footer">
+<div class="footer__grid">
+<div class="footer__brand"><a class="brand-link" href="landing.html" aria-label="Satchel home"><!--@lockup--><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2220 512" class="lockup" role="img" aria-label="Satchel" focusable="false"><rect width="512" height="512" rx="112" fill="#FF5C4D"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" transform="translate(0 10)" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#1D1340" stroke-width="92" stroke-linecap="round"/><path d="M330 184 C330 154 300 138 256 138 C206 138 182 162 182 194 C182 230 214 242 256 252 C298 262 330 274 330 310 C330 344 302 364 256 364 C210 364 182 348 180 316" fill="none" stroke="#FFFFFF" stroke-width="56" stroke-linecap="round"/><g transform="translate(609.31 372.00) scale(0.38667)"><path d="M334 12Q199 12 121.5 -45.0Q44 -102 38 -204H215Q223 -164 253.5 -145.0Q284 -126 342 -126Q432 -126 432 -173Q432 -192 418.5 -203.5Q405 -215 374 -221L240 -247Q56 -283 56 -419Q56 -507 127.0 -559.5Q198 -612 323 -612Q448 -612 520.0 -558.0Q592 -504 598 -406H421Q411 -445 385.5 -462.5Q360 -480 311 -480Q271 -480 249.5 -469.0Q228 -458 228 -436Q228 -420 241.0 -409.0Q254 -398 280 -393L418 -366Q514 -347 559.0 -304.0Q604 -261 604 -188Q604 -94 534.5 -41.0Q465 12 334 12Z M891 11Q783 11 722.5 -40.5Q662 -92 662 -178Q662 -267 725.5 -315.5Q789 -364 907 -364H1068V-386Q1068 -468 964 -468Q872 -468 852 -406H670Q691 -508 765.0 -560.0Q839 -612 963 -612Q1100 -612 1172.0 -551.5Q1244 -491 1244 -375V-180H1330V0H1146V-100H1104Q1073 -46 1022.0 -17.5Q971 11 891 11ZM919 -127Q963 -127 996.5 -142.0Q1030 -157 1049.0 -183.0Q1068 -209 1068 -241V-244H915Q838 -244 838 -187Q838 -158 859.5 -142.5Q881 -127 919 -127Z M1615 0Q1545 0 1506.5 -35.5Q1468 -71 1468 -144V-456H1368V-600H1470V-780H1650V-600H1782V-456H1652V-144H1796V0Z M2166 12Q2072 12 2000.5 -26.5Q1929 -65 1888.5 -135.0Q1848 -205 1848 -300Q1848 -395 1888.0 -465.0Q1928 -535 2000.0 -573.5Q2072 -612 2166 -612Q2288 -612 2366.5 -550.0Q2445 -488 2463 -382H2279Q2267 -415 2238.5 -433.5Q2210 -452 2166 -452Q2107 -452 2069.5 -412.5Q2032 -373 2032 -300Q2032 -227 2070.0 -187.5Q2108 -148 2166 -148Q2261 -148 2282 -227H2466Q2450 -116 2372.0 -52.0Q2294 12 2166 12Z M2530 0V-840H2714V-518H2718Q2747 -564 2794.5 -587.5Q2842 -611 2909 -611Q3022 -611 3088.0 -542.0Q3154 -473 3154 -357V0H2970V-321Q2970 -383 2937.5 -415.0Q2905 -447 2842 -447Q2779 -447 2746.5 -415.0Q2714 -383 2714 -321V0Z M3562 12Q3463 12 3390.0 -26.5Q3317 -65 3277.5 -135.5Q3238 -206 3238 -302Q3238 -398 3276.5 -467.5Q3315 -537 3386.5 -574.5Q3458 -612 3555 -612Q3651 -612 3720.0 -575.5Q3789 -539 3825.5 -471.0Q3862 -403 3862 -308V-249H3415Q3426 -191 3463.0 -161.5Q3500 -132 3561 -132Q3610 -132 3637.5 -147.5Q3665 -163 3677 -197H3861Q3842 -99 3763.0 -43.5Q3684 12 3562 12ZM3418 -369H3686Q3677 -419 3644.5 -443.5Q3612 -468 3556 -468Q3501 -468 3466.0 -443.0Q3431 -418 3418 -369Z M3953 0V-840H4137V0Z" fill="currentColor"/></g></svg><!--/@lockup--></a><p class="muted" style="font-size:14px;line-height:20px">An NFT that is a wallet.</p></div>
+<nav aria-label="Product"><p class="footer__h">Product</p><ul class="footer__links"><li><a href="app-misc.html?state=satchels">My Satchels</a></li><li><a href="app-market.html">Market</a></li><li><a href="app-mint.html">Mint</a></li><li><a href="landing.html#how">How it works</a></li></ul></nav>
+<nav aria-label="Verify"><p class="footer__h">Verify</p><ul class="footer__links"><li><a href="app-misc.html?state=contract">Contract facts</a></li><li><a href="app-satchel.html?state=visitor">A live Satchel</a></li><li><a href="#">README<svg class="icon icon--14" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></li><li><a href="#">Repo<svg class="icon icon--14" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></li></ul></nav>
+<nav aria-label="Hackathon"><p class="footer__h">Hackathon</p><ul class="footer__links"><li><a href="#">NEAR Hackathon<svg class="icon icon--14" aria-hidden="true"><use href="#i-arrow-up-right"/></svg></a></li></ul></nav>
+</div>
+<div class="footer__bottom"><p class="footer__note"><span class="badge">Testnet</span>Clean history is checked in your browser by reading each chain. The contract doesn't enforce it.</p></div>
+</footer>
+</main></div></div><!--/@app-shell-end-->
+</body>
+</html>

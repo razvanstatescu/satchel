@@ -1,0 +1,1889 @@
+{
+ "fps": 30,
+ "bpm": 120,
+ "beatSec": 0.5,
+ "barSec": 2,
+ "durationSec": 134,
+ "durationInFrames": 4020,
+ "voice": {
+  "id": "n8kTUi6dVrplENT9Un56",
+  "model": "eleven_v4"
+ },
+ "scenes": [
+  {
+   "id": "S01",
+   "start": 0,
+   "end": 8
+  },
+  {
+   "id": "W1",
+   "start": 8,
+   "end": 14
+  },
+  {
+   "id": "W2",
+   "start": 14,
+   "end": 20
+  },
+  {
+   "id": "W3",
+   "start": 20,
+   "end": 30
+  },
+  {
+   "id": "S04",
+   "start": 30,
+   "end": 38
+  },
+  {
+   "id": "S02",
+   "start": 38,
+   "end": 44
+  },
+  {
+   "id": "U1",
+   "start": 44,
+   "end": 56
+  },
+  {
+   "id": "S05",
+   "start": 56,
+   "end": 72
+  },
+  {
+   "id": "S06",
+   "start": 72,
+   "end": 76
+  },
+  {
+   "id": "S07",
+   "start": 76,
+   "end": 112,
+   "parts": [
+    {
+     "id": "S07a",
+     "start": 76,
+     "end": 84
+    },
+    {
+     "id": "S07b",
+     "start": 84,
+     "end": 90
+    },
+    {
+     "id": "S07c",
+     "start": 90,
+     "end": 100
+    },
+    {
+     "id": "S07d",
+     "start": 100,
+     "end": 106
+    },
+    {
+     "id": "S07e",
+     "start": 106,
+     "end": 112
+    }
+   ]
+  },
+  {
+   "id": "S08",
+   "start": 112,
+   "end": 122
+  },
+  {
+   "id": "S09",
+   "start": 122,
+   "end": 134
+  }
+ ],
+ "markers": {
+  "subHit": 68,
+  "logoDrop": 76,
+  "stitchLand": 118
+ },
+ "vo": [
+  {
+   "id": "L01",
+   "scene": "S01",
+   "file": "vo/L01.mp3",
+   "start": 0.5,
+   "duration": 1.21,
+   "end": 1.71,
+   "text": "A Bitcoin wallet.",
+   "words": [
+    {
+     "text": "A",
+     "start": 0.08,
+     "end": 0.2
+    },
+    {
+     "text": "Bitcoin",
+     "start": 0.24,
+     "end": 0.68
+    },
+    {
+     "text": "wallet.",
+     "start": 0.78,
+     "end": 1.14
+    }
+   ]
+  },
+  {
+   "id": "L02",
+   "scene": "S01",
+   "file": "vo/L02.mp3",
+   "start": 2,
+   "duration": 1.29,
+   "end": 3.29,
+   "text": "An Ethereum wallet.",
+   "words": [
+    {
+     "text": "An",
+     "start": 0.08,
+     "end": 0.14
+    },
+    {
+     "text": "Ethereum",
+     "start": 0.2,
+     "end": 0.76
+    },
+    {
+     "text": "wallet.",
+     "start": 0.86,
+     "end": 1.22
+    }
+   ]
+  },
+  {
+   "id": "L03",
+   "scene": "S01",
+   "file": "vo/L03.mp3",
+   "start": 3.5,
+   "duration": 1.15,
+   "end": 4.65,
+   "text": "A Solana wallet.",
+   "words": [
+    {
+     "text": "A",
+     "start": 0.08,
+     "end": 0.16
+    },
+    {
+     "text": "Solana",
+     "start": 0.18,
+     "end": 0.66
+    },
+    {
+     "text": "wallet.",
+     "start": 0.76,
+     "end": 1.08
+    }
+   ]
+  },
+  {
+   "id": "L04",
+   "scene": "S01",
+   "file": "vo/L04.mp3",
+   "start": 5,
+   "duration": 1.69,
+   "end": 6.69,
+   "text": "It's all one NFT.",
+   "words": [
+    {
+     "text": "It's",
+     "start": 0.08,
+     "end": 0.28
+    },
+    {
+     "text": "all",
+     "start": 0.38,
+     "end": 0.54
+    },
+    {
+     "text": "one",
+     "start": 0.68,
+     "end": 0.86
+    },
+    {
+     "text": "NFT.",
+     "start": 1.02,
+     "end": 1.54
+    }
+   ]
+  },
+  {
+   "id": "L20",
+   "scene": "W1",
+   "file": "vo/L20.mp3",
+   "start": 8,
+   "duration": 5.2,
+   "end": 13.2,
+   "text": "Mint a Satchel, and it comes with its own Bitcoin, Ethereum and Solana addresses.",
+   "words": [
+    {
+     "text": "Mint",
+     "start": 0.08,
+     "end": 0.24
+    },
+    {
+     "text": "a",
+     "start": 0.3,
+     "end": 0.38
+    },
+    {
+     "text": "Satchel,",
+     "start": 0.46,
+     "end": 0.84
+    },
+    {
+     "text": "and",
+     "start": 1.1,
+     "end": 1.16
+    },
+    {
+     "text": "it",
+     "start": 1.2,
+     "end": 1.3
+    },
+    {
+     "text": "comes",
+     "start": 1.36,
+     "end": 1.62
+    },
+    {
+     "text": "with",
+     "start": 1.66,
+     "end": 1.74
+    },
+    {
+     "text": "its",
+     "start": 1.78,
+     "end": 2
+    },
+    {
+     "text": "own",
+     "start": 2.08,
+     "end": 2.34
+    },
+    {
+     "text": "Bitcoin,",
+     "start": 2.36,
+     "end": 2.86
+    },
+    {
+     "text": "Ethereum",
+     "start": 3.1,
+     "end": 3.64
+    },
+    {
+     "text": "and",
+     "start": 3.84,
+     "end": 3.96
+    },
+    {
+     "text": "Solana",
+     "start": 4.08,
+     "end": 4.52
+    },
+    {
+     "text": "addresses.",
+     "start": 4.58,
+     "end": 5.14
+    }
+   ]
+  },
+  {
+   "id": "L21",
+   "scene": "W2",
+   "file": "vo/L21.mp3",
+   "start": 14,
+   "duration": 5.23,
+   "end": 19.23,
+   "text": "Fund it from any wallet or exchange. Native coins, straight to its addresses.",
+   "words": [
+    {
+     "text": "Fund",
+     "start": 0.1,
+     "end": 0.3
+    },
+    {
+     "text": "it",
+     "start": 0.34,
+     "end": 0.46
+    },
+    {
+     "text": "from",
+     "start": 0.5,
+     "end": 0.76
+    },
+    {
+     "text": "any",
+     "start": 0.82,
+     "end": 0.98
+    },
+    {
+     "text": "wallet",
+     "start": 1.1,
+     "end": 1.42
+    },
+    {
+     "text": "or",
+     "start": 1.48,
+     "end": 1.56
+    },
+    {
+     "text": "exchange.",
+     "start": 1.62,
+     "end": 2.24
+    },
+    {
+     "text": "Native",
+     "start": 2.8,
+     "end": 3.04
+    },
+    {
+     "text": "coins,",
+     "start": 3.14,
+     "end": 3.54
+    },
+    {
+     "text": "straight",
+     "start": 3.96,
+     "end": 4.24
+    },
+    {
+     "text": "to",
+     "start": 4.28,
+     "end": 4.38
+    },
+    {
+     "text": "its",
+     "start": 4.42,
+     "end": 4.52
+    },
+    {
+     "text": "addresses.",
+     "start": 4.58,
+     "end": 5.14
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    2.8
+   ]
+  },
+  {
+   "id": "L22",
+   "scene": "W3",
+   "file": "vo/L22.mp3",
+   "start": 20,
+   "duration": 1.89,
+   "end": 21.89,
+   "text": "Then spend it like any wallet.",
+   "words": [
+    {
+     "text": "Then",
+     "start": 0.1,
+     "end": 0.24
+    },
+    {
+     "text": "spend",
+     "start": 0.46,
+     "end": 0.68
+    },
+    {
+     "text": "it",
+     "start": 0.72,
+     "end": 0.86
+    },
+    {
+     "text": "like",
+     "start": 0.9,
+     "end": 1.18
+    },
+    {
+     "text": "any",
+     "start": 1.26,
+     "end": 1.4
+    },
+    {
+     "text": "wallet.",
+     "start": 1.52,
+     "end": 1.84
+    }
+   ]
+  },
+  {
+   "id": "L23",
+   "scene": "W3",
+   "file": "vo/L23.mp3",
+   "start": 22.5,
+   "duration": 6.72,
+   "end": 29.22,
+   "text": "Approve in your NEAR wallet, and NEAR Chain Signatures signs a native Bitcoin, Ethereum or Solana transaction.",
+   "words": [
+    {
+     "text": "Approve",
+     "start": 0.08,
+     "end": 0.46
+    },
+    {
+     "text": "in",
+     "start": 0.48,
+     "end": 0.58
+    },
+    {
+     "text": "your",
+     "start": 0.62,
+     "end": 0.72
+    },
+    {
+     "text": "NEAR",
+     "start": 0.84,
+     "end": 1.02
+    },
+    {
+     "text": "wallet,",
+     "start": 1.14,
+     "end": 1.44
+    },
+    {
+     "text": "and",
+     "start": 1.66,
+     "end": 1.78
+    },
+    {
+     "text": "NEAR",
+     "start": 1.84,
+     "end": 2
+    },
+    {
+     "text": "Chain",
+     "start": 2.12,
+     "end": 2.32
+    },
+    {
+     "text": "Signatures",
+     "start": 2.44,
+     "end": 2.98
+    },
+    {
+     "text": "signs",
+     "start": 3.06,
+     "end": 3.32
+    },
+    {
+     "text": "a",
+     "start": 3.38,
+     "end": 3.46
+    },
+    {
+     "text": "native",
+     "start": 3.52,
+     "end": 3.8
+    },
+    {
+     "text": "Bitcoin,",
+     "start": 3.92,
+     "end": 4.42
+    },
+    {
+     "text": "Ethereum",
+     "start": 4.64,
+     "end": 5.18
+    },
+    {
+     "text": "or",
+     "start": 5.36,
+     "end": 5.44
+    },
+    {
+     "text": "Solana",
+     "start": 5.56,
+     "end": 5.94
+    },
+    {
+     "text": "transaction.",
+     "start": 6.02,
+     "end": 6.68
+    }
+   ]
+  },
+  {
+   "id": "L07",
+   "scene": "S04",
+   "file": "vo/L07.mp3",
+   "start": 30.5,
+   "duration": 5.47,
+   "end": 35.97,
+   "text": "There's no seed phrase to copy. The contract signs only for whoever owns the NFT.",
+   "words": [
+    {
+     "text": "There's",
+     "start": 0.06,
+     "end": 0.26
+    },
+    {
+     "text": "no",
+     "start": 0.32,
+     "end": 0.52
+    },
+    {
+     "text": "seed",
+     "start": 0.6,
+     "end": 0.84
+    },
+    {
+     "text": "phrase",
+     "start": 0.86,
+     "end": 1.16
+    },
+    {
+     "text": "to",
+     "start": 1.2,
+     "end": 1.3
+    },
+    {
+     "text": "copy.",
+     "start": 1.34,
+     "end": 1.7
+    },
+    {
+     "text": "The",
+     "start": 2.24,
+     "end": 2.32
+    },
+    {
+     "text": "contract",
+     "start": 2.36,
+     "end": 2.86
+    },
+    {
+     "text": "signs",
+     "start": 2.92,
+     "end": 3.3
+    },
+    {
+     "text": "only",
+     "start": 3.38,
+     "end": 3.68
+    },
+    {
+     "text": "for",
+     "start": 3.72,
+     "end": 3.82
+    },
+    {
+     "text": "whoever",
+     "start": 3.86,
+     "end": 4.22
+    },
+    {
+     "text": "owns",
+     "start": 4.4,
+     "end": 4.64
+    },
+    {
+     "text": "the",
+     "start": 4.7,
+     "end": 4.8
+    },
+    {
+     "text": "NFT.",
+     "start": 4.88,
+     "end": 5.4
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    2.24
+   ],
+   "secondSentenceStart": 2.24
+  },
+  {
+   "id": "L05",
+   "scene": "S02",
+   "file": "vo/L05.mp3",
+   "start": 38,
+   "duration": 5.43,
+   "end": 43.43,
+   "text": "Transfer the NFT, and the whole wallet goes with it. No bridge. No wrapped tokens.",
+   "words": [
+    {
+     "text": "Transfer",
+     "start": 0.08,
+     "end": 0.52
+    },
+    {
+     "text": "the",
+     "start": 0.56,
+     "end": 0.66
+    },
+    {
+     "text": "NFT,",
+     "start": 0.74,
+     "end": 1.28
+    },
+    {
+     "text": "and",
+     "start": 1.56,
+     "end": 1.64
+    },
+    {
+     "text": "the",
+     "start": 1.68,
+     "end": 1.8
+    },
+    {
+     "text": "whole",
+     "start": 1.9,
+     "end": 2.08
+    },
+    {
+     "text": "wallet",
+     "start": 2.2,
+     "end": 2.54
+    },
+    {
+     "text": "goes",
+     "start": 2.58,
+     "end": 2.8
+    },
+    {
+     "text": "with",
+     "start": 2.86,
+     "end": 2.98
+    },
+    {
+     "text": "it.",
+     "start": 3.02,
+     "end": 3.14
+    },
+    {
+     "text": "No",
+     "start": 3.38,
+     "end": 3.5
+    },
+    {
+     "text": "bridge.",
+     "start": 3.6,
+     "end": 3.96
+    },
+    {
+     "text": "No",
+     "start": 4.28,
+     "end": 4.42
+    },
+    {
+     "text": "wrapped",
+     "start": 4.52,
+     "end": 4.84
+    },
+    {
+     "text": "tokens.",
+     "start": 4.9,
+     "end": 5.36
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    3.38,
+    4.28
+   ]
+  },
+  {
+   "id": "L24",
+   "scene": "U1",
+   "file": "vo/L24.mp3",
+   "start": 44,
+   "duration": 2.29,
+   "end": 46.29,
+   "text": "Sell a whole position in one trade.",
+   "words": [
+    {
+     "text": "Sell",
+     "start": 0.1,
+     "end": 0.26
+    },
+    {
+     "text": "a",
+     "start": 0.32,
+     "end": 0.4
+    },
+    {
+     "text": "whole",
+     "start": 0.46,
+     "end": 0.6
+    },
+    {
+     "text": "position",
+     "start": 0.7,
+     "end": 1.28
+    },
+    {
+     "text": "in",
+     "start": 1.32,
+     "end": 1.54
+    },
+    {
+     "text": "one",
+     "start": 1.58,
+     "end": 1.74
+    },
+    {
+     "text": "trade.",
+     "start": 1.86,
+     "end": 2.24
+    }
+   ]
+  },
+  {
+   "id": "L25",
+   "scene": "U1",
+   "file": "vo/L25.mp3",
+   "start": 48,
+   "duration": 1.49,
+   "end": 49.49,
+   "text": "Gift a funded wallet.",
+   "words": [
+    {
+     "text": "Gift",
+     "start": 0.08,
+     "end": 0.38
+    },
+    {
+     "text": "a",
+     "start": 0.44,
+     "end": 0.46
+    },
+    {
+     "text": "funded",
+     "start": 0.64,
+     "end": 0.96
+    },
+    {
+     "text": "wallet.",
+     "start": 1.08,
+     "end": 1.42
+    }
+   ]
+  },
+  {
+   "id": "L26",
+   "scene": "U1",
+   "file": "vo/L26.mp3",
+   "start": 52,
+   "duration": 1.92,
+   "end": 53.92,
+   "text": "Hand a treasury to the next team.",
+   "words": [
+    {
+     "text": "Hand",
+     "start": 0.06,
+     "end": 0.26
+    },
+    {
+     "text": "a",
+     "start": 0.3,
+     "end": 0.4
+    },
+    {
+     "text": "treasury",
+     "start": 0.46,
+     "end": 0.98
+    },
+    {
+     "text": "to",
+     "start": 1.02,
+     "end": 1.12
+    },
+    {
+     "text": "the",
+     "start": 1.14,
+     "end": 1.22
+    },
+    {
+     "text": "next",
+     "start": 1.26,
+     "end": 1.46
+    },
+    {
+     "text": "team.",
+     "start": 1.56,
+     "end": 1.86
+    }
+   ]
+  },
+  {
+   "id": "L08",
+   "scene": "S05",
+   "file": "vo/L08.mp3",
+   "start": 56.5,
+   "duration": 2.15,
+   "end": 58.65,
+   "text": "But a signature made before the sale…",
+   "words": [
+    {
+     "text": "But",
+     "start": 0.04,
+     "end": 0.12
+    },
+    {
+     "text": "a",
+     "start": 0.16,
+     "end": 0.26
+    },
+    {
+     "text": "signature",
+     "start": 0.32,
+     "end": 0.74
+    },
+    {
+     "text": "made",
+     "start": 0.86,
+     "end": 1.1
+    },
+    {
+     "text": "before",
+     "start": 1.14,
+     "end": 1.56
+    },
+    {
+     "text": "the",
+     "start": 1.6,
+     "end": 1.7
+    },
+    {
+     "text": "sale…",
+     "start": 1.76,
+     "end": 2.04
+    }
+   ]
+  },
+  {
+   "id": "L09",
+   "scene": "S05",
+   "file": "vo/L09.mp3",
+   "start": 59.5,
+   "duration": 1.73,
+   "end": 61.23,
+   "text": "…can still be used after it.",
+   "words": [
+    {
+     "text": "…can",
+     "start": 0.04,
+     "end": 0.18
+    },
+    {
+     "text": "still",
+     "start": 0.34,
+     "end": 0.54
+    },
+    {
+     "text": "be",
+     "start": 0.58,
+     "end": 0.66
+    },
+    {
+     "text": "used",
+     "start": 0.82,
+     "end": 1.02
+    },
+    {
+     "text": "after",
+     "start": 1.24,
+     "end": 1.5
+    },
+    {
+     "text": "it.",
+     "start": 1.56,
+     "end": 1.68
+    }
+   ]
+  },
+  {
+   "id": "L10",
+   "scene": "S05",
+   "file": "vo/L10.mp3",
+   "start": 62.5,
+   "duration": 4.96,
+   "end": 67.46,
+   "text": "Sign it. Sell it. Broadcast it later. The coins are gone.",
+   "words": [
+    {
+     "text": "Sign",
+     "start": 0.12,
+     "end": 0.36
+    },
+    {
+     "text": "it.",
+     "start": 0.4,
+     "end": 0.54
+    },
+    {
+     "text": "Sell",
+     "start": 1.06,
+     "end": 1.24
+    },
+    {
+     "text": "it.",
+     "start": 1.3,
+     "end": 1.44
+    },
+    {
+     "text": "Broadcast",
+     "start": 1.9,
+     "end": 2.4
+    },
+    {
+     "text": "it",
+     "start": 2.44,
+     "end": 2.54
+    },
+    {
+     "text": "later.",
+     "start": 2.6,
+     "end": 2.9
+    },
+    {
+     "text": "The",
+     "start": 3.44,
+     "end": 3.52
+    },
+    {
+     "text": "coins",
+     "start": 3.6,
+     "end": 3.88
+    },
+    {
+     "text": "are",
+     "start": 3.9,
+     "end": 4.08
+    },
+    {
+     "text": "gone.",
+     "start": 4.14,
+     "end": 4.52
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    1.06,
+    1.9,
+    3.44
+   ]
+  },
+  {
+   "id": "L11",
+   "scene": "S05",
+   "file": "vo/L11.mp3",
+   "start": 68,
+   "duration": 2.18,
+   "end": 70.18,
+   "text": "So how does a buyer know it's clean?",
+   "words": [
+    {
+     "text": "So",
+     "start": 0.12,
+     "end": 0.44
+    },
+    {
+     "text": "how",
+     "start": 0.5,
+     "end": 0.62
+    },
+    {
+     "text": "does",
+     "start": 0.64,
+     "end": 0.78
+    },
+    {
+     "text": "a",
+     "start": 0.84,
+     "end": 0.96
+    },
+    {
+     "text": "buyer",
+     "start": 1,
+     "end": 1.26
+    },
+    {
+     "text": "know",
+     "start": 1.34,
+     "end": 1.5
+    },
+    {
+     "text": "it's",
+     "start": 1.52,
+     "end": 1.7
+    },
+    {
+     "text": "clean?",
+     "start": 1.74,
+     "end": 2.12
+    }
+   ]
+  },
+  {
+   "id": "L12",
+   "scene": "S07",
+   "part": "S07a",
+   "file": "vo/L12.mp3",
+   "start": 76.5,
+   "duration": 6.72,
+   "end": 83.22,
+   "text": "Satchel signs only plain transfers it can read, and records each one before NEAR's signer network signs it.",
+   "words": [
+    {
+     "text": "Satchel",
+     "start": 0.1,
+     "end": 0.42
+    },
+    {
+     "text": "signs",
+     "start": 0.54,
+     "end": 0.92
+    },
+    {
+     "text": "only",
+     "start": 0.98,
+     "end": 1.3
+    },
+    {
+     "text": "plain",
+     "start": 1.36,
+     "end": 1.62
+    },
+    {
+     "text": "transfers",
+     "start": 1.72,
+     "end": 2.26
+    },
+    {
+     "text": "it",
+     "start": 2.3,
+     "end": 2.4
+    },
+    {
+     "text": "can",
+     "start": 2.44,
+     "end": 2.58
+    },
+    {
+     "text": "read,",
+     "start": 2.64,
+     "end": 2.94
+    },
+    {
+     "text": "and",
+     "start": 3.34,
+     "end": 3.44
+    },
+    {
+     "text": "records",
+     "start": 3.48,
+     "end": 3.98
+    },
+    {
+     "text": "each",
+     "start": 4.04,
+     "end": 4.22
+    },
+    {
+     "text": "one",
+     "start": 4.34,
+     "end": 4.62
+    },
+    {
+     "text": "before",
+     "start": 4.66,
+     "end": 5
+    },
+    {
+     "text": "NEAR's",
+     "start": 5.12,
+     "end": 5.42
+    },
+    {
+     "text": "signer",
+     "start": 5.48,
+     "end": 5.72
+    },
+    {
+     "text": "network",
+     "start": 5.78,
+     "end": 6.18
+    },
+    {
+     "text": "signs",
+     "start": 6.24,
+     "end": 6.5
+    },
+    {
+     "text": "it.",
+     "start": 6.56,
+     "end": 6.66
+    }
+   ]
+  },
+  {
+   "id": "L13",
+   "scene": "S07",
+   "part": "S07b",
+   "file": "vo/L13.mp3",
+   "start": 84.5,
+   "duration": 3.88,
+   "end": 88.38,
+   "text": "List it, and signing pauses. The history stops growing.",
+   "words": [
+    {
+     "text": "List",
+     "start": 0.08,
+     "end": 0.32
+    },
+    {
+     "text": "it,",
+     "start": 0.38,
+     "end": 0.48
+    },
+    {
+     "text": "and",
+     "start": 0.72,
+     "end": 0.88
+    },
+    {
+     "text": "signing",
+     "start": 0.96,
+     "end": 1.28
+    },
+    {
+     "text": "pauses.",
+     "start": 1.4,
+     "end": 1.92
+    },
+    {
+     "text": "The",
+     "start": 2.42,
+     "end": 2.5
+    },
+    {
+     "text": "history",
+     "start": 2.56,
+     "end": 2.96
+    },
+    {
+     "text": "stops",
+     "start": 3.12,
+     "end": 3.44
+    },
+    {
+     "text": "growing.",
+     "start": 3.5,
+     "end": 3.86
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    2.42
+   ]
+  },
+  {
+   "id": "L14",
+   "scene": "S07",
+   "part": "S07c",
+   "file": "vo/L14.mp3",
+   "start": 90.5,
+   "duration": 3.68,
+   "end": 94.18,
+   "text": "Then the buyer's browser checks every record against each chain.",
+   "words": [
+    {
+     "text": "Then",
+     "start": 0.1,
+     "end": 0.26
+    },
+    {
+     "text": "the",
+     "start": 0.3,
+     "end": 0.42
+    },
+    {
+     "text": "buyer's",
+     "start": 0.46,
+     "end": 0.88
+    },
+    {
+     "text": "browser",
+     "start": 0.9,
+     "end": 1.3
+    },
+    {
+     "text": "checks",
+     "start": 1.44,
+     "end": 1.8
+    },
+    {
+     "text": "every",
+     "start": 1.86,
+     "end": 2.08
+    },
+    {
+     "text": "record",
+     "start": 2.2,
+     "end": 2.5
+    },
+    {
+     "text": "against",
+     "start": 2.56,
+     "end": 2.94
+    },
+    {
+     "text": "each",
+     "start": 3,
+     "end": 3.24
+    },
+    {
+     "text": "chain.",
+     "start": 3.32,
+     "end": 3.64
+    }
+   ]
+  },
+  {
+   "id": "L15",
+   "scene": "S07",
+   "part": "S07c",
+   "file": "vo/L15.mp3",
+   "start": 95,
+   "duration": 4.4,
+   "end": 99.4,
+   "text": "Nonce used. Coin spent. Blockhash expired.",
+   "words": [
+    {
+     "text": "Nonce",
+     "start": 0.08,
+     "end": 0.42
+    },
+    {
+     "text": "used.",
+     "start": 0.64,
+     "end": 0.98
+    },
+    {
+     "text": "Coin",
+     "start": 1.6,
+     "end": 1.84
+    },
+    {
+     "text": "spent.",
+     "start": 2.06,
+     "end": 2.36
+    },
+    {
+     "text": "Blockhash",
+     "start": 3.12,
+     "end": 3.7
+    },
+    {
+     "text": "expired.",
+     "start": 3.76,
+     "end": 4.36
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    1.6,
+    3.12
+   ],
+   "phrases": [
+    {
+     "text": "Nonce used.",
+     "gridStart": 0,
+     "start": 0.08,
+     "absStart": 95.08,
+     "beatIndex": 190
+    },
+    {
+     "text": "Coin spent.",
+     "gridStart": 1.5,
+     "start": 1.6,
+     "absStart": 96.6,
+     "beatIndex": 193
+    },
+    {
+     "text": "Blockhash expired.",
+     "gridStart": 3,
+     "start": 3.12,
+     "absStart": 98.12,
+     "beatIndex": 196
+    }
+   ],
+   "phrasePeriod": 1.5
+  },
+  {
+   "id": "L16",
+   "scene": "S07",
+   "part": "S07d",
+   "file": "vo/L16.mp3",
+   "start": 100.5,
+   "duration": 4.51,
+   "end": 105.01,
+   "text": "If one old signature could still move coins, Buy stays disabled.",
+   "words": [
+    {
+     "text": "If",
+     "start": 0.08,
+     "end": 0.18
+    },
+    {
+     "text": "one",
+     "start": 0.3,
+     "end": 0.52
+    },
+    {
+     "text": "old",
+     "start": 0.58,
+     "end": 0.78
+    },
+    {
+     "text": "signature",
+     "start": 0.86,
+     "end": 1.3
+    },
+    {
+     "text": "could",
+     "start": 1.4,
+     "end": 1.58
+    },
+    {
+     "text": "still",
+     "start": 1.7,
+     "end": 1.9
+    },
+    {
+     "text": "move",
+     "start": 1.96,
+     "end": 2.18
+    },
+    {
+     "text": "coins,",
+     "start": 2.24,
+     "end": 2.68
+    },
+    {
+     "text": "Buy",
+     "start": 3.2,
+     "end": 3.48
+    },
+    {
+     "text": "stays",
+     "start": 3.56,
+     "end": 3.86
+    },
+    {
+     "text": "disabled.",
+     "start": 3.9,
+     "end": 4.44
+    }
+   ]
+  },
+  {
+   "id": "L17",
+   "scene": "S07",
+   "part": "S07e",
+   "file": "vo/L17.mp3",
+   "start": 106.5,
+   "duration": 3.44,
+   "end": 109.94,
+   "text": "And the contract has no admin key. Not even ours.",
+   "words": [
+    {
+     "text": "And",
+     "start": 0.06,
+     "end": 0.14
+    },
+    {
+     "text": "the",
+     "start": 0.18,
+     "end": 0.26
+    },
+    {
+     "text": "contract",
+     "start": 0.32,
+     "end": 0.84
+    },
+    {
+     "text": "has",
+     "start": 0.88,
+     "end": 1.1
+    },
+    {
+     "text": "no",
+     "start": 1.2,
+     "end": 1.4
+    },
+    {
+     "text": "admin",
+     "start": 1.5,
+     "end": 1.86
+    },
+    {
+     "text": "key.",
+     "start": 1.92,
+     "end": 2.14
+    },
+    {
+     "text": "Not",
+     "start": 2.58,
+     "end": 2.72
+    },
+    {
+     "text": "even",
+     "start": 2.78,
+     "end": 2.96
+    },
+    {
+     "text": "ours.",
+     "start": 3.04,
+     "end": 3.38
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    2.58
+   ]
+  },
+  {
+   "id": "L18",
+   "scene": "S08",
+   "file": "vo/L18.mp3",
+   "start": 112,
+   "duration": 4.93,
+   "end": 116.93,
+   "text": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+   "words": [
+    {
+     "text": "If",
+     "start": 0.06,
+     "end": 0.12
+    },
+    {
+     "text": "it's",
+     "start": 0.18,
+     "end": 0.34
+    },
+    {
+     "text": "clean,",
+     "start": 0.4,
+     "end": 0.76
+    },
+    {
+     "text": "one",
+     "start": 1.14,
+     "end": 1.26
+    },
+    {
+     "text": "transaction,",
+     "start": 1.36,
+     "end": 2.04
+    },
+    {
+     "text": "bound",
+     "start": 2.34,
+     "end": 2.58
+    },
+    {
+     "text": "to",
+     "start": 2.62,
+     "end": 2.7
+    },
+    {
+     "text": "that",
+     "start": 2.76,
+     "end": 2.88
+    },
+    {
+     "text": "exact",
+     "start": 2.92,
+     "end": 3.38
+    },
+    {
+     "text": "history,",
+     "start": 3.42,
+     "end": 3.84
+    },
+    {
+     "text": "pays",
+     "start": 4.12,
+     "end": 4.36
+    },
+    {
+     "text": "the",
+     "start": 4.4,
+     "end": 4.5
+    },
+    {
+     "text": "seller.",
+     "start": 4.56,
+     "end": 4.86
+    }
+   ]
+  },
+  {
+   "id": "L19",
+   "scene": "S09",
+   "file": "vo/L19.mp3",
+   "start": 122,
+   "duration": 5.75,
+   "end": 127.75,
+   "text": "Satchel. One NFT. A wallet on every chain, safe to hand over.",
+   "words": [
+    {
+     "text": "Satchel.",
+     "start": 0.1,
+     "end": 0.5
+    },
+    {
+     "text": "One",
+     "start": 1.14,
+     "end": 1.34
+    },
+    {
+     "text": "NFT.",
+     "start": 1.52,
+     "end": 2.1
+    },
+    {
+     "text": "A",
+     "start": 2.78,
+     "end": 2.86
+    },
+    {
+     "text": "wallet",
+     "start": 2.92,
+     "end": 3.24
+    },
+    {
+     "text": "on",
+     "start": 3.3,
+     "end": 3.52
+    },
+    {
+     "text": "every",
+     "start": 3.62,
+     "end": 3.8
+    },
+    {
+     "text": "chain,",
+     "start": 3.94,
+     "end": 4.26
+    },
+    {
+     "text": "safe",
+     "start": 4.74,
+     "end": 4.96
+    },
+    {
+     "text": "to",
+     "start": 5,
+     "end": 5.08
+    },
+    {
+     "text": "hand",
+     "start": 5.12,
+     "end": 5.3
+    },
+    {
+     "text": "over.",
+     "start": 5.4,
+     "end": 5.66
+    }
+   ],
+   "sentenceStarts": [
+    0,
+    1.14,
+    2.78
+   ]
+  }
+ ],
+ "duck": [
+  {
+   "start": 0.35,
+   "end": 6.99,
+   "lines": [
+    "L01",
+    "L02",
+    "L03",
+    "L04"
+   ]
+  },
+  {
+   "start": 7.85,
+   "end": 13.5,
+   "lines": [
+    "L20"
+   ]
+  },
+  {
+   "start": 13.85,
+   "end": 19.53,
+   "lines": [
+    "L21"
+   ]
+  },
+  {
+   "start": 19.85,
+   "end": 22.19,
+   "lines": [
+    "L22"
+   ]
+  },
+  {
+   "start": 22.35,
+   "end": 29.52,
+   "lines": [
+    "L23"
+   ]
+  },
+  {
+   "start": 30.35,
+   "end": 36.27,
+   "lines": [
+    "L07"
+   ]
+  },
+  {
+   "start": 37.85,
+   "end": 43.73,
+   "lines": [
+    "L05"
+   ]
+  },
+  {
+   "start": 43.85,
+   "end": 46.59,
+   "lines": [
+    "L24"
+   ]
+  },
+  {
+   "start": 47.85,
+   "end": 49.79,
+   "lines": [
+    "L25"
+   ]
+  },
+  {
+   "start": 51.85,
+   "end": 54.22,
+   "lines": [
+    "L26"
+   ]
+  },
+  {
+   "start": 56.35,
+   "end": 58.95,
+   "lines": [
+    "L08"
+   ]
+  },
+  {
+   "start": 59.35,
+   "end": 61.53,
+   "lines": [
+    "L09"
+   ]
+  },
+  {
+   "start": 62.35,
+   "end": 67.76,
+   "lines": [
+    "L10"
+   ]
+  },
+  {
+   "start": 67.85,
+   "end": 70.48,
+   "lines": [
+    "L11"
+   ]
+  },
+  {
+   "start": 76.35,
+   "end": 83.52,
+   "lines": [
+    "L12"
+   ]
+  },
+  {
+   "start": 84.35,
+   "end": 88.68,
+   "lines": [
+    "L13"
+   ]
+  },
+  {
+   "start": 90.35,
+   "end": 94.48,
+   "lines": [
+    "L14"
+   ]
+  },
+  {
+   "start": 94.85,
+   "end": 99.7,
+   "lines": [
+    "L15"
+   ]
+  },
+  {
+   "start": 100.35,
+   "end": 105.31,
+   "lines": [
+    "L16"
+   ]
+  },
+  {
+   "start": 106.35,
+   "end": 110.24,
+   "lines": [
+    "L17"
+   ]
+  },
+  {
+   "start": 111.85,
+   "end": 117.23,
+   "lines": [
+    "L18"
+   ]
+  },
+  {
+   "start": 121.85,
+   "end": 128.05,
+   "lines": [
+    "L19"
+   ]
+  }
+ ],
+ "music": {
+  "file": "music/score.mp3",
+  "format": "mp3_44100_192",
+  "model": "music_v1",
+  "seed": 777,
+  "durationSec": 134,
+  "bpmGrid": 120,
+  "beatOffset": 0.0203,
+  "trackerOffset": 0.0992,
+  "gridRmsMs": 9.4,
+  "firstDownbeat": 0.0203,
+  "sections": [
+   {
+    "id": "S01",
+    "start": 0,
+    "end": 8,
+    "what": "punchy hits on every beat"
+   },
+   {
+    "id": "W1-S02",
+    "start": 8,
+    "end": 44,
+    "what": "bright groove, brightens from 16; 2-bar breaks at 30-32 (S04 cut) and 42-44 (into U1)"
+   },
+   {
+    "id": "U1",
+    "start": 44,
+    "end": 56,
+    "what": "groove after the break (the take's chorus position)"
+   },
+   {
+    "id": "S05",
+    "start": 56,
+    "end": 72,
+    "what": "dark turn on 56 (bass out, C# minor), dark drone 60-68, deep sub hit on 68 then near silence"
+   },
+   {
+    "id": "S06",
+    "start": 72,
+    "end": 76,
+    "what": "near silence, short rise in the last second (the scene's riser SFX carries it)"
+   },
+   {
+    "id": "S07",
+    "start": 76,
+    "end": 112,
+    "what": "DROP on 76, driving warm groove"
+   },
+   {
+    "id": "S08a",
+    "start": 112,
+    "end": 118,
+    "what": "lift: high-pass sweep 30 Hz -> 900 Hz"
+   },
+   {
+    "id": "S08b",
+    "start": 118,
+    "end": 122,
+    "what": "stitch hit on 118: full groove back + sub hit; fill at 119.5"
+   },
+   {
+    "id": "S09",
+    "start": 122,
+    "end": 134,
+    "what": "drumless outro, faded out by 132 (silent 132-134)"
+   }
+  ],
+  "arrangedFrom": {
+   "source": "tools/audio/work/music/v2/score.music_v1.seed777.raw.mp3",
+   "segments": [
+    {
+     "t0": 0,
+     "t1": 40,
+     "s0": 0
+    },
+    {
+     "t0": 40,
+     "t1": 44,
+     "s0": 44
+    },
+    {
+     "t0": 44,
+     "t1": 108,
+     "s0": 48
+    },
+    {
+     "t0": 108,
+     "t1": 112,
+     "s0": 112
+    },
+    {
+     "t0": 112,
+     "t1": 134,
+     "s0": 112
+    }
+   ]
+  },
+  "hits": [
+   {
+    "t": 68,
+    "why": "S05: one deep sub hit as everything falls away (subHit)"
+   },
+   {
+    "t": 118,
+    "why": "S08: the stitch lands (stitchLand)"
+   }
+  ],
+  "sweeps": [
+   {
+    "type": "highpass",
+    "t0": 112,
+    "t1": 118,
+    "fromHz": 30,
+    "toHz": 900
+   }
+  ],
+  "gridSource": "refit from strong mid-band transients (beats.mjs fit was poor; its output is kept as tracker*)",
+  "shipped": "arranged edit (tools/audio/arrangement.json), mp3 320 kbps, 44.1 kHz stereo, sample peak -3 dBFS"
+ }
+}

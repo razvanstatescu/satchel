@@ -1,0 +1,1 @@
+{"name":"pay-spike","private":true,"type":"module","dependencies":{"@defuse-protocol/one-click-sdk-typescript":"0.1.26","near-api-js":"7.3.1","wabt":"1.0.37"}}

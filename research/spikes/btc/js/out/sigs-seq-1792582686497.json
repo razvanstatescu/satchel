@@ -1,0 +1,134 @@
+{
+  "mode": "seq",
+  "path": "satchel/1/btc",
+  "predecessor": "satchel-spk-btc-e9ea1a.testnet",
+  "rpc": "https://near-testnet.drpc.org",
+  "gasPerSignTgas": 50,
+  "startedAt": "2026-10-21T11:37:47.879Z",
+  "hashes": [
+    "b7f0149bd692c47910c985754062e405405f9a5eda60acdf58b0dc5204339496",
+    "16f39ad5240e1ef0ad805bf78a225151026c1b44e53cbfec4d03e0988b15e40e"
+  ],
+  "results": [
+    {
+      "hash": "b7f0149bd692c47910c985754062e405405f9a5eda60acdf58b0dc5204339496",
+      "submitMs": 53,
+      "txHash": "8Du9bBU9znLouRRETMwMf4CCvkodwYDeFVyRxQXkJ4vo",
+      "ms": 9247,
+      "gasBurntTgas": 8.603626669035,
+      "tokensBurntNEAR": 0.0008157261544035,
+      "receipts": 4,
+      "status": "SuccessValue",
+      "failures": [],
+      "sigs": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "0361a155aebc3572dbb40e799b762095c2b58627fe53f381e9c0769c917f3a5e75"
+          },
+          "s": {
+            "scalar": "4033fac2ad750fa6e8686d607b69324352bb4f0ab881ab00231f993727ae5694"
+          },
+          "recovery_id": 0
+        }
+      ],
+      "perReceipt": [
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.332863612205,
+          "status": "SuccessReceiptId",
+          "block": "5CcqXYS7tF85VXYCJkkqUc4oRJHRKHQGAJS6aH3b6ncA"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.50947197687,
+          "status": "SuccessValue",
+          "block": "48dNfzVt1Q2XQY81T2asFNCenvKtyWJbPXtn8CPYH2qA"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "AvtCN1rScx2wYF1y4gdNfovwnumzdJ2GXTwpgssmAjrS"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "HNMpEHcXS34kDKmuvvXxV3qrRc4bGLJJLMfxR3SUJ1y3"
+        }
+      ],
+      "result": {
+        "scheme": "Secp256k1",
+        "big_r": {
+          "affine_point": "0361a155aebc3572dbb40e799b762095c2b58627fe53f381e9c0769c917f3a5e75"
+        },
+        "s": {
+          "scalar": "4033fac2ad750fa6e8686d607b69324352bb4f0ab881ab00231f993727ae5694"
+        },
+        "recovery_id": 0
+      }
+    },
+    {
+      "hash": "16f39ad5240e1ef0ad805bf78a225151026c1b44e53cbfec4d03e0988b15e40e",
+      "submitMs": 56,
+      "txHash": "AhP1NbUUYBPiX7dDhf4ZhLtJFkDgwUHHfcuKKPYW3XuX",
+      "ms": 9228,
+      "gasBurntTgas": 8.604936498402,
+      "tokensBurntNEAR": 0.0008158571373402,
+      "receipts": 4,
+      "status": "SuccessValue",
+      "failures": [],
+      "sigs": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "023c30a5f4a56b9d22ca365732c729a3484d43de957757b412b91e76da76730e30"
+          },
+          "s": {
+            "scalar": "561842852c751f232b388f80742d442f53761abad9df92345c47464a0e917f6f"
+          },
+          "recovery_id": 1
+        }
+      ],
+      "perReceipt": [
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.334150404404,
+          "status": "SuccessReceiptId",
+          "block": "GmUqLHo876de5HpbgMcmX6CaHxRTyCdFjn4Azqq3GV17"
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.509495014038,
+          "status": "SuccessValue",
+          "block": "DRR9Y4g2jPapukDXA9pBAsp2vAxizrtkHszT5FST2uZY"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "AoUDCLx4bZJeVpvJ4FmLKpUBrtJzExy6HDyjZhsygjLn"
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "block": "6SCY29JJJayiKtWgUNtUTFKGnFbmZ3PMct5kYApuo2Wv"
+        }
+      ],
+      "result": {
+        "scheme": "Secp256k1",
+        "big_r": {
+          "affine_point": "023c30a5f4a56b9d22ca365732c729a3484d43de957757b412b91e76da76730e30"
+        },
+        "s": {
+          "scalar": "561842852c751f232b388f80742d442f53761abad9df92345c47464a0e917f6f"
+        },
+        "recovery_id": 1
+      }
+    }
+  ],
+  "totalMs": 18618,
+  "rpcCalls": 10
+}

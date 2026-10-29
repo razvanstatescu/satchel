@@ -1,0 +1,66 @@
+{
+ "key": "9c61088ccdaae767",
+ "final": {
+  "id": "L22",
+  "scene": "W3",
+  "text": "Then spend it like any wallet.",
+  "say": "Then spend it like any wallet.",
+  "file": "vo/L22.mp3",
+  "duration": 1.89,
+  "words": [
+   {
+    "text": "Then",
+    "start": 0.1,
+    "end": 0.24
+   },
+   {
+    "text": "spend",
+    "start": 0.46,
+    "end": 0.68
+   },
+   {
+    "text": "it",
+    "start": 0.72,
+    "end": 0.86
+   },
+   {
+    "text": "like",
+    "start": 0.9,
+    "end": 1.18
+   },
+   {
+    "text": "any",
+    "start": 1.26,
+    "end": 1.4
+   },
+   {
+    "text": "wallet.",
+    "start": 1.52,
+    "end": 1.84
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Then spend it like any wallet"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Then spend it like any wallet.",
+ "prev": "Fund it from any wallet or exchange. Native coins, straight to its addresses.",
+ "next": "Approve in your Near wallet, and Near Chain Signatures signs a native Bitcoin, Ethereum or Solana transaction."
+}

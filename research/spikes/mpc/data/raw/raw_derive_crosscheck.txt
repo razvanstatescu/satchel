@@ -1,0 +1,39 @@
+root domain0: secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3
+root domain1: ed25519:6vSEtQxrQj6txUMh33WC4ERyCWmNMRTdufDWAaDY3Un2
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/evm" secp256k1:2on8P2kgfawXZmFCFxYiES1pXoLruczUXizzCURpHQ6zUv55reoqECghUqTsFwpL65sn6qrAhQZ8srDWDRvdaCuh 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/evm" ed25519:2itWndjPNPTV9Mge5CnsyAjGwsZJ4Ag1XvyVM4FWyWzH 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/btc" secp256k1:3TA3Mhez5ypkHVDaZ12KXL7sphYgpXpW2hhAxR7w5zUL8ndbhC5ZtJtyBHfxq25AheEMpndzwp2hnSXY7BHXvTnp 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/btc" ed25519:68prJsRGNEbdKgkjkVvw3PikNfnoK3DLrTTWzGePUKt5 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/sol" secp256k1:2QUYBLSgZs2QBEYdTuSxuYhwc8NfpxkM9nARbL3VhSJufVJ1aVPym3NdDqjFR2KhHcGWxALxx8WsWQQ7EP2rfRZj 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "satchel/1/sol" ed25519:6HXYdgVJb9so4inbrBGsm8RFc5Q8srJ1RhvP3YpwS3UE 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "" secp256k1:3DuV6jPPgdDehrVxE2ZetQiEYhuJiSzrFrSGeTDwzVQSjwzhTsfwPdqtKczZ4mN4buKfj5kgd382uZDgWGma7KQd 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "" ed25519:3Y8mCyDGXEbHnxxu5Tr5nZxJjaBd9QhbSxvPmeXAJQDR 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "ethereum-1" secp256k1:5wRBM9vqTxtad4tzjt9ske3BbwWVCnj1sULjyB2vSvtqxyk9LtEGcRPfUK1Z9bqoMK2EvcHtDfBbpHByPmHFBhcn 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "ethereum-1" ed25519:2nvdBA5zh3ankzXnTC4i6U5MqRxUcfuLqrdg7hwhEoQ7 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "m/44'/60'/0'/0/0" secp256k1:2MNN8mJjpLDfgBxXXo1wPYZu7C1fpzmbsAJ6BnxmREkhVW4QDJBfreoGCXDCf93H4UgwJEmiCCwqT9zkJL1xoRtM 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "m/44'/60'/0'/0/0" ed25519:72hzbusSTi7s8Qvq8rvshZYCB2ATEU5TFbqfGhaC9eyE 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "satchel/123456789/evm" secp256k1:3ujzeUyC9emWcWA1n5UEiApBuYoKs1SAP6vshx3iJfFVyTtyzCogDUS6SosaBANLjpmUGBYTJzgLhEKsJZVx9rso 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "satchel/123456789/evm" ed25519:F87K1vWpqVfF9kDjt93cvCCvqG6jhNLa8giArRgE6mU3 
+MATCH d=0 "satchel-spk-mpc-e9ea1a.testnet" "ü,comma/unicode" secp256k1:4PDfuUsRwXAS5uCNdmHnHmV8Pmtqxi8WuLCDmxF4DtJZ7UA59WUor3iFAd31Vwq8gtdQyTwx6CuLoLVjXVZWdfWt 
+MATCH d=1 "satchel-spk-mpc-e9ea1a.testnet" "ü,comma/unicode" ed25519:35WvUs5XhJhrBmFx5BW3h9oD6ezUafNv75fvHWe8BajD 
+MATCH d=0 "satchel.example.testnet" "satchel/1/evm" secp256k1:amydARHfgNa4viJzVnexf4dkK39zV6Zb58Lwpy4RvLCkYCo2Bat4fVGWeiNmPdtm51CpjS9KjP7ixenSztKGDoZ 
+MATCH d=1 "satchel.example.testnet" "satchel/1/evm" ed25519:9Foi2ZkdoVDbZHPqC8ZSc2aqHJQJHxKLRXRQpnki5akZ 
+MATCH d=0 "satchel.example.testnet" "satchel/1/btc" secp256k1:3TGqBkRYSwVNjcuw43Q1SUS1sKznwNCS7Tv97jK8vLTT7J2zvwrfMiDT9sACqmrGR93XcJUprX5oVsxhtVdEUXTn 
+MATCH d=1 "satchel.example.testnet" "satchel/1/btc" ed25519:HZcwTUktCzfcDFjwP2Wpj7YUaEX7GZkV1r3PMJuLeWqN 
+MATCH d=0 "satchel.example.testnet" "satchel/1/sol" secp256k1:5KLCJroTkXS1NBecLqvY9f3L6wvXmLfzYWeZMc59cLi2W5EgaPrmDvpkcDieX7miC1QgnLnRrLq1GidieYbceci3 
+MATCH d=1 "satchel.example.testnet" "satchel/1/sol" ed25519:DvZuiQhGH32dTN5v8zRZRJJ4e5H4okwq6NjpfvoYbqGB 
+MATCH d=0 "satchel.example.testnet" "" secp256k1:3wqfi7ZwHeSULB5Q54pYSi4CWnJ9AUWVFxE5LR8hFqv9Tvr7FTG8hMdvs2eat6TNozaXU5WPmfhBrmPJCQBx6GJc 
+MATCH d=1 "satchel.example.testnet" "" ed25519:CdECHtaueeD9T1HgdXoSUCvseqXmSFkZDEW8p5fe47s2 
+MATCH d=0 "satchel.example.testnet" "ethereum-1" secp256k1:5xaV3hcsmWsok4ewQDBX2kqgx31kwE9ZFQptKxAqUmaaRVpbJq7FbfzqDXAJyyiSkQhcSvN6ByPW8DhE1jjkY2SE 
+MATCH d=1 "satchel.example.testnet" "ethereum-1" ed25519:Aj3D8E1CkSw7eJtCt2LLt8Cxoo98QpiJGgANWpdwmLcd 
+MATCH d=0 "satchel.example.testnet" "m/44'/60'/0'/0/0" secp256k1:2ZWAN88nu7GHFSm6wjPmQTHbwFi2zcmKw9zDubAuHpUdHn8b4B5vxztdCCL7aPwg88yUmyUxRGD57fpDy17gnFa7 
+MATCH d=1 "satchel.example.testnet" "m/44'/60'/0'/0/0" ed25519:Dp17uKLZzStr4bRoLvXzFzjEAvhBhZbJxqvZRXdJQ2pR 
+MATCH d=0 "satchel.example.testnet" "satchel/123456789/evm" secp256k1:4yTkGLmBVoqCcLaSnV31qmaWCPoBdDByfdHrjPF1ZurfYsJwnR7BkrtQHSYR8WQ4nee4KVnJfc7V1kdWAjwzh9yY 
+MATCH d=1 "satchel.example.testnet" "satchel/123456789/evm" ed25519:Ewi4DJ9XAFnAauFmj69VKg9r5NFR9mWSRUHaZVzZpdm7 
+MATCH d=0 "satchel.example.testnet" "ü,comma/unicode" secp256k1:5m9BGfNJeBYyMYFvY8Tm3iHZtSy13XwU1ZGtwMA9i8RVKcVaHbWWDwFPySDzYArF5ABgEbZLWsY24M5r9ZPguMNn 
+MATCH d=1 "satchel.example.testnet" "ü,comma/unicode" ed25519:4orPxJmuQVyvHhMBHmHiowVmJv8qSzMQLrBqf5CEqEx4 
+omitted domain_id -> secp256k1:amydARHfgNa4viJzVnexf4dkK39zV6Zb58Lwpy4RvLCkYCo2Bat4fVGWeiNmPdtm51CpjS9KjP7ixenSztKGDoZ MATCH(domain0)
+
+derived_public_key cross-check: 80 match, 0 mismatch
+example EVM address for satchel.example.testnet satchel/1/evm: 0x53f9e93e9cb431122872c3ee96848e97bff51c2a
+example SOL address for satchel.example.testnet satchel/1/sol: DvZuiQhGH32dTN5v8zRZRJJ4e5H4okwq6NjpfvoYbqGB

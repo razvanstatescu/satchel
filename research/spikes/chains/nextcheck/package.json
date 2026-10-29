@@ -1,0 +1,20 @@
+{
+  "name": "nextcheck-throwaway",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "build:webpack": "next build --webpack",
+    "start": "next start -p 8766"
+  },
+  "description": "THROWAWAY: does chainsig.js compile/run in a Next.js client component?",
+  "dependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "chainsig.js": "^1.1.16",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^5.9.3",
+    "viem": "^2.57.7"
+  }
+}

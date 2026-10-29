@@ -1,0 +1,17 @@
+[package]
+name = "satchel-tests"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dev-dependencies]
+near-workspaces = { version = "=0.23.0", features = ["unstable"] }   # sandbox nearcore 2.13.4; NOT 0.24.0-rc (Rust 1.95)
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+serde_json = "1"
+# Beyond spec §5.2 (test-only, already in the lock graph via near-workspaces/near-sdk):
+sha2 = "0.10"        # BTC sha256d / SOL sha256 oracles
+sha3 = "0.10"        # EVM keccak256 oracle
+reqwest = { version = "0.12", default-features = false, features = ["json"] }   # raw EXPERIMENTAL_tx_status (receipt actions)
+base64 = "0.22"      # decode FunctionCall args in receipts

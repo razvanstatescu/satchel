@@ -1,0 +1,72 @@
+{
+  "pubkey": "021e857e1164787e91347a2f7e91b88b16d00a064963a50988798d7185e8bace2d",
+  "address": "tb1qzplwrxu3p9xy95twx3tm2fveql80fvcjgc0ze7",
+  "vsizeEstimate": 209,
+  "feeRate": 2,
+  "fee": "418",
+  "change": "14582",
+  "unsignedTxid": "5cbd4ff872dc16c1d1f5fcf2c9ea8e9047c9b20bec1cf4674532272e14a199a1",
+  "inputs": [
+    {
+      "index": 0,
+      "outpoint": "37ea6fceca4d4c4068056ab1b0ad3fbb43a1a57a9963525a37dcef5ef6e042a0:0",
+      "value": "30000",
+      "sighash": "b7f0149bd692c47910c985754062e405405f9a5eda60acdf58b0dc5204339496",
+      "capturedEqualsDirect": true,
+      "preimageEqualsDirect": true,
+      "preimageHex": "0200000011c6ce69661e31403c667dacce9a838cfb32c7a3c00e519e9f761cf51f85cc72957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a098a042e0f65eefdc375a5263997aa5a143bb3fadb0b16a0568404c4dcace6fea37000000001976a914107ee19b91094c42d16e3457b5259907cef4b31288ac3075000000000000fdffffff4402c2f7017bdd7a2ce52e42f74d7928983ca2095b4f7374bbe5267fcc46201a0000000001000000",
+      "parsed": {
+        "version": 2,
+        "hashPrevouts": "11c6ce69661e31403c667dacce9a838cfb32c7a3c00e519e9f761cf51f85cc72",
+        "hashSequence": "957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a098",
+        "outpoint": {
+          "txid": "37ea6fceca4d4c4068056ab1b0ad3fbb43a1a57a9963525a37dcef5ef6e042a0",
+          "vout": 0
+        },
+        "pubkeyHash": "107ee19b91094c42d16e3457b5259907cef4b312",
+        "amount": "30000",
+        "sequence": 4294967293,
+        "hashOutputs": "4402c2f7017bdd7a2ce52e42f74d7928983ca2095b4f7374bbe5267fcc46201a",
+        "locktime": 0,
+        "sighashType": 1
+      }
+    },
+    {
+      "index": 1,
+      "outpoint": "092c7db589e926e4582a8b7312904aeddf7a4b3f145c89cba8d236a7ec6a5072:1",
+      "value": "25000",
+      "sighash": "16f39ad5240e1ef0ad805bf78a225151026c1b44e53cbfec4d03e0988b15e40e",
+      "capturedEqualsDirect": true,
+      "preimageEqualsDirect": true,
+      "preimageHex": "0200000011c6ce69661e31403c667dacce9a838cfb32c7a3c00e519e9f761cf51f85cc72957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a09872506aeca736d2a8cb895c143f4b7adfed4a9012738b2a58e426e989b57d2c09010000001976a914107ee19b91094c42d16e3457b5259907cef4b31288aca861000000000000fdffffff4402c2f7017bdd7a2ce52e42f74d7928983ca2095b4f7374bbe5267fcc46201a0000000001000000",
+      "parsed": {
+        "version": 2,
+        "hashPrevouts": "11c6ce69661e31403c667dacce9a838cfb32c7a3c00e519e9f761cf51f85cc72",
+        "hashSequence": "957879fdce4d8ab885e32ff307d54e75884da52522cc53d3c4fdb60edb69a098",
+        "outpoint": {
+          "txid": "092c7db589e926e4582a8b7312904aeddf7a4b3f145c89cba8d236a7ec6a5072",
+          "vout": 1
+        },
+        "pubkeyHash": "107ee19b91094c42d16e3457b5259907cef4b312",
+        "amount": "25000",
+        "sequence": 4294967293,
+        "hashOutputs": "4402c2f7017bdd7a2ce52e42f74d7928983ca2095b4f7374bbe5267fcc46201a",
+        "locktime": 0,
+        "sighashType": 1
+      }
+    }
+  ],
+  "chainsig": {
+    "hashes": [
+      "d8da6b4315207e8e658be0ca1d7d080c17ff17f1c42723f8648e97ce3fadae5e",
+      "0d537980a8ce2375749e2fbd715353c249c2dd4122e2d981400005a4294bbb5b"
+    ],
+    "sequences": [
+      4294967295,
+      4294967295
+    ],
+    "note": "chainsig.js builds inputs with default sequence 0xffffffff (no BIP125 signal), so its hashes differ from our RBF tx",
+    "equalsBitcoinjs7_whenSameSequenceAndVersion": true
+  },
+  "psbtBase64": "cHNidP8BAJoCAAAAAqBC4PZe79w3WlJjmXqloUO7P62wsWoFaEBMTcrOb+o3AAAAAAD9////clBq7Kc20qjLiVwUP0t63+1KkBJziypY5CbpibV9LAkBAAAAAP3///8CQJwAAAAAAAAWABT8tV5pIOLG83Mnpb9KJM9C67rwfPY4AAAAAAAAFgAUEH7hm5EJTELRbjRXtSWZB870sxIAAAAAAAEBHzB1AAAAAAAAFgAUEH7hm5EJTELRbjRXtSWZB870sxIAAQEfqGEAAAAAAAAWABQQfuGbkQlMQtFuNFe1JZkHzvSzEgAAAA=="
+}

@@ -1,0 +1,106 @@
+{
+ "key": "e8b6e3455f229595",
+ "final": {
+  "id": "L17",
+  "scene": "S07e",
+  "text": "And the contract was born with no keys, so every signature leaves a record.",
+  "say": "And the contract was born with no keys, so every signature leaves a record.",
+  "file": "vo/L17.mp3",
+  "duration": 4.66,
+  "words": [
+   {
+    "text": "And",
+    "start": 0.04,
+    "end": 0.14
+   },
+   {
+    "text": "the",
+    "start": 0.18,
+    "end": 0.28
+   },
+   {
+    "text": "contract",
+    "start": 0.32,
+    "end": 0.82
+   },
+   {
+    "text": "was",
+    "start": 0.88,
+    "end": 1.06
+   },
+   {
+    "text": "born",
+    "start": 1.1,
+    "end": 1.38
+   },
+   {
+    "text": "with",
+    "start": 1.42,
+    "end": 1.58
+   },
+   {
+    "text": "no",
+    "start": 1.68,
+    "end": 1.8
+   },
+   {
+    "text": "keys,",
+    "start": 1.94,
+    "end": 2.32
+   },
+   {
+    "text": "so",
+    "start": 2.72,
+    "end": 2.9
+   },
+   {
+    "text": "every",
+    "start": 2.98,
+    "end": 3.16
+   },
+   {
+    "text": "signature",
+    "start": 3.32,
+    "end": 3.74
+   },
+   {
+    "text": "leaves",
+    "start": 3.86,
+    "end": 4.059
+   },
+   {
+    "text": "a",
+    "start": 4.12,
+    "end": 4.18
+   },
+   {
+    "text": "record.",
+    "start": 4.22,
+    "end": 4.58
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "And the contract was born with no keys, so every signature leaves a record"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "And the contract was born with no keys, so every signature leaves a record.",
+ "prev": "If one old signature could still move coins, Buy stays disabled.",
+ "next": "If it's clean, one transaction, bound to that exact history, pays the seller."
+}

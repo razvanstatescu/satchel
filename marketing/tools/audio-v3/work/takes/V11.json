@@ -1,0 +1,56 @@
+{
+ "key": "49eddabbe772656c",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Gift a funded wallet.",
+ "prev": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+ "next": "Sell a whole position in one trade.",
+ "final": {
+  "id": "V11",
+  "scene": "P6",
+  "text": "Gift a funded wallet.",
+  "say": "Gift a funded wallet.",
+  "file": "v2/vo/V11.mp3",
+  "duration": 1.54,
+  "words": [
+   {
+    "text": "Gift",
+    "start": 0.1,
+    "end": 0.34
+   },
+   {
+    "text": "a",
+    "start": 0.4,
+    "end": 0.42
+   },
+   {
+    "text": "funded",
+    "start": 0.6,
+    "end": 0.92
+   },
+   {
+    "text": "wallet.",
+    "start": 1.02,
+    "end": 1.48
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Gift a funded wallet"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

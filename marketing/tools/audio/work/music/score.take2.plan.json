@@ -1,0 +1,237 @@
+{
+ "positive_global_styles": [
+  "premium cinematic electronic",
+  "instrumental",
+  "120 BPM",
+  "4/4",
+  "warm analog synths",
+  "felt piano",
+  "tight modern drums",
+  "deep sub bass",
+  "tactile",
+  "crafted",
+  "confident",
+  "polished modern tech launch film score",
+  "clean mix with space for a voiceover",
+  "continuous music from the first beat to the last, no gaps"
+ ],
+ "negative_global_styles": [
+  "vocals",
+  "singing",
+  "vocal chops",
+  "choir",
+  "spoken word",
+  "EDM",
+  "big room",
+  "dubstep",
+  "trap hi-hat rolls",
+  "cheesy",
+  "risers that never resolve",
+  "lo-fi",
+  "distortion",
+  "tempo changes",
+  "swing",
+  "orchestral trailer braams",
+  "long silent gaps"
+ ],
+ "sections": [
+  {
+   "section_name": "Hook (S01)",
+   "positive_local_styles": [
+    "punchy confident hits on every beat",
+    "deep kick with short warm analog synth stabs",
+    "full energy from the very first beat"
+   ],
+   "negative_local_styles": [
+    "intro",
+    "fade in",
+    "ambient pad intro"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "Idea (S02)",
+   "positive_local_styles": [
+    "brighter groove",
+    "kick, snare and shaker groove",
+    "plucky warm analog synth arpeggio",
+    "optimistic, light"
+   ],
+   "negative_local_styles": [
+    "dark",
+    "heavy"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "Problem (S03)",
+   "positive_local_styles": [
+    "darker minimal pulse",
+    "ticking closed hi-hats",
+    "muted low kick on every beat",
+    "dark filtered synth drone",
+    "minor key"
+   ],
+   "negative_local_styles": [
+    "bright melody",
+    "big drums",
+    "gaps"
+   ],
+   "duration_ms": 6000,
+   "lines": []
+  },
+  {
+   "section_name": "First fix (S04)",
+   "positive_local_styles": [
+    "dark minimal pulse continues",
+    "ticking hi-hats",
+    "sparse felt piano notes",
+    "steady muted kick"
+   ],
+   "negative_local_styles": [
+    "big drums",
+    "drop",
+    "gaps"
+   ],
+   "duration_ms": 8000,
+   "lines": []
+  },
+  {
+   "section_name": "The hole: tension (S05a)",
+   "positive_local_styles": [
+    "rising tension",
+    "pulsing sub bass on every beat",
+    "ticking hi-hats",
+    "slowly opening filtered synth",
+    "gradual crescendo"
+   ],
+   "negative_local_styles": [
+    "drop",
+    "release",
+    "melodic hook",
+    "gaps"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  },
+  {
+   "section_name": "The hole: near silence (S05b)",
+   "positive_local_styles": [
+    "sudden drop to a very sparse, quiet texture",
+    "one deep sub bass boom on the first beat",
+    "then only a soft low drone holding underneath",
+    "suspended, held breath"
+   ],
+   "negative_local_styles": [
+    "drums",
+    "melody",
+    "riser"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Turn: riser (S06)",
+   "positive_local_styles": [
+    "continuous rising synth swell with a snare roll crescendo for the whole section",
+    "energy building steadily toward the next section"
+   ],
+   "negative_local_styles": [
+    "drum groove",
+    "melody",
+    "gaps",
+    "early drop"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Solution: drop (S07ab)",
+   "positive_local_styles": [
+    "the drop: full energy from the very first beat and for the entire section",
+    "driving four-on-the-floor kick",
+    "claps on two and four",
+    "warm analog bass",
+    "felt piano chords",
+    "confident"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "build-up",
+    "quiet start",
+    "fade",
+    "gaps"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  },
+  {
+   "section_name": "Solution: build (S07ce)",
+   "positive_local_styles": [
+    "driving warm groove continues",
+    "claps on two and four",
+    "an analog synth arpeggio layer joins",
+    "gradually building",
+    "constant energy"
+   ],
+   "negative_local_styles": [
+    "breakdown",
+    "drop",
+    "gaps",
+    "fade"
+   ],
+   "duration_ms": 22000,
+   "lines": []
+  },
+  {
+   "section_name": "Handoff: lift (S08a)",
+   "positive_local_styles": [
+    "lift",
+    "drums thin out to hi-hats and claps",
+    "upward filter sweep with a swelling warm pad",
+    "anticipation"
+   ],
+   "negative_local_styles": [
+    "full drop",
+    "gaps"
+   ],
+   "duration_ms": 7000,
+   "lines": []
+  },
+  {
+   "section_name": "Handoff: hit (S08b)",
+   "positive_local_styles": [
+    "one big satisfying impact on the first beat",
+    "a warm major chord ringing out",
+    "deep sub boom",
+    "soft kick continues"
+   ],
+   "negative_local_styles": [
+    "busy drums",
+    "gaps"
+   ],
+   "duration_ms": 3000,
+   "lines": []
+  },
+  {
+   "section_name": "Outro (S09)",
+   "positive_local_styles": [
+    "warm resolved outro",
+    "felt piano melody over a soft analog pad and gentle sub, playing through the whole section",
+    "calm, resolved, major key",
+    "the final chord rings out naturally over the last two seconds"
+   ],
+   "negative_local_styles": [
+    "abrupt cut",
+    "early ending",
+    "gaps",
+    "new drums",
+    "riser"
+   ],
+   "duration_ms": 12000,
+   "lines": []
+  }
+ ]
+}

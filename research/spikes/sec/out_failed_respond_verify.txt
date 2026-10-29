@@ -1,0 +1,7 @@
+{
+  tx: 'J7wZDTNAQmWo46cfhQXvjMkYLs3r9Yw3h3wdjdcySkEr',
+  txStatus: { status: false },
+  signer: 'natsai-mpc.testnet',
+  payload: 'e49490b418eb2066ac78bf01b612a65c9c6320c9420e9da49d46fbfcc012aa03',
+  signatureValidForDerivedKey: true
+}

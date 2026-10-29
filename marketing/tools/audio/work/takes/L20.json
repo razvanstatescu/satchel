@@ -1,0 +1,106 @@
+{
+ "key": "d95d313d7f4d13d1",
+ "final": {
+  "id": "L20",
+  "scene": "W1",
+  "text": "Mint a Satchel, and it comes with its own Bitcoin, Ethereum and Solana addresses.",
+  "say": "Mint a Satchel, and it comes with its own Bitcoin, Ethereum and Solana addresses.",
+  "file": "vo/L20.mp3",
+  "duration": 5.2,
+  "words": [
+   {
+    "text": "Mint",
+    "start": 0.08,
+    "end": 0.24
+   },
+   {
+    "text": "a",
+    "start": 0.3,
+    "end": 0.38
+   },
+   {
+    "text": "Satchel,",
+    "start": 0.46,
+    "end": 0.84
+   },
+   {
+    "text": "and",
+    "start": 1.1,
+    "end": 1.16
+   },
+   {
+    "text": "it",
+    "start": 1.2,
+    "end": 1.3
+   },
+   {
+    "text": "comes",
+    "start": 1.36,
+    "end": 1.62
+   },
+   {
+    "text": "with",
+    "start": 1.66,
+    "end": 1.74
+   },
+   {
+    "text": "its",
+    "start": 1.78,
+    "end": 2
+   },
+   {
+    "text": "own",
+    "start": 2.08,
+    "end": 2.34
+   },
+   {
+    "text": "Bitcoin,",
+    "start": 2.36,
+    "end": 2.86
+   },
+   {
+    "text": "Ethereum",
+    "start": 3.1,
+    "end": 3.64
+   },
+   {
+    "text": "and",
+    "start": 3.84,
+    "end": 3.96
+   },
+   {
+    "text": "Solana",
+    "start": 4.08,
+    "end": 4.52
+   },
+   {
+    "text": "addresses.",
+    "start": 4.58,
+    "end": 5.14
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Mint a Satchel and it comes with its own Bitcoin, Ethereum, and Solana addresses"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Mint a Satchel, and it comes with its own Bitcoin, Ethereum and Solana addresses.",
+ "prev": "It's all one NFT.",
+ "next": "Fund it from any wallet or exchange. Native coins, straight to its addresses."
+}

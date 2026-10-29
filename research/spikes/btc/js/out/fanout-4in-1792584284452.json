@@ -1,0 +1,243 @@
+{
+  "contract": "fanout.satchel-spk-btc-e9ea1a.testnet",
+  "inFile": "out/unsigned-fanout-4.json",
+  "nInputs": 4,
+  "attachedTgas": 80,
+  "signGasTgas": 15,
+  "cbGasTgas": 10,
+  "startedAt": "2026-10-21T12:04:34.134Z",
+  "results": [
+    {
+      "hashes": [
+        "0658b73acb923dad15e8a63b4a8048cd1a2d1c003c019be24d50e141a2bc0d5d",
+        "d272a410d614b1f43064b37448705e98985c2267877b02058b2ea08c991652ae",
+        "0838aecdd7c572a87aaf69ce7df02a0d2e0b4c307f467daf9fd92fd0dc13ac56",
+        "1cb0621b5a20006efa2ad0052a4b8ad8f805a243e6dbe4a587bde3ae6232566b"
+      ],
+      "sigs": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "030ed16dbae28d5e25a938fe9bfcb54d995d2cac71bf2b2e78e474f7d1caa17302"
+          },
+          "s": {
+            "scalar": "3001b5ef90eff7b8a5dd687d3a13f5c20779743a349218ce54106776fe85d210"
+          },
+          "recovery_id": 0
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "03b742296f5e1c539874cff20f08c899ba81a6d96a666e52bb64078aa271c0dc21"
+          },
+          "s": {
+            "scalar": "6fbe6018f3936d976a652c6c9c92367c5b2013918f32fa67c407e5047d3639dd"
+          },
+          "recovery_id": 1
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "0252524c29db60f192cf694f599e33875ca05f67ca5cdd344505ac5b86e02fee5d"
+          },
+          "s": {
+            "scalar": "306cbe3405cfbb4894bf93b34792bf795289588da1e0ee325f6f7b26a463d95e"
+          },
+          "recovery_id": 0
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "02d892391c36870369a164a0922ae26039c20086b9e68e017921be0e27fda121fe"
+          },
+          "s": {
+            "scalar": "37df2dd0dfa284fb7785d458f0f5abdc40874086f1eb930e589c55a965d558e5"
+          },
+          "recovery_id": 0
+        }
+      ],
+      "txHash": "DwQmE3AWmLzo4Uw6XUXTXR8WAgc4VUShKWS3uhDC2H9N",
+      "ms": 10217,
+      "gasBurntTgas": 39.867332656333,
+      "tokensBurntNEAR": 0.0037635507031333008,
+      "receipts": 20,
+      "status": "SuccessValue",
+      "perReceipt": [
+        {
+          "executor": "fanout.satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 4.515278885466,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "EVENT_JSON:{\"standard\":\"satchel_spike\",\"version\":\"0.0.1\",\"event\":\"btc_sign_requested\",\"data\":[{\"token_id\":\"1\",\"path\":\"satchel/1/btc\",\"inputs\":[{\"payload\":\"0658b73acb923dad15e8a63b4a8048cd1a2d1c003c019be24d50e141a2bc0d5d\",\"txid\":\"37ea6fceca4d4c4068056ab1b0ad3fbb43a1a57a9963525a37dcef5ef6e042a0\",\"vout\":0,\"amount\":\"30000\",\"hash_outputs\":\"f27916efe2320c0599100b6b7c9151d451d28b5cc61e204389488d378681184d\"},{\"payload\":\"d272a410d614b1f43064b37448705e98985c2267877b02058b2ea08c991652ae\",\"txid\":\"092c7db589e926e4582a8b7312904aeddf7a4b3f145c89cba8d236a7ec6a5072\",\"vout\":1,\"amount\":\"25000\",\"hash_outputs\":\"f27916efe2320c0599100b6b7c9151d451d28b5cc61e204389488d378681184d\"},{\"payload\":\"0838aecdd7c572a87aaf69c"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.333743766959,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [6, 88, 183, 58, 203, 146, 61, 173, 21, 232, 166, 59, 74, 128, 72, 205, 26, 45, 28, 0, 60, 1, 155, 226, 77, 80, 225, 65, 162, 188, 13, 93], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.475549260666,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.288489558179,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [210, 114, 164, 16, 214, 20, 177, 244, 48, 100, 179, 116, 72, 112, 94, 152, 152, 92, 34, 103, 135, 123, 2, 5, 139, 46, 160, 140, 153, 22, 82, 174], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.475703938794,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.288696939794,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [8, 56, 174, 205, 215, 197, 114, 168, 122, 175, 105, 206, 125, 240, 42, 13, 46, 11, 76, 48, 127, 70, 125, 175, 159, 217, 47, 208, 220, 19, 172, 86], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.52341609657,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 4.287144163707,
+          "status": "SuccessReceiptId",
+          "logs": [
+            "sign: predecessor=AccountId(\"fanout.satchel-spk-btc-e9ea1a.testnet\"), request=SignRequestArgs { path: \"satchel/1/btc\", payload: Ecdsa(BoundedVec { inner: [28, 176, 98, 27, 90, 32, 0, 110, 250, 42, 208, 5, 42, 75, 138, 216, 248, 5, 162, 67, 230, 219, 228, 165, 135, 189, 227, 174, 98, 50, 86, 107], witness: NonEmpty(()) }), domain_id: DomainId(0) }"
+          ]
+        },
+        {
+          "executor": "v1.signer-prod.testnet",
+          "gasTgas": 3.47560191705,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "fanout.satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 1.590103980758,
+          "status": "SuccessValue",
+          "logs": [
+            "EVENT_JSON:{\"standard\":\"satchel_spike\",\"version\":\"0.0.1\",\"event\":\"btc_sign_completed\",\"data\":[{\"ok\":4,\"failed\":0}]}"
+          ]
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        }
+      ],
+      "result": [
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "030ed16dbae28d5e25a938fe9bfcb54d995d2cac71bf2b2e78e474f7d1caa17302"
+          },
+          "s": {
+            "scalar": "3001b5ef90eff7b8a5dd687d3a13f5c20779743a349218ce54106776fe85d210"
+          },
+          "recovery_id": 0
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "03b742296f5e1c539874cff20f08c899ba81a6d96a666e52bb64078aa271c0dc21"
+          },
+          "s": {
+            "scalar": "6fbe6018f3936d976a652c6c9c92367c5b2013918f32fa67c407e5047d3639dd"
+          },
+          "recovery_id": 1
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "0252524c29db60f192cf694f599e33875ca05f67ca5cdd344505ac5b86e02fee5d"
+          },
+          "s": {
+            "scalar": "306cbe3405cfbb4894bf93b34792bf795289588da1e0ee325f6f7b26a463d95e"
+          },
+          "recovery_id": 0
+        },
+        {
+          "scheme": "Secp256k1",
+          "big_r": {
+            "affine_point": "02d892391c36870369a164a0922ae26039c20086b9e68e017921be0e27fda121fe"
+          },
+          "s": {
+            "scalar": "37df2dd0dfa284fb7785d458f0f5abdc40874086f1eb930e589c55a965d558e5"
+          },
+          "recovery_id": 0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+emit tx ADFzVr5o9yCBD3rASyVywGJeRmsQxKGPY2Y5tjJfRN2a ms_to_FINAL 3218 logs ["EVENT_JSON:{\"standard\":\"nep171\",\"version\":\"1.2.0\",\"event\":\"nft_transfe","EVENT_JSON:{\"standard\":\"satchel\",\"version\":\"1.0.0\",\"event\":\"signature_"]
+  txapi_seller_event_log: visible 515 ms after FINAL
+  fastnear_nft_index_seller: visible 636 ms after FINAL
+  txapi_receiver: visible 3857 ms after FINAL
+fastnear nft index for seller: {"account_id":"seller.satchel-spk-pay-e9ea1a.testnet","tokens":[{"contract_id":"recv.satchel-spk-pay-e9ea1a.testnet","last_update_block_height":274092360}]}

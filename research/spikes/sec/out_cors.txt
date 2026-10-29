@@ -1,0 +1,25 @@
+--- https://ethereum-sepolia-rpc.publicnode.com (preflight OPTIONS)
+HTTP/2 204 
+access-control-allow-headers: content-type
+access-control-allow-methods: GET,HEAD,OPTIONS,POST
+access-control-allow-origin: *
+--- https://sepolia.drpc.org (preflight OPTIONS)
+HTTP/2 204 
+access-control-allow-headers: content-type
+access-control-allow-methods: POST
+access-control-allow-origin: https://satchel-example.vercel.app
+--- https://api.devnet.solana.com (preflight OPTIONS)
+HTTP/2 200 
+access-control-allow-origin: https://satchel-example.vercel.app
+access-control-allow-methods: OPTIONS, POST, GET
+access-control-allow-headers: authorization, content-type
+--- https://rpc.testnet.fastnear.com (preflight OPTIONS)
+HTTP/2 200 
+access-control-allow-origin: *
+access-control-allow-headers: *
+access-control-allow-methods: *
+--- https://rpc.testnet.near.org (preflight OPTIONS)
+HTTP/2 200 
+access-control-allow-origin: *
+access-control-allow-headers: *
+access-control-allow-methods: *

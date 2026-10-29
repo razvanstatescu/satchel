@@ -1,0 +1,76 @@
+{
+ "key": "2c019821ea946c54",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+ "prev": "Hand it over.",
+ "next": "Whoever holds the Satchel holds everything inside.",
+ "final": {
+  "id": "V03",
+  "scene": "H2",
+  "text": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+  "say": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+  "file": "v2/vo/V03.mp3",
+  "duration": 4.62,
+  "words": [
+   {
+    "text": "Native",
+    "start": 0.1,
+    "end": 0.4
+   },
+   {
+    "text": "Bitcoin,",
+    "start": 0.52,
+    "end": 1.08
+   },
+   {
+    "text": "Ethereum",
+    "start": 1.36,
+    "end": 1.94
+   },
+   {
+    "text": "and",
+    "start": 2.1,
+    "end": 2.18
+   },
+   {
+    "text": "Solana,",
+    "start": 2.28,
+    "end": 2.82
+   },
+   {
+    "text": "in",
+    "start": 3.14,
+    "end": 3.36
+   },
+   {
+    "text": "one",
+    "start": 3.44,
+    "end": 3.64
+   },
+   {
+    "text": "NFT.",
+    "start": 3.86,
+    "end": 4.4
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Native Bitcoin, Ethereum, and Solana in one NFT"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

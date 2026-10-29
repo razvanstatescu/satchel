@@ -1,0 +1,352 @@
+NEAR HACKATHON — Build what’s next
+NEAR HACKATHON
+Loading...
+Skip intro ↗
+Skip to tracks
+NEAR Hackathon home
+HCKTHN
+Tracks
+Timeline
+Judges
+Ecosystem
+Toolkit
+Submit
+NEAR HACKATHON
+The era of programmable money starts here...
+Make it real on NEAR
+PAUSE
+Autonomous payments. Intelligent agents.
+Money with a mind of its own.
+Explore tracks
+Submit your project
+BUILD WITHOUT PERMISSION✳THINK BEYOND THE CHAIN✳MAKE YOUR SIGNAL MATTER✳
+00 / HACKATHON INFO
+THE HACKATHON AT A GLANCE
+Turn bold ideas into real-world applications. Experiment, collaborate, and build what comes next.Great ideas deserve great rewards.
+TOTAL PRIZE POOL (USDT)
+HACKATHON STARTS IN
+DAYS
+HOURS
+MIN
+SEC
+HACKATHON STARTS
+1 Nov 2026 · 00:00 UTC
+DEVELOPMENT
+1–14 Nov 2026
+JUDGING & RESULTS
+16–18 Nov 2026
+SUBMITTED PROJECTS
+—
+01 / BUILD DIRECTIONS
+CHOOSE YOUR
+BUILD CHANNEL
+Pick a problem worth solving.
+Bring your own perspective. Build on NEAR.
+[ 01 / DFI ]
+01
+Unstoppable DeFi
+Markets that never close
+Build exchanges, perps, lending, vaults and trading agents that settle across chains through NEAR Intents. Deep liquidity, no custodian, nobody to switch it off.
+TRADING
+NEAR INTENTS
+CHAIN SIGNATURES
+Build in this track
+[ 02 / INV ]
+02
+Investment Thesis
+Make the long-term case
+Build a long-term investment thesis for NEAR and back it with data: onchain analytics, live dashboards and models anyone can re-run. Judged on the evidence, not the conviction.
+ONCHAIN DATA
+DASHBOARDS
+RESEARCH
+Build in this track
+[ 03 / PRV ]
+03
+Privacy & Private AI
+Private by design
+Explore confidential computation, private finance and AI that protects sensitive data. Build intelligence without exposure.
+PRIVATE AI
+TEE
+NEAR AI CLOUD
+Build in this track
+[ 04 / BUS ]
+04
+Autonomous Business
+The company of one. Or none
+Build AI-native businesses with treasury, sales, procurement, cross-chain payments via NEAR Intents and revenue sharing. Humans only set the constraints.
+AI AGENTS
+NEAR INTENTS
+CHAIN SIGNATURES
+Build in this track
+[ 05 / SWM ]
+05
+AI Swarms
+Many agents. One economy
+Build coordination markets, bidding, collective purchasing, intent-based settlement and emergent economies between agents.
+MULTI-AGENT SYSTEMS
+NEAR INTENTS
+SUB-ACCOUNTS
+Build in this track
+[ 06 / SEC ]
+06
+AI Security & Defense
+Trust, but verify
+Build spending limits, policy engines, sandboxed wallets, reputation and scam detection. Give AI money without giving it the keys to everything.
+AGENT SECURITY
+FUNCTION CALL KEYS
+TEE ATTESTATION
+Build in this track
+[ 07 / AGT ]
+07
+Agent Economy
+Give AI a wallet
+Build agents that earn, spend, negotiate, hire other agents and pay for APIs, compute or data — with crypto directly or through NEAR Intents.
+AGENT COMMERCE
+NEAR INTENTS
+CHAIN SIGNATURES
+Build in this track
+[ 08 / RWM ]
+08
+Real-World Money
+Bring the boring money onchain
+Build payroll, invoicing, remittances, merchant payments and stablecoin rails for real businesses. Something a normal company could use tomorrow.
+STABLECOINS
+NEAR INTENTS
+META TRANSACTIONS
+Build in this track
+[ 09 / GAM ]
+09
+Games With Real Economies
+The economy is the gameplay
+Build NPCs with wallets, player-owned markets and economies that evolve without a dev patch. Judged on the game loop, not the token — bonus if players never notice the chain.
+AGENT NPCS
+SOCIAL LOGIN
+NEAR INTENTS
+NEP-245
+Build in this track
+[ 10 / NFT ]
+10
+NFTs That Do Something
+What comes after the JPEG
+Build NFTs as accounts — assets that own money, earn royalties, hold inventory, carry credentials, memberships or access rights. Ownership with behavior.
+DYNAMIC NFTS
+NEP-171
+SUB-ACCOUNTS
+Build in this track
+[ 11 / MEM ]
+11
+Memecoins With Mechanics
+The joke needs rules
+Build memecoins where the meme does something — supply that reacts to the community, treasuries with rules, onchain rituals and challenges. Judged on the mechanic, not the chart.
+MEMECOINS
+TOKEN MECHANICS
+NEP-141
+Build in this track
+[ 12 / SOC ]
+12
+Social Money
+Coordinate value together
+Build shared budgets, programmable rewards, collective ownership and reputation-based access on top of Sputnik DAO and Trezu. Don't rebuild the multisig — build what communities do with it.
+SPUTNIK DAO
+TREZU
+NAMED ACCOUNTS
+Build in this track
+[ 13 / NEW ]
+13
+Open Innovation
+Something we haven't seen
+Have an idea that refuses to fit a category? Explore new ways for money, intelligence and ownership to work together.
+EXPERIMENTAL
+CHAIN ABSTRACTION
+BUILD YOUR OWN
+Build in this track
+02 / EXECUTION PLAN
+IDEA > BUILD > DEMO
+Four stages. One thing to show for it:
+something that works.
+01
+Assemble
+Bring your team and choose a track. No sign-up needed to start.
+02
+Build
+Turn your idea into a working prototype. Test the assumptions that matter.
+03
+Show it
+Publish your repository and post your demo on X, with a video or screenshots of what you built.
+04
+Submit
+Send the form with both links: your repository and your demo post.
+03 / THE PEOPLE
+MEET THE JUDGES
+The people reviewing what you build.
+[ 01 ]
+Illia Polosukhin
+NEAR Protocol
+@ilblackdragon
+[ 02 ]
+Eddy Lazzarin
+a16z crypto
+@eddylazzarin
+[ 03 ]
+Mert Mumtaz
+Helius
+@0xMert_
+[ 04 ]
+Avichal Garg
+Electric Capital
+@avichal
+[ 05 ]
+Kain Warwick
+Synthetix & Infinex
+@kain
+[ 06 ]
+Haseeb Qureshi
+Dragonfly
+@hosseeb
+[ 07 ]
+Stepan Gershuni
+cyber•Fund
+@cyntro_py
+[ 08 ]
+Claude Code & Codex
+Anthropic & OpenAI
+@claudeai
+@OpenAI
+04 / THE ECOSYSTEM
+CONNECTED BY BUILDING
+Tools, teams and resources for your next build.
+NEAR Intents
+Cross-chain execution
+Website
+Docs
+Git
+Aurora
+Ethereum on NEAR
+Website
+Docs
+Git
+HOT
+Chain abstraction
+Website
+Docs
+Git
+Rhea
+DeFi on NEAR
+Website
+Docs
+Git
+meme.cooking
+Memecoin launchpad
+Website
+Docs
+— not available
+Git
+— not available
+HEX
+Cross-chain swaps
+Website
+Docs
+— not available
+Git
+— not available
+NEAR.AI
+Private AI
+Website
+Docs
+Git
+SVRN
+Sovereign technology
+Website
+Docs
+— not available
+Git
+— not available
+Trezu
+Multisig treasury for Web3 teams
+Website
+Docs
+Git
+SputnikDAO
+DAO infrastructure
+Website
+Docs
+Git
+05 / BUILDER TOOLKIT
+LESS SETUP.
+MORE SHIPPING
+[ START HERE ]
+From your first smart contract to your next big idea. Find the guides and building blocks to make it happen on NEAR.
+Rather ship than read? Hand HACKATHON.md to your coding agent. It knows the tracks, the dates and the submission steps, and can file your submission. You just build.
+Read the Docs
+Download HACKATHON.md
+THE BUILD DOESN’T HAPPEN ALONE
+FIND YOUR
+CO-BUILDERS
+Meet collaborators and ask questions in the NEAR Discord. Follow the hackathon on X for the latest updates.
+Join the NEAR Discord
+Follow on X
+06 / FINAL SUBMISSION
+YOUR PROJECT.
+LANDS HERE
+No sign-up to start. Build with your team or solo, then submit once before development ends, 14 Nov 2026 · 23:59 UTC.
+01
+Build your project during the hackathon
+02
+Publish the repository. Judges can’t open a private one
+03
+Post your demo on X: say you built it at NEAR HACKATHON and attach the demo video or screenshots
+04
+Submit the repository link and the link to your demo post. Both are required
+PROJECT SUBMISSION
+Project name *
+Team lead *
+Email address *
+Team size *
+Select size
+1 — Solo builder
+2 - 4 people
+4 - 6 people
+6 - 8 people
+8+ people
+Preferred track *
+Choose your track
+Unstoppable DeFi
+Investment Thesis
+Privacy & Private AI
+Autonomous Business
+AI Swarms
+AI Security & Defense
+Agent Economy
+Real-World Money
+Games With Real Economies
+NFTs That Do Something
+Memecoins With Mechanics
+Social Money
+Open Innovation
+NEAR wallet address *
+Your own wallet or your team’s. If you win, the prize is sent here.
+Repository link *
+This is the repository judges will review. It must be public.
+Demo post link *
+Your public post on X with the demo video or screenshots.
+What did you build? *
+20–2,000 characters.
+Website
+I agree that the organizers may use these details to review our submission and contact us about this hackathon.
+Submissions open 1 Nov 2026 · 00:00 UTC
+One submission per team. No wallet connection needed.
+07 / FREQUENT QUERIES
+QUESTIONS?
+START HERE
+Who can take part?Developers, designers and people with ideas for the NEAR ecosystem. No wallet connection is needed to submit: you only enter a NEAR account address, and if you win, the prize is sent there. Final eligibility and event rules will be published before the hackathon.
+Do I need a team already?No. Build as a solo builder or with a team — one submission per team. Looking for teammates? Join the NEAR Discord and find them there.
+When and where does it happen?The hackathon starts 1 Nov 2026 · 00:00 UTC. Development runs for two weeks and ends 14 Nov 2026 · 23:59 UTC, and results are announced by 18 Nov 2026 · 23:59 UTC. The full schedule is in the at-a-glance panel; the event format will be announced here.
+What should we submit?A working prototype in a public repository and a public demo post on X: say you built it at NEAR HACKATHON and attach the demo video or screenshots. Send both links through the form before development ends, 14 Nov 2026 · 23:59 UTC.
+How will projects be judged?Projects are reviewed by the jury above, with Claude Code & Codex joining as AI judges. Previous NEAR hackathons evaluated technical implementation, design, impact, originality and sustainability — a good guide to prepare by.
+Can I build something across multiple tracks?Yes. Pick one preferred track in the submission form; your project can still span several areas.
+NEAR Hackathon home
+HCKTHN
+BUILT FOR BUILDERS
+Back to top ↑
+NEAR HACKATHONProject submission
+Submit

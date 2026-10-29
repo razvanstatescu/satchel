@@ -1,0 +1,151 @@
+{
+ "id": "EXAVITQu4vr4xnSDxMaL",
+ "why": "premade; \"Mature, Reassuring, Confident\": young adult, warm and mature, professional",
+ "file": "notes/probe/v3-voice-sarah.mp3",
+ "durationSec": 10,
+ "words": [
+  {
+   "text": "Stick",
+   "start": 0,
+   "end": 0.288
+  },
+  {
+   "text": "it",
+   "start": 0.32,
+   "end": 0.38
+  },
+  {
+   "text": "on.",
+   "start": 0.4,
+   "end": 0.8
+  },
+  {
+   "text": "Hand",
+   "start": 0.88,
+   "end": 1.36
+  },
+  {
+   "text": "it",
+   "start": 1.44,
+   "end": 1.48
+  },
+  {
+   "text": "over.",
+   "start": 1.52,
+   "end": 2
+  },
+  {
+   "text": "Satchel",
+   "start": 2.4,
+   "end": 2.8
+  },
+  {
+   "text": "keeps",
+   "start": 2.84,
+   "end": 3.04
+  },
+  {
+   "text": "the",
+   "start": 3.12,
+   "end": 3.28
+  },
+  {
+   "text": "receipts.",
+   "start": 3.44,
+   "end": 4
+  },
+  {
+   "text": "And",
+   "start": 4.24,
+   "end": 4.48
+  },
+  {
+   "text": "there's",
+   "start": 4.56,
+   "end": 4.72
+  },
+  {
+   "text": "no",
+   "start": 4.88,
+   "end": 5.04
+  },
+  {
+   "text": "admin",
+   "start": 5.12,
+   "end": 5.52
+  },
+  {
+   "text": "key.",
+   "start": 5.6,
+   "end": 5.92
+  },
+  {
+   "text": "Not",
+   "start": 6.16,
+   "end": 6.32
+  },
+  {
+   "text": "even",
+   "start": 6.44,
+   "end": 6.56
+  },
+  {
+   "text": "ours.",
+   "start": 6.64,
+   "end": 7.2
+  },
+  {
+   "text": "So",
+   "start": 7.36,
+   "end": 7.52
+  },
+  {
+   "text": "it",
+   "start": 7.68,
+   "end": 7.84
+  },
+  {
+   "text": "can't",
+   "start": 7.92,
+   "end": 8.08
+  },
+  {
+   "text": "sign",
+   "start": 8.16,
+   "end": 8.4
+  },
+  {
+   "text": "anything",
+   "start": 8.56,
+   "end": 8.96
+  },
+  {
+   "text": "off",
+   "start": 9.04,
+   "end": 9.12
+  },
+  {
+   "text": "the",
+   "start": 9.2,
+   "end": 9.24
+  },
+  {
+   "text": "record.",
+   "start": 9.28,
+   "end": 10.08
+  }
+ ],
+ "spanSec": 10.08,
+ "wpmOverall": 155,
+ "wpmArticulation": 161,
+ "pauses": [
+  "over.|0.40"
+ ],
+ "notEvenOurs": {
+  "pauseBefore": 0.24,
+  "durSec": 1.04
+ },
+ "wpmOffTarget": 0,
+ "heard": "Stick it on. Hand it over. Satchel keeps the receipts. And there's no admin key, not even ours, so it can't sign anything off the record",
+ "sttExact": true
+}

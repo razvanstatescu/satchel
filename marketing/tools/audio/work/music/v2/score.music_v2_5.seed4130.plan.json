@@ -1,0 +1,401 @@
+{
+ "chunks": [
+  {
+   "text": "[Hook]",
+   "duration_ms": 8000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "punchy confident hits on every beat",
+    "deep kick with short warm analog synth stabs",
+    "full energy from the very first beat",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "intro",
+    "fade in",
+    "ambient pad intro",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Groove]",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "a bright, confident groove starts",
+    "kick, snare and shaker",
+    "plucky warm analog synth arpeggio",
+    "premium product launch",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "dark",
+    "heavy",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Groove builds]",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "the bright groove continues and builds",
+    "claps join on two and four",
+    "warm analog bass line",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "dark",
+    "breakdown",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Build]",
+   "duration_ms": 10000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "the groove keeps building",
+    "felt piano chords join",
+    "rising energy",
+    "confident and bright",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "breakdown",
+    "drop",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Groove]",
+   "duration_ms": 8000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "full confident groove",
+    "warm analog bass",
+    "felt piano chords",
+    "steady energy",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "breakdown",
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Peak]",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "the groove at its brightest",
+    "confident",
+    "a small fill on the last bar into the next section",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "breakdown",
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Lift]",
+   "duration_ms": 12000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "lifted, the warmest point of the track",
+    "warm major chords",
+    "felt piano melody",
+    "airy claps",
+    "rounded analog pads",
+    "uplifting, emotional",
+    "premium cinematic electronic",
+    "warm analog synths"
+   ],
+   "negative_styles": [
+    "dark",
+    "minor key",
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Dark turn]",
+   "duration_ms": 12000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "sudden dark turn on the first beat",
+    "minor key",
+    "low pulsing sub bass",
+    "ticking hi-hats",
+    "suspense, tension rising",
+    "stripped back",
+    "premium cinematic electronic",
+    "warm analog synths"
+   ],
+   "negative_styles": [
+    "bright",
+    "major key",
+    "melody",
+    "drop",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Breakdown]",
+   "duration_ms": 4000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "one deep sub bass boom on the first beat",
+    "then only a soft, quiet low drone",
+    "very sparse, held breath",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "drums",
+    "melody",
+    "riser",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Riser]",
+   "duration_ms": 4000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "continuous rising synth swell with a snare roll crescendo for the whole section",
+    "building into a big drop",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "drum groove",
+    "melody",
+    "early drop",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Drop]",
+   "duration_ms": 14000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "the big drop on the very first beat",
+    "driving warm four-on-the-floor groove",
+    "claps on two and four",
+    "warm analog bass",
+    "felt piano chords",
+    "full energy for the whole section",
+    "premium cinematic electronic",
+    "warm analog synths"
+   ],
+   "negative_styles": [
+    "breakdown",
+    "build-up",
+    "quiet start",
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Drive]",
+   "duration_ms": 22000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "the driving warm groove continues",
+    "an analog synth arpeggio layer joins",
+    "constant energy",
+    "confident",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "breakdown",
+    "drop",
+    "gaps",
+    "fade",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Lift]",
+   "duration_ms": 6000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "lift: the drums thin out to hi-hats and claps",
+    "upward filter sweep",
+    "a swelling warm pad",
+    "anticipation",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "full drop",
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Hit]",
+   "duration_ms": 4000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "one big satisfying impact on the first beat",
+    "a warm major chord ringing out",
+    "the groove returns",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "gaps",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  },
+  {
+   "text": "[Outro]",
+   "duration_ms": 12000,
+   "positive_styles": [
+    "120 BPM",
+    "instrumental",
+    "warm resolved outro without drums",
+    "felt piano and soft analog pad playing through the whole section",
+    "calm, resolved, major key",
+    "the final chord rings out and ends cleanly",
+    "premium cinematic electronic",
+    "warm analog synths",
+    "polished modern mix"
+   ],
+   "negative_styles": [
+    "abrupt cut",
+    "early ending",
+    "new drums",
+    "riser",
+    "vocals",
+    "EDM",
+    "cheesy",
+    "tempo changes"
+   ],
+   "context_adherence": "high",
+   "conditioning_ref": null,
+   "condition_strength": null
+  }
+ ]
+}

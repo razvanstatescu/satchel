@@ -1,0 +1,70 @@
+{
+ "at": "2026-10-21T11:38:48.552Z",
+ "ms_to_FINAL": 91163,
+ "tx_hash": "5VY9ejgPyPbcS72fhdX3WeJrXrBqSVZAHHXNEq4Cuyhq",
+ "final_execution_status": "FINAL",
+ "status": {
+  "SuccessValue": "\"0\""
+ },
+ "receipts": [
+  {
+   "id": "JBUkg54VCiy71tNZZcLaBbwf4U7q84vhz9SNNC3SrfW6",
+   "executor": "usdc.fakes.testnet",
+   "block": "274090225",
+   "status": "SuccessReceiptId",
+   "logs": [
+    "Transfer 1000000 from satchel-spk-pay-e9ea1a.testnet to seller.satchel-spk-pay-e9ea1a.testnet"
+   ],
+   "tokens_burnt": "281648565995200000000",
+   "gas_burnt": 2816485659952
+  },
+  {
+   "id": "EXDTLaaKwFJwoeMGzrGSRYpzzUwPtwyosQYQVR7aJ3wb",
+   "executor": "seller.satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090226",
+   "status": "Failure",
+   "fail": "{\"ActionError\":{\"index\":0,\"kind\":{\"FunctionCallError\":{\"CompilationError\":{\"CodeDoesNotExist\":{\"account_id\":\"seller.satchel-spk-pay-e9ea1a.testnet\"}}}}}}",
+   "logs": [],
+   "tokens_burnt": "88828980120200000000",
+   "gas_burnt": 888289801202
+  },
+  {
+   "id": "Cz3oUxxHbQ99JwqzGxfpdb8nc9gauLgw9QtoPcmw1jZv",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090227",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  },
+  {
+   "id": "DdVnTed57fdt5vyimr47w591QEzJAQ2bq22GiiQ4sKLb",
+   "executor": "usdc.fakes.testnet",
+   "block": "274090227",
+   "status": "SuccessValue",
+   "logs": [
+    "Refund 1000000 from seller.satchel-spk-pay-e9ea1a.testnet to satchel-spk-pay-e9ea1a.testnet"
+   ],
+   "tokens_burnt": "203720788602200000000",
+   "gas_burnt": 2037207886022
+  },
+  {
+   "id": "6su6M38pVVsP7nZ5W9ejdfWXMP15XV1pwdx8s4u8eJUP",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090228",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  },
+  {
+   "id": "AidAWrfg4yt8PTEoQJ6F1rLwTc5hVNXWzrhnEpW3WDC1",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090226",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

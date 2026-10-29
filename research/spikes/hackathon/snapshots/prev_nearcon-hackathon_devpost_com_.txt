@@ -1,0 +1,220 @@
+NEARCON IRL Hackathon: Step Into The Open Web - Devpost
+We've detected that you are using an unsupported browser.  Please
+upgrade your browser
+to Internet Explorer 10 or higher.
+Log in
+Sign up
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Join a hackathon
+Devpost
+Participate in our public hackathons
+Hackathons
+Projects
+Devpost for Teams
+Access your company's private hackathons
+Login
+Host a hackathon
+Devpost
+Grow your developer ecosystem and promote your platform
+Host a public hackathon
+Devpost for Teams
+Drive innovation, collaboration, and retention within your organization
+Host an internal hackathon
+By use case
+AI hackathons
+Customer hackathons
+Employee hackathons
+Public hackathons
+Resources
+Blog
+Insights into hackathon planning and participation
+Customer stories
+Inspiration from peers and other industry leaders
+Planning guides
+Best practices for planning online and in-person hackathons
+Webinars & events
+Upcoming events and on-demand recordings
+Help desk
+Common questions and support documentation
+Log in
+Sign up
+Descend
+Overview
+My projects
+Participants (732)
+Resources
+Rules
+Project gallery
+Updates
+Discussions
+NEARCON IRL Hackathon
+Step Into The Open Web
+This hackathon has ended
+Find more hackathons
+View the winners
+Who can participate
+Above legal age of majority in country of residence
+All countries/territories, excluding
+standard exceptions
+View full rules
+View schedule
+Nov 7 – 9, 2023
+Armazem
+Public
+$161,000
+in prizes
+732
+participants
+NEAR Protocol
+Beginner Friendly
+Blockchain
+Web
+The NEARCON hackathon is a 48-hour IRL hacking session for those who want to team up, get familiar with NEAR, build a prototype for their project, pitch it, and get a chance to win.
+The hackathon can be the start of something amazing, or a way to fail fast, learn, and adapt. We appreciate both, because we know that to build the next big thing you often have to fail enough times to find just the right idea.
+The winners will be invited to participate in a pre-acceleration program facilitated by NEAR Horizon
+.
+Requirements
+What to build
+Explore your own idea or submit a solution for
+one of the sponsored challenges
+(added soon).
+Hackers are expected to build on NEAR and present an MVP of a product that focuses on one of the 4 NEARCON’s tracks:
+Developers – building tooling and documentation to make Web3 truly open
+Entrepreneurs – launching innovative products towards mass adoption
+Creators – resetting culture through technology
+Regulators – evolving rules, policies and regulations for the Web3 space
+Submissions must be created, or substantially modified, during the hackathon. At least one of the team members must be present at the hackathon in person to consult the mentors and pitch the project during the finale. The code of the submission must be open source – please check the rules or ask a mentor if you have any questions.
+How to win
+We’re looking for committed builders who understand their market and are intended to stay in the NEAR ecosystem long term. The judging will look for technical excellence, creative ideas, a bold approach, and solid team spirit.
+Our mentors will be tracking the teams’ progress to make sure that the winners have the energy and experience to keep building when the hackathon is over.
+Finally, top-10 teams will be invited to a pitch competition to showcase their ideas in front of a live audience of founders, VC’s, and core ecosystem experts.
+Hackathon Sponsors
+Prizes
+$161,000
+in prizes
+1st Place Winner
+1 winner
+2nd Place Winner
+1 winner
+3rd Place Winner
+1 winner
+Developers Track Winner
+1 winner
+Entrepreneurs Track Winner
+1 winner
+Creators Track Winner
+1 winner
+Regulators Track Winner
+1 winner
+Pitch Competition Winner
+1 winner
+Aurora Cross-Ecosystem Communication Bounty
+1 winner
+Creating templates using the Mintbase SDK
+1 winner
+Account abstraction bounty
+3 winners
+Innovate Web3 UX with BOS by Proximity
+3 winners
+Devpost Achievements
+Submitting to this hackathon could earn you:
+Judges
+Max Zavershynskyi
+Leader | NEAR DevHub
+Eric Winer
+CTO | Pagoda
+Alex Shevchenko
+CEO | Aurora
+Nate Geier
+CEO | Mintbase
+Laura Cunningham
+General Manager | NEAR Horizon
+Samantha Bohbot
+Chief Growth Officer | RockawayX
+Oleg Fomenko
+Co-founder | Sweat Economy
+Bowen Wang
+Head of Protocol | Pagoda
+Sandi Fatic
+Co-founder | Calimero Network
+Joe Spano
+Co-Founder | ShardDog
+MJ
+Head of Product | Proximity Labs
+Diogo Monica
+Anchorage Digital | Founder
+Judging Criteria
+Technological Implementation
+Does the interaction with NEAR demonstrate quality software development?
+Design
+Is the user experience and design of the project well thought out?
+Potential Impact
+Is the Project Open Source and how big of an impact could the project have on the NEAR ecosystem?
+Quality of the Idea
+How creative and unique is the project?
+Project Sustainability
+Is the plan for the Project thought out and realistic?
+Questions?
+Email the hackathon manager
+Tell your friends
+Hackathon sponsors
+This site is protected by reCAPTCHA and the Google
+Privacy Policy
+and
+Terms of Service
+apply.
+Devpost
+About
+Careers
+Contact
+Help
+Hackathons
+Browse hackathons
+Explore projects
+Host a hackathon
+Hackathon guides
+Portfolio
+Your projects
+Your hackathons
+Settings
+Connect
+Twitter
+Discord
+Facebook
+LinkedIn
+© 2026 Devpost, Inc. All rights reserved.
+Community guidelines
+Security
+CA notice
+Privacy policy
+Terms of service

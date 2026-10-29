@@ -1,0 +1,398 @@
+[
+  {
+    "name": "sticker-slap",
+    "version": 1,
+    "prompt": "A thick vinyl sticker slapped flat onto a smooth aluminium laptop lid with an open palm, one soft flat thwap with a tiny papery snap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:29.046Z"
+  },
+  {
+    "name": "sticker-peel",
+    "version": 1,
+    "prompt": "A vinyl sticker peeled off a smooth plastic surface, a slow sticky crackling peel that speeds up and ends with a quick light snap, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:31.890Z"
+  },
+  {
+    "name": "pop",
+    "version": 1,
+    "prompt": "One single clean soft mouth pop, the round hollow pop of a finger flicked out of the cheek, short and tidy, close-mic, one pop only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:33.616Z"
+  },
+  {
+    "name": "pop-high",
+    "version": 1,
+    "prompt": "One single tiny high-pitched bubble pop, a small bright round pop like a soap bubble bursting, very short, close-mic, one pop only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:35.137Z"
+  },
+  {
+    "name": "boing-soft",
+    "version": 1,
+    "prompt": "A subtle soft rubbery bounce, a small rubber ball bouncing once on a wooden table with a gentle short pitch wobble, muted and tasteful, not a cartoon spring, no metal spring twang, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:36.843Z"
+  },
+  {
+    "name": "charm-jingle",
+    "version": 1,
+    "prompt": "Three small enamel-coated metal keychain charms clinking together as they swing, a light bright jingle of a few delicate clinks, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:38.471Z"
+  },
+  {
+    "name": "chain-clink",
+    "version": 1,
+    "prompt": "A light metal ball chain keychain clinking once, a short delicate rattle of tiny steel beads, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:41.025Z"
+  },
+  {
+    "name": "swing-swish",
+    "version": 1,
+    "prompt": "A soft gentle air swish of a small keychain charm swinging past the microphone once, smooth and light, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:42.769Z"
+  },
+  {
+    "name": "button-thock",
+    "version": 1,
+    "prompt": "One single satisfying soft button press, a rubbery silicone key pressed down with a muted rounded thock, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:44.223Z"
+  },
+  {
+    "name": "button-thock-deep",
+    "version": 1,
+    "prompt": "One single deeper soft button press, a large rubber keycap pressed into a padded base, a low round thock, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:45.758Z"
+  },
+  {
+    "name": "tick-soft",
+    "version": 1,
+    "prompt": "One single tiny soft tick, a gentle rounded plastic click, very short and quiet, close-mic, one tick only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:47.299Z"
+  },
+  {
+    "name": "bubble-tick-run",
+    "version": 1,
+    "prompt": "A quick run of soft bubbly interface ticks, about twelve tiny rounded water-drop pops in a fast steady rhythm, light and playful, like a number counting up, clean, no music.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-26T09:42:49.029Z"
+  },
+  {
+    "name": "type-run",
+    "version": 1,
+    "prompt": "Soft rounded keyboard typing, a fast short burst of about ten muted rubber-dome key presses, gentle and cozy, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-26T09:42:50.623Z"
+  },
+  {
+    "name": "pen-scribble",
+    "version": 1,
+    "prompt": "A felt-tip marker pen scribbling a quick signature on thick paper, fast soft strokes with a final flick, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-10-26T09:42:52.520Z"
+  },
+  {
+    "name": "paper-slide",
+    "version": 1,
+    "prompt": "A stiff paper card sliding across a smooth table, one short smooth slide, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:54.008Z"
+  },
+  {
+    "name": "pocket-slip",
+    "version": 1,
+    "prompt": "A paper card slipped into a soft cotton fabric pocket, a short brushing slide ending in a soft settle, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:55.630Z"
+  },
+  {
+    "name": "stamp-thunk",
+    "version": 1,
+    "prompt": "A rubber stamp pressed firmly onto paper on a wooden desk, one short soft thunk with a slight rubbery squish, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:57.069Z"
+  },
+  {
+    "name": "lock-click",
+    "version": 1,
+    "prompt": "A small metal latch clicking shut, one crisp tidy click of a little clasp closing, close-mic foley, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:42:58.671Z"
+  },
+  {
+    "name": "whoosh-soft",
+    "version": 1,
+    "prompt": "A gentle airy whoosh, a soft quick pass of air rising to a peak then falling away, smooth and light, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:00.401Z"
+  },
+  {
+    "name": "whoosh-zip",
+    "version": 1,
+    "prompt": "A quick bright zip-past whoosh, a fast thin airy zip passing by the microphone, snappy, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:02.132Z"
+  },
+  {
+    "name": "swoop-up",
+    "version": 1,
+    "prompt": "A playful rising swoosh, a smooth soft airy whoosh sweeping upward in pitch, light and refined, not a slide whistle, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:03.780Z"
+  },
+  {
+    "name": "swoop-down",
+    "version": 1,
+    "prompt": "A playful falling swoosh, a smooth soft airy whoosh sweeping downward in pitch, light and refined, not a slide whistle, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:05.356Z"
+  },
+  {
+    "name": "sparkle",
+    "version": 1,
+    "prompt": "A tiny tasteful glittery shimmer, a few delicate high glass chime sparkles, soft and quick, no music.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:07.281Z"
+  },
+  {
+    "name": "success-marimba",
+    "version": 1,
+    "prompt": "Three quick ascending marimba notes, a warm wooden do-mi-sol flourish played with soft mallets, a short friendly yes, no other instruments, no reverb tail.",
+    "durationSeconds": 0.9,
+    "bytes": 22612,
+    "characterCost": 5,
+    "at": "2026-10-26T09:43:08.881Z"
+  },
+  {
+    "name": "coin-ding",
+    "version": 1,
+    "prompt": "One soft bright ding, a small metal bell struck lightly once like a payment arriving, clean and pleasant, not a slot machine, not a video game coin, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:10.573Z"
+  },
+  {
+    "name": "error-boop",
+    "version": 1,
+    "prompt": "A gentle low two-note uh-oh boop, two soft rounded synth tones stepping down, friendly and muted, not a buzzer, not harsh, no music.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:12.179Z"
+  },
+  {
+    "name": "sneaky-pizz",
+    "version": 1,
+    "prompt": "A short sneaky pizzicato motif, four plucked string notes tiptoeing on cello and violin, comedic suspense but subtle and classy, solo plucked strings only, dry, no reverb tail.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-10-26T09:43:13.821Z"
+  },
+  {
+    "name": "tension-tick",
+    "version": 1,
+    "prompt": "A light clock-tick pulse, a small wooden clock ticking evenly about three ticks per second, steady and slightly tense, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1.5,
+    "bytes": 37032,
+    "characterCost": 8,
+    "at": "2026-10-26T09:43:15.347Z"
+  },
+  {
+    "name": "freeze-chime",
+    "version": 1,
+    "prompt": "An icy crystalline glint, a short bright shimmering chime like frost crackling on glass with one sparkling ring, delicate, no music.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:43:16.929Z"
+  },
+  {
+    "name": "magic-wand",
+    "version": 1,
+    "prompt": "A soft upward twinkle, a quick rising run of tiny bell and glass sparkles, gentle and tasteful, no music.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:43:18.734Z"
+  },
+  {
+    "name": "drum-hit-soft",
+    "version": 1,
+    "prompt": "One punchy soft tom drum hit, a warm round floor tom struck once with a felt mallet, tight and short, no other instruments, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:43:20.144Z"
+  },
+  {
+    "name": "riser-short",
+    "version": 1,
+    "prompt": "A playful rising synth swell, a soft bubbly synth tone sweeping upward in pitch and brightness for two seconds and ending cleanly at its top, no impact, no drums, no other instruments.",
+    "durationSeconds": 2,
+    "bytes": 49571,
+    "characterCost": 11,
+    "at": "2026-10-26T09:43:22.109Z"
+  },
+  {
+    "name": "crowd-yay-tiny",
+    "version": 1,
+    "prompt": "A tiny distant cheer of three or four friends going yay together, brief and happy, very subtle, heard from across a small room, no music.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:43:23.755Z"
+  },
+  {
+    "name": "boing-soft",
+    "version": 2,
+    "prompt": "A subtle soft rubbery boing, a small rubber toy bouncing once on a table with a quick gentle pitch bend in the mid range, round and muted, starting immediately, single bounce, not a cartoon spring, no metal spring twang, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:47:52.340Z"
+  },
+  {
+    "name": "button-thock-deep",
+    "version": 2,
+    "prompt": "One single deep soft button press, a large silicone keycap bottoming out with a low round thock and a crisp short attack, tactile and premium, close-mic, one press only, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:47:54.470Z"
+  },
+  {
+    "name": "bubble-tick-run",
+    "version": 2,
+    "prompt": "A steady run of soft bubbly interface ticks, twelve tiny rounded water-drop pops, evenly spaced and equally loud from start to end, fast steady rhythm, light and playful, like a number counting up, clean, no music.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-10-26T09:47:56.040Z"
+  },
+  {
+    "name": "success-marimba",
+    "version": 2,
+    "prompt": "A marimba arpeggio of three separate short notes rising, ding-ding-ding, each note struck clearly about 0.15 seconds apart, warm soft mallets, a friendly short yes, no other instruments, no reverb tail.",
+    "durationSeconds": 0.9,
+    "bytes": 22612,
+    "characterCost": 5,
+    "at": "2026-10-26T09:47:57.464Z"
+  },
+  {
+    "name": "error-boop",
+    "version": 2,
+    "prompt": "A gentle two-note uh-oh in the mid range, two soft rounded mallet tones, the first note higher and the second note lower, clearly separated, friendly and quiet, not a buzzer, not harsh, no bass, no music.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:47:59.153Z"
+  },
+  {
+    "name": "sneaky-pizz",
+    "version": 2,
+    "prompt": "Four separate staccato pizzicato plucks on violin, a sneaky tiptoeing motif, pluck, pluck, pluck-pluck, each note short and clearly separated, comedic suspense but subtle and classy, solo plucked strings only, dry, no reverb tail.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-10-26T09:48:00.990Z"
+  },
+  {
+    "name": "magic-wand",
+    "version": 2,
+    "prompt": "A soft upward magic twinkle, a quick glissando of tiny bell and glass sparkles rising from low to high pitch and getting brighter, ending on a tiny high twinkle, gentle and tasteful, no music.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:48:02.468Z"
+  },
+  {
+    "name": "drum-hit-soft",
+    "version": 2,
+    "prompt": "One punchy soft tom drum hit, a tight mid tom struck once with a felt mallet, a clear soft attack and a short warm round body, full and present, no other instruments, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-10-26T09:48:04.054Z"
+  },
+  {
+    "name": "riser-short",
+    "version": 2,
+    "prompt": "A playful rising synth swell lasting the full duration, a soft bubbly synth tone sweeping upward in pitch while growing louder and brighter until the very end, loudest at the end, then stopping cleanly, no impact, no drums, no other instruments.",
+    "durationSeconds": 2.4,
+    "bytes": 58975,
+    "characterCost": 13,
+    "at": "2026-10-26T09:48:06.349Z"
+  },
+  {
+    "name": "crowd-yay-tiny",
+    "version": 2,
+    "prompt": "A tiny distant cheer from a small group of four adults with different voices, a short overlapping yay and a little clapping, warm and genuine, very subtle, heard from across a room, no music.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:48:07.920Z"
+  },
+  {
+    "name": "src-marimba-note",
+    "version": "src",
+    "prompt": "One single marimba note, middle register, struck once with a soft rubber mallet, warm wooden tone with a natural short decay, one note only, no other instruments, no reverb tail.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-10-26T09:51:16.659Z"
+  }
+]

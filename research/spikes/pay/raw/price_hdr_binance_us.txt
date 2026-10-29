@@ -1,0 +1,10 @@
+HTTP/2 451 
+server: CloudFront
+date: Wed, 21 Oct 2026 11:47:30 GMT
+content-length: 245
+content-type: application/json
+x-cache: Error from cloudfront
+via: 1.1 3621ca50ba49ddcb4ec6b807edaab51a.cloudfront.net (CloudFront)
+x-amz-cf-pop: BUD50-P1
+x-amz-cf-id: OMZYDyoEhYEh_5R5eUEx3S6fzTnO7Xfbd0C83lYfcUCPuU_mHSRkCg==
+

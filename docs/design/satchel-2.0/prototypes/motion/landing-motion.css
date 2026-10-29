@@ -1,0 +1,53 @@
+/* Satchel 2.0 landing motion (motion designer). Loaded after landing.css by motion-landing.html. Every rule here keeps
+   the server frame (no JS, reduced motion) exactly as the design lead drew it; the engine animates from it. */
+
+/* ── Hero stage ───────────────────────────────────────────────────────────────────────────────────────────── */
+/* The card hangs from a hook 16 px above its top centre; its hard drop is a plate that stays on the ground while the
+   card is lifted (so a lift reads as a lift, not as a thicker sticker). */
+.stage__hanger { position: relative; transform-origin: 50% -16px; }
+.stage__plate { position: absolute; inset: 4px 0 -4px 0; border-radius: var(--radius-card); background: var(--sticker-shade); }
+.stage__card .card { box-shadow: none; position: relative; }
+.stage [data-el="yours"] { opacity: 0; }                 /* hidden in the server frame (act 3), stuck on in act 4 */
+.m-pillstack { display: inline-grid; justify-items: start; }
+.m-pillstack > * { grid-area: 1 / 1; }
+.m-pillstack > [data-pill="active"] { opacity: 0; }
+.m-statestack { display: inline-grid; justify-items: end; }
+.m-statestack > * { grid-area: 1 / 1; }
+.m-statestack > [data-state="checking"] { opacity: 0; color: var(--ink-muted); font-weight: 600; }
+/* the price tag hangs on its string from the card's edge: the lead's .stage__tag already pivots at the string top */
+/* the caption is a ticker: four captions in one clipped cell, one shown */
+.stage__ticker { display: grid; overflow: clip; }
+.stage__ticker > * { grid-area: 1 / 1; display: flex; align-items: baseline; gap: 10px; }
+.stage__ticker > :not([data-cap="3"]) { opacity: 0; }
+/* the bars fill with time; the track keeps its 20 % ink */
+.stage__step[data-done], .stage__step[aria-current] { background: rgb(29 19 64 / .2); }
+.stage__step > b { display: block; height: 100%; border-radius: inherit; background: var(--on-brand); transform-origin: left; scale: 0 1; }
+.stage__step[data-done] > b, .stage__step[aria-current] > b { scale: 1 1; }
+/* Pause: shown only when the loop can run (JS and full motion); its space is kept so nothing shifts */
+.stage [data-pause] .icon--play { display: none; }
+.stage [data-pause][aria-pressed="true"] .icon--play { display: block; }
+.stage [data-pause][aria-pressed="true"] .icon--pause { display: none; }
+:root:not([data-js]) .stage [data-pause], :root[data-motion="reduce"] .stage [data-pause] { visibility: hidden; }
+
+/* ── Charms that hang: they swing about the top of their string or stem ────────────────────────────────────── */
+.shelf__hang, .charm-row__coin { transform-origin: 50% 0; }
+.addr-tag { transform-origin: 50% -32px; }               /* the top of its string, on the card's bottom edge */
+
+/* ── The finale S: inline, so its face can stamp into its own drop (it never rotates) ─────────────────────── */
+svg.finale__s { overflow: visible; }
+.finale__s .m-s-face { transform-box: view-box; }
+
+/* ── Clean-history strip: layers for the one change each frame plays ──────────────────────────────────────── */
+.m-amtstack { display: inline-grid; } .m-amtstack > * { grid-area: 1 / 1; }
+.m-amtstack > [data-old] { opacity: 0; }
+.m-coinstack { display: inline-grid; flex: none; } .m-coinstack > * { grid-area: 1 / 1; }
+.m-coinstack > [data-old] { opacity: 0; }
+.m-headstack { display: grid; } .m-headstack > * { grid-area: 1 / 1; }
+.m-headstack > [data-old] { opacity: 0; }
+.m-buystack { display: inline-grid; } .m-buystack > * { grid-area: 1 / 1; }
+.m-buystack > [data-old] { opacity: 0; }
+.swing-pose[data-rest] { transform: none; }               /* after its swing, the How-it-works card hangs at rest */
+
+/* Below 430 px the longest caption ("1 of 4 Bitcoin and Ethereum inside", 268 px) is wider than the bar (230–260 px).
+   The bars already say where you are, so the count steps aside and every caption stays on one line (no shift). */
+@media (max-width: 429px) { .stage__ticker .stage__count { display: none; } }

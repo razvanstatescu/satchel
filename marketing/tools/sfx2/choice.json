@@ -1,0 +1,52 @@
+{
+  "sources": {
+    "bubble-tick-run": "bubble-tick-run.v2.mp3",
+    "riser-short": "riser-short.v2.mp3",
+    "success-marimba": "success-marimba.comp.wav",
+    "error-boop": "error-boop.comp.wav",
+    "sneaky-pizz": "sneaky-pizz.comp.wav",
+    "magic-wand": "magic-wand.comp.wav",
+    "drum-hit-soft": "drum-hit-soft.comp.wav",
+    "boing-soft": "boing-soft.comp.wav",
+    "button-thock-deep": "button-thock-deep.comp.wav"
+  },
+  "drop": [
+    "crowd-yay-tiny"
+  ],
+  "promptFrom": {
+    "success-marimba": [
+      "src:marimba-note"
+    ],
+    "error-boop": [
+      "regen:error-boop"
+    ],
+    "sneaky-pizz": [
+      "regen:sneaky-pizz"
+    ],
+    "magic-wand": [
+      "spec:magic-wand"
+    ],
+    "drum-hit-soft": [
+      "regen:drum-hit-soft",
+      "spec:button-thock"
+    ],
+    "boing-soft": [
+      "regen:boing-soft"
+    ],
+    "button-thock-deep": [
+      "spec:button-thock"
+    ]
+  },
+  "notes": {
+    "bubble-tick-run": "v2: ticks spread over the full second; in v1 they faded to -40 dB by halfway.",
+    "riser-short": "v2 (2.4 s generation), cut at 1.925 s where the glide tops out at full level, 12 ms fade. v1 got quieter as it rose.",
+    "success-marimba": "Composite: one generated marimba note (f0 ~298 Hz) played G4-C5-E5, 90 ms apart. Both takes were one struck cluster (with a semitone clash), not a flourish.",
+    "error-boop": "Composite: the v2 boop (~237 Hz) as 'uh-oh', first a minor third up, then the original. v1 sat at 65-86 Hz (inaudible on laptops and phones); v2 was one note.",
+    "sneaky-pizz": "Composite: the v2 pluck (f0 ~390 Hz) as a tiptoe motif, 0, +1, +2 semitones, then a plunk a fourth below (hits at hitsSec). Both takes were a single pluck.",
+    "magic-wand": "Composite: v1 sparkles under a rising varispeed (0.7x to 1.3x) with a 200 ms swell; both takes fell or stayed flat in pitch.",
+    "drum-hit-soft": "Composite: v2 felt tom (~151 Hz) + the button-thock attack at -9 dB + light saturation, so it reads on small speakers. v1 was near-silent (raw -40 dBFS) at 86 Hz.",
+    "boing-soft": "Composite: the v2 bounce raised x2.5 (to ~300 Hz) with a quick downward bend and a slight wobble. Both takes sat at 86-130 Hz, inaudible on laptops and phones.",
+    "button-thock-deep": "Composite: button-thock slowed to 0.72x (about -5.7 semitones), so the two thocks are one family. v1 was barely deeper than button-thock; v2 was brighter.",
+    "crowd-yay-tiny": "Dropped: both takes were one high voice (f0 440-700 Hz), not a small group; it would read as childish."
+  }
+}

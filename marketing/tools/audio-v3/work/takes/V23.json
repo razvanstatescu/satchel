@@ -1,0 +1,88 @@
+{
+ "key": "d3c142462ceb1acd",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Nonce used. Coin spent. Blockhash expired.",
+ "prev": "Then the buyer's browser checks every record against each chain.",
+ "next": "If one old signature could still move coins, Buy stays off.",
+ "respace": {
+  "phrases": 3,
+  "everyBeats": 2
+ },
+ "final": {
+  "id": "V23",
+  "scene": "T5",
+  "text": "Nonce used. Coin spent. Blockhash expired.",
+  "say": "Nonce used. Coin spent. Blockhash expired.",
+  "file": "v2/vo/V23.mp3",
+  "duration": 4.49,
+  "words": [
+   {
+    "text": "Nonce",
+    "start": 0.12,
+    "end": 0.44
+   },
+   {
+    "text": "used.",
+    "start": 0.64,
+    "end": 1
+   },
+   {
+    "text": "Coin",
+    "start": 1.58,
+    "end": 1.86
+   },
+   {
+    "text": "spent.",
+    "start": 2.08,
+    "end": 2.42
+   },
+   {
+    "text": "Blockhash",
+    "start": 3.12,
+    "end": 3.7
+   },
+   {
+    "text": "expired.",
+    "start": 3.8,
+    "end": 4.42
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "period": 1.5,
+  "phraseGrid": [
+   0,
+   1.5,
+   3
+  ],
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": false,
+     "exact": false,
+     "heard": "Nonce used. Coins spent. Block hash expired"
+    },
+    {
+     "attempt": 1,
+     "ok": false,
+     "exact": false,
+     "heard": "Nonce used. Coins spent. Block hash expired"
+    },
+    {
+     "attempt": 2,
+     "ok": false,
+     "exact": false,
+     "heard": "Nonce used. Coins spent. Block hash expired"
+    }
+   ],
+   "chosen": 2
+  }
+ }
+}

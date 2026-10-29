@@ -1,0 +1,29 @@
+{
+ "at": "2026-10-21T11:38:40.237Z",
+ "ms_to_FINAL": 3656,
+ "tx_hash": "3trnarL8oFnB5NxuNT5Kn5pjfSnAH1H25xKPrFfqC8ik",
+ "final_execution_status": "FINAL",
+ "status": {
+  "SuccessValue": "{\"total\":\"1250000000000000000000\",\"available\":\"0\"}"
+ },
+ "receipts": [
+  {
+   "id": "F6ziUsfm6wMdL3YUCc4Qkqf2XzBBvaygntdnTPksCpxj",
+   "executor": "usdc.fakes.testnet",
+   "block": "274090211",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "177295478770600000000",
+   "gas_burnt": 1772954787706
+  },
+  {
+   "id": "EL5RXMvpGm3rY7wyDcGVn8SAZaLFgzHG5SWbmo4VscjA",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274090212",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

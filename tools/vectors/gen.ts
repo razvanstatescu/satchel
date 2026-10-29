@@ -1,0 +1,62 @@
+/**
+ * Generates the shared Rust/TS vectors (spec §12.2): vectors/{evm,btc,sol}.json and vectors/derive.json.
+ *
+ *   pnpm --filter @satchel/tools vectors          # write
+ *   pnpm --filter @satchel/tools vectors:check    # fail if the committed files differ (CI)
+ *
+ * Every vector's expected outcome is declared by hand from the spec rule and cross-checked against the TS reference
+ * classifier (@satchel/core/policy); accepted BTC vectors are also checked against bitcoinjs-lib `hashForWitnessV0`.
+ * Deterministic: no clock, no randomness, no network.
+ */
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { checkUnique, type Kind, type Vector, type VectorFile } from './lib'
+import { evmVectors } from './evm'
+import { btcVectors } from './btc'
+import { solVectors } from './sol'
+import { deriveVectors } from './derive'
+
+const OUT = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'vectors')
+const check = process.argv.includes('--check')
+
+function file(set: Kind, vectors: Vector[]): VectorFile {
+  checkUnique(vectors)
+  return { schema: 'satchel-vectors/1', set, generator: 'tools/vectors/gen.ts', vectors }
+}
+
+const outputs: [string, unknown][] = [
+  ['evm.json', file('evm', evmVectors())],
+  ['btc.json', file('btc', btcVectors())],
+  ['sol.json', file('sol', solVectors())],
+  ['derive.json', deriveVectors()],
+]
+
+mkdirSync(OUT, { recursive: true })
+let stale = 0
+for (const [name, data] of outputs) {
+  const text = `${JSON.stringify(data, null, 2)}\n`
+  const path = join(OUT, name)
+  if (check) {
+    let cur = ''
+    try {
+      cur = readFileSync(path, 'utf8')
+    } catch {
+      /* missing */
+    }
+    if (cur !== text) {
+      console.error(`STALE ${path}`)
+      stale++
+    } else console.log(`ok    ${path}`)
+  } else {
+    writeFileSync(path, text)
+    const n = (data as { vectors: unknown[] }).vectors.length
+    const vs = (data as { vectors: Vector[] }).vectors
+    const ok = Array.isArray(vs) && 'expect' in (vs[0] ?? {}) ? vs.filter((v) => v.expect.ok).length : n
+    console.log(`wrote ${path}: ${n} vectors (${ok} accepted, ${n - ok} refused)`)
+  }
+}
+if (stale) {
+  console.error(`${stale} vector file(s) out of date: run pnpm --filter @satchel/tools vectors`)
+  process.exit(1)
+}

@@ -1,0 +1,67 @@
+{"step":"state","from":"0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d","to":"0x61739f33AdbB7F76c1b5B222E4119085257528BE","balanceWei":"0","balanceEth":"0","nonce":0,"fees":{"maxFeePerGas":"200028","maxPriorityFeePerGas":"200008"}}
+{"step":"prepared","transaction":{"gas":"21000","maxFeePerGas":"200028","maxPriorityFeePerGas":"200008","nonce":0,"chainId":11155111,"type":"eip1559","to":"0x61739f33AdbB7F76c1b5B222E4119085257528BE","value":"100000000000000"},"hashToSign":"0xbc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377","independentHash":"0xbc657845d9165bf3555d8b8a9a5b830272d83b762c60ceab048355a87deac377","hashMatch":true}
+{"step":"mpc","txHash":"Dcc3gktAJ96hPDQ3Lp3FxfnYo4zXtujqt2SGWYUFuWWa","explorer":"https://testnet.nearblocks.io/txns/Dcc3gktAJ96hPDQ3Lp3FxfnYo4zXtujqt2SGWYUFuWWa","ms":{"submitToIncluded":1011,"submitToFinal":4605},"gasTgasAttached":50,"gasBurntTgas":8.382393028801,"tokensBurntNear":0.0008159210466301,"receipts":3,"response":{"scheme":"Secp256k1","big_r":{"affine_point":"02f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0c"},"s":{"scalar":"549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"},"recovery_id":1}}
+{"step":"finalized","rsv":{"r":"f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0c","s":"549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1","v":28},"yParity":1,"recovery_id":1,"big_r_prefix":"02","big_r_prefix_parity":0,"lowS":true,"recovered":"0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d","derived":"0x532b9aAEA7803aDCaC5FB8Fe53166147CEE4832d","recoveredMatches":true,"signedTx":"0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1","signedTxHash":"0x2fc767520187c7206fca93ecec3838b96f01956ebe31051d90ae3035270fab76"}
+{"step":"broadcast","ok":false,"shortMessage":"Transaction creation failed.","details":"insufficient funds for gas * price + value: have 0 want 100004200588000","name":"TransactionRejectedRpcError"}
+Transaction broadcast failed: TransactionRejectedRpcError: Transaction creation failed.
+
+URL: https://ethereum-sepolia-rpc.publicnode.com
+Request body: {"method":"eth_sendRawTransaction","params":["0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"]}
+
+Details: insufficient funds for gas * price + value: have 0 want 100004200588000
+Version: viem@2.57.7
+    at withRetry.delay.count.count (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/buildRequest.ts:198:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async attemptRetry (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/promise/withRetry.ts:63:22) {
+  details: 'insufficient funds for gas * price + value: have 0 want 100004200588000',
+  docsPath: undefined,
+  metaMessages: [
+    'URL: https://ethereum-sepolia-rpc.publicnode.com',
+    'Request body: {"method":"eth_sendRawTransaction","params":["0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"]}'
+  ],
+  shortMessage: 'Transaction creation failed.',
+  version: '2.57.7',
+  code: -32003,
+  [cause]: TransactionRejectedRpcError: Transaction creation failed.
+  
+  URL: https://ethereum-sepolia-rpc.publicnode.com
+  Request body: {"method":"eth_sendRawTransaction","params":["0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"]}
+  
+  Details: insufficient funds for gas * price + value: have 0 want 100004200588000
+  Version: viem@2.57.7
+      at withRetry.delay.count.count (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/buildRequest.ts:198:25)
+      at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+      at async attemptRetry (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/promise/withRetry.ts:63:22) {
+    details: 'insufficient funds for gas * price + value: have 0 want 100004200588000',
+    docsPath: undefined,
+    metaMessages: [
+      'URL: https://ethereum-sepolia-rpc.publicnode.com',
+      'Request body: {"method":"eth_sendRawTransaction","params":["0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"]}'
+    ],
+    shortMessage: 'Transaction creation failed.',
+    version: '2.57.7',
+    code: -32003,
+    [cause]: RpcRequestError: RPC Request failed.
+    
+    URL: https://ethereum-sepolia-rpc.publicnode.com
+    Request body: {"method":"eth_sendRawTransaction","params":["0x02f87183aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c001a0f6efe9455463c738e2bd553f14f638fcfbf8465a54eae1ffac915111aebb0f0ca0549e7285bfe162a32441fef9305b83cc2961071bf7a4bec83d2e99ae3cac87e1"]}
+    
+    Details: insufficient funds for gas * price + value: have 0 want 100004200588000
+    Version: viem@2.57.7
+        at request (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/clients/transports/http.ts:177:19)
+        at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        at async withRetry.delay.count.count (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/buildRequest.ts:163:22)
+        at async attemptRetry (/Users/razvanstatescu/Documents/Work/near/Satchel/research/spikes/chains/node_modules/viem/utils/promise/withRetry.ts:63:22) {
+      details: 'insufficient funds for gas * price + value: have 0 want 100004200588000',
+      docsPath: undefined,
+      metaMessages: [Array],
+      shortMessage: 'RPC Request failed.',
+      version: '2.57.7',
+      code: -32003,
+      data: undefined,
+      url: 'https://ethereum-sepolia-rpc.publicnode.com',
+      [cause]: [Object]
+    }
+  }
+}
+{"step":"broadcast-chainsig","ok":false,"message":"Failed to broadcast transaction."}

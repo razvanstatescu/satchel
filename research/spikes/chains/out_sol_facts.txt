@@ -1,0 +1,1 @@
+{"secPerSlotAvg":0.238,"secPerSlotMin":0.235,"secPerSlotMax":0.24,"blockHeight":500719980,"lastValidBlockHeight":500720130,"validityBlocks":150,"approxValiditySecs":35.7,"feeLegacyLamports":5000,"feeV0Lamports":5000,"legacyMsgLen":150,"legacyFirstByte":1,"v0MsgLen":152,"v0FirstByte":"0x80"}

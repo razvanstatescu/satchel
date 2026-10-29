@@ -1,0 +1,118 @@
+import type { SatchelStatus } from "@/lib/near/contract";
+import type { Chain, ConfigView, Listing, SigRecordView } from "@/lib/near/types";
+
+/** GET /api/satchels/[id] shape (kb/90 §9) — also feeds the blocking /s/[id] render. */
+export interface SatchelSnapshot {
+  token_id: string;
+  contract: string;
+  role: "dev" | "rc" | "final";
+  data_mode: "live" | "fixture";
+  owner: string;
+  status: SatchelStatus;
+  listing: Listing | null;
+  sig_count: number;
+  last_sign_height: number;
+  listable_at: number;
+  addresses: { btc: string; evm: string; sol: string };
+  paths: Record<Chain, string>;
+  balances: {
+    btc: { confirmed_sats: string; unconfirmed_sats: string } | null;
+    evm: { wei: string } | null;
+    sol: { lamports: string } | null;
+  };
+  as_of: number; // ms
+  links: { nearblocks_token: string; btc: string; evm: string; sol: string; contract_facts: string };
+  quiet_period_blocks: number;
+  height: number | null;
+  minted_at: number | null; // ms
+  last_signature: { seq: number; chain: Chain; height: number; timestamp_ms: number; status: SigRecordView["status"]; url: string | null } | null;
+  lock: LockFacts;
+  errors: string[];
+}
+
+export interface LockFacts {
+  access_keys: number | null; // null = couldn't read
+  account_exists: boolean | null;
+  locked: boolean | null; // exists && keys == 0
+  code_hash_hex: string | null;
+  expected_code_hash: string | null;
+  code_matches: boolean | null; // null when nothing to compare (dev without expected hash)
+  birth_tx: string | null;
+  birth_block: number | null;
+}
+
+/** GET /api/contract (kb/90 §9). */
+export interface ContractFacts extends LockFacts {
+  account_id: string;
+  role: "dev" | "rc" | "final";
+  data_mode: "live" | "fixture";
+  birth_actions: string[];
+  any_signer_tx_count: number | null;
+  oldest_tx: string | null;
+  mpc_version: string | null;
+  config: ConfigView | null;
+  as_of: number;
+  errors: string[];
+}
+
+export type ItemStatus = "spent" | "expired" | "unfunded" | "foreign" | "settling" | "unused" | "unknown";
+export type Aggregate = "checking" | "empty" | "clean" | "settling" | "blocked" | "unknown" | "unsafe";
+
+export interface CleanItem {
+  seq: number;
+  chain: Chain;
+  key: string; // "nonce 3" | "coin 7d…e2:1" | "blockhash 9f…"
+  wouldPay: string | null;
+  amountSource: "chain" | "claimed";
+  evidence: string;
+  evidenceUrl: string | null;
+  status: ItemStatus | "checking";
+  signedAt: number;
+  height: number;
+  requester: string;
+}
+
+export interface CleanCheck {
+  name: string;
+  ok: boolean;
+  warn?: boolean; // dev role: neutral warning row
+}
+
+export interface CleanReport {
+  token_id: string;
+  aggregate: Aggregate;
+  checked_at: number;
+  sig_count: number;
+  listing_id: number | null;
+  one_of_two: boolean;
+  role: "dev" | "rc" | "final";
+  checks: CleanCheck[];
+  items: CleanItem[];
+  sources: { chain: Chain; provider: string; ok: boolean }[];
+  unsafe_reason: string | null;
+  encumbered_utxos: string[];
+  source: "server-hint" | "browser" | "fixture";
+}
+
+export interface MarketEntry {
+  token_id: string;
+  listing: Listing;
+  snapshot: SatchelSnapshot;
+  hint: Pick<CleanReport, "aggregate" | "checked_at" | "items"> | null;
+}
+
+export interface ActivityRow {
+  kind: "sent" | "signed_not_sent" | "issued" | "transferred" | "received" | "minted" | "listed" | "delisted" | "sold" | "bought";
+  tx: string;
+  block: number;
+  timestampMs: number | null;
+  chain?: Chain;
+  amount?: string; // base units
+  to?: string;
+  from?: string;
+  fee?: string;
+  chainTxId?: string;
+  price?: string;
+  currency?: "near" | "usdc";
+  status?: "final" | "signing" | "mempool" | "unused" | "failed";
+}

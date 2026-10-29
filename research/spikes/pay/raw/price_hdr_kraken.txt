@@ -1,0 +1,20 @@
+HTTP/2 200 
+date: Wed, 21 Oct 2026 11:47:29 GMT
+content-type: application/json
+set-cookie: facade-lang=ro-ro; Path=/; Domain=kraken.com; Max-Age=2592000; SameSite=Lax; Secure
+set-cookie: __cf_bm=QzOkkq7EEAjU9rtpfpGfH9bTaJuzMIz2asUocv5Y0Cw-1792583249.4373934-1.0.1.1-ufzzYslJ.EZ2eM0Kg6aNWztDUE4qpchYqpDlDWQOq5hmf2ejPFc4G.gaKmcYoXJ1qivY6cGEjyNWu5hsjpqJaKOo.50r01Al5rSDmcwrnWOq1xRbLRdGorujaDvLlrlf; HttpOnly; SameSite=None; Secure; Path=/; Domain=kraken.com; Expires=Wed, 21 Oct 2026 12:17:29 GMT
+set-cookie: _cfuvid=9aDCpVXjLLSpvVD7bHcHCGXFpCkVa6sq8Hz8jK5qvMw-1792583249.4373934-1.0.1.1-w_254gNvW.wlbQqIcFmpjhOulSjdVuPvtaSQmqGvAn0; HttpOnly; SameSite=None; Secure; Path=/; Domain=kraken.com
+cf-ray: a4e0071cfc6a52b3-OTP
+cf-cache-status: MISS
+access-control-allow-origin: https://satchel-test.vercel.app
+cache-control: public, max-age=2
+last-modified: Wed, 21 Oct 2026 11:47:29 GMT
+server: cloudflare
+x-trace-id: 0ab2b92e01a15e49ae45000325754f18
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+vary: Accept-Encoding, origin
+x-content-type-options: nosniff
+a3li9vdfjv-pad: eT2&X7XS1VZxE&&w^U!f%KuTmNMBN+&0wuYq
+referrer-policy: strict-origin-when-cross-origin
+x-proxy: gateway
+

@@ -1,0 +1,1344 @@
+{
+ "voice": {
+  "id": "n8kTUi6dVrplENT9Un56",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "settings": {
+   "stability": 0.55,
+   "similarity_boost": 0.8,
+   "speed": 1
+  }
+ },
+ "lines": [
+  {
+   "id": "L01",
+   "scene": "S01",
+   "text": "A Bitcoin wallet.",
+   "say": "A Bitcoin wallet.",
+   "file": "vo/L01.mp3",
+   "duration": 1.21,
+   "words": [
+    {
+     "text": "A",
+     "start": 0.08,
+     "end": 0.2
+    },
+    {
+     "text": "Bitcoin",
+     "start": 0.24,
+     "end": 0.68
+    },
+    {
+     "text": "wallet.",
+     "start": 0.78,
+     "end": 1.14
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "A Bitcoin wallet"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L02",
+   "scene": "S01",
+   "text": "An Ethereum wallet.",
+   "say": "An Ethereum wallet.",
+   "file": "vo/L02.mp3",
+   "duration": 1.29,
+   "words": [
+    {
+     "text": "An",
+     "start": 0.08,
+     "end": 0.14
+    },
+    {
+     "text": "Ethereum",
+     "start": 0.2,
+     "end": 0.76
+    },
+    {
+     "text": "wallet.",
+     "start": 0.86,
+     "end": 1.22
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "An Ethereum wallet"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L03",
+   "scene": "S01",
+   "text": "A Solana wallet.",
+   "say": "A Solana wallet.",
+   "file": "vo/L03.mp3",
+   "duration": 1.15,
+   "words": [
+    {
+     "text": "A",
+     "start": 0.08,
+     "end": 0.16
+    },
+    {
+     "text": "Solana",
+     "start": 0.18,
+     "end": 0.66
+    },
+    {
+     "text": "wallet.",
+     "start": 0.76,
+     "end": 1.08
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "A Solana wallet"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L04",
+   "scene": "S01",
+   "text": "It's all one NFT.",
+   "say": "It's all one NFT.",
+   "file": "vo/L04.mp3",
+   "duration": 1.69,
+   "words": [
+    {
+     "text": "It's",
+     "start": 0.08,
+     "end": 0.28
+    },
+    {
+     "text": "all",
+     "start": 0.38,
+     "end": 0.54
+    },
+    {
+     "text": "one",
+     "start": 0.68,
+     "end": 0.86
+    },
+    {
+     "text": "NFT.",
+     "start": 1.02,
+     "end": 1.54
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "It's all one NFT"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L05",
+   "scene": "S02",
+   "text": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+   "say": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+   "file": "vo/L05.mp3",
+   "duration": 5.5,
+   "words": [
+    {
+     "text": "Sell",
+     "start": 0.12,
+     "end": 0.32
+    },
+    {
+     "text": "the",
+     "start": 0.36,
+     "end": 0.5
+    },
+    {
+     "text": "NFT,",
+     "start": 0.56,
+     "end": 1.14
+    },
+    {
+     "text": "and",
+     "start": 1.44,
+     "end": 1.54
+    },
+    {
+     "text": "you",
+     "start": 1.6,
+     "end": 1.7
+    },
+    {
+     "text": "hand",
+     "start": 1.76,
+     "end": 1.96
+    },
+    {
+     "text": "over",
+     "start": 2.04,
+     "end": 2.18
+    },
+    {
+     "text": "the",
+     "start": 2.22,
+     "end": 2.32
+    },
+    {
+     "text": "wallet.",
+     "start": 2.38,
+     "end": 2.72
+    },
+    {
+     "text": "No",
+     "start": 3.32,
+     "end": 3.44
+    },
+    {
+     "text": "bridge.",
+     "start": 3.54,
+     "end": 3.9
+    },
+    {
+     "text": "No",
+     "start": 4.34,
+     "end": 4.46
+    },
+    {
+     "text": "wrapped",
+     "start": 4.56,
+     "end": 4.88
+    },
+    {
+     "text": "tokens.",
+     "start": 4.94,
+     "end": 5.42
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Sell the NFT and you hand over the wallet. No bridge, no wrapped tokens"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L06",
+   "scene": "S03",
+   "text": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+   "say": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+   "file": "vo/L06.mp3",
+   "duration": 5.47,
+   "words": [
+    {
+     "text": "Selling",
+     "start": 0.12,
+     "end": 0.38
+    },
+    {
+     "text": "a",
+     "start": 0.44,
+     "end": 0.56
+    },
+    {
+     "text": "wallet",
+     "start": 0.6,
+     "end": 0.92
+    },
+    {
+     "text": "used",
+     "start": 1.1,
+     "end": 1.28
+    },
+    {
+     "text": "to",
+     "start": 1.3,
+     "end": 1.38
+    },
+    {
+     "text": "mean",
+     "start": 1.42,
+     "end": 1.58
+    },
+    {
+     "text": "selling",
+     "start": 1.74,
+     "end": 2.02
+    },
+    {
+     "text": "a",
+     "start": 2.06,
+     "end": 2.16
+    },
+    {
+     "text": "seed",
+     "start": 2.24,
+     "end": 2.48
+    },
+    {
+     "text": "phrase.",
+     "start": 2.5,
+     "end": 2.9
+    },
+    {
+     "text": "And",
+     "start": 3.32,
+     "end": 3.46
+    },
+    {
+     "text": "anyone",
+     "start": 3.54,
+     "end": 3.86
+    },
+    {
+     "text": "who",
+     "start": 3.9,
+     "end": 4.059
+    },
+    {
+     "text": "saw",
+     "start": 4.14,
+     "end": 4.32
+    },
+    {
+     "text": "it",
+     "start": 4.38,
+     "end": 4.52
+    },
+    {
+     "text": "could",
+     "start": 4.56,
+     "end": 4.72
+    },
+    {
+     "text": "keep",
+     "start": 4.76,
+     "end": 4.9
+    },
+    {
+     "text": "a",
+     "start": 4.94,
+     "end": 5
+    },
+    {
+     "text": "copy.",
+     "start": 5.04,
+     "end": 5.42
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Selling a wallet used to mean selling a seed phrase, and anyone who saw it could keep a copy"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L07",
+   "scene": "S04",
+   "text": "Satchel has no seed phrase. Through NEAR Chain Signatures, it signs only for the NFT's current owner.",
+   "say": "Satchel has no seed phrase. Through Near Chain Signatures, it signs only for the NFT's current owner.",
+   "file": "vo/L07.mp3",
+   "duration": 6.73,
+   "words": [
+    {
+     "text": "Satchel",
+     "start": 0.12,
+     "end": 0.54
+    },
+    {
+     "text": "has",
+     "start": 0.62,
+     "end": 0.86
+    },
+    {
+     "text": "no",
+     "start": 0.92,
+     "end": 1.1
+    },
+    {
+     "text": "seed",
+     "start": 1.16,
+     "end": 1.38
+    },
+    {
+     "text": "phrase.",
+     "start": 1.4,
+     "end": 1.8
+    },
+    {
+     "text": "Through",
+     "start": 2.36,
+     "end": 2.58
+    },
+    {
+     "text": "NEAR",
+     "start": 2.62,
+     "end": 2.76
+    },
+    {
+     "text": "Chain",
+     "start": 2.88,
+     "end": 3.08
+    },
+    {
+     "text": "Signatures,",
+     "start": 3.22,
+     "end": 3.78
+    },
+    {
+     "text": "it",
+     "start": 4.08,
+     "end": 4.2
+    },
+    {
+     "text": "signs",
+     "start": 4.26,
+     "end": 4.66
+    },
+    {
+     "text": "only",
+     "start": 4.74,
+     "end": 5.02
+    },
+    {
+     "text": "for",
+     "start": 5.04,
+     "end": 5.14
+    },
+    {
+     "text": "the",
+     "start": 5.18,
+     "end": 5.28
+    },
+    {
+     "text": "NFT's",
+     "start": 5.36,
+     "end": 5.94
+    },
+    {
+     "text": "current",
+     "start": 6,
+     "end": 6.28
+    },
+    {
+     "text": "owner.",
+     "start": 6.4,
+     "end": 6.66
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Satchel has no seed phrase. Through NEAR Chain signatures, it signs only for the NFT's current owner"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L08",
+   "scene": "S05",
+   "text": "But a signature made before the sale…",
+   "say": "But a signature made before the sale…",
+   "file": "vo/L08.mp3",
+   "duration": 2.15,
+   "words": [
+    {
+     "text": "But",
+     "start": 0.04,
+     "end": 0.12
+    },
+    {
+     "text": "a",
+     "start": 0.16,
+     "end": 0.26
+    },
+    {
+     "text": "signature",
+     "start": 0.32,
+     "end": 0.74
+    },
+    {
+     "text": "made",
+     "start": 0.86,
+     "end": 1.1
+    },
+    {
+     "text": "before",
+     "start": 1.14,
+     "end": 1.56
+    },
+    {
+     "text": "the",
+     "start": 1.6,
+     "end": 1.7
+    },
+    {
+     "text": "sale…",
+     "start": 1.76,
+     "end": 2.04
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "But a signature made before the sale"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L09",
+   "scene": "S05",
+   "text": "…can still be used after it.",
+   "say": "…can still be used after it.",
+   "file": "vo/L09.mp3",
+   "duration": 1.73,
+   "words": [
+    {
+     "text": "…can",
+     "start": 0.04,
+     "end": 0.18
+    },
+    {
+     "text": "still",
+     "start": 0.34,
+     "end": 0.54
+    },
+    {
+     "text": "be",
+     "start": 0.58,
+     "end": 0.66
+    },
+    {
+     "text": "used",
+     "start": 0.82,
+     "end": 1.02
+    },
+    {
+     "text": "after",
+     "start": 1.24,
+     "end": 1.5
+    },
+    {
+     "text": "it.",
+     "start": 1.56,
+     "end": 1.68
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "can still be used after it"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L10",
+   "scene": "S05",
+   "text": "Sign it. Sell it. Broadcast it later. The coins are gone.",
+   "say": "Sign it. Sell it. Broadcast it later. The coins are gone.",
+   "file": "vo/L10.mp3",
+   "duration": 4.96,
+   "words": [
+    {
+     "text": "Sign",
+     "start": 0.12,
+     "end": 0.36
+    },
+    {
+     "text": "it.",
+     "start": 0.4,
+     "end": 0.54
+    },
+    {
+     "text": "Sell",
+     "start": 1.06,
+     "end": 1.24
+    },
+    {
+     "text": "it.",
+     "start": 1.3,
+     "end": 1.44
+    },
+    {
+     "text": "Broadcast",
+     "start": 1.9,
+     "end": 2.4
+    },
+    {
+     "text": "it",
+     "start": 2.44,
+     "end": 2.54
+    },
+    {
+     "text": "later.",
+     "start": 2.6,
+     "end": 2.9
+    },
+    {
+     "text": "The",
+     "start": 3.44,
+     "end": 3.52
+    },
+    {
+     "text": "coins",
+     "start": 3.6,
+     "end": 3.88
+    },
+    {
+     "text": "are",
+     "start": 3.9,
+     "end": 4.08
+    },
+    {
+     "text": "gone.",
+     "start": 4.14,
+     "end": 4.52
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Sign it, sell it, broadcast it later. The coins are gone"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L11",
+   "scene": "S05",
+   "text": "So how does a buyer know it's clean?",
+   "say": "So how does a buyer know it's clean?",
+   "file": "vo/L11.mp3",
+   "duration": 2.18,
+   "words": [
+    {
+     "text": "So",
+     "start": 0.12,
+     "end": 0.44
+    },
+    {
+     "text": "how",
+     "start": 0.5,
+     "end": 0.62
+    },
+    {
+     "text": "does",
+     "start": 0.64,
+     "end": 0.78
+    },
+    {
+     "text": "a",
+     "start": 0.84,
+     "end": 0.96
+    },
+    {
+     "text": "buyer",
+     "start": 1,
+     "end": 1.26
+    },
+    {
+     "text": "know",
+     "start": 1.34,
+     "end": 1.5
+    },
+    {
+     "text": "it's",
+     "start": 1.52,
+     "end": 1.7
+    },
+    {
+     "text": "clean?",
+     "start": 1.74,
+     "end": 2.12
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "So how does a buyer know it's clean?"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L12",
+   "scene": "S07a",
+   "text": "Satchel writes down every signature before NEAR's signer network makes it.",
+   "say": "Satchel writes down every signature before Near's signer network makes it.",
+   "file": "vo/L12.mp3",
+   "duration": 4.21,
+   "words": [
+    {
+     "text": "Satchel",
+     "start": 0.12,
+     "end": 0.44
+    },
+    {
+     "text": "writes",
+     "start": 0.52,
+     "end": 0.82
+    },
+    {
+     "text": "down",
+     "start": 0.84,
+     "end": 1.18
+    },
+    {
+     "text": "every",
+     "start": 1.24,
+     "end": 1.46
+    },
+    {
+     "text": "signature",
+     "start": 1.62,
+     "end": 2.08
+    },
+    {
+     "text": "before",
+     "start": 2.18,
+     "end": 2.56
+    },
+    {
+     "text": "NEAR's",
+     "start": 2.62,
+     "end": 2.92
+    },
+    {
+     "text": "signer",
+     "start": 2.98,
+     "end": 3.24
+    },
+    {
+     "text": "network",
+     "start": 3.32,
+     "end": 3.72
+    },
+    {
+     "text": "makes",
+     "start": 3.78,
+     "end": 4
+    },
+    {
+     "text": "it.",
+     "start": 4.059,
+     "end": 4.16
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Satchel writes down every signature before Near's signer network makes it"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L13",
+   "scene": "S07b",
+   "text": "List it, and signing pauses. The history stops growing.",
+   "say": "List it, and signing pauses. The history stops growing.",
+   "file": "vo/L13.mp3",
+   "duration": 3.88,
+   "words": [
+    {
+     "text": "List",
+     "start": 0.08,
+     "end": 0.32
+    },
+    {
+     "text": "it,",
+     "start": 0.38,
+     "end": 0.48
+    },
+    {
+     "text": "and",
+     "start": 0.72,
+     "end": 0.88
+    },
+    {
+     "text": "signing",
+     "start": 0.96,
+     "end": 1.28
+    },
+    {
+     "text": "pauses.",
+     "start": 1.4,
+     "end": 1.92
+    },
+    {
+     "text": "The",
+     "start": 2.42,
+     "end": 2.5
+    },
+    {
+     "text": "history",
+     "start": 2.56,
+     "end": 2.96
+    },
+    {
+     "text": "stops",
+     "start": 3.12,
+     "end": 3.44
+    },
+    {
+     "text": "growing.",
+     "start": 3.5,
+     "end": 3.86
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "List it and signing pauses. The history stops growing"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L14",
+   "scene": "S07c",
+   "text": "Then the buyer's browser checks every record against each chain.",
+   "say": "Then the buyer's browser checks every record against each chain.",
+   "file": "vo/L14.mp3",
+   "duration": 3.68,
+   "words": [
+    {
+     "text": "Then",
+     "start": 0.1,
+     "end": 0.26
+    },
+    {
+     "text": "the",
+     "start": 0.3,
+     "end": 0.42
+    },
+    {
+     "text": "buyer's",
+     "start": 0.46,
+     "end": 0.88
+    },
+    {
+     "text": "browser",
+     "start": 0.9,
+     "end": 1.3
+    },
+    {
+     "text": "checks",
+     "start": 1.44,
+     "end": 1.8
+    },
+    {
+     "text": "every",
+     "start": 1.86,
+     "end": 2.08
+    },
+    {
+     "text": "record",
+     "start": 2.2,
+     "end": 2.5
+    },
+    {
+     "text": "against",
+     "start": 2.56,
+     "end": 2.94
+    },
+    {
+     "text": "each",
+     "start": 3,
+     "end": 3.24
+    },
+    {
+     "text": "chain.",
+     "start": 3.32,
+     "end": 3.64
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Then the buyer's browser checks every record against each chain"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L15",
+   "scene": "S07c",
+   "text": "Nonce used. Coin spent. Blockhash expired.",
+   "say": "Nonce used. Coin spent. Blockhash expired.",
+   "file": "vo/L15.mp3",
+   "duration": 4.4,
+   "words": [
+    {
+     "text": "Nonce",
+     "start": 0.08,
+     "end": 0.42
+    },
+    {
+     "text": "used.",
+     "start": 0.64,
+     "end": 0.98
+    },
+    {
+     "text": "Coin",
+     "start": 1.6,
+     "end": 1.84
+    },
+    {
+     "text": "spent.",
+     "start": 2.06,
+     "end": 2.36
+    },
+    {
+     "text": "Blockhash",
+     "start": 3.12,
+     "end": 3.7
+    },
+    {
+     "text": "expired.",
+     "start": 3.76,
+     "end": 4.36
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "period": 1.5,
+   "phraseGrid": [
+    0,
+    1.5,
+    3
+   ],
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": false,
+      "exact": false,
+      "heard": "Nonce used. Coins spent. Block hash expired"
+     },
+     {
+      "attempt": 1,
+      "ok": true,
+      "exact": false,
+      "heard": "Nonce used. Coin spent. Block hash expired"
+     }
+    ],
+    "chosen": 1
+   }
+  },
+  {
+   "id": "L16",
+   "scene": "S07d",
+   "text": "If one old signature could still move coins, Buy stays disabled.",
+   "say": "If one old signature could still move coins, Buy stays disabled.",
+   "file": "vo/L16.mp3",
+   "duration": 4.51,
+   "words": [
+    {
+     "text": "If",
+     "start": 0.08,
+     "end": 0.18
+    },
+    {
+     "text": "one",
+     "start": 0.3,
+     "end": 0.52
+    },
+    {
+     "text": "old",
+     "start": 0.58,
+     "end": 0.78
+    },
+    {
+     "text": "signature",
+     "start": 0.86,
+     "end": 1.3
+    },
+    {
+     "text": "could",
+     "start": 1.4,
+     "end": 1.58
+    },
+    {
+     "text": "still",
+     "start": 1.7,
+     "end": 1.9
+    },
+    {
+     "text": "move",
+     "start": 1.96,
+     "end": 2.18
+    },
+    {
+     "text": "coins,",
+     "start": 2.24,
+     "end": 2.68
+    },
+    {
+     "text": "Buy",
+     "start": 3.2,
+     "end": 3.48
+    },
+    {
+     "text": "stays",
+     "start": 3.56,
+     "end": 3.86
+    },
+    {
+     "text": "disabled.",
+     "start": 3.9,
+     "end": 4.44
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "If one old signature could still move coins, buy stays disabled"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L17",
+   "scene": "S07e",
+   "text": "And the contract was born with no keys, so every signature leaves a record.",
+   "say": "And the contract was born with no keys, so every signature leaves a record.",
+   "file": "vo/L17.mp3",
+   "duration": 4.66,
+   "words": [
+    {
+     "text": "And",
+     "start": 0.04,
+     "end": 0.14
+    },
+    {
+     "text": "the",
+     "start": 0.18,
+     "end": 0.28
+    },
+    {
+     "text": "contract",
+     "start": 0.32,
+     "end": 0.82
+    },
+    {
+     "text": "was",
+     "start": 0.88,
+     "end": 1.06
+    },
+    {
+     "text": "born",
+     "start": 1.1,
+     "end": 1.38
+    },
+    {
+     "text": "with",
+     "start": 1.42,
+     "end": 1.58
+    },
+    {
+     "text": "no",
+     "start": 1.68,
+     "end": 1.8
+    },
+    {
+     "text": "keys,",
+     "start": 1.94,
+     "end": 2.32
+    },
+    {
+     "text": "so",
+     "start": 2.72,
+     "end": 2.9
+    },
+    {
+     "text": "every",
+     "start": 2.98,
+     "end": 3.16
+    },
+    {
+     "text": "signature",
+     "start": 3.32,
+     "end": 3.74
+    },
+    {
+     "text": "leaves",
+     "start": 3.86,
+     "end": 4.059
+    },
+    {
+     "text": "a",
+     "start": 4.12,
+     "end": 4.18
+    },
+    {
+     "text": "record.",
+     "start": 4.22,
+     "end": 4.58
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "And the contract was born with no keys, so every signature leaves a record"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L18",
+   "scene": "S08",
+   "text": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+   "say": "If it's clean, one transaction, bound to that exact history, pays the seller.",
+   "file": "vo/L18.mp3",
+   "duration": 4.93,
+   "words": [
+    {
+     "text": "If",
+     "start": 0.06,
+     "end": 0.12
+    },
+    {
+     "text": "it's",
+     "start": 0.18,
+     "end": 0.34
+    },
+    {
+     "text": "clean,",
+     "start": 0.4,
+     "end": 0.76
+    },
+    {
+     "text": "one",
+     "start": 1.14,
+     "end": 1.26
+    },
+    {
+     "text": "transaction,",
+     "start": 1.36,
+     "end": 2.04
+    },
+    {
+     "text": "bound",
+     "start": 2.34,
+     "end": 2.58
+    },
+    {
+     "text": "to",
+     "start": 2.62,
+     "end": 2.7
+    },
+    {
+     "text": "that",
+     "start": 2.76,
+     "end": 2.88
+    },
+    {
+     "text": "exact",
+     "start": 2.92,
+     "end": 3.38
+    },
+    {
+     "text": "history,",
+     "start": 3.42,
+     "end": 3.84
+    },
+    {
+     "text": "pays",
+     "start": 4.12,
+     "end": 4.36
+    },
+    {
+     "text": "the",
+     "start": 4.4,
+     "end": 4.5
+    },
+    {
+     "text": "seller.",
+     "start": 4.56,
+     "end": 4.86
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "If it's clean, one transaction bound to that exact history pays the seller"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "L19",
+   "scene": "S09",
+   "text": "Satchel. Hand over the wallet. Let the buyer check every signature.",
+   "say": "Satchel. Hand over the wallet. Let the buyer check every signature.",
+   "file": "vo/L19.mp3",
+   "duration": 4.34,
+   "words": [
+    {
+     "text": "Satchel.",
+     "start": 0.1,
+     "end": 0.5
+    },
+    {
+     "text": "Hand",
+     "start": 0.98,
+     "end": 1.18
+    },
+    {
+     "text": "over",
+     "start": 1.26,
+     "end": 1.4
+    },
+    {
+     "text": "the",
+     "start": 1.44,
+     "end": 1.5
+    },
+    {
+     "text": "wallet.",
+     "start": 1.6,
+     "end": 1.94
+    },
+    {
+     "text": "Let",
+     "start": 2.36,
+     "end": 2.48
+    },
+    {
+     "text": "the",
+     "start": 2.52,
+     "end": 2.64
+    },
+    {
+     "text": "buyer",
+     "start": 2.68,
+     "end": 2.98
+    },
+    {
+     "text": "check",
+     "start": 3.04,
+     "end": 3.38
+    },
+    {
+     "text": "every",
+     "start": 3.46,
+     "end": 3.66
+    },
+    {
+     "text": "signature.",
+     "start": 3.8,
+     "end": 4.26
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Satchel, hand over the wallet. Let the buyer check every signature"
+     }
+    ],
+    "chosen": 0
+   }
+  }
+ ]
+}

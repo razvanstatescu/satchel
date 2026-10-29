@@ -1,0 +1,131 @@
+{
+ "key": "f05067df37aaf507",
+ "final": {
+  "id": "L06",
+  "scene": "S03",
+  "text": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+  "say": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+  "file": "vo/L06.mp3",
+  "duration": 5.47,
+  "words": [
+   {
+    "text": "Selling",
+    "start": 0.12,
+    "end": 0.38
+   },
+   {
+    "text": "a",
+    "start": 0.44,
+    "end": 0.56
+   },
+   {
+    "text": "wallet",
+    "start": 0.6,
+    "end": 0.92
+   },
+   {
+    "text": "used",
+    "start": 1.1,
+    "end": 1.28
+   },
+   {
+    "text": "to",
+    "start": 1.3,
+    "end": 1.38
+   },
+   {
+    "text": "mean",
+    "start": 1.42,
+    "end": 1.58
+   },
+   {
+    "text": "selling",
+    "start": 1.74,
+    "end": 2.02
+   },
+   {
+    "text": "a",
+    "start": 2.06,
+    "end": 2.16
+   },
+   {
+    "text": "seed",
+    "start": 2.24,
+    "end": 2.48
+   },
+   {
+    "text": "phrase.",
+    "start": 2.5,
+    "end": 2.9
+   },
+   {
+    "text": "And",
+    "start": 3.32,
+    "end": 3.46
+   },
+   {
+    "text": "anyone",
+    "start": 3.54,
+    "end": 3.86
+   },
+   {
+    "text": "who",
+    "start": 3.9,
+    "end": 4.059
+   },
+   {
+    "text": "saw",
+    "start": 4.14,
+    "end": 4.32
+   },
+   {
+    "text": "it",
+    "start": 4.38,
+    "end": 4.52
+   },
+   {
+    "text": "could",
+    "start": 4.56,
+    "end": 4.72
+   },
+   {
+    "text": "keep",
+    "start": 4.76,
+    "end": 4.9
+   },
+   {
+    "text": "a",
+    "start": 4.94,
+    "end": 5
+   },
+   {
+    "text": "copy.",
+    "start": 5.04,
+    "end": 5.42
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Selling a wallet used to mean selling a seed phrase, and anyone who saw it could keep a copy"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Selling a wallet used to mean selling a seed phrase. And anyone who saw it could keep a copy.",
+ "prev": "Sell the NFT, and you hand over the wallet. No bridge. No wrapped tokens.",
+ "next": "Satchel has no seed phrase. Through Near Chain Signatures, it signs only for the NFT's current owner."
+}

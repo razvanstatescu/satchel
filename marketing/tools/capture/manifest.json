@@ -1,0 +1,882 @@
+{
+ "files": [
+  {
+   "file": "cards/1.svg",
+   "route": "/api/card/1.svg",
+   "what": "NFT media SVG #1 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/2.svg",
+   "route": "/api/card/2.svg",
+   "what": "NFT media SVG #2 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/3.svg",
+   "route": "/api/card/3.svg",
+   "what": "NFT media SVG #3 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/4.svg",
+   "route": "/api/card/4.svg",
+   "what": "NFT media SVG #4 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/5.svg",
+   "route": "/api/card/5.svg",
+   "what": "NFT media SVG #5 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/6.svg",
+   "route": "/api/card/6.svg",
+   "what": "NFT media SVG #6 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/7.svg",
+   "route": "/api/card/7.svg",
+   "what": "NFT media SVG #7 (embedded fonts)",
+   "size": "0 0 800 504"
+  },
+  {
+   "file": "cards/card-svg-1@2x.png",
+   "route": "/api/card/1.svg",
+   "what": "NFT media SVG #1 rasterised at 1200 css px",
+   "size": "2400x1512"
+  },
+  {
+   "file": "cards/card-svg-3@2x.png",
+   "route": "/api/card/3.svg",
+   "what": "NFT media SVG #3 rasterised at 1200 css px",
+   "size": "2400x1512"
+  },
+  {
+   "file": "components/action-row-owner@3x.png",
+   "route": "/s/1",
+   "what": "Owner action row: Send / Fund / Transfer / Sell",
+   "size": "1200x213"
+  },
+  {
+   "file": "components/address-btc-grouped@3x.png",
+   "route": "/s/1",
+   "what": "AddressDisplay grouped (BTC tb1q…)",
+   "size": "1122x48"
+  },
+  {
+   "file": "components/address-evm-grouped@3x.png",
+   "route": "/s/1",
+   "what": "AddressDisplay grouped (EVM 0x…)",
+   "size": "1122x48"
+  },
+  {
+   "file": "components/blocked-banner-s4@3x.png",
+   "route": "/s/4/sale",
+   "what": "Danger banner: blocked, nonce 1 not used yet",
+   "size": "2160x330"
+  },
+  {
+   "file": "components/buy-block-s3-clean@3x.png",
+   "route": "/s/3/sale",
+   "what": "Buy block #3: 5.00 USDC, GateLine clean, Buy enabled",
+   "size": "2160x729"
+  },
+  {
+   "file": "components/buy-block-s4-blocked@3x.png",
+   "route": "/s/4/sale",
+   "what": "Buy block #4: 2 NEAR, GateLine blocked, Buy disabled",
+   "size": "2160x663"
+  },
+  {
+   "file": "components/card-s1-active-day@3x.png",
+   "route": "/s/1",
+   "what": "SatchelCard #1 in Day theme (surface body)",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s1-active-owned-tight@3x.png",
+   "route": "/s/1",
+   "what": "SatchelCard #1 owned, tight crop",
+   "size": "1200x759"
+  },
+  {
+   "file": "components/card-s1-active-owned@3x.png",
+   "route": "/s/1",
+   "what": "SatchelCard #1, Active, OWNED: saddle stitch visible",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s1-active-tight@3x.png",
+   "route": "/s/1",
+   "what": "SatchelCard #1, Active, tight crop (transparent rounded corners)",
+   "size": "1200x759"
+  },
+  {
+   "file": "components/card-s1-active@3x.png",
+   "route": "/s/1",
+   "what": "SatchelCard #1, Active, visitor (no stitch), with shadow",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s2-active@3x.png",
+   "route": "/s/2",
+   "what": "SatchelCard #2, active, visitor, per-token leather hue",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s3-listed@3x.png",
+   "route": "/s/3",
+   "what": "SatchelCard #3, listed, visitor, per-token leather hue",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s4-listed@3x.png",
+   "route": "/s/4",
+   "what": "SatchelCard #4, listed, visitor, per-token leather hue",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s5-listed-owned@3x.png",
+   "route": "/s/5",
+   "what": "SatchelCard #5, Listed, owned (stitch + Listed band pill)",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/card-s6-active@3x.png",
+   "route": "/s/6",
+   "what": "SatchelCard #6, active, visitor, per-token leather hue",
+   "size": "1488x1044"
+  },
+  {
+   "file": "components/chainrow-btc@3x.png",
+   "route": "/s/1",
+   "what": "ChainRow Bitcoin testnet4",
+   "size": "2160x261"
+  },
+  {
+   "file": "components/chainrow-evm@3x.png",
+   "route": "/s/1",
+   "what": "ChainRow Ethereum Sepolia",
+   "size": "2160x261"
+  },
+  {
+   "file": "components/chainrows-s1@3x.png",
+   "route": "/s/1",
+   "what": "ChainRows (Bitcoin testnet4 + Ethereum Sepolia) with grouped addresses, copy/QR/explorer",
+   "size": "2160x525"
+  },
+  {
+   "file": "components/clean-history-s3-clean@3x.png",
+   "route": "/s/3/sale",
+   "what": "CleanHistory report: CLEAN verdict, checks, settled signature row",
+   "size": "2160x1359"
+  },
+  {
+   "file": "components/clean-history-s4-blocked@3x.png",
+   "route": "/s/4/sale",
+   "what": "CleanHistory report: BLOCKED verdict, 'Can still move coins' group",
+   "size": "2160x1359"
+  },
+  {
+   "file": "components/clean-row-s3-settled@3x.png",
+   "route": "/s/3/sale",
+   "what": "Clean-history row: EVM nonce 0, Settled pill",
+   "size": "2064x234"
+  },
+  {
+   "file": "components/clean-row-s4-unused@3x.png",
+   "route": "/s/4/sale",
+   "what": "Clean-history row: nonce 1 not used yet, Unused pill",
+   "size": "2064x234"
+  },
+  {
+   "file": "components/clean-verdict-blocked@3x.png",
+   "route": "/s/4/sale",
+   "what": "Blocked verdict headline",
+   "size": "2064x162"
+  },
+  {
+   "file": "components/clean-verdict-clean@3x.png",
+   "route": "/s/3/sale",
+   "what": "Clean verdict headline (shield + text)",
+   "size": "2064x162"
+  },
+  {
+   "file": "components/contract-facts@3x.png",
+   "route": "/contract",
+   "what": "Contract facts (keys: locked, birth tx, signer txs 0, code hash, expected Matches, MPC)",
+   "size": "3456x1266"
+  },
+  {
+   "file": "components/contract-verify-commands@3x.png",
+   "route": "/contract",
+   "what": "Copy-paste verify commands",
+   "size": "3456x1086"
+  },
+  {
+   "file": "components/dialog-mint@3x.png",
+   "route": "/mint",
+   "what": "Whole Mint dialog as alice",
+   "size": "1440x1932"
+  },
+  {
+   "file": "components/dialog-receive-btc@3x.png",
+   "route": "/s/1/receive?chain=btc",
+   "what": "Whole Receive dialog (FlowShell)",
+   "size": "1440x2256"
+  },
+  {
+   "file": "components/facts-s1@3x.png",
+   "route": "/s/1",
+   "what": "Judge facts block for #1 (owner, status, sig count, 3 full addresses, keys, code hash)",
+   "size": "2160x1827"
+  },
+  {
+   "file": "components/freeze-banner-owner@3x.png",
+   "route": "/s/5",
+   "what": "FreezeBanner owner copy with Delist",
+   "size": "2160x336"
+  },
+  {
+   "file": "components/freeze-banner-visitor@3x.png",
+   "route": "/s/4",
+   "what": "FreezeBanner (visitor copy)",
+   "size": "2160x228"
+  },
+  {
+   "file": "components/gateline-blocked@3x.png",
+   "route": "/s/4/sale",
+   "what": "GateLine: blocked, 1 unused signature",
+   "size": "567x54"
+  },
+  {
+   "file": "components/gateline-clean@3x.png",
+   "route": "/s/3/sale",
+   "what": "GateLine: clean (browser check)",
+   "size": "615x54"
+  },
+  {
+   "file": "components/gateline-hint-s3@3x.png",
+   "route": "/market",
+   "what": "GateLine server hint for #3",
+   "size": "987x57"
+  },
+  {
+   "file": "components/gateline-hint-s4@3x.png",
+   "route": "/market",
+   "what": "GateLine server hint for #4",
+   "size": "570x57"
+  },
+  {
+   "file": "components/gateline-hint-s5@3x.png",
+   "route": "/market",
+   "what": "GateLine server hint for #5",
+   "size": "987x57"
+  },
+  {
+   "file": "components/home-hero@3x.png",
+   "route": "/",
+   "what": "Landing hero block (H1 + card)",
+   "size": "3456x849"
+  },
+  {
+   "file": "components/how-it-works@3x.png",
+   "route": "/s/1",
+   "what": "How it works 1-2-3",
+   "size": "2160x708"
+  },
+  {
+   "file": "components/listing-facts-s3@3x.png",
+   "route": "/s/3/sale",
+   "what": "Listing facts strip (price, listing #, signatures, server hint)",
+   "size": "2160x258"
+  },
+  {
+   "file": "components/market-item-s3@3x.png",
+   "route": "/market",
+   "what": "Market item #3: card + price + GateLine hint",
+   "size": "1230x1053"
+  },
+  {
+   "file": "components/market-item-s4@3x.png",
+   "route": "/market",
+   "what": "Market item #4: card + price + GateLine hint",
+   "size": "1230x1053"
+  },
+  {
+   "file": "components/market-item-s5@3x.png",
+   "route": "/market",
+   "what": "Market item #5: card + price + GateLine hint",
+   "size": "1230x1053"
+  },
+  {
+   "file": "components/mint-preview-card@3x.png",
+   "route": "/mint",
+   "what": "Mint preview card (stitched, 'Your new Satchel')",
+   "size": "1338x849"
+  },
+  {
+   "file": "components/navtabs-s1@3x.png",
+   "route": "/s/1",
+   "what": "Tabs Wallet / Activity",
+   "size": "2160x135"
+  },
+  {
+   "file": "components/owner-pill@3x.png",
+   "route": "/s/1",
+   "what": "Owner pill 'Owned by you'",
+   "size": "564x78"
+  },
+  {
+   "file": "components/pill-active@3x.png",
+   "route": "/s/1",
+   "what": "StatusPill Active",
+   "size": "243x84"
+  },
+  {
+   "file": "components/pill-band-active@3x.png",
+   "route": "/s/1",
+   "what": "StatusPill (band variant) Active",
+   "size": "222x75"
+  },
+  {
+   "file": "components/pill-item-unused@3x.png",
+   "route": "/s/4/sale",
+   "what": "Item pill: unused (danger)",
+   "size": "267x84"
+  },
+  {
+   "file": "components/pill-listed@3x.png",
+   "route": "/s/4",
+   "what": "StatusPill Listed",
+   "size": "240x84"
+  },
+  {
+   "file": "components/receive-qr-btc@3x.png",
+   "route": "/s/1/receive?chain=btc",
+   "what": "Receive plate: brass band, QR, grouped BTC address",
+   "size": "1338x1071"
+  },
+  {
+   "file": "components/sidebar-nav@3x.png",
+   "route": "/s/1",
+   "what": "Left navigation with Satchel lockup",
+   "size": "672x2700"
+  },
+  {
+   "file": "components/stats-strip-s1@3x.png",
+   "route": "/s/1",
+   "what": "Stats strip: Status pill Active, signatures 2, listed —, minted",
+   "size": "2160x246"
+  },
+  {
+   "file": "components/timeline-row-1-expanded@3x.png",
+   "route": "/s/1/activity",
+   "what": "Timeline row expanded (date, fee, to, NearBlocks + mempool links)",
+   "size": "2160x546"
+  },
+  {
+   "file": "components/timeline-row-1-sent@3x.png",
+   "route": "/s/1/activity",
+   "what": "Timeline row 1 (sent)",
+   "size": "2160x192"
+  },
+  {
+   "file": "components/timeline-row-2-sent@3x.png",
+   "route": "/s/1/activity",
+   "what": "Timeline row 2 (sent)",
+   "size": "2160x195"
+  },
+  {
+   "file": "components/timeline-row-3-minted@3x.png",
+   "route": "/s/1/activity",
+   "what": "Timeline row 3 (minted)",
+   "size": "2160x180"
+  },
+  {
+   "file": "components/timeline-s1@3x.png",
+   "route": "/s/1/activity",
+   "what": "Timeline (all rows, day groups)",
+   "size": "2160x933"
+  },
+  {
+   "file": "day/home@2x.png",
+   "route": "/",
+   "what": "Landing, Day theme (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "day/market@2x.png",
+   "route": "/market",
+   "what": "Market, Day theme (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "day/s1-wallet@2x.png",
+   "route": "/s/1",
+   "what": "Satchel #1, Day theme (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "day/s4-sale@2x.png",
+   "route": "/s/4/sale",
+   "what": "Satchel #4 sale (blocked), Day theme (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/contract-full@2x.png",
+   "route": "/contract",
+   "what": "Contract page: 'Born without a key', facts, verify commands (full page)",
+   "size": "2880x2922"
+  },
+  {
+   "file": "desktop/contract@2x.png",
+   "route": "/contract",
+   "what": "Contract page: 'Born without a key', facts, verify commands (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/home-full@2x.png",
+   "route": "/",
+   "what": "Landing: H1 'An NFT that is a wallet.', hero card #1, how it works, proof grid (full page)",
+   "size": "2880x2110"
+  },
+  {
+   "file": "desktop/home-owner-full@2x.png",
+   "route": "/",
+   "what": "Home with My Satchels (owner alice) (full page)",
+   "size": "2880x3322"
+  },
+  {
+   "file": "desktop/home-owner@2x.png",
+   "route": "/",
+   "what": "Home with My Satchels (owner alice) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/home@2x.png",
+   "route": "/",
+   "what": "Landing: H1 'An NFT that is a wallet.', hero card #1, how it works, proof grid (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/market-full@2x.png",
+   "route": "/market",
+   "what": "Market: 3 listed cards with verdict hints (full page)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/market@2x.png",
+   "route": "/market",
+   "what": "Market: 3 listed cards with verdict hints (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/mint-full@2x.png",
+   "route": "/mint",
+   "what": "Mint dialog over Home (visitor: connect CTA), stitched preview card (full page)",
+   "size": "2880x2110"
+  },
+  {
+   "file": "desktop/mint@2x.png",
+   "route": "/mint",
+   "what": "Mint dialog over Home (visitor: connect CTA), stitched preview card (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-activity-full@2x.png",
+   "route": "/s/1/activity",
+   "what": "Satchel #1 Activity timeline (full page)",
+   "size": "2880x2050"
+  },
+  {
+   "file": "desktop/s1-activity@2x.png",
+   "route": "/s/1/activity",
+   "what": "Satchel #1 Activity timeline (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-receive-btc-full@2x.png",
+   "route": "/s/1/receive?chain=btc",
+   "what": "Receive/Fund dialog: BTC QR on brass-banded plate (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s1-receive-btc@2x.png",
+   "route": "/s/1/receive?chain=btc",
+   "what": "Receive/Fund dialog: BTC QR on brass-banded plate (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-receive-evm-full@2x.png",
+   "route": "/s/1/receive?chain=evm",
+   "what": "Receive/Fund dialog: Ethereum Sepolia QR (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s1-receive-evm@2x.png",
+   "route": "/s/1/receive?chain=evm",
+   "what": "Receive/Fund dialog: Ethereum Sepolia QR (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-sale-owner-full@2x.png",
+   "route": "/s/1/sale",
+   "what": "Satchel #1 Sell tab (owner, not listed) (full page)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-sale-owner@2x.png",
+   "route": "/s/1/sale",
+   "what": "Satchel #1 Sell tab (owner, not listed) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-send-visitor-full@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send dialog as a visitor (connect guard) (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s1-send-visitor@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send dialog as a visitor (connect guard) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-transfer-visitor-full@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer dialog as a visitor (connect guard) (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s1-transfer-visitor@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer dialog as a visitor (connect guard) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-wallet-full@2x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 (visitor): card, stats strip, holdings (BTC/ETH rows), judge facts (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s1-wallet-owner-full@2x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 as owner: 'Your Satchel #1', stitched card, action row (Send/Fund/Transfer/Sell) (full page)",
+   "size": "2880x3868"
+  },
+  {
+   "file": "desktop/s1-wallet-owner@2x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 as owner: 'Your Satchel #1', stitched card, action row (Send/Fund/Transfer/Sell) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-wallet-RAW-with-fixture-strip@2x.png",
+   "route": "/s/1",
+   "what": "Reference only: as served, with the 'Fixture data' strip",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s1-wallet@2x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 (visitor): card, stats strip, holdings (BTC/ETH rows), judge facts (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s2-wallet-full@2x.png",
+   "route": "/s/2",
+   "what": "Satchel #2 (gift, owned by bob) (full page)",
+   "size": "2880x3928"
+  },
+  {
+   "file": "desktop/s2-wallet@2x.png",
+   "route": "/s/2",
+   "what": "Satchel #2 (gift, owned by bob) (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s3-sale-full@2x.png",
+   "route": "/s/3/sale",
+   "what": "Satchel #3 Buy tab (visitor): price, GateLine, clean history report (full page)",
+   "size": "2880x3764"
+  },
+  {
+   "file": "desktop/s3-sale@2x.png",
+   "route": "/s/3/sale",
+   "what": "Satchel #3 Buy tab (visitor): price, GateLine, clean history report (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s4-sale-full@2x.png",
+   "route": "/s/4/sale",
+   "what": "Satchel #4 Buy tab (visitor): blocked by 1 unused signature (full page)",
+   "size": "2880x3988"
+  },
+  {
+   "file": "desktop/s4-sale@2x.png",
+   "route": "/s/4/sale",
+   "what": "Satchel #4 Buy tab (visitor): blocked by 1 unused signature (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "desktop/s5-wallet-owner-listed-full@2x.png",
+   "route": "/s/5",
+   "what": "Satchel #5 as owner while listed: FreezeBanner 'Signing paused while listed', Delist is brass (full page)",
+   "size": "2880x4124"
+  },
+  {
+   "file": "desktop/s5-wallet-owner-listed@2x.png",
+   "route": "/s/5",
+   "what": "Satchel #5 as owner while listed: FreezeBanner 'Signing paused while listed', Delist is brass (viewport)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/buy-done-component@2x.png",
+   "route": "/s/3/sale",
+   "what": "Buy-done handoff + receipt block",
+   "size": "1440x1148"
+  },
+  {
+   "file": "flows/buy-s3-1-clean-full@2x.png",
+   "route": "/s/3/sale",
+   "what": "Buyer carol on #3 (full page)",
+   "size": "2880x3764"
+  },
+  {
+   "file": "flows/buy-s3-1-clean@2x.png",
+   "route": "/s/3/sale",
+   "what": "Buyer carol on #3: Clean, 'Buy for 5.00 USDC' enabled",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/buy-s3-2-done@2x.png",
+   "route": "/s/3/sale",
+   "what": "Bought: 'Satchel #3 is yours.' reverse handoff + receipt",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/buy-s4-blocked-full@2x.png",
+   "route": "/s/4/sale",
+   "what": "Buyer carol on #4 (full page)",
+   "size": "2880x3988"
+  },
+  {
+   "file": "flows/buy-s4-blocked@2x.png",
+   "route": "/s/4/sale",
+   "what": "Buyer carol on #4: Blocked, Buy disabled, no override",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/handoff-component@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Handoff component end state",
+   "size": "892x774"
+  },
+  {
+   "file": "flows/mint-1-preview@2x.png",
+   "route": "/mint",
+   "what": "Mint dialog as alice: stitched preview, what you get, Mint CTA",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/mint-2-done@2x.png",
+   "route": "/mint",
+   "what": "Minted: 'Satchel #8 is yours.'",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/sell-1-checklist@2x.png",
+   "route": "/s/1/sale?list=1",
+   "what": "Sell dialog: Before-you-list checklist (quiet period, USDC, past signatures)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/sell-2-priced@2x.png",
+   "route": "/s/1/sale?list=1",
+   "what": "Sell dialog: price 5 USDC, 'List for 5.00 USDC'",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-btc-1-mainnet-refused@2x.png",
+   "route": "/s/1/send?chain=btc",
+   "what": "Send BTC: a mainnet address is refused inline",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-btc-2-form-filled@2x.png",
+   "route": "/s/1/send?chain=btc",
+   "what": "Send BTC: 0.0001 BTC to a testnet4 address",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-btc-3-review@2x.png",
+   "route": "/s/1/send?chain=btc",
+   "what": "Send BTC: Review with sats fee",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-1-form@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send step 1 of 3: empty form (chain select, hero amount)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-2-form-filled@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send step 1: 0.001 ETH, recipient resolved (Ethereum Sepolia address)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-3-review@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send step 2: Review (the exact outcome), checksum warning checkbox unticked",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-4-review-acked@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send step 2: Review, address acknowledged, 'Send 0.0010 ETH' enabled",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-5-signing@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send step 3: tracker 'signing' (NEAR signer network), minimize, pending card",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-6-confirmed@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Send receipt: 'Sent 0.001 ETH', confirmed",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-7-activity-after@2x.png",
+   "route": "/s/1/activity",
+   "what": "Activity after the simulated send (new row on top)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/send-evm-review-dialog@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "Review dialog only",
+   "size": "960x1392"
+  },
+  {
+   "file": "flows/signing-progress-confirmed@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "SigningProgress component, confirmed receipt",
+   "size": "892x562"
+  },
+  {
+   "file": "flows/signing-progress-signing@2x.png",
+   "route": "/s/1/send?chain=evm",
+   "what": "SigningProgress component, signing stage",
+   "size": "892x524"
+  },
+  {
+   "file": "flows/transfer-1-recipient-empty@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer step 1: recipient",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-2-refuses-contract@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer refuses the Satchel contract as recipient",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-3-recipient-found@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer: bob.satchelhq.testnet, Account found",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-4-review@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer step 2: Review (stitched card, 'signature history stays with the Satchel')",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-5-in-flight@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Transfer in flight: card lifted 6deg, progress steps",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-6-handoff@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Handoff end state: card landed on bob, stitch drawn, Transferred pill, receipt",
+   "size": "2880x1800"
+  },
+  {
+   "file": "flows/transfer-6a-handoff-midmotion@2x.png",
+   "route": "/s/1/transfer",
+   "what": "Handoff animation mid-motion (card sliding to recipient)",
+   "size": "2880x1800"
+  },
+  {
+   "file": "mobile/market-full@3x.png",
+   "route": "/market",
+   "what": "Market on mobile (full page)",
+   "size": "1170x4995"
+  },
+  {
+   "file": "mobile/market@3x.png",
+   "route": "/market",
+   "what": "Market on mobile (viewport)",
+   "size": "1170x2532"
+  },
+  {
+   "file": "mobile/mint@3x.png",
+   "route": "/mint",
+   "what": "Mint bottom sheet on mobile (viewport)",
+   "size": "1170x2532"
+  },
+  {
+   "file": "mobile/s1-receive-btc@3x.png",
+   "route": "/s/1/receive?chain=btc",
+   "what": "Receive bottom sheet on mobile (bonus) (viewport)",
+   "size": "1170x2532"
+  },
+  {
+   "file": "mobile/s1-wallet-full@3x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 on mobile (visitor) (full page)",
+   "size": "1170x8598"
+  },
+  {
+   "file": "mobile/s1-wallet-owner@3x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 on mobile as owner (stitched card, action row)",
+   "size": "1170x2532"
+  },
+  {
+   "file": "mobile/s1-wallet@3x.png",
+   "route": "/s/1",
+   "what": "Satchel #1 on mobile (visitor) (viewport)",
+   "size": "1170x2532"
+  },
+  {
+   "file": "mobile/s3-sale-full@3x.png",
+   "route": "/s/3/sale",
+   "what": "Satchel #3 Buy tab on mobile (full page)",
+   "size": "1170x7743"
+  },
+  {
+   "file": "mobile/s3-sale@3x.png",
+   "route": "/s/3/sale",
+   "what": "Satchel #3 Buy tab on mobile (viewport)",
+   "size": "1170x2532"
+  }
+ ],
+ "blocked": [],
+ "problemsFinal": []
+}

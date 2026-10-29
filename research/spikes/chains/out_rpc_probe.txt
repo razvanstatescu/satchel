@@ -1,0 +1,100 @@
+URL=https://ethereum-sepolia-rpc.publicnode.com
+  chainId={"jsonrpc":"2.0","result":"0xaa36a7","id":1}
+  blockNumber={"jsonrpc":"2.0","result":"0xb68703","id":1}  http+time=200 0.062352
+  CORS: access-control-allow-origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://sepolia.drpc.org
+  chainId={"id":1,"jsonrpc":"2.0","result":"0xaa36a7"}
+  blockNumber={"id":1,"jsonrpc":"2.0","result":"0xb68702"}  http+time=200 0.078982
+  CORS: access-control-allow-origin: https://satchel-test.vercel.app
+  burst20: ok=20 fail=0 codes:
+URL=https://1rpc.io/sepolia
+  chainId={"jsonrpc":"2.0","result":"0xaa36a7","id":1}
+  blockNumber={"jsonrpc":"2.0","result":"0xb68702","id":1}  http+time=200 0.166502
+  CORS: access-control-allow-origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://rpc.sepolia.org
+  chainId=
+  blockNumber=  http+time=000 8.003044
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
+URL=https://rpc2.sepolia.org
+  chainId=
+  blockNumber=  http+time=000 8.003674
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
+URL=https://11155111.rpc.thirdweb.com
+  chainId={"id":1,"jsonrpc":"2.0","result":"0xaa36a7"}
+  blockNumber={"id":1,"jsonrpc":"2.0","result":"0xb68724"}  http+time=200 0.230530
+  CORS: access-control-allow-origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://sepolia.gateway.tenderly.co
+  chainId={"id":1,"jsonrpc":"2.0","result":"0xaa36a7"}
+  blockNumber={"id":1,"jsonrpc":"2.0","result":"0xb68724"}  http+time=200 0.127162
+  CORS: access-control-allow-origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://gateway.tenderly.co/public/sepolia
+  chainId={"id":1,"jsonrpc":"2.0","result":"0xaa36a7"}
+  blockNumber={"id":1,"jsonrpc":"2.0","result":"0xb68724"}  http+time=200 0.102483
+  CORS: access-control-allow-origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://endpoints.omniatech.io/v1/eth/sepolia/public
+  chainId=error code: 521
+  blockNumber=error code: 521  http+time=521 0.097610
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521 521
+URL=https://rpc.sepolia.ethpandaops.io
+  chainId={"jsonrpc":"2.0","id":1,"result":"0xaa36a7"}
+  blockNumber={"jsonrpc":"2.0","id":1,"result":"0xb68725"}  http+time=200 0.099383
+  CORS: access-control-allow-origin: https://satchel-test.vercel.app
+  burst20: ok=20 fail=0 codes:
+URL=https://eth-sepolia.api.onfinality.io/public
+  chainId={"jsonrpc":"2.0","id":1,"result":"0xaa36a7"}
+  blockNumber={"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or contact us t  http+time=429 0.382774
+  CORS: access-control-allow-origin: *
+  burst20: ok=5 fail=15 codes: 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429
+URL=https://api.zan.top/eth-sepolia
+  chainId={"jsonrpc":"2.0","id":1,"result":"0xaa36a7"}
+  blockNumber={"result":"0xb68726","id":1,"jsonrpc":"2.0"}  http+time=200 0.327856
+  CORS: access-control-allow-origin: https://satchel-test.vercel.app
+  burst20: ok=20 fail=0 codes:
+URL=https://0xrpc.io/sep
+  chainId={"jsonrpc":"2.0","id":1,"result":"0xaa36a7"}
+  blockNumber={"jsonrpc":"2.0","id":1,"result":"0xb68727"}  http+time=200 0.137057
+  CORS: Access-Control-Allow-Origin: *
+  burst20: ok=20 fail=0 codes:
+URL=https://ethereum-sepolia.rpc.subquery.network/public
+  chainId=
+  blockNumber=  http+time=000 0.001365
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
+URL=https://eth-sepolia.public.blastapi.io
+  chainId={
+  "jsonrpc": "2.0",
+  "id": null,
+  "error": {
+    "code": -32000,
+    "message": "Blast API is no longer available. Please update your integration to use Alchemy's API instead: https://alchemy.com"
+  blockNumber={
+  "jsonrpc": "2.0",
+  "id": null,
+  "error": {
+    "code": -32000,
+    "message": "Blast API is no longer available. P  http+time=403 0.031279
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403 403
+URL=https://sepolia.rpc.grove.city/v1/01fdb492
+  chainId=
+  blockNumber=  http+time=000 0.001288
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000 000
+URL=https://rpc.ankr.com/eth_sepolia
+  chainId={"jsonrpc": "2.0", "error": {"code": -32000, "message": "Unauthorized: You must authenticate your request with an API key. Create an account on https://www.ankr.com/rpc/ and generate your personal API
+  blockNumber={"jsonrpc": "2.0", "error": {"code": -32000, "message": "Unauthorized: You must authenticate your request with an API ke  http+time=200 0.135281
+  CORS: access-control-allow-origin: *
+  burst20: ok=0 fail=20 codes: 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200 200
+URL=https://eth-sepolia.g.alchemy.com/v2/demo
+  chainId=
+  blockNumber=  http+time=429 0.170590
+  CORS: <none>
+  burst20: ok=0 fail=20 codes: 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429 429

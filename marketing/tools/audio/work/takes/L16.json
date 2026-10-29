@@ -1,0 +1,91 @@
+{
+ "key": "2967b19f7cdfa509",
+ "final": {
+  "id": "L16",
+  "scene": "S07d",
+  "text": "If one old signature could still move coins, Buy stays disabled.",
+  "say": "If one old signature could still move coins, Buy stays disabled.",
+  "file": "vo/L16.mp3",
+  "duration": 4.51,
+  "words": [
+   {
+    "text": "If",
+    "start": 0.08,
+    "end": 0.18
+   },
+   {
+    "text": "one",
+    "start": 0.3,
+    "end": 0.52
+   },
+   {
+    "text": "old",
+    "start": 0.58,
+    "end": 0.78
+   },
+   {
+    "text": "signature",
+    "start": 0.86,
+    "end": 1.3
+   },
+   {
+    "text": "could",
+    "start": 1.4,
+    "end": 1.58
+   },
+   {
+    "text": "still",
+    "start": 1.7,
+    "end": 1.9
+   },
+   {
+    "text": "move",
+    "start": 1.96,
+    "end": 2.18
+   },
+   {
+    "text": "coins,",
+    "start": 2.24,
+    "end": 2.68
+   },
+   {
+    "text": "Buy",
+    "start": 3.2,
+    "end": 3.48
+   },
+   {
+    "text": "stays",
+    "start": 3.56,
+    "end": 3.86
+   },
+   {
+    "text": "disabled.",
+    "start": 3.9,
+    "end": 4.44
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "If one old signature could still move coins, buy stays disabled"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "If one old signature could still move coins, Buy stays disabled.",
+ "prev": "Nonce used. Coin spent. Blockhash expired.",
+ "next": "And the contract was born with no keys, so every signature leaves a record."
+}

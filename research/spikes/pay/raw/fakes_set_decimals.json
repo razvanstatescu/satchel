@@ -1,0 +1,39 @@
+{
+ "at": "2026-10-21T12:03:18.856Z",
+ "ms_to_FINAL": 3637,
+ "tx_hash": "EvwRneVZB8vECJzBcXAwZM3hbtWC8WjPwLNojaf1T8CJ",
+ "final_execution_status": "FINAL",
+ "status": {
+  "Failure": {
+   "ActionError": {
+    "index": 0,
+    "kind": {
+     "FunctionCallError": {
+      "ExecutionError": "Smart contract panicked: panicked at 'Failed to deserialize input from JSON.: Error(\"missing field `dec`\", line: 1, column: 14)', test-token/src/lib.rs:21:1"
+     }
+    }
+   }
+  }
+ },
+ "receipts": [
+  {
+   "id": "9B93oYqc5JXDNqZj64UUcWZS1NSnN4GgbJWGWUXx6878",
+   "executor": "usdc.fakes.testnet",
+   "block": "274092827",
+   "status": "Failure",
+   "fail": "{\"ActionError\":{\"index\":0,\"kind\":{\"FunctionCallError\":{\"ExecutionError\":\"Smart contract panicked: panicked at 'Failed to deserialize input from JSON.: Error(\\\"missing field `dec`\\\", line: 1, column: 14)', test-token/src/lib.rs:21:1\"}}}}",
+   "logs": [],
+   "tokens_burnt": "121623867743100000000",
+   "gas_burnt": 1216238677431
+  },
+  {
+   "id": "DbHvqaYjh95LY9ZyfDaN8cTgCAYHheYywYcyNXtTJfKV",
+   "executor": "satchel-spk-pay-e9ea1a.testnet",
+   "block": "274092828",
+   "status": "SuccessValue",
+   "logs": [],
+   "tokens_burnt": "0",
+   "gas_burnt": 223182562500
+  }
+ ]
+}

@@ -1,0 +1,11 @@
+{
+  "name": "satchel",
+  "private": true,
+  "packageManager": "pnpm@11.1.0",
+  "engines": { "node": ">=22.22.2" },
+  "scripts": {
+    "test": "pnpm -r --if-present test",
+    "test:contracts": "cargo test --workspace",
+    "typecheck": "pnpm -r --if-present typecheck"
+  }
+}

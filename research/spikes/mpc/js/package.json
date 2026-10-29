@@ -1,0 +1,12 @@
+{
+  "name": "mpc-spike-js",
+  "private": true,
+  "type": "module",
+  "description": "THROWAWAY Phase 0 spike - never import into product",
+  "dependencies": {
+    "@noble/curves": "^2.4.0",
+    "@noble/hashes": "^2.4.0",
+    "bs58": "^6.0.0",
+    "near-api-js": "^7.3.1"
+  }
+}

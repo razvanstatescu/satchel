@@ -1,0 +1,21 @@
+{
+  "sources": {
+    "stitch-run": "stitch-run.comp.wav",
+    "stitch-single": "stitch-single.comp.wav",
+    "heartbeat-tension": "heartbeat-tension.comp.wav",
+    "riser-4s": "riser-4s.v2.mp3",
+    "approve-chime": "approve-chime.comp.wav",
+    "count-up": "count-up.comp.wav"
+  },
+  "notes": {
+    "stitch-run": "Composite (tools/sfx/composite.mjs): 6 layered punctures ~165 ms apart; the body grain is from stitch-run v1, the crisp grain from stitch-single v2. Both stitch-run generations returned only 1-2 hits.",
+    "stitch-single": "Composite: body grain (stitch-run v1) + crisp grain (stitch-single v2); matches the punctures in stitch-run. v1 was near-silent.",
+    "heartbeat-tension": "Composite: the v2 lub-dub repeated 1.0 s later (60 bpm). v1 was one decaying hit.",
+    "riser-4s": "v2 (4.5 s generation), last 4.0 s kept so it ends at full level. v1 built for only ~3.6 s.",
+    "approve-chime": "Composite: the v1 note (C5, ~523 Hz) then the same note a fifth up (G5, ~785 Hz) 130 ms later. Both generations (v1, and v2 with an explicit two-note prompt) returned one sustained note.",
+    "count-up": "Composite: counter-roll's ticks under a rising varispeed (0.72x to 1.0x), so it pairs with counter-roll (same tick sound, rising ~5.7 semitones, accelerating). The generated count-up (warmer, 2-8 kHz, also ascending) is kept as tools/sfx/_raw/count-up.mp3."
+  },
+  "promptOf": {
+    "count-up": "counter-roll"
+  }
+}

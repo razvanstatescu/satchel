@@ -1,0 +1,76 @@
+{
+ "key": "2af9122db4c532af",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "So how does a buyer know it's clean?",
+ "prev": "A signature made before the sale can still be used after it.",
+ "next": "Satchel keeps the receipts.",
+ "final": {
+  "id": "V16",
+  "scene": "C1",
+  "text": "So how does a buyer know it's clean?",
+  "say": "So how does a buyer know it's clean?",
+  "file": "v2/vo/V16.mp3",
+  "duration": 2.24,
+  "words": [
+   {
+    "text": "So",
+    "start": 0.12,
+    "end": 0.34
+   },
+   {
+    "text": "how",
+    "start": 0.46,
+    "end": 0.6
+   },
+   {
+    "text": "does",
+    "start": 0.64,
+    "end": 0.76
+   },
+   {
+    "text": "a",
+    "start": 0.82,
+    "end": 0.92
+   },
+   {
+    "text": "buyer",
+    "start": 0.94,
+    "end": 1.22
+   },
+   {
+    "text": "know",
+    "start": 1.32,
+    "end": 1.46
+   },
+   {
+    "text": "it's",
+    "start": 1.5,
+    "end": 1.68
+   },
+   {
+    "text": "clean?",
+    "start": 1.74,
+    "end": 2.14
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "So how does a buyer know it's clean?"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

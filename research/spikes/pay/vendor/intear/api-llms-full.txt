@@ -1,0 +1,1685 @@
+# Intear API
+
+> Prices, token data, charts, trades, transfers and balances for NEAR fungible tokens, live over one WebSocket.
+
+The Intear API has prices, token data, charts, trades, transfers, balances and holders for every fungible token on NEAR. All of it comes live over one WebSocket, updated after every block, and the parts that answer once are plain HTTP too.
+
+```
+wss://api.intea.rs/ws
+https://api.intea.rs
+```
+
+It's built for apps that show token data:
+- You ask for only the fields you show, so responses stay small.
+- Updates can come after every block, or only once a value has moved by a threshold you pick.
+- History and live updates join up exactly, so a list of trades never misses or repeats one.
+
+:::note
+No API key is needed. Every message reports the [credits](https://docs.intear.tech/api/reference/limits.md#credits) it would cost, but nothing is charged yet.
+:::
+
+## What you can do
+
+- **Token lists**: Every token's price, liquidity, volume, supply and more, filtered and sorted, kept live with [`tokens.subscribe`](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe).
+- **Charts**: Candles in USD or NEAR, from 1 second to 1 week, with the latest candle updated live. See [`candles`](https://docs.intear.tech/api/reference/candles.md).
+- **Trades and transfers**: Every swap, transfer and transaction, as history and then live, filtered by token, account or size.
+- **Wallets**: An account's balances, its activity across trades and transfers, and every token's top holders.
+
+## Conventions
+
+- Tokens are identified by their contract's account ID, like `wrap.near`.
+- Amounts in a token's smallest units (balances, supplies, trade amounts) are decimal strings, since they don't fit in a JSON number.
+- `price_usd` is USD per whole token. `price_usd_raw` is the unscaled form the indexer works in: `price_usd = price_usd_raw × 10^(decimals − 6)`.
+- Prices and USD values sent as strings have at most 30 significant digits and no trailing zeros. A token without a price has `"0"`.
+- `*_millis` are Unix timestamps in milliseconds, and `height` is a NEAR block height.
+- In trades, native NEAR is always `wrap.near`. In balances and transfers it's `near`, in yoctoNEAR.
+
+## Next steps
+
+- [Quickstart](https://docs.intear.tech/api/quickstart.md): Fetch tokens over HTTP, then keep a live token list over the WebSocket.
+- [Connecting](https://docs.intear.tech/api/guides/connecting.md): How messages, subscriptions and reconnects work.
+- [Token fields](https://docs.intear.tech/api/reference/token-fields.md): Every field a token has, and what it can be filtered and sorted by.
+
+## Replaced APIs
+
+The Intear API replaces the Events API (`wss://ws-events-v3.intear.tech`, `https://events-v3.intear.tech`) and the prices API, also called the Token Indexer (`https://prices.intear.tech`). Write new code against the Intear API. For code that uses the old ones:
+
+| Before | Now |
+| --- | --- |
+| `trade_swap` events, and `/v3/trade_swap/*` | [`trades.subscribe`](https://docs.intear.tech/api/reference/trades.md#tradessubscribe) and [`trades.query`](https://docs.intear.tech/api/reference/trades.md#tradesquery) |
+| `ft_transfer` events | [`transfers.subscribe` and `transfers.query`](https://docs.intear.tech/api/reference/transfers.md) |
+| `price_token` events, and `/v3/price_token/latest_price` | `price_usd` in [`tokens.subscribe`](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe) and [`tokens.get`](https://docs.intear.tech/api/reference/tokens.md#tokensget) |
+| `/v3/price_token/ohlc` and `/v3/price_token/price_at_time` | [`candles.get`](https://docs.intear.tech/api/reference/candles.md#candlesget) and [`prices.at`](https://docs.intear.tech/api/reference/prices.md#pricesat) |
+| `newtoken_nep141` events | A [`tokens.subscribe`](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe) list sorted by `created_at`, where a new token comes with all of its fields |
+| `/tokens`, `/token`, `/prices`, `/price` and the other price endpoints | [`tokens.get`](https://docs.intear.tech/api/reference/tokens.md#tokensget), with only the [fields](https://docs.intear.tech/api/reference/token-fields.md) you need |
+| `/token-search` | [`tokens.search`](https://docs.intear.tech/api/reference/tokens.md#tokenssearch) |
+| The reputation lists, like `/tokens-reputable` and `/token-spam-list` | The `reputation` field of [tokens](https://docs.intear.tech/api/reference/token-fields.md) |
+| `chart.intear.tech` | [Charts](https://docs.intear.tech/api/guides/charts.md), with a [TradingView example](https://docs.intear.tech/api/guides/charts.md#example-tradingview) |
+
+The Events API's other events, like the NFT, Potlock and SocialDB ones, have no counterpart: the Intear API is about fungible tokens.
+
+## For agents
+
+Every page is also Markdown, at its URL with `.md` in place of the trailing slash, like [`/api/reference/tokens.md`](https://docs.intear.tech/api/reference/tokens.md), or at its URL itself for a request with `Accept: text/markdown`. [`/api/llms-full.txt`](https://docs.intear.tech/api/llms-full.txt) has all the Intear API pages in one file, and [`/llms.txt`](https://docs.intear.tech/llms.txt) lists every page of these docs.
+
+The [`intear-api` skill](https://docs.intear.tech/skills/intear-api/SKILL.md) has the endpoints and rules of the Intear API for agents. To install it, save it as `intear-api/SKILL.md` in the agent's skills folder, like `~/.claude/skills/` for Claude Code.
+
+# Quickstart
+
+> Fetch tokens over HTTP, then keep a live token list over the WebSocket.
+
+The examples use `fetch` and the browser's `WebSocket`, which Node.js has too.
+
+## Over HTTP
+
+1. **Ask for tokens, with only the fields you need.**
+
+   ```
+   GET https://api.intea.rs/tokens?ids=wrap.near&fields=symbol,price_usd
+   ```
+
+   ```json
+   {
+     "height": 219969220,
+     "timestamp_millis": 1792003477277,
+     "columns": ["account_id", "symbol", "price_usd"],
+     "rows": [["wrap.near", "wNEAR", "4.815189744118901"]],
+     "total": 1,
+     "missing": []
+   }
+   ```
+
+   Tokens come as a [table](https://docs.intear.tech/api/guides/connecting.md#tables): the column names once, then a row per token, in the same order. `account_id` always comes first.
+
+2. **Turn the table into objects, if that's easier to work with.**
+
+   ```js
+   /**
+    * Turns a table into `{ <key>: { <column>: value } }`, keyed by its first column
+    */
+   function tableToObjects({ columns, rows }) {
+     const objects = {};
+     for (const row of rows) {
+       const object = {};
+       columns.slice(1).forEach((column, i) => (object[column] = row[i + 1]));
+       objects[String(row[0])] = object;
+     }
+     return objects;
+   }
+
+   const params = new URLSearchParams({
+     ids: 'wrap.near,usdt.tether-token.near',
+     fields: 'symbol,price_usd,liquidity_usd,price_change_24h',
+   });
+   const response = await fetch(`https://api.intea.rs/tokens?${params}`);
+   const result = await response.json();
+   if (!response.ok) throw new Error(result.error.message);
+   const tokens = tableToObjects(result);
+   // tokens['wrap.near'] is { symbol: 'wNEAR', price_usd: '4.81', ... }
+   ```
+
+   The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+Every method that answers once, except `tokens.update` and `unsubscribe`, works like this over HTTP. See [Using HTTP](https://docs.intear.tech/api/guides/http.md) for how params go in a URL.
+
+## Over the WebSocket
+
+1. **Connect.** The server's first message is a `hello`, with the latest block and the [limits](https://docs.intear.tech/api/reference/limits.md):
+
+   ```json
+   { "hello": { "version": 2, "height": 219969289, "timestamp_millis": 1792003517185, "limits": { ... } }, "credits_used": 0 }
+   ```
+
+2. **Subscribe.** Send a request with an `id` you choose. The reply has the same `id`, and every update after it has `sub` set to that `id`:
+
+   ```json
+   → { "id": 1, "method": "tokens.subscribe", "params": { "fields": ["symbol", "price_usd"], "ids": ["wrap.near"] } }
+   ← { "id": 1, "result": { "height": 219969289, "columns": ["account_id", "symbol", "price_usd"], "rows": [["wrap.near", "wNEAR", "4.81"]], ... } }
+   ← { "sub": 1, "height": 219969292, "set": { "wrap.near": { "price_usd": "4.82" } }, ... }
+   ```
+
+   Updates only carry what changed: here, only `price_usd` of `wrap.near`.
+
+3. **Keep a list up to date.** This follows the 20 `NotFake` or `Reputable` tokens with the most volume in the last 24 hours. Prices only update once they've moved 0.1%, and tokens that drop out of the top 20 are in `left`:
+
+   The examples on this site use this small client. It matches replies to requests by `id`, and passes each subscription's updates to its callback:
+
+   ```js
+   /** A minimal Intear API client: requests resolve with their result, and pushes go to their subscription's callback */
+   export class IntearApi {
+     #socket;
+     #nextId = 1;
+     #pending = new Map();
+     #subscriptions = new Map();
+     ready;
+
+     constructor(url = 'wss://api.intea.rs/ws') {
+       this.#socket = new WebSocket(url);
+       this.ready = new Promise((resolve, reject) => {
+         this.#socket.addEventListener('error', () => reject(new Error('Connection failed')));
+         this.#socket.addEventListener('message', (event) => {
+           const message = JSON.parse(event.data);
+           if ('hello' in message) {
+             resolve(message.hello);
+           } else if ('sub' in message) {
+             this.#subscriptions.get(message.sub)?.(message);
+           } else if ('id' in message) {
+             const request = this.#pending.get(message.id);
+             this.#pending.delete(message.id);
+             if ('error' in message) {
+               this.#subscriptions.delete(message.id);
+               const error = message.error;
+               request?.reject(new Error(`${error.code}: ${error.message}`));
+             } else {
+               request?.resolve(message.result);
+             }
+           }
+         });
+       });
+     }
+
+     /**
+      * Sends a request, and resolves with its result
+      */
+     async request(method, params) {
+       await this.ready;
+       const id = this.#nextId++;
+       const result = new Promise((resolve, reject) => this.#pending.set(id, { resolve, reject }));
+       this.#socket.send(JSON.stringify({ id, method, params }));
+       return result;
+     }
+
+     /**
+      * Makes a subscription. `onPush` gets each of its pushes, after the result
+      */
+     async subscribe(method, params, onPush) {
+       await this.ready;
+       const id = this.#nextId++;
+       this.#subscriptions.set(id, onPush);
+       const result = new Promise((resolve, reject) => this.#pending.set(id, { resolve, reject }));
+       this.#socket.send(JSON.stringify({ id, method, params }));
+       return { sub: id, result: await result };
+     }
+
+     async unsubscribe(sub) {
+       await this.request('unsubscribe', { sub });
+       this.#subscriptions.delete(sub);
+     }
+
+     close() {
+       this.#socket.close();
+     }
+   }
+   ```
+
+   The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+   ```js
+   const tokens = new Map();
+
+   const { result } = await api.subscribe(
+     'tokens.subscribe',
+     {
+       fields: ['symbol', 'icon_hash', 'price_usd', 'volume_usd_24h'],
+       where: { min_reputation: 'NotFake' },
+       sort: { by: 'volume_usd_24h', desc: true },
+       limit: 20,
+       min_change: { price_usd: '0.1%', volume_usd_24h: '1%' },
+       precision: 6,
+     },
+     (push) => {
+       if (push.end) throw new Error(`Subscription ended: ${push.end.message}`);
+       for (const [token, fields] of Object.entries(push.set ?? {})) {
+         tokens.set(token, { ...tokens.get(token), ...fields });
+       }
+       for (const token of push.left ?? []) tokens.delete(token);
+       render(tokens);
+     },
+   );
+
+   for (const [token, fields] of Object.entries(tableToObjects(result))) tokens.set(token, fields);
+   render(tokens);
+   ```
+
+   The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+## What's next
+
+- [Connecting](https://docs.intear.tech/api/guides/connecting.md): how the protocol works, and what to do after a reconnect.
+- [Live token lists](https://docs.intear.tech/api/guides/live-token-lists.md): thresholds, intervals, and following only the tokens on screen.
+- [History, then live](https://docs.intear.tech/api/guides/history-then-live.md): show past trades and keep the list live without a gap.
+
+# Playground
+
+> Send requests to the Intear API WebSocket and watch replies and pushes live.
+
+Connect to `wss://api.intea.rs/ws` from your browser, send any method, and watch replies and pushes as they come. Each method starts from an example: edit its params and send. Click a message to see all of it. See the [reference](https://docs.intear.tech/api/reference/tokens.md) for every method's params.
+
+The playground needs a browser: [open it](https://docs.intear.tech/api/playground/).
+
+# Connecting
+
+> How messages, subscriptions, updates and reconnects work on the WebSocket.
+
+Connect to `wss://api.intea.rs/ws`. Every message, both ways, is one JSON text message. Messages are compressed with `permessage-deflate` when the client offers it, as browsers do.
+
+## Requests and replies
+
+The client sends requests:
+
+```json
+{ "id": 1, "method": "tokens.get", "params": { "fields": ["symbol"], "ids": ["wrap.near"] } }
+```
+
+- `id` is a number or a string you pick. The reply has the same `id`.
+- `params` can be left out when a method takes none.
+- Replies can come in any order, and at most 16 requests can wait for their reply at once.
+
+The server replies with a `result` or an `error`:
+
+```json
+{ "id": 1, "result": { ... }, "credits_used": 1 }
+{ "id": 1, "error": { "code": "unknown_field", "message": "..." }, "credits_used": 0 }
+```
+
+See [Messages](https://docs.intear.tech/api/reference/messages.md) for every message the server sends, and [Errors](https://docs.intear.tech/api/reference/errors.md) for the error codes.
+
+:::caution
+A message that isn't a JSON object with an `id` and a `method`, or a binary message, closes the connection with code `1008`. A message of 64 KiB or more ends it without a close frame, so the client sees code `1006`.
+:::
+
+## The first message
+
+The server's first message is `hello`, sent once, with the latest block and the [limits](https://docs.intear.tech/api/reference/limits.md):
+
+```json
+{ "hello": { "version": 2, "height": 219969289, "timestamp_millis": 1792003517185, "limits": { ... } }, "credits_used": 0 }
+```
+
+Right after the server restarts, `hello` only comes once every token is loaded, so wait for it before counting on replies.
+
+## Subscriptions
+
+Methods ending in `.subscribe` make a subscription. It's named by the `id` of the request that made it, and every update it sends, called a push, has that `id` as `sub`:
+
+```json
+{ "sub": 1, "height": 219969292, "timestamp_millis": 1792003519000, "set": { ... }, "credits_used": 1 }
+```
+
+- The reply comes before the first push, with nothing missed or repeated between them.
+- Pushes come in block order across all of a connection's subscriptions, at most one per subscription per block, and none for a block that changed nothing the subscription follows.
+- Changes made outside blocks, like token metadata being refreshed, come with the next block. If no block comes within a second, they come in a push of their own, with the `height` of the block before them.
+- An `id` can't be reused while a request with it waits for its reply, or while its subscription is active. Reusing it gets a `bad_request` error with that `id`. End a subscription with `unsubscribe`, which replies `{}`:
+
+  ```json
+  { "id": 7, "method": "unsubscribe", "params": { "sub": 1 } }
+  ```
+
+- A connection can have up to 100 subscriptions.
+
+If a request fails, the subscription it would have made doesn't exist.
+
+## Heights
+
+Every result and push has `height` and `timestamp_millis`: the latest block it accounts for. The results of `unsubscribe` and `schema` don't, and neither do errors and `end` messages. Use `height` to pick up after a reconnect, see [below](#after-a-reconnect).
+
+## Idle connections
+
+After 15 seconds with nothing else sent, the server sends:
+
+```json
+{ "idle": { "height": 219969300, "timestamp_millis": 1792003525000 }, "credits_used": 0 }
+```
+
+so you can tell a quiet connection from a dead one. If nothing at all arrives for much longer than 15 seconds, reconnect.
+
+## Slow clients
+
+A client that can't read pushes as fast as they come isn't disconnected. Each of its subscriptions catches up in one push instead:
+- Token subscriptions send everything that changed since the last push.
+- Event subscriptions (trades, transfers, activity) send every event after the last one sent.
+
+Some subscriptions can't catch up and end with `too_far_behind` instead:
+- An event subscription that falls more than 10,000 rows behind.
+- Any `balances.subscribe`, since balance changes can't be read back.
+
+When the server ends a subscription, it sends:
+
+```json
+{ "sub": 1, "end": { "code": "too_far_behind", "message": "..." }, "credits_used": 0 }
+```
+
+Make the subscription again to carry on.
+
+## Tables
+
+Tokens, trades, transfers, balances and holders come as a table, so each field name is sent once instead of in every row:
+
+```json
+{
+  "columns": ["account_id", "symbol", "price_usd"],
+  "rows": [
+    ["wrap.near", "wNEAR", "4.81"],
+    ["usdt.tether-token.near", "USDt", "1"]
+  ]
+}
+```
+
+The first column is the row's key (`account_id` for tokens, `id` for trades), then the fields you asked for, in the order you asked for them.
+
+## After a reconnect
+
+Connections drop. Each kind of subscription has a way to carry on from where it left off without downloading everything again:
+
+| Subscription | How to resume |
+| --- | --- |
+| `tokens.subscribe` | Same params, with `resume_from` set to the `height` of the last reply or push. See [Live token lists](https://docs.intear.tech/api/guides/live-token-lists.md#after-a-reconnect) |
+| `trades.subscribe`, `transfers.subscribe` | `after_id` set to the newest `id` you have. For transfers, it needs the same [filters as history](https://docs.intear.tech/api/reference/transfers.md#filters). See [History, then live](https://docs.intear.tech/api/guides/history-then-live.md) |
+| `activity.subscribe` | `after` set to the `last` of the last reply or push |
+| `candles.subscribe`, `holders.subscribe`, `balances.subscribe` | Subscribe again: the reply has the current state |
+
+# Live token lists
+
+> Follow tokens with tokens.subscribe, with thresholds, intervals, top lists and resuming.
+
+[`tokens.subscribe`](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe) keeps a list of tokens up to date. The reply has the tokens as they are now, and each push after it only has what changed.
+
+## Which tokens
+
+Pick tokens in one of these ways:
+
+- **By ID:** `"ids": ["wrap.near", "usdt.tether-token.near"]`. Use [`tokens.update`](#following-the-tokens-on-screen) to change the list later.
+- **By filter:** `where` narrows tokens down by reputation, parent account, creation time, or bounds on numeric fields:
+
+  ```json
+  "where": { "min_reputation": "NotFake", "min": { "liquidity_usd": 10000 } }
+  ```
+
+- **A top list:** `sort` and `limit` follow the top tokens by a numeric field as they change places. The sort field has to be one of `fields`:
+
+  ```json
+  "sort": { "by": "volume_usd_24h", "desc": true }, "limit": 20
+  ```
+
+With neither `ids` nor `where`, it's every token.
+
+## Reading pushes
+
+A push has up to three parts, each left out when empty:
+
+```json
+{
+  "sub": 1,
+  "height": 219969292,
+  "timestamp_millis": 1792003519000,
+  "set": {
+    "wrap.near": { "price_usd": "4.82" },
+    "new-token.near": { "symbol": "NEW", "price_usd": "0", "volume_usd_24h": 0 }
+  },
+  "created": ["new-token.near"],
+  "left": ["old-token.near"]
+}
+```
+
+- `set`: the fields that changed, and only those. A token the list didn't have before (a new token, or one that came to match `where` or into the top `limit`) has every field.
+- `created`: the tokens in `set` that were just created.
+- `left`: tokens the list no longer has.
+
+So keeping a list is: merge `set` into what you have, and drop `left`.
+
+Using the client from the [Quickstart](https://docs.intear.tech/api/quickstart.md#over-the-websocket):
+
+```js
+const tokens = new Map();
+
+const { result } = await api.subscribe(
+  'tokens.subscribe',
+  {
+    fields: ['symbol', 'icon_hash', 'price_usd', 'volume_usd_24h'],
+    where: { min_reputation: 'NotFake' },
+    sort: { by: 'volume_usd_24h', desc: true },
+    limit: 20,
+    min_change: { price_usd: '0.1%', volume_usd_24h: '1%' },
+    precision: 6,
+  },
+  (push) => {
+    if (push.end) throw new Error(`Subscription ended: ${push.end.message}`);
+    for (const [token, fields] of Object.entries(push.set ?? {})) {
+      tokens.set(token, { ...tokens.get(token), ...fields });
+    }
+    for (const token of push.left ?? []) tokens.delete(token);
+    render(tokens);
+  },
+);
+
+for (const [token, fields] of Object.entries(tableToObjects(result))) tokens.set(token, fields);
+render(tokens);
+```
+
+The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+## Fewer updates
+
+Prices and volumes change almost every block. Two params cut the updates down to the ones worth showing:
+
+- **`min_change`** sends a field only once it has moved by a threshold since the value last sent, in either direction. A change from or to `0` always counts:
+
+  ```json
+  "min_change": { "price_usd": "0.1%", "liquidity_usd": "1%" }
+  ```
+
+  Thresholds are `0.01%`, `0.1%`, `0.25%`, `0.5%`, `1%`, `2%`, `5%` or `10%`. Everyone using the same threshold gets the same values, and `where` and `sort` go by them too, so a token near a bound doesn't flicker in and out of the list. See [Token fields](https://docs.intear.tech/api/reference/token-fields.md) for the fields that take one.
+
+- **`min_interval_ms`** sends at most one push per that much block time, with everything that changed since the one before: `200`, `600`, `1000`, `5000`, `15000` or `60000`.
+
+`precision` rounds string prices to that many significant digits (1 to 30), but keeps at least 3 decimals, so `12345.6789` at 6 is `12345.679` rather than `12346`. Rounded prices also change less often.
+
+## Following the tokens on screen
+
+For a long list where only some rows are visible, subscribe with `ids` and change them as the user scrolls with [`tokens.update`](https://docs.intear.tech/api/reference/tokens.md#tokensupdate):
+
+```json
+{ "id": 2, "method": "tokens.update", "params": { "sub": 1, "add": ["meta-pool.near"], "remove": ["wrap.near"] } }
+```
+
+The reply has the added tokens as of its `height`, and pushes after it carry their changes.
+
+## Icons
+
+Use `icon_hash` rather than `icon` in lists. `icon` is the whole image inline, in every snapshot. `icon_hash` is short, and the image is at `https://api.intea.rs/icon/<icon_hash>.webp`: a WebP of up to 128×128, cached forever since its URL changes whenever the icon does. The browser downloads each icon once, only for the tokens it shows.
+
+## Only what changes
+
+`"snapshot": false` leaves `rows` in the reply empty, for a client that already has the tokens and only wants changes from now on.
+
+## After a reconnect
+
+Subscribe with the same params, and `resume_from` set to the `height` of the last reply or push you got. The reply then has only what changed since, shaped like a push:
+
+```json
+{ "height": 219970000, "timestamp_millis": 1792003900000, "resumed": true, "set": { ... }, "created": [...], "left": [...] }
+```
+
+`left` can name tokens you never had: drop them if you do. When the server can't work out what changed (it restarted since, or the subscription has a `limit`), the reply has `"resumed": false` and every row, like a fresh subscription.
+
+Thresholds are kept for 10 minutes after their last subscriber leaves, so a client back within that only gets what crossed its threshold.
+
+# Keeping every token
+
+> Keep a backend's copy of every token current by polling with since.
+
+A backend that keeps every token doesn't need to download all of them each time. Poll [`tokens.get`](https://docs.intear.tech/api/reference/tokens.md#tokensget) (or `GET /tokens`) with `since` set to the `height` of the result before, and get only what changed:
+
+1. Fetch every token once, and remember the result's `height`.
+2. Every few seconds, fetch again with `since` set to that `height`.
+3. If the result has `"resumed": true`, `rows` are only the tokens that changed, each with every field you asked for. Replace them, drop the tokens in `left`, which stopped matching `where`, and remember the new `height`.
+4. If it has `"resumed": false`, the server couldn't work out what changed (it restarted since), and `rows` has every token. Start over with them.
+
+```js
+/**
+ * Turns a table into `{ <key>: { <column>: value } }`, keyed by its first column
+ */
+function tableToObjects({ columns, rows }) {
+  const objects = {};
+  for (const row of rows) {
+    const object = {};
+    columns.slice(1).forEach((column, i) => (object[column] = row[i + 1]));
+    objects[String(row[0])] = object;
+  }
+  return objects;
+}
+
+const params = new URLSearchParams({ fields: 'symbol,decimals,price_usd' });
+if (since !== undefined) params.set('since', String(since));
+const response = await fetch(`https://api.intea.rs/tokens?${params}`);
+const result = await response.json();
+if (!response.ok) throw new Error(result.error.message);
+
+if (!result.resumed) tokens.clear(); // every token is in rows
+for (const [token, fields] of Object.entries(tableToObjects(result))) tokens.set(token, fields);
+for (const token of result.left ?? []) tokens.delete(token);
+// Poll again with `since: result.height`
+```
+
+The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+`since` can't be combined with `sort`, `limit` or `offset`, and the other params have to be the same as in the earlier request.
+
+With `min_change`, the values are the ones subscribers with the same thresholds were sent. A threshold is kept for 10 minutes after it was last used, so polling more often than that with `since` only gets what crossed it.
+
+# History, then live
+
+> Show past trades, transfers or activity and keep the list live, without missing or repeating an event.
+
+Trades, transfers and an account's activity each have two methods:
+- `.query` answers once, with a page of history.
+- `.subscribe` sends history and then live events, with nothing missed or repeated between them.
+
+## A live list
+
+Subscribe with `history` set to how many past events to show (up to 200). The reply has them newest first, and each push after it has a block's new events, oldest first:
+
+Using the client from the [Quickstart](https://docs.intear.tech/api/quickstart.md#over-the-websocket):
+
+```js
+let latestId = 0;
+
+const { result } = await api.subscribe(
+  'trades.subscribe',
+  {
+    fields: ['id', 'timestamp_millis', 'trader', 'side', 'amount', 'usd_value'],
+    token: 'wrap.near',
+    history: 50,
+  },
+  (push) => {
+    if (push.end) throw new Error(`Subscription ended: ${push.end.message}`);
+    const rows = push.rows ?? [];
+    latestId = Math.max(latestId, ...rows.map((row) => Number(row[0])));
+    addTrades(rows); // oldest first
+  },
+);
+
+latestId = result.latest_id;
+addTrades(result.rows.toReversed()); // history comes newest first
+// After a reconnect, subscribe with `after_id: latestId` instead of `history`
+```
+
+The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+## Older pages
+
+When there's more history than `history` asked for, the reply has `next_cursor`. Pass it as `cursor` to the matching `.query` method for the page before, and keep going with each page's `next_cursor` until it's `null`:
+
+```json
+{ "id": 2, "method": "trades.query", "params": { "fields": ["id", "side", "usd_value"], "token": "wrap.near", "limit": 200, "cursor": "1792003517185090582:6860366" } }
+```
+
+Use the same filters as the subscription. `.query` also takes `after_millis` (inclusive) and `before_millis` (exclusive) to limit history to a time range.
+
+To read on from a time instead, such as a date jumped to, pass `"order": "oldest"` with `after_millis`: pages go toward the present, and the last one, with a `null` `next_cursor`, ends at the latest block.
+
+## After a reconnect
+
+Subscribe again with `after_id` (for trades and transfers) instead of `history`. The reply has every event after that one, oldest first, and pushes carry on from there:
+
+- Set `after_id` to the newest `id` you have, or the reply's `latest_id` if that's newer. `latest_id` is the newest event the reply accounts for, matching or not, so it can be ahead of your newest row.
+- For `activity.subscribe`, use `after` set to the `last` of the last reply or push you got. Activity mixes trades, transfers and transactions, so it can't use a single `id`.
+- More than 10,000 events after it is an error, `too_far_behind`: start over with `history`.
+
+With neither `history` nor `after_id`, a subscription only sends events from now on.
+
+## Filters
+
+Trades can be filtered by token, the other token, trader, side and size, and transfers by token, sender and receiver. See [Trades](https://docs.intear.tech/api/reference/trades.md), [Transfers](https://docs.intear.tech/api/reference/transfers.md) and [Activity](https://docs.intear.tech/api/reference/activity.md) for every filter.
+
+`parent` follows the tokens directly under an account instead of one `token`, like every token launched on a platform. It's resolved when the request is made, so tokens created after that aren't included.
+
+:::note
+Transfer history, `after_id` included, needs a `sender`, `receiver` or `account`. Subscribing to transfers from now on takes any filters, or none for every transfer.
+:::
+
+# Charts
+
+> Price candles in USD or NEAR, fetched once or kept live.
+
+[`candles.get`](https://docs.intear.tech/api/reference/candles.md#candlesget) returns price candles of up to 200 tokens at once, and [`candles.subscribe`](https://docs.intear.tech/api/reference/candles.md#candlessubscribe) keeps them live.
+
+## Fetching candles
+
+Candles come as columns rather than one object per candle, so a chart library can often take them as they are:
+
+```json
+{
+  "height": 219969220,
+  "timestamp_millis": 1792003477277,
+  "tokens": {
+    "wrap.near": {
+      "time": [1791921600000, 1791925200000],
+      "usd": { "open": [4.79, 4.8], "high": [4.83, 4.82], "low": [4.77, 4.79], "close": [4.8, 4.81] }
+    }
+  },
+  "missing": []
+}
+```
+
+`time` is when each candle opens, in milliseconds, oldest first.
+
+```js
+const params = new URLSearchParams({
+  tokens: 'wrap.near',
+  resolution: '60',
+  count_back: '24',
+  series: 'open,high,low,close',
+});
+const response = await fetch(`https://api.intea.rs/candles?${params}`);
+const result = await response.json();
+if (!response.ok) throw new Error(result.error.message);
+const { time, usd } = result.tokens['wrap.near'];
+const candles = [];
+for (const [i, openedAt] of time.entries()) {
+  candles.push({ time: openedAt, open: usd.open[i], high: usd.high[i], low: usd.low[i], close: usd.close[i] });
+}
+```
+
+The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/intear-api.js
+
+## Resolutions
+
+| `resolution` | Candle | Also accepted |
+| --- | --- | --- |
+| `1S` | 1 second | |
+| `1` | 1 minute | `1m` |
+| `5` | 5 minutes | `5m` |
+| `15` | 15 minutes | `15m` |
+| `60` | 1 hour | `60m`, `1h` |
+| `240` | 4 hours | `240m`, `4h` |
+| `D` | 1 day | `24h`, `1d` |
+| `W` | 1 week | `7d`, `1w` |
+
+The aliases work in any case.
+
+Each candle opens where the one before closed. There's no candle for a time when the price didn't change and nothing traded.
+
+`1S` candles only exist for the seconds the token was swapped in, so there are gaps between them. Each opens at the price before the first block with a swap in its second, which isn't necessarily where the one before closed. They're worked out from trades on request, so they're slower than the other resolutions.
+
+## In NEAR
+
+`"quote": "near"` gives prices in NEAR instead of USD: the token's USD price over NEAR's at the same block. A token traded against NEAR then stays flat while only NEAR moves. Ask for both with `"quote": ["usd", "near"]`, and each token has a `usd` and a `near` object.
+
+In `near`, values are `null` from before wrap.near had a price.
+
+## Live charts
+
+[`candles.subscribe`](https://docs.intear.tech/api/reference/candles.md#candlessubscribe) takes the same params except `to_millis`, with `count_back` defaulting to `0`. Set `count_back` to get the chart's history in the reply too. Each push has the candles that changed in that block: the latest one, and a new one when it opens. A push can also carry the candle before the latest one. A candle replaces the one you have with the same `time`.
+
+## Example: TradingView
+
+[chart-tradingview](https://github.com/INTEARnear/chart-tradingview) shows Intear API candles in the [TradingView charting library](https://www.tradingview.com/charting-library-docs/). Its datafeed loads history with `/candles` and keeps the chart live with `candles.subscribe`, all charts sharing one connection:
+
+```js
+/**
+ * Turns a token's candle columns into TradingView bars
+ */
+function toBars({ time, usd }) {
+  return time.map((openedAt, i) => ({
+    time: openedAt,
+    open: usd.open[i],
+    high: usd.high[i],
+    low: usd.low[i],
+    close: usd.close[i],
+    volume: usd.volume[i],
+  }));
+}
+
+/**
+ * The newest bar TradingView has of each token and resolution. It can only update its newest
+ * bar, and a push can also carry the candle before it
+ */
+const newestBarTimes = new Map();
+
+/**
+ * History: one request per chunk TradingView asks for
+ */
+async function getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+  const countBack = Math.min(periodParams.countBack, 5000);
+  const params = new URLSearchParams({
+    tokens: symbolInfo.ticker,
+    resolution,
+    count_back: String(countBack),
+    to_millis: String(periodParams.to * 1000 - 1), // TradingView's `to` is exclusive
+  });
+  try {
+    const response = await fetch(`https://api.intea.rs/candles?${params}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error.message);
+    const candles = result.tokens[symbolInfo.ticker]; // not there if the token doesn't exist
+    const bars = candles ? toBars(candles) : [];
+    const key = `${symbolInfo.ticker}/${resolution}`;
+    if (bars.length > 0) newestBarTimes.set(key, Math.max(newestBarTimes.get(key) ?? 0, bars[bars.length - 1].time));
+    onHistoryCallback(bars, { noData: bars.length < countBack });
+  } catch (error) {
+    onErrorCallback(String(error));
+  }
+}
+
+// Live candles: every chart shares one connection, with a subscription per chart
+const streams = new Map();
+const streamIds = new Map(); // subscription id of each TradingView listenerGuid
+let nextId = 1;
+let socket = connect();
+
+ */
+function send(method, params, id = nextId++) {
+  if (socket.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ id, method, params }));
+}
+
+function connect() {
+  const ws = new WebSocket('wss://api.intea.rs/ws');
+  ws.addEventListener('open', () => {
+    for (const [id, stream] of streams) send('candles.subscribe', stream.params, id);
+  });
+  ws.addEventListener('message', (event) => {
+    const message = JSON.parse(event.data);
+    if (message.error) console.error(`Request ${message.id} failed: ${message.error.message}`);
+    const stream = streams.get(message.sub);
+    if (!stream || !message.tokens) return;
+    for (const bar of Object.values(message.tokens).flatMap(toBars)) {
+      if (bar.time < (newestBarTimes.get(stream.key) ?? 0)) continue;
+      newestBarTimes.set(stream.key, bar.time);
+      stream.onTick(bar);
+    }
+  });
+  ws.addEventListener('close', () => {
+    if (closed) return;
+    // Candles may have changed while disconnected, so TradingView fetches them again
+    for (const stream of streams.values()) stream.onReset();
+    setTimeout(() => (socket = connect()), 1000);
+  });
+  return ws;
+}
+
+ */
+function subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+  const id = nextId++;
+  const params = { tokens: [symbolInfo.ticker], resolution, series: ['open', 'high', 'low', 'close', 'volume'] };
+  streams.set(id, { key: `${symbolInfo.ticker}/${resolution}`, params, onTick, onReset: onResetCacheNeededCallback });
+  streamIds.set(listenerGuid, id);
+  send('candles.subscribe', params, id);
+}
+
+function unsubscribeBars(listenerGuid) {
+  const id = streamIds.get(listenerGuid);
+  if (id === undefined) return;
+  streamIds.delete(listenerGuid);
+  streams.delete(id);
+  send('unsubscribe', { sub: id });
+}
+```
+
+The whole file, tested in CI: https://docs.intear.tech/snippets/js/src/tradingview.js
+
+TradingView can only update its newest bar, so candles older than it are skipped. The full page, with symbol search and a market cap mode, is [index.html](https://github.com/INTEARnear/chart-tradingview/blob/main/index.html).
+
+# Balances and holders
+
+> An account's token balances, and a token's largest holders, fetched once or kept live.
+
+## An account's balances
+
+[`balances.get`](https://docs.intear.tech/api/reference/balances.md#balancesget) returns what an account holds, from any of three sources:
+
+- `direct`: its own token balances.
+- `native`: its NEAR balance, as token `near` in yoctoNEAR.
+- `rhea`: its deposits in Rhea (`v2.ref-finance.near`).
+
+```json
+{ "id": 1, "method": "balances.get", "params": { "account": "alice.near", "sources": ["direct", "native"], "token_fields": ["symbol", "decimals", "price_usd"] } }
+```
+
+`token_fields` brings along fields of each token held, so a wallet view needs one request. Native NEAR gets wrap.near's fields.
+
+The reply has:
+- `balances`: a table of `token`, `source` and `balance`, in the token's smallest units.
+- `tokens`: the held tokens' `token_fields`, only when `token_fields` was given.
+- `unknown`: tokens the account holds that this API doesn't know, without balances.
+- `errors`: sources that couldn't be read right now, as `upstream_unavailable`. The other sources' balances are there all the same.
+
+## Live balances
+
+[`balances.subscribe`](https://docs.intear.tech/api/reference/balances.md#balancessubscribe) follows `direct` and `native` balances. Each push has every balance a block changed, including NEAR spent on gas and refunded:
+
+```json
+{ "sub": 1, "height": 219969300, "timestamp_millis": 1792003525000, "balances": { "wrap.near": "1500000000000000000000000" } }
+```
+
+With `token_fields`, `set` carries changes to the held tokens' fields, like a [token subscription](https://docs.intear.tech/api/guides/live-token-lists.md#reading-pushes), and `token_min_change` sets [thresholds](https://docs.intear.tech/api/guides/live-token-lists.md#fewer-updates) for them.
+
+- Rhea deposits aren't followed live, and the reply says so with `"not_live": ["rhea"]`.
+- A connection can follow up to 100 accounts.
+- A balance subscription ends with `too_far_behind` if the client falls behind, since balance changes can't be read back. Subscribe again for the current balances.
+
+## A token's holders
+
+[`holders.get`](https://docs.intear.tech/api/reference/holders.md#holdersget) pages through a token's holders, largest balance first, with `total`, the number of holders. [`holders.subscribe`](https://docs.intear.tech/api/reference/holders.md#holderssubscribe) follows the top holders (up to 1,000):
+
+```json
+{ "sub": 1, "height": 219969300, "timestamp_millis": 1792003525000, "set": { "alice.near": "1200000" }, "left": ["bob.near"] }
+```
+
+`set` has the new balances in the top, including accounts that came into it, and `left` the accounts that fell out.
+
+Holders are counted from this project's indexed balances. An account that has held a token since before indexing started and hasn't touched it since isn't counted until its balances are re-checked.
+
+# Using HTTP
+
+> Call the methods that answer once over plain HTTP, and how params go in a URL.
+
+Every method that answers once, except `tokens.update` and `unsubscribe`, is plain HTTP too, on `https://api.intea.rs`, for clients that don't need anything live:
+
+| Path | Method |
+| --- | --- |
+| `/tokens` | [`tokens.get`](https://docs.intear.tech/api/reference/tokens.md#tokensget) |
+| `/tokens/search` | [`tokens.search`](https://docs.intear.tech/api/reference/tokens.md#tokenssearch) |
+| `/trades` | [`trades.query`](https://docs.intear.tech/api/reference/trades.md#tradesquery) |
+| `/transfers` | [`transfers.query`](https://docs.intear.tech/api/reference/transfers.md) |
+| `/activity` | [`activity.query`](https://docs.intear.tech/api/reference/activity.md#activityquery) |
+| `/candles` | [`candles.get`](https://docs.intear.tech/api/reference/candles.md#candlesget) |
+| `/prices/at` | [`prices.at`](https://docs.intear.tech/api/reference/prices.md#pricesat) |
+| `/balances` | [`balances.get`](https://docs.intear.tech/api/reference/balances.md#balancesget) |
+| `/holders` | [`holders.get`](https://docs.intear.tech/api/reference/holders.md#holdersget) |
+| `/positions` | [`positions.get`](https://docs.intear.tech/api/reference/positions.md#positionsget) |
+| `/accounts/search` | [`accounts.search`](https://docs.intear.tech/api/reference/accounts.md#accountssearch) |
+| `/schema` | [`schema`](https://docs.intear.tech/api/reference/messages.md#schema) |
+
+The response's body is what the method's `result` would be on the WebSocket.
+
+Some paths are HTTP only, with no method on the WebSocket: [`/public_key/{key}`](https://docs.intear.tech/api/reference/accounts.md#accounts-by-public-key), [`/stats`](https://docs.intear.tech/api/reference/accounts.md#key-stats), [`/cosmetics`](https://docs.intear.tech/api/reference/trades.md#referrers-names-and-icons) and token icons at [`/icon/<icon_hash>.webp`](https://docs.intear.tech/api/guides/live-token-lists.md#icons).
+
+## GET or POST
+
+A `GET` takes the params in its URL. A `POST` takes them as a JSON body, exactly as `params` on the WebSocket, up to 64 KiB, for what's too long for a URL:
+
+```sh
+curl -X POST https://api.intea.rs/tokens \
+  -d '{"fields": ["symbol", "price_usd"], "ids": ["wrap.near", "usdt.tether-token.near"]}'
+```
+
+## Params in a URL
+
+- A list is comma-separated: `fields=symbol,price_usd`.
+- An object's keys are dotted: `min_change.price_usd=0.1%25` (`%` is URL-encoded), or `fields.trade=amount_in,amount_out` for `activity.query`.
+- `where`'s params go without `where`: `min_reputation=NotFake`, `min.liquidity_usd=1000`.
+- `sort=volume_usd_24h` sorts ascending, and `sort=-volume_usd_24h` descending.
+- `prices.at`'s queries are `at=<token>:<timestamp_millis>`, comma-separated.
+- A param given twice, or one the method doesn't take, is a `bad_request`. `/schema`, `/stats` and `/cosmetics` take none, and ignore unknown ones.
+
+For example, the 10 `NotFake` or `Reputable` tokens with the most volume in the last 24 hours:
+
+```
+GET https://api.intea.rs/tokens?fields=symbol,price_usd,volume_usd_24h&sort=-volume_usd_24h&limit=10&min_reputation=NotFake
+```
+
+## Errors
+
+An error is `{ "error": { "code": "...", "message": "..." } }`, with the status:
+
+| Status | Codes |
+| --- | --- |
+| `404` | `not_found`, and `unknown_method` for a path nothing is served at |
+| `500` | `internal` |
+| `503` | `not_indexed` |
+| `400` | every other code |
+
+See [Errors](https://docs.intear.tech/api/reference/errors.md) for what each code means.
+
+## Caching and compression
+
+Responses can be cached for a second (`Cache-Control: public, max-age=1`), `/stats` for 10 seconds, and `/cosmetics` for a minute. Responses only about the past can be cached for a day (`max-age=86400`):
+- history with a `cursor` (newest first), with a `before_millis` the latest block has passed, or oldest first with a `next_cursor`;
+- candles up to a `to_millis` whose candle has closed;
+- `prices.at` of times the latest block has passed.
+
+Candles and `prices.at` aren't cached for a day when a token asked about doesn't exist, since it may yet. A cached response keeps the `height` and `latest_id` it was first answered with.
+
+Responses allow any origin (CORS), and are compressed with `gzip` or `zstd` when the request's `Accept-Encoding` allows it. The `X-Credits-Used` header has the [credits](https://docs.intear.tech/api/reference/limits.md#credits) a method's response would cost.
+
+# Token fields
+
+> Every field a token has, what it means, and what it can be filtered, sorted and thresholded by.
+
+Name the fields you want in `fields`. `account_id` always comes first. The last three columns say whether a field works in `where` bounds (`min`, `max`), in `sort`, and in `min_change`.
+
+| Field | Type | `where` | `sort` | `min_change` |
+| --- | --- | --- | --- | --- |
+| `name`, `symbol` | string | | | |
+| `decimals` | number | ✅ | ✅ | |
+| `reference` | string or `null` | | | |
+| `icon` | string or `null` | | | |
+| `thumbnail` | string or `null` | | | |
+| `icon_hash` | string or `null` | | | |
+| `price_usd`, `price_usd_raw`, `price_usd_hardcoded` | string | ✅ | ✅ | ✅ |
+| `price_near` | string | ✅ | ✅ | ✅ |
+| `ath_price_usd_raw` | string | ✅ | ✅ | |
+| `main_pool`, `main_pool_url` | string or `null` | | | |
+| `liquidity` | string | ✅ | ✅ | ✅ |
+| `liquidity_usd` | number | ✅ | ✅ | ✅ |
+| `market_cap_usd`, `fdv_usd` | number | ✅ | ✅ | ✅ |
+| `total_supply`, `circulating_supply`, `circulating_supply_excluding_team` | string | ✅ | ✅ | ✅ |
+| the same three with `_with_decimals` | string | ✅ | ✅ | ✅ |
+| `holders` | number | ✅ | ✅ | ✅ |
+| `reputation` | string | | | |
+| `socials` | object or `null` | | | |
+| `description` | string or `null` | | | |
+| `dev` | string or `null` | | | |
+| `deleted` | boolean | | | |
+| `created_at`, `created_at_millis` | number | ✅ | ✅ | |
+| `buys_<w>`, `sells_<w>`, `traders_<w>` | number | ✅ | ✅ | ✅ |
+| `volume_usd_<w>` | number | ✅ | ✅ | ✅ |
+| `price_usd_raw_<w>_ago` | string | ✅ | ✅ | ✅ |
+| `price_change_<w>` | number or `null` | ✅ | ✅ | |
+
+`<w>` is a window: `5m`, `15m`, `1h`, `6h` or `24h`.
+
+## Metadata
+
+- `name`, `symbol`, `decimals`, `reference`: from the token contract's `ft_metadata`.
+- `icon`: the contract's icon, shrunk to a small WebP if it's a raster image, or `null` when there's none that can be served inline.
+- `thumbnail`: a WebP of at most 35×35, a few hundred bytes, SVG icons included. `null` when the icon can't be decoded, and for a new token until its icon has been processed.
+- `icon_hash`: the icon as a WebP of up to 128×128 at `https://api.intea.rs/icon/<icon_hash>.webp`, SVG icons rasterized. The hash is 16 characters of URL-safe base64 from the icon's SHA-256, so the URL changes whenever the icon does. It's served with `Cache-Control: public, max-age=31536000, immutable`, and returns `404` once no token has that icon. Tokens with the same icon share it.
+- `reputation`: `Spam`, `Unknown`, `NotFake` or `Reputable`, in increasing order.
+- `socials`: links like `{ "twitter": "https://x.com/..." }`.
+- `description`: what the launchpad the token was launched on describes it as, `null` when it isn't from one that does.
+- `dev`: the account that launched the token: the one that signed the transaction deploying its contract, or for a meta-transaction, the signer of the delegate action rather than the relayer. For a meme.cooking token, whoever created the meme. `null` when that isn't known.
+- `deleted`: the token's account is gone, has no contract, or has no `ft_metadata`, or what `ft_metadata` returns isn't token metadata. A contract that panics, or an RPC that fails, doesn't count. It stays `true` until the token is found again, say after a redeploy.
+- `created_at`: the block height the token was first seen at, and `created_at_millis` when that block was produced. A few tokens that predate indexing have `created_at` `0`.
+
+## Prices
+
+- `price_usd`: USD per whole token. `"0"` without a price. USDt is always `"1"`, but that price isn't recorded, so its `ath_price_usd_raw`, `price_usd_raw_<w>_ago` and [`prices.at`](https://docs.intear.tech/api/reference/prices.md#pricesat) are `"0"` and its `price_change_<w>` is `null`.
+- `price_usd_raw`: the unscaled price the indexer works in: `price_usd = price_usd_raw × 10^(decimals − 6)`.
+- `price_usd_hardcoded`: `price_usd`, except that USDC (`17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1`) is pinned at exactly `"1"` while it's within 1% of $1.
+- `price_near`: NEAR per whole token, `price_usd` over wrap.near's at the same block. `"0"` while either has no price.
+- `ath_price_usd_raw`: the highest raw price ever recorded, as of the latest block.
+- `main_pool`: the pool the price comes from, like `REF-6063`, or `null`. It pairs the token with one that has a price of its own, and so on down to `wrap.near` or USDt, along the route whose shallowest pool is deepest. A route with one more pool needs to be twice as deep, and the price only moves to another route once that one is twice as deep. `main_pool_url` is the pool's page on its DEX.
+
+`precision` (1 to 30) rounds the string prices (`price_usd`, `price_usd_raw`, `price_usd_hardcoded`, `price_near`, `ath_price_usd_raw` and `price_usd_raw_<w>_ago`) to that many significant digits, keeping at least 3 decimals: at 6, `0.000123456789` is `0.000123457` and `12345.6789` is `12345.679`. Without it, `price_near` and `ath_price_usd_raw` have up to 30 significant digits, and the others up to 20.
+
+## Liquidity and supply
+
+- `liquidity`: the token's reserves summed across its pools with tokens that have a price, in its smallest units, each counted only as far as the route behind that price is deep. A Rhea DCL pool counts what it holds, not its liquidity at the current price.
+- `liquidity_usd`: the value of `liquidity`, doubled to count the side it's paired with.
+- `total_supply`, `circulating_supply`, `circulating_supply_excluding_team`: in the token's smallest units. The `_with_decimals` forms are the same in whole tokens, like `"21000000.5"`.
+- `market_cap_usd` and `fdv_usd`: `circulating_supply` and `total_supply` at `price_usd`. `0` without a price.
+- `holders`: how many accounts hold any of the token, as far as this project's indexed balances go.
+
+## Activity windows
+
+For each window `<w>`, exact as of every block:
+
+- `buys_<w>`, `sells_<w>`: how many swaps bought and sold the token.
+- `traders_<w>`: how many accounts made them.
+- `volume_usd_<w>`: what they were worth in USD, each swap valued at the prices from before its block.
+- `price_usd_raw_<w>_ago`: the last raw price recorded at or before the window's start, or `"0"`.
+- `price_change_<w>`: `price_usd_raw / price_usd_raw_<w>_ago - 1`, like `0.05` for +5%. `null` without both prices.
+
+A swap counts from its block until the window has moved past it, and `price_usd_raw_<w>_ago` moves along with the window.
+
+# Tokens
+
+> tokens.get, tokens.search, tokens.subscribe and tokens.update.
+
+## `tokens.get`
+
+Tokens, filtered and sorted, once. HTTP: `/tokens`.
+
+| Param | Description |
+| --- | --- |
+| `fields` | **Required.** [Token fields](https://docs.intear.tech/api/reference/token-fields.md) to return |
+| `ids` | Only these tokens, up to 2,000 |
+| `where` | Filters, see [below](#where) |
+| `sort` | `{ "by": "<field>", "desc": true }`, by a numeric field. `null` values come last, ascending or descending, but a missing price is `"0"` and sorts as 0. Without `sort`, tokens are in account ID order |
+| `limit`, `offset` | A page of the sorted tokens. Both need `sort` |
+| `precision` | 1 to 30, rounds string prices, see [Token fields](https://docs.intear.tech/api/reference/token-fields.md#prices) |
+| `min_change` | Thresholds, as for [`tokens.subscribe`](#tokenssubscribe). The values are those subscribers with the same thresholds were sent |
+| `since` | The `height` of an earlier result with the same params, for only what changed after it. Not with `sort`, `limit` or `offset`. See [Keeping every token](https://docs.intear.tech/api/guides/syncing-tokens.md) |
+
+Result:
+
+```json
+{ "height": 219969220, "timestamp_millis": 1792003477277, "columns": ["account_id", "symbol"], "rows": [["wrap.near", "wNEAR"]], "total": 1, "missing": [] }
+```
+
+- `total`: how many tokens matched, before `limit` and `offset`.
+- `missing`: the `ids` that aren't tokens.
+- With `since`, also `resumed`, and `left` when it's `true`. With `"resumed": true`, `rows` are only the tokens that changed after that height, each with every field, and `left` the tokens that stopped matching `where`. With `"resumed": false`, `rows` has every token.
+
+### `where`
+
+All optional:
+
+| Filter | Description |
+| --- | --- |
+| `parent` | An account or a list of them: only tokens directly under one. `meme-cooking.near` has `abc.meme-cooking.near` but not `x.abc.meme-cooking.near` |
+| `min_reputation` | `Spam`, `Unknown`, `NotFake` or `Reputable` |
+| `deleted` | `true` for only deleted tokens, `false` for only ones that aren't |
+| `min`, `max` | `{ "<field>": number }`, inclusive bounds on numeric fields |
+| `created_after_millis` | Only tokens created after this time |
+
+## `tokens.search`
+
+Tokens matching a search, best match first. HTTP: `/tokens/search`.
+
+| Param | Description |
+| --- | --- |
+| `q` | **Required.** Matched against symbol, name, account ID and social links |
+| `fields` | **Required.** Token fields to return |
+| `limit` | At most 100, default 10 |
+| `min_reputation` | Default `Unknown` |
+| `holder` | An account whose tokens rank higher |
+| `parent` | Only tokens directly under this account, or a list of them |
+| `precision` | As for `tokens.get` |
+
+The result is `{ "height", "timestamp_millis", "columns", "rows" }`.
+
+## `tokens.subscribe`
+
+Follows tokens as they change. See [Live token lists](https://docs.intear.tech/api/guides/live-token-lists.md) for how to use it.
+
+Takes the params of `tokens.get` except `offset` and `since`, and:
+
+| Param | Description |
+| --- | --- |
+| `min_change` | `{ "<field>": "<threshold>" }`: that field only changes once it's moved by the threshold since the value last sent, either way. A change from or to 0 always counts. Thresholds: `0.01%`, `0.1%`, `0.25%`, `0.5%`, `1%`, `2%`, `5%`, `10%` |
+| `min_interval_ms` | At most one push per this much block time: `200`, `600`, `1000`, `5000`, `15000` or `60000` |
+| `snapshot` | Default `true`. `false` leaves `rows` in the result empty |
+| `resume_from` | The `height` of the last reply or push before a reconnect, for only what changed since |
+
+With `sort` and `limit`, it follows the top `limit` tokens as they change places. The sort field has to be one of `fields`.
+
+The result is `{ "height", "timestamp_millis", "columns", "rows" }`. Each push is:
+
+```json
+{ "sub": 1, "height": 219969292, "timestamp_millis": 1792003519000, "set": { "<token>": { "<field>": "value" } }, "created": ["<token>"], "left": ["<token>"] }
+```
+
+- `set`: the fields that changed. A token the subscription didn't have before has every field.
+- `created`: tokens in `set` that were just created.
+- `left`: tokens the subscription is no longer about.
+
+Each of the three is left out when empty.
+
+With `resume_from`, the result is `{ "height", "timestamp_millis", "resumed": true, "set", "created", "left" }`, shaped like a push. A token that may have come to match `where` since has every field, and `left` can name tokens the client never had. When the server can't work out what changed (it restarted since, or the subscription has a `limit`), the result has `"resumed": false` and every row.
+
+## `tokens.update`
+
+Changes the tokens a `tokens.subscribe` with `ids` follows, say the ones on screen.
+
+| Param | Description |
+| --- | --- |
+| `sub` | **Required.** The subscription's `id` |
+| `add` | Tokens to start following |
+| `remove` | Tokens to stop following |
+
+The result is `{ "height", "timestamp_millis", "columns", "rows", "missing" }`: the added tokens as of that `height`, and `missing` the ones that aren't tokens. Pushes after it carry changes to the added tokens after that `height`.
+
+# Trades
+
+> trades.query and trades.subscribe, and the fields of a trade.
+
+## Filters
+
+Both methods take these, all optional:
+
+| Param | Description |
+| --- | --- |
+| `fields` | **Required.** [Trade fields](#trade-fields) to return. `id` always comes first |
+| `token` | Trades with this token on either side, or a list of tokens. Each trade appears once per listed token it has, seen from that token, so a trade between two listed tokens appears twice |
+| `parent` | Instead of `token`: the tokens directly under an account or a list of them, as they are when the request is made, up to 2,000 tokens |
+| `counterparty` | The other token. Needs `token` |
+| `trader` | Trades by this account |
+| `side` | `sell`, `buy`, `add_liquidity` or `remove_liquidity`. With `token`, only trades where it went in or came out, or only that kind of liquidity change. Without it, `sell` and `buy` pick which token each trade is seen from (`buy` means `token_out`) |
+| `include_liquidity` | Default `false`. Liquidity changes alongside swaps, when `side` isn't given |
+| `min_usd` | One of `10`, `50`, `100`, `500`, `1000`, `5000`, `10000` |
+
+## `trades.query`
+
+A page of trades, newest first, or oldest first with `order`. HTTP: `/trades`.
+
+| Param | Description |
+| --- | --- |
+| `limit` | 1 to 200, default 50 |
+| `cursor` | `next_cursor` from the page before |
+| `after_millis` | Inclusive |
+| `before_millis` | Exclusive |
+| `order` | `newest` (default) or `oldest`: from `after_millis` toward the present, to read on from a time |
+
+Result:
+
+```json
+{ "height": 219969289, "timestamp_millis": 1792003517185, "columns": ["id", "side"], "rows": [[6860365, "buy"]], "next_cursor": "1792003517185090582:6860365", "latest_id": 6860368 }
+```
+
+- `next_cursor`: pass as `cursor`, with the same `order`, for the next page. `null` on the last page, which oldest first is the newest one.
+- `latest_id`: the newest trade the result accounts for, of all trades, not just matching ones.
+
+## `trades.subscribe`
+
+History, then live trades. See [History, then live](https://docs.intear.tech/api/guides/history-then-live.md). Takes one of:
+
+| Param | Description |
+| --- | --- |
+| `history` | 1 to 200: the newest trades, newest first, in the result, with `next_cursor` if there are more |
+| `after_id` | Every trade after this one, oldest first, in the result. More than 10,000 is `too_far_behind` |
+| neither | Only trades from now on |
+
+The result is `{ "height", "timestamp_millis", "columns", "rows", "latest_id" }`, plus `next_cursor` with `history`. Each push is `{ "sub", "height", "timestamp_millis", "rows" }` with a block's matching trades, oldest first, in the result's columns.
+
+To pick up after a reconnect, subscribe again with `after_id` set to the newest `id` you have, or the result's `latest_id` if that's newer.
+
+## Trade fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | number | Identifies this view of the trade. The same trade seen from its other token has another `id` |
+| `height`, `timestamp_millis` | number | The block it's in |
+| `trader` | string | The account that swapped, or the liquidity provider |
+| `pool_id` | string | Like `REF-6063` |
+| `pool_url` | string | The pool's page on its DEX |
+| `transaction_id`, `receipt_id` | string | |
+| `token_in`, `amount_in` | string or `null` | What was sold. `null` for liquidity changes |
+| `token_out`, `amount_out` | string or `null` | What was bought. `null` for liquidity changes |
+| `token`, `amount` | string | The trade seen from one of its tokens: the filtered one with a `token` or `parent` filter. Otherwise `token_out` with a `side: "buy"` filter, and `token_in` without one |
+| `counterparty`, `counterparty_amount` | string | The other token |
+| `side` | string | `sell` if `token` went in, `buy` if it came out, or `add_liquidity` or `remove_liquidity` |
+| `usd_value` | string or `null` | At the prices from before its block. `null` when neither token had a price yet. For a liquidity change, both tokens together |
+| `referrer` | string or `null` | The app or aggregator the swap came through, as the DEX reports it. Always `null` for liquidity changes |
+
+- Amounts are in each token's smallest units.
+- Native NEAR is always `wrap.near`, so its trades are found with `token: "wrap.near"`. Wrapping and unwrapping aren't trades.
+- For liquidity changes, `token` and `counterparty` are the pool's two tokens.
+
+## Referrers' names and icons
+
+`GET /cosmetics` returns how to show trades: the name, emoji and icon of the apps and aggregators that trades name as their `referrer`, and an emoji for some traders. Nothing on chain says these, so Intear sets them by hand, and only some accounts have them. It's HTTP only, and can be cached for a minute.
+
+```json
+{
+  "referrers": {
+    "<account id>": {
+      "emoji": "💦",
+      "telegram_custom_emoji_id": "5953988320630415439",
+      "name": "Intear DEX",
+      "icon": "/referral/inteardex.png"
+    }
+  },
+  "users": {
+    "<account id>": { "emoji": "🐳" }
+  }
+}
+```
+
+`referrers` and `users` are keyed by account ID. `icon` is the path of an image on `https://api.intea.rs`. `telegram_custom_emoji_id` is the ID of a Telegram custom emoji to show instead of `emoji` where Telegram can.
+
+# Transfers
+
+> transfers.query and transfers.subscribe, and the fields of a transfer and a transaction.
+
+`transfers.query` and `transfers.subscribe` work like [trades](https://docs.intear.tech/api/reference/trades.md): `transfers.query` takes `limit`, `cursor`, `after_millis`, `before_millis` and `order` (HTTP: `/transfers`), and `transfers.subscribe` takes `history` or `after_id`, with the same results and pushes.
+
+## Filters
+
+| Param | Description |
+| --- | --- |
+| `fields` | **Required.** [Transfer fields](#transfer-fields), or with `kind: "transaction"`, [transaction fields](#transaction-fields) |
+| `token` | Transfers of this token, or a list of tokens |
+| `parent` | Instead of `token`: the tokens directly under an account or a list of them, as they are when the request is made, up to 2,000 tokens |
+| `sender`, `receiver` | Transfers and transactions from or to this account |
+| `account` | From or to this account, instead of `sender` and `receiver` |
+| `kind` | `transfer` or `transaction`: only that kind |
+| `include_transactions` | Default `false`. Transactions alongside transfers when `kind` isn't given |
+
+- History (`transfers.query`, `history` or `after_id`) needs a `sender`, `receiver` or `account`. Subscribing from now on takes any filters, or none for every transfer.
+- Transactions have no token, so `token` and `parent` can't be used with `include_transactions` or `kind: "transaction"`.
+
+## Transfer fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | number | |
+| `kind` | string | `transfer` or `transaction` |
+| `height`, `timestamp_millis` | number | The block it's in |
+| `transaction_id` | string or `null` | `null` for the few transfers whose transaction started long before they did |
+| `receipt_id` | string or `null` | `null` for transactions |
+| `token` | string or `null` | `near` for native NEAR. `null` for transactions |
+| `sender` | string or `null` | `null` for a mint |
+| `receiver` | string or `null` | `null` for a burn |
+| `amount` | string or `null` | In the token's smallest units, yoctoNEAR for `near`. `null` for transactions |
+
+A `transfer` is every NEP-141 mint, transfer and burn, and every native NEAR transfer or deposit attached to a function call, except gas refunds and amounts of 1 yoctoNEAR or less.
+
+## Transaction fields
+
+With `kind: "transaction"`, fields are a transaction's: `id`, `height`, `timestamp_millis`, `transaction_id`, `sender` and `receiver`.
+
+A `transaction` is every transaction, in the block it was included in, whether or not it went on to succeed, so an account's history can show what it sent alongside the tokens it moved. `sender` and `receiver` are its signer and receiver, or for a meta-transaction, those of the delegate action rather than the relayer. Transfers made by a transaction carry its hash as their `transaction_id`.
+
+# Activity
+
+> activity.query and activity.subscribe, an account's trades, transfers and transactions as one list.
+
+An account's trades, transfers and transactions as one list, in block order.
+
+## Params
+
+Both methods take:
+
+| Param | Description |
+| --- | --- |
+| `account` | **Required.** Its trades as `trader`, and the transfers and transactions it sent or received |
+| `kinds` | **Required.** Any of `trade`, `transfer` and `transaction` |
+| `fields` | **Required.** `{ "trade": [...], "transfer": [...], "transaction": [...] }`, for the kinds in `kinds`. See [trade fields](https://docs.intear.tech/api/reference/trades.md#trade-fields) and [transfer and transaction fields](https://docs.intear.tech/api/reference/transfers.md#transfer-fields) |
+| `token` | Only this token's trades and transfers. Not with `transaction` |
+| `side`, `min_usd`, `include_liquidity` | For trades, as for [`trades.query`](https://docs.intear.tech/api/reference/trades.md#filters) |
+
+## `activity.query`
+
+A page of activity, newest first, or oldest first with `order`. HTTP: `/activity`, with `fields` as `fields.trade=...&fields.transfer=...`. Takes `limit`, `cursor`, `after_millis`, `before_millis` and `order`, as [`trades.query`](https://docs.intear.tech/api/reference/trades.md#tradesquery) does.
+
+## `activity.subscribe`
+
+History, then live activity. Takes one of:
+
+| Param | Description |
+| --- | --- |
+| `history` | 1 to 200, the newest rows, newest first, in the result |
+| `after` | The `last` of a result or push: everything after it, oldest first |
+| neither | Only activity from now on |
+
+## Results
+
+The result has a set of columns per kind, and each row starts with its kind:
+
+```json
+{
+  "height": 219969289,
+  "timestamp_millis": 1792003517185,
+  "columns": {
+    "trade": ["id", "token", "side", "usd_value"],
+    "transfer": ["id", "token", "amount"]
+  },
+  "rows": [
+    ["trade", 6860368, "wrap.near", "buy", "191.54"],
+    ["transfer", 9120443, "near", "1000000000000000000000000"]
+  ],
+  "next_cursor": "1792003517185090582:0:9120443",
+  "last": "6860916:30209055"
+}
+```
+
+Within a block, transfers and transactions come before trades when oldest first, and after them when newest first. Instead of `latest_id`, results and pushes have `last`, where they leave off. Pass it as `after` to pick up after a reconnect.
+
+# Candles
+
+> Intear API candles.get and candles.subscribe: price candles of NEAR tokens in USD or NEAR, from 1 second to 1 week, fetched or live.
+
+See [Charts](https://docs.intear.tech/api/guides/charts.md) for resolutions and how candles are built.
+
+## `candles.get`
+
+HTTP: `/candles`.
+
+| Param | Description |
+| --- | --- |
+| `tokens` | **Required.** 1 to 200 tokens |
+| `resolution` | **Required.** `1S`, `1`, `5`, `15`, `60`, `240`, `D` or `W`, see [Resolutions](https://docs.intear.tech/api/guides/charts.md#resolutions) |
+| `quote` | `usd` (default), `near`, or both as a list |
+| `series` | Which of `open`, `high`, `low`, `close` and `volume`. All of them by default |
+| `count_back` | How many candles of each token, at most 5,000, or 1,000 for `1S`. Default 300 |
+| `to_millis` | The latest candle start to include. Now by default |
+
+Result:
+
+```json
+{
+  "height": 219969900,
+  "timestamp_millis": 1792003880982,
+  "tokens": {
+    "wrap.near": {
+      "time": [1791997200000, 1792000800000],
+      "usd": { "close": [4.8274, 4.8295] },
+      "near": { "close": [1.0, 1.0] }
+    }
+  },
+  "missing": []
+}
+```
+
+- Each token's candles are columns, oldest first. `time` is when each candle opens, in milliseconds.
+- Prices are per whole token, and `volume` is in the same currency.
+- In `near`, values are `null` from before wrap.near had a price.
+- `missing`: tokens that don't exist.
+
+## `candles.subscribe`
+
+Takes the params of `candles.get` except `to_millis`, with `count_back` defaulting to `0`. The result is shaped like `candles.get`'s.
+
+Each push is `{ "sub", "height", "timestamp_millis", "tokens" }` with the candles that changed in that block: the latest one, and a new one once it opens. It can also carry the candle before the latest one. A candle replaces the one with the same `time`.
+
+See [Charts](https://docs.intear.tech/api/guides/charts.md#example-tradingview) for a TradingView datafeed built on both.
+
+# Prices at a time
+
+> prices.at, a token's price at a point in the past.
+
+## `prices.at`
+
+Prices of tokens at given times. HTTP: `/prices/at`, with each query as `at=<token>:<timestamp_millis>`, comma-separated.
+
+| Param | Description |
+| --- | --- |
+| `queries` | **Required.** 1 to 100 of `{ "token": "wrap.near", "timestamp_millis": 1700000000000 }` |
+
+The result is `{ "height", "timestamp_millis", "prices" }`, with a price for each query, in the same order:
+- the last `price_usd` recorded at or before that time;
+- `"0"` before the token's first price, and always for USDt;
+- `null` for a token that doesn't exist.
+
+A time after the latest indexed block is a [`not_indexed`](https://docs.intear.tech/api/reference/errors.md) error.
+
+```
+GET https://api.intea.rs/prices/at?at=wrap.near:1790000000000,nope.near:1790000000000
+```
+
+```json
+{ "height": 219969969, "timestamp_millis": 1792003920726, "prices": ["4.0912072952475411051", null] }
+```
+
+# Balances
+
+> Intear API balances.get and balances.subscribe: an account's token, NEAR and Rhea balances, fetched once or followed live.
+
+See [Balances and holders](https://docs.intear.tech/api/guides/balances-and-holders.md) for how to use them.
+
+## `balances.get`
+
+HTTP: `/balances`.
+
+| Param | Description |
+| --- | --- |
+| `account` | **Required** |
+| `sources` | **Required.** Any of `direct` (the account's own token balances), `native` (its NEAR) and `rhea` (its deposits in Rhea) |
+| `tokens` | Only these tokens' balances |
+| `token_fields` | These [token fields](https://docs.intear.tech/api/reference/token-fields.md) of each token held come along. Native NEAR's are wrap.near's |
+
+Result:
+
+```json
+{
+  "height": 219969785,
+  "timestamp_millis": 1792003812629,
+  "balances": {
+    "columns": ["token", "source", "balance"],
+    "rows": [["wrap.near", "direct", "2564083907000000000000"], ["near", "native", "1000000000000000000000000"]]
+  },
+  "unknown": [],
+  "errors": {},
+  "tokens": { "columns": ["account_id", "symbol"], "rows": [["wrap.near", "wNEAR"]] }
+}
+```
+
+- Balances are in the token's smallest units. Native NEAR is token `near`, in yoctoNEAR. Tokens the account held before and has none of now are listed with `"0"`.
+- `unknown`: tokens held that this API doesn't know, without their balances.
+- `errors`: `{ "<source>": { "code": "upstream_unavailable", "message": "..." } }` for each source that couldn't be read. The others are there all the same.
+- `tokens`: a table of the `token_fields` of the tokens in `balances`, only with `token_fields`.
+
+The first time an account is asked for, its `direct` balances come from FastNEAR, and are then stored and re-checked against RPC in the background. After that they come from this project's own indexed balances.
+
+## `balances.subscribe`
+
+Takes the params of `balances.get`, and:
+
+| Param | Description |
+| --- | --- |
+| `token_min_change` | With `token_fields`: [thresholds](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe) for them |
+
+The result is shaped like `balances.get`'s. It follows `direct` and `native` balances. Each push is:
+
+```json
+{ "sub": 1, "height": 219969790, "timestamp_millis": 1792003815000, "balances": { "<token>": "<balance>" }, "set": { ... } }
+```
+
+- `balances`: every balance the block changed, after a mint, transfer or burn, gas spent or refunded, or a re-check that corrected it.
+- `set`: as in [`tokens.subscribe`](https://docs.intear.tech/api/reference/tokens.md#tokenssubscribe), for the held tokens' `token_fields`, with every field of a token held for the first time.
+
+Rhea deposits aren't followed, and the result says so with `"not_live": ["rhea"]`. A connection can follow up to 100 accounts. If the client falls behind, the subscription ends with `too_far_behind`: subscribe again.
+
+# Holders
+
+> Intear API holders.get and holders.subscribe: a NEAR token's holders, largest balance first, paged or followed live.
+
+## `holders.get`
+
+A page of a token's holders, largest balance first. HTTP: `/holders`.
+
+| Param | Description |
+| --- | --- |
+| `token` | **Required** |
+| `limit` | 1 to 100, default 50 |
+| `cursor` | `next_cursor` from the page before |
+
+Result:
+
+```json
+{
+  "height": 219969899,
+  "timestamp_millis": 1792003880287,
+  "columns": ["account_id", "balance"],
+  "rows": [["intents.near", "16981241773386170753431556038986"], ["omni.bridge.near", "11774926230871993514984106326729"]],
+  "next_cursor": "11774926230871993514984106326729:omni.bridge.near",
+  "total": 2197
+}
+```
+
+`total` is the token's `holders`. `next_cursor` is `null` on the last page.
+
+## `holders.subscribe`
+
+| Param | Description |
+| --- | --- |
+| `token` | **Required** |
+| `top` | **Required.** 1 to 1,000 |
+
+The result is the `top` largest holders, as rows with `total`. Each push is `{ "sub", "height", "timestamp_millis", "set", "left" }`:
+
+- `set`: `{ "<account>": "<balance>" }`, the new balances in the top, including accounts that came into it.
+- `left`: accounts that fell out of it, when there are any.
+
+# Positions
+
+> Intear API positions.get: an account's positions in tokens from its swaps, open and closed, with what each cost and made.
+
+## `positions.get`
+
+An account's positions, built from its swaps, newest trade first. HTTP: `/positions`.
+
+| Param | Description |
+| --- | --- |
+| `account` | **Required** |
+| `limit` | 1 to 1000, default 1000 |
+
+The first time an account is asked about, its positions are built from its newest 1,000 trades. From then on they're kept current with every trade it makes, whether it's asked about again or not.
+
+Result:
+
+```json
+{
+  "height": 220122260,
+  "timestamp_millis": 1792093696887,
+  "since_millis": 1790709119408,
+  "columns": ["token", "opened_at_millis", "closed_at_millis", "last_trade_millis", "amount", "cost_usd", "bought", "bought_usd", "sold", "sold_usd", "realized_pnl_usd", "buys", "sells"],
+  "rows": [["ribbit-426.meme-cooking.near", 1791563912000, null, 1792086520230, "600000000000000000000000", 3600, "1000000000000000000000000", 6000, "400000000000000000000000", 4000, 1600, 3, 1]]
+}
+```
+
+- `since_millis`: the oldest trade the positions were built from, `null` when the account had none. What was bought before it isn't known, so selling it isn't counted.
+- A position is open while `closed_at_millis` is `null`. An account has at most one open position per token.
+- `amount`, `bought` and `sold` are in the token's smallest units. `amount` is what's held now, and `cost_usd` what it cost.
+- `realized_pnl_usd`: what sells got, minus what the part sold cost, at average cost. For an open position, what it's worth now is up to you: `amount` at the token's price.
+
+### How swaps count
+
+- A transaction's trades, one per pool, count as one swap. A token passed from one pool to the next nets to nothing.
+- A swap buys what the account got and sells what it gave. wNEAR, USDC, USDt and their bridged forms are what positions are paid in, so they never hold one.
+- A buy opens a position in the token, or adds to the open one at a new average entry.
+- A sell takes from the open position. The position closes once 1% or less of what was bought is left.
+- A sell of more than the position holds is left out, like selling tokens bought before `since_millis` or that came in by transfer.
+- Transfers in and out don't count. An open position whose account holds less than one whole token of it, in its wallet and Rhea deposits together, was transferred away. It's deleted, not closed, the next time the account's positions are read, since it was never sold.
+
+# Accounts
+
+> Intear API accounts.search: NEAR accounts by prefix, the most recently active first. And the accounts a public key can sign for, by key or ML-DSA-65 key handle.
+
+Accounts are indexed from 16 October 2026 on, with the full access keys added since. An account is indexed once a transaction it signed, or a successful receipt to it, shows that it exists. It's removed once a receipt deletes it. An older account that hasn't done anything since isn't found.
+
+## `accounts.search`
+
+Accounts starting with a prefix. HTTP: `/accounts/search`.
+
+| Param | Description |
+| --- | --- |
+| `prefix` | **Required.** The start of an account id: 1 to 64 of `a-z`, `0-9`, `.`, `_` and `-`. Uppercase letters are read as lowercase |
+| `limit` | 1 to 50, default 50 |
+
+The account the prefix names in full comes first, if there is one. The rest are ordered by their last transaction, the most recent first. Accounts that haven't signed a transaction come last.
+
+Result:
+
+```json
+{
+  "height": 220512870,
+  "timestamp_millis": 1792326870365,
+  "columns": ["account_id", "last_transaction_millis"],
+  "rows": [["intearbots.near", 1792326752235], ["intear.pool.near", null], ["intear.user.intear.near", null]]
+}
+```
+
+- `last_transaction_millis`: when the account last signed a transaction since indexing began, `null` when it hasn't.
+
+## Accounts by public key
+
+`GET /public_key/{key}` returns the accounts that have `key` as a full access key, if it was added to them since indexing began. It answers in the same shape as FastNEAR's `/v0/public_key/{key}`. It's HTTP only.
+
+`key` is a public key (`ed25519:…`, `secp256k1:…`, `ml-dsa-65:…`) or a key handle. On chain, an ML-DSA-65 key is stored as its hash, `ml-dsa-65-hash:…`. Looking that handle up here gives the whole key back.
+
+```json
+{
+  "public_key": "ed25519:BWxsRE6rAtn4ED8UGJ5jCh8ZrMPT9W4vXsHLkQxYQH6U",
+  "account_ids": ["086c1f8a9c8600dacd074c13776407e7a9afc260d1fe0064fa2727e37e91fc2b"]
+}
+```
+
+- `public_key`: the whole key. It's `null` for a handle that no account has.
+- For an ED25519 key, its implicit account (the key in hex) is included if it holds any NEAR.
+
+## Key stats
+
+`GET /stats` returns hourly counts of transactions by the type of key that signed them, and of active accounts whose full access keys are all ML-DSA-65. It's HTTP only, and counted again at most every 10 seconds.
+
+```json
+{
+  "hourly_transactions_by_key_type": [{"hour": "2026-10-17T00:00:00Z", "ed25519": 28758, "secp256k1": 0, "ml_dsa_65": 3}],
+  "hourly_pq_adoption": [{"hour": "2026-10-17T00:00:00Z", "active_accounts": 1955, "exclusively_ml_dsa_65_accounts": 0}],
+  "totals": {"quantum_safe_accounts": 6, "quantum_safe_transactions": 276}
+}
+```
+
+# Messages
+
+> Every message on the WebSocket, and the unsubscribe and schema methods.
+
+See [Connecting](https://docs.intear.tech/api/guides/connecting.md) for how they fit together.
+
+## From the client
+
+```json
+{ "id": 1, "method": "tokens.get", "params": { ... } }
+```
+
+| Key | Description |
+| --- | --- |
+| `id` | A number or a string. Names the reply, and the subscription if the method makes one |
+| `method` | The method to call |
+| `params` | The method's params. Can be left out when there are none |
+
+## From the server
+
+Every message also has `credits_used`, see [Credits](https://docs.intear.tech/api/reference/limits.md#credits).
+
+| Message | When |
+| --- | --- |
+| `{ "hello": { "version": 2, "height", "timestamp_millis", "limits" } }` | First, once |
+| `{ "id": 1, "result": { ... } }` | The reply to request `1` |
+| `{ "id": 1, "error": { "code", "message" } }` | Request `1` failed. A subscription it would have made doesn't exist |
+| `{ "sub": 1, "height", "timestamp_millis", ... }` | A push of the subscription request `1` made |
+| `{ "sub": 1, "end": { "code", "message" } }` | The server ended subscription `1` |
+| `{ "idle": { "height", "timestamp_millis" } }` | After 15 seconds with nothing else sent |
+
+## Closing codes
+
+| Code | Why |
+| --- | --- |
+| `1008` | The client sent a binary message, or one that isn't a JSON object with an `id` and a `method` |
+| `1006` | The connection dropped without a close frame, as it does when the client sends a message of 64 KiB or more |
+
+## `unsubscribe`
+
+Ends a subscription, so its `id` can be used again.
+
+| Param | Description |
+| --- | --- |
+| `sub` | **Required.** The subscription's `id` |
+
+The result is `{}`.
+
+## `schema`
+
+Takes no params. HTTP: `/schema`. The result describes the whole API, for checking a client against and generating types from:
+
+- `version`: the protocol version, as in `hello`;
+- `token_fields`: every token field with its type and `kind`, and whether it works in `where`, `sort` and `min_change`;
+- `windows`, `thresholds`, `intervals_ms` and `limits`;
+- `trade_fields`, `transfer_fields` and `transaction_fields`;
+- `methods`: every method's params, and its HTTP path if it has one.
+
+# Errors
+
+> Error codes of the Intear API, what each one means, and the HTTP status it comes with.
+
+An error is `{ "code": "...", "message": "..." }`: in a reply's `error` on the WebSocket, or the body's `error` over HTTP. `message` is for developers and says what went wrong.
+
+| Code | HTTP | Meaning |
+| --- | --- | --- |
+| `bad_request` | `400` | Params that aren't valid |
+| `unknown_method` | `404` | No such method, or no such HTTP path |
+| `unknown_field` | `400` | A field that doesn't exist, or that can't be used where it was, like a text field in `sort` |
+| `unsupported_threshold` | `400` | A `min_change` or `min_interval_ms` that isn't one of the supported values |
+| `not_found` | `404` | No such token, trade or subscription |
+| `too_many` | `400` | Over one of the [limits](https://docs.intear.tech/api/reference/limits.md) |
+| `too_far_behind` | `400` | More than 10,000 rows after an `after_id` or `after`, or a subscription the client fell too far behind on |
+| `not_indexed` | `503` | A time after the latest indexed block, in `prices.at` |
+| `upstream_unavailable` | | Only in `balances.*` `errors`, for a source that couldn't be read |
+| `internal` | `500` | Something went wrong on the server |
+
+# Limits and credits
+
+> Limits per connection and request, and what messages cost in credits.
+
+## Limits
+
+| | |
+| --- | --- |
+| Requests waiting for their reply | 16 |
+| Subscriptions per connection | 100 |
+| `ids`, `token`, `tokens` and `where.parent` lists, and the tokens under a `parent` in trades and transfers | 2,000 |
+| Accounts followed with `balances.subscribe` | 100 |
+| Rows in a page of history | 200 |
+| Rows from `after_id` or `after` | 10,000 |
+| A message from the client | 64 KiB |
+
+`hello` has them as `limits`, and so does [`schema`](https://docs.intear.tech/api/reference/messages.md#schema). Going over one is a [`too_many`](https://docs.intear.tech/api/reference/errors.md) error, except for these: more than 200 rows in a page of history (`limit` or `history`) is a `bad_request`, more than 10,000 rows after an `after_id` or `after` is [`too_far_behind`](https://docs.intear.tech/api/reference/errors.md), and a message of 64 KiB or more on the WebSocket [drops the connection](https://docs.intear.tech/api/reference/messages.md#closing-codes). `candles.*` take up to 200 `tokens` and `prices.at` up to 100 `queries`, and going over those is a `bad_request`.
+
+## Credits
+
+Every message has `credits_used`, what it cost:
+
+- A credit per started KiB of the message, uncompressed, at least one.
+- A `balances.*` result: 5 more for each of `native` and `rhea`.
+- A result with `1S` candles: 1 more per started hundred candles.
+- Pushes cost only their size.
+- `hello`, `idle`, errors and `end` cost nothing.
+
+Over HTTP, the `X-Credits-Used` header of a method's response has it, for the response's body. `/public_key`, `/stats`, `/cosmetics` and icons have none.
+
+:::note
+Nothing is charged yet. The numbers show what a client would use.
+:::

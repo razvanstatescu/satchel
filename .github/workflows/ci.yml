@@ -1,0 +1,189 @@
+# Satchel CI (kb/90 §12.6). No secrets, no keys, no transactions: every job is offline or read-only.
+#   contracts  build the three wasm files, unit + sandbox tests, INV-22 import check, wasm size and SHA-256
+#   web        install, typecheck, lint, vitest (non-network), next build, the near.org RPC grep
+#   smoke      manual or scheduled: Playwright judge checks + tools/monitor.sh against the hosted app (read-only)
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: "Hosted app URL for the smoke job (default: repository variable NEXT_PUBLIC_APP_URL)"
+        required: false
+        type: string
+  schedule:
+    - cron: "30 6 * * *" # daily smoke, keep-alive window Nov 14–19 (plan §5.5)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: "1.93.0"
+  CARGO_NEAR_VERSION: "0.22.0"
+
+jobs:
+  contracts:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust ${{ env.RUST_TOOLCHAIN }} + wasm32 (pinned by rust-toolchain.toml)
+        run: |
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target wasm32-unknown-unknown --component rustfmt,clippy
+          rustup show active-toolchain
+          rustc --version
+
+      - name: Cache cargo registry, target/ and the sandbox binary
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/cargo-near
+            target
+          key: contracts-${{ runner.os }}-${{ env.RUST_TOOLCHAIN }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: contracts-${{ runner.os }}-${{ env.RUST_TOOLCHAIN }}-
+
+      - name: Install cargo-near ${{ env.CARGO_NEAR_VERSION }}
+        run: |
+          if ! cargo near --version 2>/dev/null | grep -q "$CARGO_NEAR_VERSION"; then
+            curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/near/cargo-near/releases/download/cargo-near-v${CARGO_NEAR_VERSION}/cargo-near-installer.sh" | sh
+          fi
+          cargo near --version
+
+      - name: near-sdk-env must resolve to 0.1.6 (0.1.7 needs rustc 1.95)
+        run: cargo tree --locked -i near-sdk-env | head -1 | grep -q 'v0.1.6'
+
+      - name: Build wasm (satchel, mock-signer, mock-ft)
+        run: |
+          for c in satchel mock-signer mock-ft; do
+            cargo near build non-reproducible-wasm --locked --manifest-path "contracts/$c/Cargo.toml"
+          done
+
+      - name: Contract unit tests (incl. the shared vectors)
+        run: cargo test --locked -p satchel --lib
+
+      - name: Mock contract unit tests
+        run: cargo test --locked -p mock-signer -p mock-ft
+
+      - name: Sandbox integration suite (near-workspaces 0.23.0)
+        run: cargo test --locked -p satchel-tests
+
+      - name: INV-22 wasm import check
+        run: bash tools/check-wasm-imports.sh --list target/near/satchel/satchel.wasm
+
+      - name: Wasm size and SHA-256 (sha256sum; shasum -a 256 on macOS gives the same)
+        run: |
+          ls -l target/near/*/*.wasm
+          sha256sum target/near/satchel/satchel.wasm
+          bash tools/judge-snippets.sh --offline | sed -n '/\[S13\]/,/\[S14\]/p'
+
+  web:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # version from package.json "packageManager"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck (every workspace package)
+        run: pnpm -r --if-present typecheck
+
+      - name: ESLint (apps/web)
+        run: pnpm --filter web lint
+
+      - name: Unit tests (non-network)
+        run: |
+          pnpm --filter @satchel/core test
+          pnpm --filter @satchel/tools test
+          pnpm --filter web test
+
+      - name: next build (fixture data mode; production sets NEXT_PUBLIC_DATA_MODE=live)
+        run: pnpm --filter web build
+
+      - name: The deprecated near.org testnet RPC appears nowhere (spec §8.3)
+        run: |
+          pnpm --filter web check:rpc
+          if grep -rnE 'rpc[.]testnet[.]near[.]org' apps packages tools README.md .env.example .github \
+               --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=test-results; then
+            echo "::error::found the deprecated near.org RPC"; exit 1
+          fi
+
+      - name: Release scripts parse and dry-run offline
+        run: |
+          bash -n tools/judge-snippets.sh
+          bash -n tools/monitor.sh
+          bash tools/judge-snippets.sh --print > /dev/null
+          bash tools/monitor.sh --offline
+          pnpm --filter @satchel/tools exec tsx e2e/evm.ts --offline
+          pnpm --filter @satchel/tools exec tsx e2e/transfer.ts --offline
+
+  smoke:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_URL: ${{ inputs.app_url || vars.NEXT_PUBLIC_APP_URL }}
+      SATCHEL_CONTRACT: ${{ vars.NEXT_PUBLIC_SATCHEL_CONTRACT }}
+      SATCHEL_EXPECTED_CODE_HASH: ${{ vars.NEXT_PUBLIC_EXPECTED_CODE_HASH }}
+      SATCHEL_BIRTH_TX: ${{ vars.SATCHEL_BIRTH_TX }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Need an app URL
+        id: url
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "No app URL (set the repository variable NEXT_PUBLIC_APP_URL or pass app_url); skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@v4
+        if: steps.url.outputs.skip != 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.url.outputs.skip != 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install + Playwright chromium
+        if: steps.url.outputs.skip != 'true'
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Playwright judge checks (JavaScript disabled) against the hosted app
+        if: steps.url.outputs.skip != 'true'
+        env:
+          E2E_BASE_URL: ${{ env.APP_URL }}
+        run: pnpm --filter web exec playwright test test/e2e/judge.spec.ts --project desktop
+
+      - name: Read-only monitor (README commands, no-JS pages, balances, endpoints)
+        if: steps.url.outputs.skip != 'true'
+        env:
+          SATCHEL_APP_URL: ${{ env.APP_URL }}
+        run: |
+          [ -n "$SATCHEL_CONTRACT" ] || unset SATCHEL_CONTRACT
+          [ -n "$SATCHEL_EXPECTED_CODE_HASH" ] || unset SATCHEL_EXPECTED_CODE_HASH
+          [ -n "$SATCHEL_BIRTH_TX" ] || unset SATCHEL_BIRTH_TX
+          bash tools/monitor.sh

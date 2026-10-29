@@ -1,0 +1,43 @@
+{
+  "contract": "fanout.satchel-spk-btc-e9ea1a.testnet",
+  "inFile": "out/unsigned-fanout-2.json",
+  "nInputs": 2,
+  "attachedTgas": 50,
+  "signGasTgas": 15,
+  "cbGasTgas": 10,
+  "startedAt": "2026-10-21T11:52:25.927Z",
+  "neg_sighash_none": {
+    "txHash": "3gM2JEbWdfN1xvbMogA1Xia36p73mqs23xaoEkbJFRuZ",
+    "status": "Failure",
+    "gasBurntTgas": 2.056399029847,
+    "result": {
+      "Failure": {
+        "ActionError": {
+          "index": 0,
+          "kind": {
+            "FunctionCallError": {
+              "ExecutionError": "Smart contract panicked: ERR_SIGHASH_NOT_ALL"
+            }
+          }
+        }
+      }
+    }
+  },
+  "neg_incomplete": {
+    "txHash": "6eCzQrPR4iqTAaiHy8sRCJFZ8U1rLsemJgFvgV9Tzv5B",
+    "status": "Failure",
+    "gasBurntTgas": 2.02108056649,
+    "result": {
+      "Failure": {
+        "ActionError": {
+          "index": 0,
+          "kind": {
+            "FunctionCallError": {
+              "ExecutionError": "Smart contract panicked: ERR_PREVOUTS_INCOMPLETE"
+            }
+          }
+        }
+      }
+    }
+  }
+}

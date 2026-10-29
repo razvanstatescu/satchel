@@ -1,0 +1,12 @@
+HTTP/2 200 
+date: Wed, 21 Oct 2026 11:59:23 GMT
+content-type: application/json
+content-length: 506
+cf-ray: a4e01888ed65e4b7-OTP
+cf-cache-status: DYNAMIC
+access-control-allow-origin: https://satchel-test.vercel.app
+server: cloudflare
+vary: Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+access-control-allow-credentials: true
+alt-svc: h3=":443"; ma=86400
+

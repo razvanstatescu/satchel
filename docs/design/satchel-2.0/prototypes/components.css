@@ -1,0 +1,414 @@
+/* Satchel 2.0 prototype components (design lead). Builds on tokens.css. Class names are listed in FOUNDATION-READY.md;
+   don't rename without noting it there. Colour only through tokens (rule 1); coral is one *action* fill per view
+   (rule 2); stickers only for what you own, press or celebrate (rule 5). Sizes in px; targets >= 44. */
+
+/* ── 0. Utilities ─────────────────────────────────────────────────────────────────────────────────────────────── */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; left: 16px; top: -100px; z-index: 100; background: var(--surface); color: var(--ink);
+  padding: 12px 16px; border-radius: var(--radius-md); border: 2px solid var(--sticker-line); font-weight: 700; }
+.skip-link:focus { top: 12px; }
+.container { width: 100%; max-width: calc(var(--container-app) + 2 * var(--gutter)); margin-inline: auto;
+  padding-inline: var(--gutter); }
+.container--flow { max-width: calc(var(--container-flow) + 2 * var(--gutter)); }
+.container--prose { max-width: calc(var(--container-prose) + 2 * var(--gutter)); }
+.stack { display: flex; flex-direction: column; gap: var(--stack, 16px); }
+.cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--cluster, 8px); }
+.icon, .tracker__mark, .row__chev { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.icon--14 { width: 14px; height: 14px; } .icon--16 { width: 16px; height: 16px; } .icon--24 { width: 24px; height: 24px; }
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── 1. Type utilities (mirror the planned Tailwind utilities) ───────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); } .font-sans { font-family: var(--font-sans); }
+.font-mono { font-family: var(--font-mono); }
+.t-num { font-variant-numeric: tabular-nums; }
+.text-balance-hero { font: 800 var(--text-balance-hero)/var(--text-balance-hero--lh) var(--font-display); letter-spacing: -0.03em; }
+.text-balance-hero-sm { font: 800 var(--text-balance-hero-sm)/var(--text-balance-hero-sm--lh) var(--font-display); letter-spacing: -0.03em; }
+.text-title { font: 750 var(--text-title)/var(--text-title--lh) var(--font-display); letter-spacing: -0.02em; }
+.text-heading { font: 700 var(--text-heading)/var(--text-heading--lh) var(--font-display); letter-spacing: -0.01em; }
+.text-body { font: 400 var(--text-body)/var(--text-body--lh) var(--font-sans); }
+.text-body-sm { font: 400 var(--text-body-sm)/var(--text-body-sm--lh) var(--font-sans); }
+.text-label { font: 600 var(--text-label)/var(--text-label--lh) var(--font-sans); }
+.text-address { font: 450 var(--text-address)/var(--text-address--lh) var(--font-mono); }
+.text-button { font: 700 var(--text-button)/20px var(--font-sans); }
+.text-caption { font: 500 var(--text-caption)/var(--text-caption--lh) var(--font-sans); }
+.text-badge { font: 700 var(--text-badge)/var(--text-badge--lh) var(--font-sans); }
+.text-display { font: 800 var(--text-display)/var(--text-display--lh) var(--font-display); letter-spacing: -0.035em; }
+.text-section { font: 800 var(--text-section)/var(--text-section--lh) var(--font-display); letter-spacing: -0.03em; }
+.text-lead { font: 400 var(--text-lead)/var(--text-lead--lh) var(--font-sans); }
+.muted { color: var(--ink-muted); }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font: 600 15px/20px var(--font-sans); color: var(--ink-muted); }
+
+/* ── 2. Buttons: one system for the landing and the app (design-system-impl §4.1) ─────────────────────────────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px;
+  border-radius: var(--radius-md); border: 2px solid transparent; background: transparent; color: var(--ink);
+  font: 700 var(--text-button)/20px var(--font-sans); text-decoration: none; white-space: nowrap; cursor: pointer;
+  -webkit-tap-highlight-color: transparent; user-select: none; position: relative;
+  transition: transform var(--dur-press) var(--ease-out), box-shadow var(--dur-press) var(--ease-out), background-color 120ms; }
+.btn > .icon { width: 20px; height: 20px; }
+.btn--lg { min-height: 52px; padding: 0 24px; font-size: var(--text-button-lg); }
+.btn--xl { min-height: 56px; padding: 0 28px; font-size: 17px; border-radius: 20px; }   /* landing hero + final CTA only */
+.btn--block { display: flex; width: 100%; }
+/* Primary: the one coral fill per view. 2px sticker outline is its boundary (F4); the press is the motion (F3). */
+.btn--primary { background: var(--brand); color: var(--on-brand); border-color: var(--sticker-line); box-shadow: var(--shadow-sticker); }
+@media (hover: hover) { .btn--primary:hover { background: var(--brand-hover); } }
+.btn--primary:active, .btn--primary[data-pressed], .btn--paper:active, .btn--paper[data-pressed] {
+  transform: translateY(4px); box-shadow: var(--shadow-pressed);
+  transition-duration: var(--dur-press-in); transition-timing-function: var(--ease-in); }
+/* Paper: the primary on a coral ground (the final CTA band), a white sticker. Use it inside a data-scheme="day" island,
+   where --surface is white, so it stays constant in both themes. */
+.btn--paper { background: var(--surface); color: var(--on-brand); border-color: var(--on-brand); box-shadow: 0 4px 0 var(--on-brand); }
+@media (hover: hover) { .btn--paper:hover { background: var(--brand-soft); } }
+.btn--secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+@media (hover: hover) { .btn--secondary:hover { background: var(--surface-sunken); } }
+.btn--secondary:active { background: var(--surface-sunken); }
+/* Ghost: a secondary without a fill, for the coral band (ink outline on coral is 5.65:1). */
+.btn--ghost-on-brand { background: transparent; color: var(--on-brand); border-color: var(--on-brand); }
+@media (hover: hover) { .btn--ghost-on-brand:hover { background: var(--brand-hover); } }
+.btn--link { min-height: 44px; padding: 0 2px; border: 0; color: var(--link); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+@media (hover: hover) { .btn--link:hover { text-decoration-thickness: 2px; } }
+.btn--link:active { color: var(--ink); }
+.btn--danger { background: var(--surface); color: var(--danger); border-color: var(--danger); }
+@media (hover: hover) { .btn--danger:hover { background: var(--surface-sunken); } }
+.btn--icon { width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: var(--radius-pill); color: var(--ink); }
+.btn--icon > .icon { width: 20px; height: 20px; }
+.btn--icon.btn--icon-24 > .icon { width: 24px; height: 24px; }
+@media (hover: hover) { .btn--icon:hover { background: var(--surface-sunken); } }
+.btn--icon:active { background: var(--surface-sunken); transform: scale(.96); }
+.btn[aria-busy="true"] > .icon { animation: spin 900ms linear infinite; }
+.btn:disabled, .btn[aria-disabled="true"] { background: var(--disabled); color: var(--on-disabled); border-color: var(--line);
+  box-shadow: none; transform: none; cursor: not-allowed; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn-row--stack { flex-direction: column; align-items: stretch; }
+
+/* ── 3. The Satchel card (§4.2 + CARD-HERO.md): a <figure> of real text, coral band, charm S, "what's inside" ─── */
+.card { container: card / inline-size; position: relative; display: flex; flex-direction: column; margin: 0;
+  aspect-ratio: 1.586 / 1; width: 100%; max-width: 400px; border-radius: var(--radius-card); background: var(--surface);
+  color: var(--ink); border: var(--outline) solid var(--sticker-line); box-shadow: var(--shadow-sticker); overflow: hidden; }
+.card--md { width: 300px; }
+.card--sm { width: 240px; }
+.card__band { flex: 0 0 28%; display: flex; align-items: center; gap: 8px; padding: 0 14px 0 16px; background: var(--brand);
+  border-bottom: var(--outline) solid var(--sticker-line); min-width: 0; }
+.card__name { font: 800 17px/22px var(--font-display); letter-spacing: -0.01em; color: var(--on-brand); margin: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.card__charm { height: 30px; width: auto; margin-left: auto; flex: none; }
+.card__body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;
+  padding: 12px 16px 14px; }
+.card__inside { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.card__coin { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.card__coin .coin { width: 22px; height: 22px; }
+.card__amt { font: 800 24px/28px var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  white-space: nowrap; }
+.card__tick { font: 600 13px/18px var(--font-sans); color: var(--ink-muted); }
+.card__coin[data-zero] .card__amt, .card__coin[data-unavailable] .card__amt { color: var(--ink-muted); }
+.card__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+.card__empty { font: 800 22px/26px var(--font-display); letter-spacing: -0.02em; }
+.card[data-coins="3"] .card__amt { font-size: 20px; line-height: 24px; }
+.card[data-coins="3"] .card__coin .coin { width: 20px; height: 20px; }
+@container card (min-width: 352px) {
+  .card__band { padding: 0 18px 0 20px; gap: 10px; }
+  .card__name { font-size: 20px; line-height: 26px; }
+  .card__charm { height: 40px; }
+  .card__body { padding: 16px 20px 18px; }
+  .card__inside { gap: 6px; }
+  .card__coin { gap: 10px; }
+  .card__coin .coin { width: 28px; height: 28px; }
+  .card__amt { font-size: 32px; line-height: 36px; }
+  .card__tick { font-size: 15px; line-height: 20px; }
+  .card__empty { font-size: 28px; line-height: 32px; }
+  .card[data-coins="3"] .card__amt { font-size: 26px; line-height: 30px; }
+  .card[data-coins="3"] .card__coin .coin { width: 24px; height: 24px; }
+}
+@container card (max-width: 250px) {
+  .card__band { padding: 0 10px 0 12px; }
+  .card__name { font-size: 14px; line-height: 18px; }
+  .card__charm { height: 24px; }
+  .card__body { padding: 8px 12px 10px; gap: 4px; }
+  .card__inside { gap: 2px; }
+  .card__coin .coin { width: 18px; height: 18px; }
+  .card__amt { font-size: 19px; line-height: 23px; }
+  .card__tick { font-size: 12px; line-height: 16px; }
+  .card__foot .pill { padding: 3px 8px; font-size: 12px; }
+}
+/* As one link (grids, My Satchels): the whole card is one <a class="card-link">; nothing inside is focusable. */
+.card-link { display: block; width: 100%; max-width: 400px; text-decoration: none; color: inherit;
+  border-radius: var(--radius-card); }
+.card-link:has(> .card--md) { max-width: 300px; } .card-link:has(> .card--sm) { max-width: 240px; }
+.card-link .card { transition: transform 120ms var(--ease-out), box-shadow 120ms var(--ease-out); }
+@media (hover: hover) { .card-link:hover .card { transform: translateY(-2px); box-shadow: var(--shadow-sticker-lift); } }
+.card-link:active .card { transform: translateY(4px); box-shadow: var(--shadow-pressed); }
+.card-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+/* Row thumbnail (replaces Swatch) */
+.card-thumb { width: 40px; height: 25px; flex: none; border-radius: 5px; border: 1.5px solid var(--sticker-line);
+  background: linear-gradient(var(--brand) 0 32%, var(--sticker-line) 32% calc(32% + 1.5px), var(--surface) 0); }
+
+/* ── 4. Chips, status pills, badges (§4.4) ────────────────────────────────────────────────────────────────────── */
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: var(--radius-sm);
+  background: var(--surface-sunken); color: var(--ink); font: 500 var(--text-caption)/var(--text-caption--lh) var(--font-sans);
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--ink-muted); }
+.dot--12 { width: 12px; height: 12px; }
+.dot--btc { background: var(--chain-btc); } .dot--evm { background: var(--chain-evm); } .dot--sol { background: var(--chain-sol); }
+.chip--filter { min-height: 36px; padding: 0 14px; border: 2px solid transparent; border-radius: var(--radius-pill);
+  font-weight: 600; cursor: pointer; margin-block: 4px; }   /* 36 + 2×4 = a 44 target */
+@media (hover: hover) { .chip--filter:hover { border-color: var(--line-strong); } }
+.chip--filter[aria-pressed="true"] { background: var(--inverse); color: var(--on-inverse); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 9px; border-radius: var(--radius-pill);
+  background: var(--surface-sunken); color: var(--ink-muted); font: 600 var(--text-caption)/var(--text-caption--lh) var(--font-sans);
+  white-space: nowrap; }
+.pill > .icon { width: 14px; height: 14px; }
+.pill--success { color: var(--success); } .pill--frozen { color: var(--frozen); } .pill--danger { color: var(--danger); }
+.pill--muted { color: var(--ink-muted); }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 1px 9px; border-radius: var(--radius-pill);
+  background: var(--lemon); color: var(--on-brand); border: 2px solid var(--on-brand);
+  font: 700 var(--text-badge)/var(--text-badge--lh) var(--font-sans); white-space: nowrap; flex: none; }
+.badge--yours { transform: rotate(-4deg); }       /* the "you own this" sticker (R1 #3); badges may tilt, the S never */
+.badge--new { transform: rotate(3deg); }
+.badge--sky { background: var(--sky); }
+
+/* ── 5. Chain charms, the charm S, the strap (illustration; §6) ───────────────────────────────────────────────── */
+.coin { width: 32px; height: 32px; flex: none; }
+.coin--20 { width: 20px; height: 20px; } .coin--24 { width: 24px; height: 24px; } .coin--48 { width: 48px; height: 48px; }
+.coin--64 { width: 64px; height: 64px; }
+.coin--drop { filter: drop-shadow(0 3px 0 var(--on-brand)); }
+.charm-s { height: 96px; width: auto; }
+.strap { height: 14px; border-radius: var(--radius-pill); background: var(--on-brand); }   /* the ink bar charms hang from */
+.illo { background: var(--sky); color: var(--on-brand); border: var(--outline) solid var(--sticker-line);
+  border-radius: var(--radius-card); box-shadow: var(--shadow-sticker); }  /* illustration panel: light in both themes */
+.illo--white { background: var(--surface); }   /* inside a data-scheme="day" island */ .illo--lemon { background: var(--lemon); }
+
+/* ── 6. Panels: sticker vs flat vs overlay (§4.3) ──────────────────────────────────────────────────────────────── */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.panel--card { border-radius: var(--radius-card); }
+.panel--sunken { background: var(--surface-sunken); border-color: transparent; }
+.panel--pad { padding: 20px; } @media (min-width: 768px) { .panel--pad { padding: 24px; } }
+.sticker { border: var(--outline) solid var(--sticker-line); box-shadow: var(--shadow-sticker); }
+.sticker-sm { border: 2px solid var(--sticker-line); box-shadow: var(--shadow-sticker); }
+
+/* ── 7. Inputs and addresses (§4.6) ───────────────────────────────────────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field__label { font: 600 var(--text-label)/var(--text-label--lh) var(--font-sans); color: var(--ink); }
+.input { min-height: 52px; width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface-sunken);
+  color: var(--ink); border: 2px solid var(--line-strong); font: 400 16px/24px var(--font-sans); }
+.input::placeholder { color: var(--ink-muted); opacity: 1; }
+.input--mono { font-family: var(--font-mono); font-weight: 450; }
+@media (hover: hover) { .input:hover { border-color: var(--ink-muted); } }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.input:disabled { background: var(--disabled); color: var(--on-disabled); border-color: var(--line); }
+.field__help { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+.field__error { display: flex; gap: 6px; align-items: flex-start; font: 400 14px/20px var(--font-sans); color: var(--danger); }
+.field__error > .icon { width: 16px; height: 16px; margin-top: 2px; }
+.amount { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: var(--radius-md);
+  background: var(--surface-sunken); border: 2px solid var(--line-strong); }
+.amount__line { display: flex; align-items: baseline; gap: 10px; }
+.amount__value { flex: 1; min-width: 0; border: 0; background: transparent; padding: 0; color: var(--ink);
+  font: 800 var(--text-balance-hero-sm)/var(--text-balance-hero-sm--lh) var(--font-display); letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums; }
+.amount__value:focus-visible { outline: none; }
+.amount:focus-within { outline: 2px solid var(--focus); outline-offset: 2px; }
+.amount__tick { font: 600 15px/20px var(--font-sans); color: var(--ink-muted); }
+.amount__avail { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+.address { font: 450 var(--text-address)/var(--text-address--lh) var(--font-mono); white-space: nowrap; color: var(--ink); }
+.address--grouped { white-space: normal; display: inline-flex; flex-wrap: wrap; column-gap: .55ch; row-gap: 2px; }
+.address--grouped > span { white-space: nowrap; color: var(--ink-muted); }
+.address--grouped > span[data-key] { color: var(--ink); font-weight: 600; }
+.copy-line { display: flex; align-items: center; gap: 4px; min-width: 0; }
+
+/* ── 8. List rows (§4.7) ──────────────────────────────────────────────────────────────────────────────────────── */
+.list { list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md);
+  overflow: hidden; }
+.list--bare { background: transparent; border: 0; border-radius: 0; }
+.row { position: relative; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px;
+  color: inherit; text-decoration: none; }
+.row--2 { min-height: 64px; }
+.list > li + li > .row::before, .list > .row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 16px;
+  height: 1px; background: var(--line); }
+.row__lead { flex: none; display: flex; align-items: center; }
+.row__main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.row__title { font: 400 16px/24px var(--font-sans); color: var(--ink); }
+.row__meta { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+.row__trail { flex: none; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.row__amt { font: 700 15px/20px var(--font-sans); font-variant-numeric: tabular-nums; color: var(--ink); }
+.row__sub { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+.row__chev { width: 20px; height: 20px; color: var(--ink-muted); flex: none; }
+a.row, button.row { cursor: pointer; width: 100%; border: 0; background: transparent; text-align: left; font: inherit; }
+@media (hover: hover) { a.row:hover, button.row:hover { background: var(--surface-sunken); } }
+a.row:active, button.row:active { background: var(--surface-sunken); }
+a.row:focus-visible, button.row:focus-visible { outline-offset: -2px; }
+.row[aria-current], .row[aria-selected="true"] { background: var(--selected); }
+
+/* ── 9. Tabs and segmented control (§4.5) ─────────────────────────────────────────────────────────────────────── */
+.tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tab { display: inline-flex; align-items: center; min-height: 44px; padding: 0 2px; color: var(--ink-muted);
+  font: 600 15px/20px var(--font-sans); text-decoration: none; white-space: nowrap; }
+@media (hover: hover) { .tab:hover { color: var(--ink); } }
+.tab[aria-current="page"], .tab[aria-selected="true"] { color: var(--ink); font-weight: 700;
+  box-shadow: inset 0 -3px 0 var(--brand-line); }
+.seg { display: inline-flex; padding: 0; border-radius: var(--radius-pill); background: var(--surface-sunken); border: 0; margin: 0; }
+.seg__opt { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px;
+  padding: 0 14px; color: var(--ink-muted); font: 600 15px/20px var(--font-sans); cursor: pointer; border-radius: var(--radius-pill);
+  isolation: isolate; }
+.seg__opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.seg__opt > .icon { width: 16px; height: 16px; }
+.seg__opt::before { content: ""; position: absolute; inset: 4px; border-radius: var(--radius-pill); background: transparent; z-index: -1; }
+@media (hover: hover) { .seg__opt:hover { color: var(--ink); } }
+.seg__opt:has(input:checked) { color: var(--on-inverse); }
+.seg__opt:has(input:checked)::before { background: var(--inverse); }
+.seg__opt:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+.seg--sm .seg__opt { padding: 0 12px; font-size: 14px; }
+
+/* ── 10. Sheets and dialogs (§4.8). .sheet is fixed; .sheet--static shows one inline in a prototype frame. ─────── */
+.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 60; }
+.sheet { position: fixed; z-index: 61; inset: auto 0 0 0; max-height: calc(100dvh - 16px); display: flex; flex-direction: column;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--overlay-edge); border-bottom: 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0; box-shadow: var(--shadow-overlay); }
+.sheet__grabber { width: 40px; height: 5px; border-radius: 3px; background: var(--line-strong); margin: 8px auto 0; flex: none; }
+.sheet__head { display: flex; align-items: flex-start; gap: 8px; padding: 16px 20px 8px; }
+.sheet__titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 6px; }
+.sheet__title { font: 750 var(--text-title)/var(--text-title--lh) var(--font-display); letter-spacing: -0.02em; }
+.sheet__title--confirm { font: 700 var(--text-heading)/var(--text-heading--lh) var(--font-display); letter-spacing: -0.01em; }
+.sheet__step { font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+.sheet__body { flex: 1; overflow: auto; padding: 8px 20px 20px; display: flex; flex-direction: column; gap: 16px; }
+.sheet__foot { flex: none; padding: 16px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--surface); }
+.sheet__foot[data-scrolled] { border-top: 1px solid var(--line); }
+@media (min-width: 768px) {
+  .sheet { inset: 50% auto auto 50%; transform: translate(-50%, -50%); width: 480px; max-height: calc(100dvh - 96px);
+    border-radius: var(--radius-card); border-bottom: 1px solid var(--overlay-edge); }
+  .sheet__grabber { display: none; }
+  .sheet__head { padding-top: 20px; }
+  .sheet__foot { padding-bottom: 20px; border-radius: 0 0 var(--radius-card) var(--radius-card); }
+}
+.sheet--static { position: relative; inset: auto; transform: none; z-index: auto; width: 100%; max-width: 480px; }
+@media (min-width: 768px) { .sheet--static { inset: auto; transform: none; } }
+
+/* ── 11. Toasts and banners (§4.9) ────────────────────────────────────────────────────────────────────────────── */
+.toast-region { position: fixed; z-index: 70; left: 50%; transform: translateX(-50%);
+  bottom: calc(88px + env(safe-area-inset-bottom)); display: flex; justify-content: center; pointer-events: none; }
+@media (min-width: 768px) { .toast-region { bottom: 24px; } }
+.toast { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: var(--radius-md);
+  background: var(--toast); color: var(--ink); border: 2px solid var(--sticker-line); box-shadow: var(--shadow-sticker);
+  font: 600 15px/20px var(--font-sans); pointer-events: auto; max-width: calc(100vw - 32px); }
+.toast > .icon { width: 20px; height: 20px; }
+.toast--success > .icon { color: var(--success); } .toast--frozen > .icon { color: var(--frozen); }
+.toast--danger > .icon { color: var(--danger); } .toast--muted > .icon { color: var(--ink-muted); }
+.toast__action { margin-left: 4px; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; font-weight: 700;
+  background: none; border: 0; padding: 0; min-height: 44px; margin-block: -12px; cursor: pointer; }
+.banner { --tone: var(--ink); display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: var(--radius-md);
+  background: var(--surface-sunken); color: var(--ink); }
+.banner > .icon { color: var(--tone); margin-top: 2px; }
+.banner__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.banner__title { font: 600 15px/20px var(--font-sans); color: var(--tone); }
+.banner__body { font: 400 16px/24px var(--font-sans); }
+.banner--success { --tone: var(--success); } .banner--frozen { --tone: var(--frozen); } .banner--danger { --tone: var(--danger); }
+
+/* ── 12. Skeleton, empty state, progress tracker (§4.10) ──────────────────────────────────────────────────────── */
+.skeleton { background: var(--skeleton); border-radius: 6px; }
+.skeleton--line { height: 12px; }
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; max-width: 360px;
+  margin-inline: auto; }
+.empty__art { padding: 20px 28px; margin-bottom: 8px; }
+.empty__title { font: 700 var(--text-heading)/var(--text-heading--lh) var(--font-display); letter-spacing: -0.01em; }
+.empty__body { color: var(--ink-muted); }
+.tracker { list-style: none; display: flex; flex-direction: column; }
+.tracker__step { position: relative; display: grid; grid-template-columns: 24px 1fr; column-gap: 12px; padding-bottom: 20px;
+  color: var(--ink-muted); }
+.tracker__step:last-child { padding-bottom: 0; }
+.tracker__step::before { content: ""; position: absolute; left: 11px; top: 28px; bottom: 4px; width: 2px; background: var(--line-strong); }
+.tracker__step:last-child::before { display: none; }
+.tracker__step[data-state="done"]::before { background: var(--success); }
+.tracker__mark { width: 24px; height: 24px; }
+.tracker__step[data-state="done"] .tracker__mark { color: var(--success); }
+.tracker__step[data-state="active"] .tracker__mark { color: var(--frozen); }
+.tracker__step[data-state="future"] .tracker__mark { color: var(--line-strong); }
+.tracker__step[data-state="failed"] .tracker__mark { color: var(--danger); }
+.tracker__label { font: 400 16px/24px var(--font-sans); }
+.tracker__step[data-state="active"] .tracker__label { font-weight: 600; color: var(--ink); }
+.tracker__step[data-state="done"] .tracker__label { color: var(--ink); }
+.tracker__meta { grid-column: 2; font: 400 14px/20px var(--font-sans); color: var(--ink-muted); }
+
+/* ── 13. Account control, avatar, Testnet badge ───────────────────────────────────────────────────────────────── */
+.avatar { width: 32px; height: 32px; border-radius: 50%; flex: none; display: inline-grid; place-items: center;
+  background: var(--sky); color: var(--on-brand); border: 2px solid var(--on-brand); font: 800 14px/1 var(--font-display); }
+.avatar--28 { width: 28px; height: 28px; font-size: 13px; }
+.account { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px 0 6px; max-width: 220px;
+  border-radius: var(--radius-pill); background: var(--surface); border: 2px solid var(--line); color: var(--ink);
+  font: 600 15px/20px var(--font-sans); text-decoration: none; cursor: pointer; }
+@media (hover: hover) { .account:hover { background: var(--surface-sunken); } }
+.account__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.account--icon { width: 44px; padding: 0; justify-content: center; }
+.account > .icon { width: 16px; height: 16px; color: var(--ink-muted); }
+
+/* ── 14. Shell: one top bar (app + landing variant), the side nav, the menu sheet, the footer (§4.11) ─────────── */
+.lockup { height: 32px; width: auto; color: var(--ink); }
+.brand-link { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: var(--ink);
+  border-radius: var(--radius-sm); }
+.topbar { position: sticky; top: 0; z-index: 40; background: var(--ground); }
+.topbar[data-scrolled] { box-shadow: inset 0 -1px 0 var(--line); }
+.topbar__inner { display: flex; align-items: center; gap: 12px; height: var(--topbar-h); }
+.topbar__nav { display: none; align-items: center; gap: 4px; margin-left: 20px; }
+.topbar__link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; border-radius: var(--radius-pill);
+  color: var(--ink-muted); font: 600 15px/20px var(--font-sans); text-decoration: none; }
+@media (hover: hover) { .topbar__link:hover { color: var(--ink); background: var(--surface-sunken); } }
+.topbar__link[aria-current="page"] { color: var(--ink); }
+.topbar__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+@media (min-width: 1024px) { .topbar__nav { display: flex; } .topbar [data-menu-button] { display: none; } }
+@media (max-width: 479px) { .topbar .badge--testnet-wide { display: none; } }
+/* App frame: top bar below 1024, side nav from 1024 */
+.app { min-height: 100dvh; }
+.app__main { min-width: 0; }
+.app__content { padding-block: 24px 48px; }
+.sidenav { display: none; }
+@media (min-width: 1024px) {
+  .app { display: grid; grid-template-columns: var(--sidenav-w) minmax(0, 1fr); }
+  .app > .topbar { display: none; }
+  .sidenav { position: sticky; top: 0; height: 100dvh; display: flex; flex-direction: column; gap: 24px; padding: 24px 16px;
+    background: var(--ground); border-right: 1px solid var(--line); overflow-y: auto; }
+  .app__content { padding-block: 40px 64px; }
+}
+.sidenav__brand { display: flex; align-items: center; gap: 10px; padding-inline: 8px; }
+.sidenav__brand .lockup { height: 34px; }
+.sidenav__list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.sidenav__foot { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
+.nav-item { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 12px;
+  border-radius: var(--radius-md); color: var(--ink-muted); font: 600 15px/20px var(--font-sans); text-decoration: none; }
+.nav-item > .icon { width: 20px; height: 20px; }
+@media (hover: hover) { .nav-item:hover { background: var(--surface-sunken); color: var(--ink); } }
+.nav-item[aria-current="page"] { background: var(--surface-sunken); color: var(--ink); font-weight: 700; }
+.nav-item[aria-current="page"]::before { content: ""; position: absolute; left: -16px; top: 12px; width: 4px; height: 20px;
+  border-radius: 0 3px 3px 0; background: var(--brand-line); }
+.menu-list { list-style: none; display: flex; flex-direction: column; }
+.menu-row { display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 0 12px; border-radius: var(--radius-md);
+  color: var(--ink); font: 600 16px/24px var(--font-sans); text-decoration: none; }
+.menu-row > .icon { width: 24px; height: 24px; color: var(--ink-muted); }
+@media (hover: hover) { .menu-row:hover { background: var(--surface-sunken); } }
+.menu-row[aria-current="page"] { background: var(--surface-sunken); }
+.menu-row[aria-current="page"] > .icon { color: var(--ink); }
+.footer { border-top: 1px solid var(--line); padding-block: 40px 32px; color: var(--ink); }
+.footer__grid { display: grid; gap: 24px 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.footer__brand { grid-column: 1 / -1; }
+@media (min-width: 480px) { .footer__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .footer__grid { grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr)); } .footer__brand { grid-column: auto; } }
+.footer__brand { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.footer__h { font: 600 15px/20px var(--font-sans); color: var(--ink); margin-bottom: 4px; }
+.footer__links { list-style: none; display: flex; flex-direction: column; }
+.footer__links a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--ink-muted);
+  font: 400 14px/20px var(--font-sans); text-decoration: none; }
+@media (hover: hover) { .footer__links a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; } }
+.footer__bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+  margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); }
+.footer__note { display: inline-flex; align-items: center; gap: 8px; font: 600 14px/20px var(--font-sans); color: var(--ink); }
+.theme-control { display: inline-flex; align-items: center; gap: 12px; }
+.theme-control__label { font: 600 14px/20px var(--font-sans); color: var(--ink-muted); }
+
+/* ── 15. Landing sections (rhythm in design-spec §3.2) ────────────────────────────────────────────────────────── */
+.section { --section-y: 64px; padding-block: var(--section-y); }
+@media (min-width: 768px) { .section { --section-y: 96px; } }
+@media (min-width: 1280px) { .section { --section-y: 120px; } }
+.section--tight { --section-y: 48px; }
+.section__head { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+.section__head--center { align-items: center; text-align: center; margin-inline: auto; }
+.section__title { font: 800 var(--text-section)/var(--text-section--lh) var(--font-display); letter-spacing: -0.03em; }
+.section__lead { font: 400 var(--text-lead)/var(--text-lead--lh) var(--font-sans); color: var(--ink-muted); max-width: 620px; }

@@ -1,0 +1,71 @@
+{
+ "key": "23ab83509a45f227",
+ "final": {
+  "id": "L08",
+  "scene": "S05",
+  "text": "But a signature made before the sale…",
+  "say": "But a signature made before the sale…",
+  "file": "vo/L08.mp3",
+  "duration": 2.15,
+  "words": [
+   {
+    "text": "But",
+    "start": 0.04,
+    "end": 0.12
+   },
+   {
+    "text": "a",
+    "start": 0.16,
+    "end": 0.26
+   },
+   {
+    "text": "signature",
+    "start": 0.32,
+    "end": 0.74
+   },
+   {
+    "text": "made",
+    "start": 0.86,
+    "end": 1.1
+   },
+   {
+    "text": "before",
+    "start": 1.14,
+    "end": 1.56
+   },
+   {
+    "text": "the",
+    "start": 1.6,
+    "end": 1.7
+   },
+   {
+    "text": "sale…",
+    "start": 1.76,
+    "end": 2.04
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "But a signature made before the sale"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8,
+  "speed": 0.95
+ },
+ "say": "But a signature made before the sale…",
+ "prev": "Satchel has no seed phrase. Through Near Chain Signatures, it signs only for the NFT's current owner.",
+ "next": "…can still be used after it."
+}

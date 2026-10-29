@@ -1,0 +1,113 @@
+{
+ "key": "1dad4c52dfc4a25c",
+ "final": {
+  "id": "L21",
+  "scene": "W2",
+  "text": "Fund it from any wallet or exchange. Native coins, straight to its addresses.",
+  "say": "Fund it from any wallet or exchange. Native coins, straight to its addresses.",
+  "file": "vo/L21.mp3",
+  "duration": 5.23,
+  "words": [
+   {
+    "text": "Fund",
+    "start": 0.1,
+    "end": 0.3
+   },
+   {
+    "text": "it",
+    "start": 0.34,
+    "end": 0.46
+   },
+   {
+    "text": "from",
+    "start": 0.5,
+    "end": 0.76
+   },
+   {
+    "text": "any",
+    "start": 0.82,
+    "end": 0.98
+   },
+   {
+    "text": "wallet",
+    "start": 1.1,
+    "end": 1.42
+   },
+   {
+    "text": "or",
+    "start": 1.48,
+    "end": 1.56
+   },
+   {
+    "text": "exchange.",
+    "start": 1.62,
+    "end": 2.24
+   },
+   {
+    "text": "Native",
+    "start": 2.8,
+    "end": 3.04
+   },
+   {
+    "text": "coins,",
+    "start": 3.14,
+    "end": 3.54
+   },
+   {
+    "text": "straight",
+    "start": 3.96,
+    "end": 4.24
+   },
+   {
+    "text": "to",
+    "start": 4.28,
+    "end": 4.38
+   },
+   {
+    "text": "its",
+    "start": 4.42,
+    "end": 4.52
+   },
+   {
+    "text": "addresses.",
+    "start": 4.58,
+    "end": 5.14
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": false,
+     "exact": false,
+     "heard": "Funded from any wallet or exchange. Native coins straight to its addresses"
+    },
+    {
+     "attempt": 1,
+     "ok": false,
+     "exact": false,
+     "heard": "Funded from any wallet or exchange. Native coins straight to its addresses"
+    },
+    {
+     "attempt": 2,
+     "ok": true,
+     "exact": true,
+     "heard": "Fund it from any wallet or exchange. Native coins straight to its addresses"
+    }
+   ],
+   "chosen": 2
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "Fund it from any wallet or exchange. Native coins, straight to its addresses.",
+ "prev": "Mint a Satchel, and it comes with its own Bitcoin, Ethereum and Solana addresses.",
+ "next": "Then spend it like any wallet."
+}

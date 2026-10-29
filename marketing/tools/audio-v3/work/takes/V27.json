@@ -1,0 +1,70 @@
+{
+ "key": "31c478c7aacaf3e4",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Satchel. Stick it on. Hand it over.",
+ "prev": "and the buyer gets everything inside.",
+ "final": {
+  "id": "V27",
+  "scene": "E1",
+  "text": "Satchel. Stick it on. Hand it over.",
+  "say": "Satchel. Stick it on. Hand it over.",
+  "file": "v2/vo/V27.mp3",
+  "duration": 3.12,
+  "words": [
+   {
+    "text": "Satchel.",
+    "start": 0.12,
+    "end": 0.6
+   },
+   {
+    "text": "Stick",
+    "start": 1.24,
+    "end": 1.4
+   },
+   {
+    "text": "it",
+    "start": 1.44,
+    "end": 1.52
+   },
+   {
+    "text": "on.",
+    "start": 1.62,
+    "end": 1.9
+   },
+   {
+    "text": "Hand",
+    "start": 2.32,
+    "end": 2.5
+   },
+   {
+    "text": "it",
+    "start": 2.54,
+    "end": 2.62
+   },
+   {
+    "text": "over.",
+    "start": 2.72,
+    "end": 3.04
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Satchel. Stick it on. Hand it over"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

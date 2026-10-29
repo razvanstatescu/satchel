@@ -1,0 +1,11 @@
+HTTP/2 200 
+age: 3576
+cache-control: public, max-age=300
+content-type: text/markdown; charset=utf-8
+date: Wed, 21 Oct 2026 10:21:04 GMT
+server: Vercel
+strict-transport-security: max-age=63072000
+x-matched-path: /HACKATHON.md
+x-vercel-cache: HIT
+x-vercel-id: fra1::iad1::b4mnc-1792581640115-21793386b56a
+

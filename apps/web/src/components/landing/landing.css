@@ -1,0 +1,1305 @@
+/* ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+   Satchel 2.0 landing: the illustrations and their motion layers (package L).
+
+   Ported from the design lead's proto/landing.css and components.css (card, pill, badge, slip, tracker) and the motion
+   designer's proto/motion/{motion,landing-motion}.css. Section layout is Tailwind in the components; only the intricate
+   art lives here, namespaced `.lp-`.
+
+   Rules (F1-READY §1; design-spec §4.0; motion-spec §0):
+   - Colour only through the raw tokens (`var(--ink)`), never `var(--color-*)`, so the `data-scheme="day"` islands (the
+     sky shelf, the lemon and sky fields, the coral finale) re-declare everything in Day. Night stickers outside the
+     islands take `--sticker-line` (#8A82AE) and the black drop.
+   - Every label is drawn from its `data-l` attribute (`.lp-l`), so the server text layer holds only copy.
+   - This static CSS is the server frame (no JS, reduced motion; the hero shows act 3 at rest). Motion only animates
+     translate / rotate / scale / opacity from it (WAAPI), and composes with the static tilts on `transform`.
+   - Unlayered on purpose: it never shares an element and a property with a Tailwind utility.
+   ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 0. Labels, icons, coins ──────────────────────────────────────────────────────────────────────────────────────── */
+.lp-l::before {
+  content: attr(data-l);
+}
+.lp-coin {
+  display: block;
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+.lp-coin > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── 1. The Satchel card as art (components.css §3; SatchelCard's look) ───────────────────────────────────────────── */
+.lp-card {
+  container: lpcard / inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1.586 / 1;
+  overflow: hidden;
+  border: 3px solid var(--sticker-line);
+  border-radius: 28px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+}
+.lp-card--md {
+  width: 300px;
+}
+.lp-card--sm {
+  width: 240px;
+}
+.lp-card__band {
+  flex: 0 0 28%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 14px 0 16px;
+  border-bottom: 3px solid var(--sticker-line);
+  background: var(--brand);
+}
+.lp-card__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--on-brand);
+  font: 800 17px/22px var(--font-display);
+  letter-spacing: -0.01em;
+}
+.lp-card__charm {
+  flex: none;
+  width: auto;
+  height: 30px;
+  margin-left: auto;
+}
+.lp-card__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px 14px;
+}
+.lp-card__inside {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-card__coin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.lp-card__amt {
+  white-space: nowrap;
+  font: 800 24px/28px var(--font-display);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lp-card__tick {
+  color: var(--ink-muted);
+  font: 600 13px/18px var(--font-sans);
+}
+.lp-card__coin[data-zero] .lp-card__amt {
+  color: var(--ink-muted);
+}
+/* the catch's frame 2: the ETH it held before (0.80, ink) rolls away to 0.00 (muted) */
+.lp-card__coin[data-zero] .lp-amt-was {
+  color: var(--ink);
+}
+.lp-card__coin > .lp-stack {
+  flex: none;
+}
+.lp-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+@container lpcard (min-width: 352px) {
+  .lp-card__band {
+    gap: 10px;
+    padding: 0 18px 0 20px;
+  }
+  .lp-card__name {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .lp-card__charm {
+    height: 40px;
+  }
+  .lp-card__body {
+    padding: 16px 20px 18px;
+  }
+  .lp-card__inside {
+    gap: 6px;
+  }
+  .lp-card__coin {
+    gap: 10px;
+  }
+  .lp-card__coin .lp-coin {
+    width: 28px;
+    height: 28px;
+  }
+  .lp-card__amt {
+    font-size: 32px;
+    line-height: 36px;
+  }
+  .lp-card__tick {
+    font-size: 15px;
+    line-height: 20px;
+  }
+}
+@container lpcard (max-width: 250px) {
+  .lp-card__band {
+    padding: 0 10px 0 12px;
+  }
+  .lp-card__name {
+    font-size: 14px;
+    line-height: 18px;
+  }
+  .lp-card__charm {
+    height: 24px;
+  }
+  .lp-card__body {
+    gap: 4px;
+    padding: 8px 12px 10px;
+  }
+  .lp-card__inside {
+    gap: 2px;
+  }
+  .lp-card__coin .lp-coin {
+    width: 18px;
+    height: 18px;
+  }
+  .lp-card__amt {
+    font-size: 19px;
+    line-height: 23px;
+  }
+  .lp-card__tick {
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .lp-card__foot .lp-pill {
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+}
+
+/* ── 2. Pills, stickers, avatars (components.css §4, §13) ─────────────────────────────────────────────────────────── */
+.lp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--ink-muted);
+  white-space: nowrap;
+  font: 600 13px/18px var(--font-sans);
+}
+.lp-pill > svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.lp-pill--success {
+  color: var(--success);
+}
+.lp-pill--frozen {
+  color: var(--frozen);
+}
+.lp-pill--danger {
+  color: var(--danger);
+}
+/* the lemon sticker: its ink outline is constant (on-brand), so it reads on any field */
+.lp-badge {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding: 1px 9px;
+  border: 2px solid var(--on-brand);
+  border-radius: 999px;
+  background: var(--lemon);
+  color: var(--on-brand);
+  white-space: nowrap;
+  font: 700 12px/16px var(--font-sans);
+}
+.lp-badge--yours {
+  transform: rotate(-4deg);
+}
+.lp-badge--new {
+  transform: rotate(3deg);
+}
+.lp-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--on-brand);
+  border-radius: 50%;
+  background: var(--sky);
+  color: var(--on-brand);
+  font: 800 12px/1 var(--font-display);
+}
+/* an owner chip (How it works step 3; the catch's Buyer): a white sticker on a field, themed on a desk */
+.lp-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 4px;
+  border: 2px solid var(--on-brand);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--on-brand);
+  white-space: nowrap;
+  box-shadow: 0 3px 0 var(--on-brand);
+  font: 700 13px/16px var(--font-sans);
+}
+.lp-owner--themed {
+  border-color: var(--sticker-line);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+}
+
+/* ── 3. The slip: a real UI fragment as a paper object (the check, the record, the contract facts) ─────────────────── */
+.lp-slip {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  border: 2px solid var(--sticker-line);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+}
+.lp-slip__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font: 700 14px/18px var(--font-sans);
+}
+.lp-slip__head > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+.lp-slip__head--danger {
+  color: var(--danger);
+}
+.lp-slip__head--success {
+  color: var(--success);
+}
+.lp-slip__meta {
+  margin-top: -6px;
+  color: var(--ink-muted);
+  font: 500 12px/16px var(--font-sans);
+}
+.lp-slip__rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px dashed var(--line-strong);
+}
+.lp-slip__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--line);
+  font: 500 13px/18px var(--font-sans);
+}
+.lp-slip__row svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.lp-slip__row--hl {
+  margin-inline: -8px;
+  padding-inline: 8px;
+  border-bottom-color: transparent;
+  border-radius: 8px;
+  background: var(--brand-soft);
+}
+.lp-slip__name--strong {
+  font-weight: 700;
+}
+.lp-slip__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--success);
+  font-weight: 700;
+}
+.lp-slip__state--danger {
+  color: var(--danger);
+}
+.lp-slip__state--frozen {
+  color: var(--frozen);
+}
+.lp-slip__state--muted {
+  color: var(--ink-muted);
+}
+.lp-slip__state--checking {
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.lp-pen {
+  display: inline-flex;
+}
+.lp-slip__verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--success);
+  font: 800 18px/22px var(--font-display);
+  letter-spacing: -0.01em;
+}
+.lp-slip__verdict > svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+/* Motion stacks (motion-spec §3 "roll"): the layers of one piece share a grid cell, so nothing resizes when a word
+   rolls; in the server frame only the current layer shows (`data-off` layers are transparent). */
+.lp-stack {
+  display: inline-grid;
+}
+.lp-stack > * {
+  grid-area: 1 / 1;
+}
+.lp-stack--start {
+  justify-items: start;
+}
+.lp-stack--end {
+  justify-items: end;
+}
+.lp-stack--block {
+  display: grid;
+}
+.lp-stack > [data-off] {
+  opacity: 0;
+}
+
+/* ── 4. Hero: the shelf (design-spec §4.2; a flat sky field, a Day island, holding the stage) ─────────────────────── */
+.lp-stage {
+  position: relative;
+  margin: 36px 0 0;
+  padding: 22px 20px 14px;
+  border-radius: 32px;
+  background: var(--sky);
+  color: var(--on-brand);
+}
+@media (min-width: 768px) {
+  .lp-stage {
+    margin-top: 44px;
+    padding: 32px 40px 16px;
+    border-radius: 44px;
+  }
+}
+.lp-stage__scene {
+  position: relative;
+  height: 336px;
+  max-width: 700px;
+  margin-inline: auto;
+  container-type: inline-size;
+  /* the card's width as a length, for the tag's string (below); the card itself takes the same width in % */
+  --card-w: min(82cqi, 400px);
+}
+@media (min-width: 768px) {
+  .lp-stage__scene {
+    height: 334px;
+  }
+}
+/* the card hangs from a hook 16 px above its top centre; its hard drop is a plate that stays on the ground while the
+   card is lifted (a lift reads as a lift, not as a thicker sticker). Its width is a percentage of the scene (= 82cqi,
+   the scene has no padding), not a container unit: a card sized in its parent's container units loses its own
+   container queries in Chromium's full-size captures (DevTools, Playwright fullPage), which drew it in small type. */
+.lp-stage__card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: min(82%, 400px);
+}
+@media (min-width: 768px) {
+  .lp-stage__card {
+    left: 30px;
+  }
+}
+.lp-stage__hanger {
+  position: relative;
+  transform-origin: 50% -16px;
+}
+.lp-stage__plate {
+  position: absolute;
+  inset: 4px 0 -4px 0;
+  border-radius: 28px;
+  background: var(--sticker-shade);
+}
+.lp-stage__card .lp-card {
+  box-shadow: none;
+}
+/* Yours is stuck on in act 4 only: in the server frame (act 3) it keeps its place, unseen */
+.lp-stage [data-k="yours"] {
+  opacity: 0;
+}
+.lp-stage__tag {
+  position: absolute;
+  top: calc(var(--card-w) / 1.586 + 26px);
+  left: 22px;
+  z-index: 2;
+  transform-origin: 50% -22px;
+}
+@media (min-width: 768px) {
+  .lp-stage__tag {
+    left: 64px;
+  }
+}
+.lp-stage__tag::after {
+  content: "";
+  position: absolute;
+  top: -25px;
+  left: 50%;
+  width: 2px;
+  height: 24px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--on-brand);
+}
+.lp-stage__slip {
+  position: absolute;
+  right: 2px;
+  bottom: 6px;
+  z-index: 2;
+  width: min(58%, 270px);
+  transform: rotate(2.5deg);
+}
+@media (min-width: 768px) {
+  .lp-stage__slip {
+    right: 30px;
+    bottom: 4px;
+    width: min(60%, 270px);
+  }
+}
+@media (max-width: 479px) {
+  .lp-stage__slip {
+    gap: 7px;
+    padding: 10px 12px;
+  }
+  .lp-stage__slip .lp-slip__row {
+    padding: 5px 0;
+    font-size: 12px;
+  }
+  .lp-stage__slip .lp-slip__meta {
+    display: none;
+  }
+  .lp-stage__slip .lp-slip__verdict {
+    font-size: 16px;
+  }
+}
+.lp-stage__spark {
+  position: absolute;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+}
+.lp-stage__spark > svg,
+.lp-spark > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lp-stage__spark--a {
+  right: -8px;
+  bottom: 188px;
+}
+.lp-stage__spark--b {
+  right: 34px;
+  bottom: 214px;
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 767px) {
+  .lp-stage__spark--a {
+    bottom: 168px;
+  }
+  .lp-stage__spark--b {
+    bottom: 192px;
+  }
+}
+
+/* The slip's rows never wrap (a wrapped "Signature / 1" reads as a broken sticker): below 390 px its type steps down to
+   11–14 px and the tag moves left, so its words stay clear of the slip; below 360 px (320-wide phones) the field
+   padding narrows, the slip widens and the shelf grows 16 px so the slip sits below the tag. The card's travel and the
+   swing room follow at run time (hero/timeline.ts travel()). */
+.lp-stage__slip .lp-slip__head,
+.lp-stage__slip .lp-slip__row,
+.lp-stage__slip .lp-slip__verdict {
+  white-space: nowrap;
+}
+@media (max-width: 389px) {
+  .lp-stage__slip {
+    width: 60%;
+    gap: 6px;
+    padding: 9px 10px;
+  }
+  .lp-stage__slip .lp-slip__head {
+    gap: 6px;
+    font-size: 12px;
+  }
+  .lp-stage__slip .lp-slip__head > svg {
+    width: 15px;
+    height: 15px;
+  }
+  .lp-stage__slip .lp-slip__row {
+    gap: 6px;
+    padding: 4px 0;
+    font-size: 11px;
+  }
+  .lp-stage__slip .lp-slip__verdict {
+    gap: 6px;
+    font-size: 14px;
+  }
+  .lp-stage__slip .lp-slip__verdict > svg {
+    width: 18px;
+    height: 18px;
+  }
+  .lp-stage__tag {
+    left: 4px;
+  }
+}
+@media (max-width: 359px) {
+  .lp-stage {
+    padding-inline: 14px;
+  }
+  .lp-stage__scene {
+    height: 352px;
+  }
+  .lp-stage__slip {
+    width: 66%;
+  }
+}
+
+/* the hang tag: a price tag sticker on its string (pivot: the string's top, on the card's edge) */
+.lp-hangtag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border: 2px solid var(--on-brand);
+  border-radius: 12px 16px 16px 12px;
+  background: var(--surface);
+  color: var(--on-brand);
+  white-space: nowrap;
+  box-shadow: 0 3px 0 var(--on-brand);
+  font: 800 17px/20px var(--font-display);
+  letter-spacing: -0.01em;
+  transform: rotate(-5deg);
+}
+.lp-hangtag::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--on-brand);
+  border-radius: 50%;
+  background: var(--sky);
+}
+@media (max-width: 479px) {
+  .lp-hangtag {
+    padding: 6px 12px 6px 8px;
+    font-size: 15px;
+  }
+}
+
+/* the bar under the scene: the four acts as bars (the steps list) and the caption ticker, then Pause */
+.lp-stage__bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 700px;
+  margin: 16px auto 0;
+}
+.lp-stage__progress {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.lp-stage__steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-stage__step {
+  position: relative;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--surface);
+}
+/* the act in progress (and the done ones) keep a 20 % ink track under their fill */
+.lp-stage__step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--on-brand);
+  opacity: 0;
+}
+.lp-stage__step[data-done]::before,
+.lp-stage__step[aria-current]::before {
+  opacity: 0.2;
+}
+.lp-stage__step > b {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--on-brand);
+  transform-origin: left;
+  scale: 0 1;
+}
+.lp-stage__step[data-done] > b,
+.lp-stage__step[aria-current] > b {
+  scale: 1 1;
+}
+.lp-stage__ticker {
+  display: grid;
+  overflow: clip;
+  margin: 0;
+  font: 700 17px/22px var(--font-display);
+  letter-spacing: -0.01em;
+}
+.lp-stage__ticker > * {
+  display: flex;
+  grid-area: 1 / 1;
+  align-items: baseline;
+  gap: 10px;
+  white-space: nowrap;
+}
+.lp-stage__ticker > :not([data-cap="3"]) {
+  opacity: 0;
+}
+.lp-stage__count {
+  font: 600 13px/16px var(--font-sans);
+  letter-spacing: 0;
+}
+/* the longest caption with its count needs 268 px; below 430 the bars already say where you are (MOTION-NOTES 2) */
+@media (max-width: 429px) {
+  .lp-stage__count {
+    display: none;
+  }
+}
+/* below 360 even "Bitcoin and Ethereum inside" alone is wider than the bar: every caption may take two lines (they all
+   share one grid cell, so the cell is always as tall as the longest and nothing shifts mid-loop) */
+@media (max-width: 359px) {
+  .lp-stage__ticker > * {
+    white-space: normal;
+  }
+}
+/* Pause (WCAG 2.2.2): its place is always kept; it shows while the loop is live (JS, full motion) */
+.lp-stage__pause {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--on-brand);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--on-brand);
+  cursor: pointer;
+  visibility: hidden;
+}
+.lp-stage[data-live] .lp-stage__pause {
+  visibility: visible;
+}
+@media (hover: hover) {
+  .lp-stage__pause:hover {
+    background: var(--lemon);
+  }
+}
+.lp-stage__pause > svg {
+  width: 20px;
+  height: 20px;
+}
+.lp-stage__pause > .lp-i-play,
+.lp-stage__pause[aria-pressed="true"] > .lp-i-pause {
+  display: none;
+}
+.lp-stage__pause[aria-pressed="true"] > .lp-i-play {
+  display: block;
+}
+
+/* the coins hanging at the shelf's ends, from 1100 px; they swing about their strings' tops */
+.lp-hang {
+  position: absolute;
+  top: 0;
+  display: none;
+  width: 64px;
+  transform-origin: 50% 0;
+}
+.lp-hang::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3px;
+  height: 56px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--on-brand);
+}
+.lp-hang > svg {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin-top: 50px;
+}
+.lp-hang--l {
+  left: 56px;
+}
+.lp-hang--r {
+  right: 56px;
+}
+.lp-hang--r::before {
+  height: 92px;
+}
+.lp-hang--r > svg {
+  margin-top: 86px;
+}
+/* D-46: the Solana coin hangs beside Bitcoin, lower, so the left end reads as a cluster, not a row */
+.lp-hang--l2 {
+  left: 132px;
+}
+.lp-hang--l2::before {
+  height: 128px;
+}
+.lp-hang--l2 > svg {
+  margin-top: 122px;
+}
+@media (min-width: 1100px) {
+  .lp-hang {
+    display: block;
+  }
+}
+
+/* the phone's charm row above the H1 (the first screen's one illustration cluster), on the themed ground */
+.lp-charmrow {
+  position: relative;
+  flex: none;
+  width: 172px;
+  height: 64px;
+  margin-bottom: -4px;
+}
+.lp-charmrow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 9px;
+  border-radius: 9px;
+  background: var(--sticker-line);
+}
+.lp-charmrow__coin {
+  position: absolute;
+  top: 4px;
+  width: 40px;
+  padding-top: 18px;
+  transform-origin: 50% 0;
+}
+.lp-charmrow__coin::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 22px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--sticker-line);
+}
+.lp-charmrow__coin > svg {
+  position: relative;
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--sticker-line);
+}
+.lp-charmrow__coin:nth-child(1) {
+  left: 14px;
+}
+.lp-charmrow__coin:nth-child(2) {
+  left: 66px;
+}
+.lp-charmrow__coin:nth-child(3) {
+  right: 14px;
+}
+@media (min-width: 1024px) {
+  .lp-charmrow {
+    display: none;
+  }
+}
+
+/* ── 5. What it is (#what): the card with its two address tags hanging from its bottom edge ──────────────────────── */
+.lp-what {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 36px;
+  border-radius: 36px;
+  background: var(--surface-sunken);
+}
+@media (min-width: 768px) {
+  .lp-what {
+    padding: 44px 32px 48px;
+  }
+}
+.lp-what .lp-card {
+  width: min(100%, 320px);
+}
+.lp-what__tags {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 30px;
+}
+@media (min-width: 480px) {
+  .lp-what__tags {
+    gap: 18px;
+  }
+}
+.lp-addr {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px 9px 9px;
+  border: 2px solid var(--sticker-line);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 4px 0 var(--sticker-shade);
+  transform-origin: 50% -32px;
+}
+.lp-addr::before {
+  content: "";
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  width: 3px;
+  height: 30px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--sticker-line);
+}
+.lp-addr .lp-coin {
+  width: 30px;
+  height: 30px;
+}
+.lp-addr__text {
+  display: flex;
+  flex-direction: column;
+}
+.lp-addr__label {
+  font: 700 14px/18px var(--font-sans);
+}
+.lp-addr__label::before {
+  content: attr(data-short);
+}
+/* Three tags (D-45): the chain name only, so the row stays under the card and every string meets it. */
+.lp-addr__addr {
+  color: var(--ink-muted);
+  font: 450 13px/18px var(--font-mono);
+}
+/* D-45: three tags (Bitcoin, Ethereum, Solana). Where the art is narrow (below 768, and the split column at 1024–1279),
+   each tag stacks its coin over the chain name and drops the address line, so all three hang side by side. */
+@media (max-width: 767.98px), (min-width: 1024px) and (max-width: 1279.98px) {
+  .lp-what__tags {
+    gap: 10px;
+  }
+  .lp-addr {
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px 7px;
+    min-width: 76px;
+  }
+  .lp-addr .lp-coin {
+    width: 26px;
+    height: 26px;
+  }
+  .lp-addr__text {
+    align-items: center;
+  }
+  .lp-addr__label {
+    font: 700 13px/16px var(--font-sans);
+  }
+  .lp-addr__addr {
+    display: none;
+  }
+}
+
+/* ── 6. How it works: the scenes (a New card on lemon, a mini signing tracker, the card hanging over its new owner) ── */
+.lp-how-card {
+  width: 220px;
+}
+.lp-spark {
+  position: absolute;
+  display: block;
+}
+.lp-spark--a {
+  top: 18%;
+  left: 16%;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 2px 0 var(--on-brand));
+}
+.lp-spark--b {
+  right: 15%;
+  bottom: 16%;
+  width: 16px;
+  height: 16px;
+}
+.lp-tracker {
+  width: 240px;
+  gap: 0;
+  padding: 14px 16px;
+}
+.lp-tracker__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-tracker__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  column-gap: 12px;
+  padding-bottom: 12px;
+  color: var(--ink-muted);
+}
+.lp-tracker__step:last-child {
+  padding-bottom: 0;
+}
+.lp-tracker__step::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  bottom: 4px;
+  left: 11px;
+  width: 2px;
+  background: var(--line-strong);
+}
+.lp-tracker__step:last-child::before {
+  display: none;
+}
+.lp-tracker__step[data-state="done"]::before {
+  background: var(--success);
+}
+.lp-tracker__mark {
+  width: 24px;
+  height: 24px;
+}
+.lp-tracker__step[data-state="done"] .lp-tracker__mark {
+  color: var(--success);
+}
+.lp-tracker__step[data-state="active"] .lp-tracker__mark {
+  color: var(--frozen);
+}
+.lp-tracker__step[data-state="future"] .lp-tracker__mark {
+  color: var(--line-strong);
+}
+.lp-tracker__label {
+  font: 400 14px/20px var(--font-sans);
+}
+.lp-tracker__step[data-state="done"] .lp-tracker__label {
+  color: var(--ink);
+}
+.lp-tracker__step[data-state="active"] .lp-tracker__label {
+  color: var(--ink);
+  font-weight: 600;
+}
+.lp-tracker__meta {
+  grid-column: 2;
+  color: var(--ink-muted);
+  font: 400 12px/16px var(--font-sans);
+}
+/* the card hangs from a pin; the drawn pose is mid-swing (−8°), and after its one swing it rests (data-rest) */
+.lp-pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 22px;
+}
+.lp-pin::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 3px;
+  height: 24px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--on-brand);
+}
+.lp-pin::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+  border-radius: 50%;
+  background: var(--on-brand);
+}
+.lp-pose {
+  transform: rotate(-8deg);
+  transform-origin: 50% -22px;
+}
+.lp-pose[data-rest] {
+  transform: none;
+}
+.lp-pose .lp-card {
+  width: 196px;
+}
+
+/* ── 7. Clean history: the five desks of the catch strip (the strip is itself the no-JS and reduced frame) ────────── */
+.lp-desk {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 196px;
+  padding: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--ground);
+}
+@media (min-width: 768px) {
+  .lp-desk {
+    gap: 10px;
+    height: 224px;
+  }
+}
+.lp-desk--bad {
+  border-color: transparent;
+  background: var(--brand-soft);
+}
+.lp-desk--top {
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+.lp-desk--buyer {
+  padding-top: 52px;
+}
+.lp-desk .lp-card {
+  width: 176px;
+}
+.lp-desk__buyer {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+.lp-desk-slip {
+  width: 200px;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+.lp-desk-slip .lp-slip__head {
+  font-size: 12px;
+  line-height: 16px;
+}
+.lp-desk-slip .lp-slip__row {
+  padding: 4px 0;
+  font-size: 12px;
+}
+.lp-desk-slip .lp-slip__row--hl {
+  padding-inline: 8px;
+}
+.lp-desk-slip .lp-slip__head > svg {
+  width: 16px;
+  height: 16px;
+}
+/* the signed transfer the seller keeps: a small paper note tucked under the card */
+.lp-note {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  width: 150px;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  transform: rotate(-3deg);
+}
+.lp-note .lp-slip__head {
+  font-size: 12px;
+  line-height: 16px;
+}
+.lp-note .lp-slip__head > svg {
+  width: 16px;
+  height: 16px;
+}
+.lp-note__what {
+  font: 600 12px/16px var(--font-sans);
+}
+.lp-note__state {
+  color: var(--ink-muted);
+  font: 500 11px/14px var(--font-sans);
+}
+.lp-stamp {
+  position: absolute;
+  right: 12px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--danger);
+  font: 800 13px/16px var(--font-display);
+  transform: rotate(-4deg);
+}
+.lp-stamp > svg {
+  width: 14px;
+  height: 14px;
+}
+.lp-buy {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 112px;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 12px;
+  font: 700 14px/1 var(--font-sans);
+}
+@media (min-width: 768px) {
+  .lp-buy {
+    height: 34px;
+  }
+}
+.lp-buy > svg {
+  width: 15px;
+  height: 15px;
+}
+.lp-buy--off {
+  border: 2px solid var(--line);
+  background: var(--surface-sunken);
+  color: var(--line-strong);
+}
+.lp-buy--on {
+  border: 2px solid var(--sticker-line);
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 3px 0 var(--sticker-shade);
+}
+
+/* ── 8. Trust: the Contract facts slip on a lemon field, the two coins peeking over its top edge ───────────────────── */
+.lp-trust {
+  display: grid;
+  place-items: center;
+  padding: 64px 22px 40px;
+  border-radius: 36px;
+  background: var(--lemon);
+}
+@media (min-width: 768px) {
+  .lp-trust {
+    padding: 84px 40px 56px;
+  }
+}
+.lp-trust__stack {
+  position: relative;
+  width: min(100%, 360px);
+}
+.lp-trust__stack .lp-slip {
+  position: relative;
+  z-index: 1;
+  gap: 12px;
+  padding: 18px 20px 16px;
+}
+.lp-trust__stack .lp-slip__row {
+  padding: 9px 0;
+  font-size: 14px;
+}
+@media (max-width: 359px) {
+  .lp-trust {
+    padding-inline: 12px;
+  }
+  .lp-trust__stack .lp-slip {
+    padding-inline: 16px;
+  }
+}
+.lp-peek {
+  position: absolute;
+  top: -40px;
+  left: 28px;
+  z-index: 0;
+  display: flex;
+  gap: 6px;
+}
+.lp-peek > .lp-coin {
+  width: 56px;
+  height: 56px;
+}
+.lp-peek > .lp-coin:nth-child(2) {
+  margin-top: 6px;
+}
+
+/* ── 9. The finale's S: inline, so its face can stamp into its own drop (it never rotates) ─────────────────────────── */
+.lp-finale-s {
+  display: block;
+  width: 132px;
+  height: auto;
+  overflow: visible;
+}
+@media (min-width: 1024px) {
+  .lp-finale-s {
+    width: 330px;
+  }
+}
+.lp-finale-s .lp-s-face {
+  transform-box: view-box;
+}
+

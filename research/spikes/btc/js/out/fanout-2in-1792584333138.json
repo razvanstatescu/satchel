@@ -1,0 +1,58 @@
+{
+  "contract": "fanout.satchel-spk-btc-e9ea1a.testnet",
+  "inFile": "out/unsigned-fanout-2.json",
+  "nInputs": 2,
+  "attachedTgas": 40,
+  "signGasTgas": 15,
+  "cbGasTgas": 10,
+  "startedAt": "2026-10-21T12:05:27.794Z",
+  "results": [
+    {
+      "hashes": [
+        "8a27532cbff6bf0efb6b9f500a8f3d860a77d7de5b0469dc3365b318bbf534d3",
+        "eb056b2e486fd6d0e26a1e4729681095d15c88080fcc9b4be3d96a241351755b"
+      ],
+      "sigs": [],
+      "txHash": "AeJoyYgx9zzj8NRo5gtUrsbAEjQDVRtXrJcnU2Ce59pT",
+      "ms": 5208,
+      "gasBurntTgas": 3.916087223573,
+      "tokensBurntNEAR": 0.0003469722098573,
+      "receipts": 3,
+      "status": "Failure",
+      "perReceipt": [
+        {
+          "executor": "fanout.satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 3.122943421993,
+          "status": "Failure",
+          "logs": [
+            "EVENT_JSON:{\"standard\":\"satchel_spike\",\"version\":\"0.0.1\",\"event\":\"btc_sign_requested\",\"data\":[{\"token_id\":\"1\",\"path\":\"satchel/1/btc\",\"inputs\":[{\"payload\":\"8a27532cbff6bf0efb6b9f500a8f3d860a77d7de5b0469dc3365b318bbf534d3\",\"txid\":\"37ea6fceca4d4c4068056ab1b0ad3fbb43a1a57a9963525a37dcef5ef6e042a0\",\"vout\":0,\"amount\":\"30000\",\"hash_outputs\":\"29228aeef69bce85f2a029ba18e63c18a3ade5e6fc39b9d31cebdebcd25ec9c9\"},{\"payload\":\"eb056b2e486fd6d0e26a1e4729681095d15c88080fcc9b4be3d96a241351755b\",\"txid\":\"092c7db589e926e4582a8b7312904aeddf7a4b3f145c89cba8d236a7ec6a5072\",\"vout\":1,\"amount\":\"25000\",\"hash_outputs\":\"29228aeef69bce85f2a029ba18e63c18a3ade5e6fc39b9d31cebdebcd25ec9c9\"}]}]}"
+          ]
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        },
+        {
+          "executor": "satchel-spk-btc-e9ea1a.testnet",
+          "gasTgas": 0.2231825625,
+          "status": "SuccessValue",
+          "logs": []
+        }
+      ],
+      "result": {
+        "Failure": {
+          "ActionError": {
+            "index": 0,
+            "kind": {
+              "FunctionCallError": {
+                "ExecutionError": "Exceeded the prepaid gas."
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

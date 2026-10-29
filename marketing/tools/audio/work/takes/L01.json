@@ -1,0 +1,50 @@
+{
+ "key": "e6ee7dffa35a314d",
+ "final": {
+  "id": "L01",
+  "scene": "S01",
+  "text": "A Bitcoin wallet.",
+  "say": "A Bitcoin wallet.",
+  "file": "vo/L01.mp3",
+  "duration": 1.21,
+  "words": [
+   {
+    "text": "A",
+    "start": 0.08,
+    "end": 0.2
+   },
+   {
+    "text": "Bitcoin",
+    "start": 0.24,
+    "end": 0.68
+   },
+   {
+    "text": "wallet.",
+    "start": 0.78,
+    "end": 1.14
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "A Bitcoin wallet"
+    }
+   ],
+   "chosen": 0
+  }
+ },
+ "voice": "n8kTUi6dVrplENT9Un56",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.55,
+  "similarity_boost": 0.8,
+  "speed": 1
+ },
+ "say": "A Bitcoin wallet.",
+ "next": "An Ethereum wallet."
+}
