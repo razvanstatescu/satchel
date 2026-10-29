@@ -140,7 +140,14 @@ export function evmRecord(seq: number, unsignedTx: string, o: Partial<SigRecordV
     payload: strip0x(keccak256(`0x${strip0x(unsignedTx)}`)),
     status: 'signed',
     signature: null,
-    detail: { evm: { chain_id: 11155111, nonce: Number(c.fields.nonce), unsigned_tx: strip0x(unsignedTx).toLowerCase() } },
+    detail: {
+      evm: {
+        chain_id: Number(c.fields.chainId),
+        nonce: Number(c.fields.nonce),
+        unsigned_tx: strip0x(unsignedTx).toLowerCase(),
+        ...(c.fields.erc20 ? { erc20: { token: c.fields.erc20.token.slice(2), to: c.fields.erc20.to.slice(2), amount: c.fields.erc20.amount.toString() } } : {}),
+      },
+    },
     ...o,
   }
 }

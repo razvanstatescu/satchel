@@ -41,7 +41,7 @@ describe('evm builder', () => {
     const acc = evm.vectors.filter((v) => v.expect.ok && v.expect.fields)
     expect(acc.length).toBeGreaterThanOrEqual(7)
     for (const v of acc) {
-      const f = v.expect.fields as Record<string, string> & { erc20?: { to: string; amount: string } }
+      const f = v.expect.fields as unknown as Record<string, string> & { erc20?: { to: string; amount: string } }
       if (BigInt(f.nonce!) > BigInt(Number.MAX_SAFE_INTEGER)) continue // viem takes number nonces; covered by the Rust/TS classifiers
       const common = {
         chainId: Number(f.chain_id),
