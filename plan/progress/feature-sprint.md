@@ -31,12 +31,12 @@
 | A3 | Empty the Satchel | web-flows | **merged + pushed** (94428ea) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
 | A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
 | C1 | `history_digest` view | contract-sign | **contract merged + pushed** (e985d82) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
-| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | 4 Circle USDC verified on-chain; new `ERR_EVM_TOKEN`/`ERR_EVM_VALUE`; EVM limit 160 B |
-| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | per-chain nonce-gap (`StorageKey::EvmNonces`, last); checker per chain, fail-closed |
-| C4 | Offers | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | `make_offer` takes an explicit `amount`; 20 open offers per offerer, 90-day max expiry; storage-credit methods for FT paths. Needs a security review |
+| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | USDC balances and sends per network; ETH-for-fee guard; USDC rows in Activity and clean history |
+| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | per-network balances (server HTML), network picker in Send and Add coins, per-chain nonce check, EIP-681 `@chainId`; L-05 fixed (`evmByChain` in the live checker) |
+| C4 | Offers | contract-market → web-market (UI) | **contract merged + M-01 fixed** (32f9467); UI in progress | `ensure_solvent` guard on transfer, buy and accept; `market_totals.escrow_near`; monitor spare = free − escrow |
 | C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract + UI merged + pushed** (1fb28f8) | UI: public allowance facts (no JS), owner add/revoke (max 4), delegate banner + cap-gated Send; unit 396, Playwright 169/169. The orchestrator fixed a stale-sheet bug (reset on each showing). Gaps: no USDC or L2 caps in the Add sheet yet (waits on C2/C3 UI) |
-| C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged** (a512d45); UI in progress | USDC + wrap.testnet allowlist; withdraw blocked while listed; invariants I-M1..I-M8; 142 unit, 107 sandbox (on the branch), 371 core |
-| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract merged + pushed** (e985d82); UI in progress | status `message`, never blocks; refused for delegates; BIP-322 skipped (spec §9) |
+| C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged + M-01 fixed** (32f9467); UI in progress | see C4 |
+| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | `/s/[id]/sign`: escaped text + hex + digest flag (L-02, SR-04), live signature verify, message deposit fixed; "Messages (n)" never blocks Buy |
 
 ## Interface decisions fixed up front (so parallel branches agree)
 Each contract agent first commits `docs/specs/<id>.md` with its exact method signatures and JSON shapes, and logs
@@ -168,3 +168,5 @@ it. Phase-2 UI work builds against those specs.
 
   Suites on the review branch: contract unit 172, sandbox 115 + 1 ignored, core 465, tools 72, differential fuzz 400k with 0 disagreements.
 - 21:05Z: merged `feat/ui-allowance` (C5 UI) into main (1fb28f8). Fixed its reported stale Add-sheet bug (reset form on each <Activity> showing) and replaced the e2e workaround with a regression check. Web unit 396, Playwright 169/169 on merged main. Pushed.
+- 21:40Z: merged `fix/m01-solvency` into main (32f9467). **M-01 is closed**: the reviewer's proof is un-ignored and passes. Contract unit 177, core 467, tools 72, web unit 396. The branch-side sandbox was 119/119 with an identical contract and tests tree. Wasm 423,977 B `10c6a8e9…` (branch build). The root state layout changed again, so deploy to a fresh devN.
+- 21:50Z: merged `feat/ui-sign` (C2, C3, C7 UI, plus review L-02 and L-05) into main (aeba7f3): web unit 422, typecheck and lint clean, Playwright 183/183. Pushed. The sandbox and wasm rebuild on final main are running. **Only web-market (C4/C6 UI) remains.**
