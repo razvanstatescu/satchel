@@ -136,11 +136,13 @@ impl Contract {
         if usage <= initial_usage {
             return;
         }
+        // balance ≥ stake + escrow, i.e. free ≥ escrow without saturating free at 0: with no escrow a short buffer is
+        // still refused with this stable code rather than the runtime's LackBalanceForState.
         let stake = usage as u128 * env::storage_byte_cost().as_yoctonear();
-        let free = env::account_balance().as_yoctonear().saturating_sub(stake);
-        let owed = self.market.totals.escrow_near();
-        if free < owed {
-            fail_with(ERR_INSOLVENT, &["top the contract up by ≥ ", &(owed - free).to_string(), " yocto (a plain transfer); its own NEAR pays storage, never escrow"].concat());
+        let needed = stake.saturating_add(self.market.totals.escrow_near());
+        let balance = env::account_balance().as_yoctonear();
+        if balance < needed {
+            fail_with(ERR_INSOLVENT, &["top the contract up by ≥ ", &(needed - balance).to_string(), " yocto (a plain transfer); its own NEAR pays storage, never escrow"].concat());
         }
     }
 }

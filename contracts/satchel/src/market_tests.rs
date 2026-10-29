@@ -1078,6 +1078,94 @@ fn m01_proceeds_near_follows_failed_payouts_and_withdrawals() {
     assert_eq!(totals(&c)["proceeds_near"], (3 * ONE_NEAR).to_string(), "a USDC withdrawal leaves the NEAR total alone");
 }
 
+/// One M-01 scenario on a fresh contract: alice holds `1` and `2`; bob escrows `inside` in `1`, a NEAR `offer` on `2`
+/// and a storage `credit`; `to` (a holder already, or not) then receives `1` by `nft_transfer`, or buys it for 1 NEAR.
+/// `spare` = yocto above escrow at the call (None: a huge balance, to measure). Returns the panic, the bytes the call
+/// grew, and `free − escrow_near` after it.
+fn m01_case(inside: u128, offer: u128, credit: u128, to: &AccountId, existing: bool, sale: bool, spare: Option<u128>) -> (Option<String>, i64, i128) {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let other = mint_to(&mut c, alice());
+    if inside > 0 {
+        Ctx::new(bob()).dep(inside).set();
+        c.deposit_near(id.clone());
+    }
+    if offer > 0 {
+        near_offer(&mut c, bob(), &other, offer);
+    }
+    if credit > 0 {
+        Ctx::new(bob()).dep(credit).set();
+        c.prepay_storage(None);
+    }
+    if existing {
+        mint_to(&mut c, to.clone());
+    }
+    let lid = sale.then(|| {
+        Ctx::new(alice()).dep(10 * MILLI).set();
+        c.list(id.clone(), U128(ONE_NEAR), Currency::Near)
+    });
+    let b = match spare {
+        Some(s) => bal_for(&mut c, s),
+        None => {
+            usage(&mut c);
+            1_000_000 * ONE_NEAR
+        }
+    };
+    let r = match lid {
+        Some(lid) => {
+            Ctx::new(to.clone()).dep(ONE_NEAR).bal(b).set();
+            panic_msg(|| c.buy(id.clone(), lid, 0))
+        }
+        None => {
+            Ctx::new(alice()).dep(1).bal(b).set();
+            panic_msg(|| c.nft_transfer(to.clone(), id.clone(), None, None))
+        }
+    };
+    let g = grew(&mut c);
+    let free = env::account_balance().as_yoctonear() as i128 - (env::storage_usage() as u128 * byte_cost()) as i128;
+    (r, g, free - c.market.totals.escrow_near() as i128)
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig { cases: cases(48), failure_persistence: None, ..ProptestConfig::default() })]
+
+    /// M-01 / I-M1: for random escrow mixes, receivers (new or existing holders, 10–64-char ids), transfers and NEAR
+    /// buys, and buffers within ±60 B (± a few yocto) of the exact storage the call adds, `ensure_solvent` refuses
+    /// exactly when the call grew storage and the spare NEAR (plus the attached yocto a transfer leaves behind) can't
+    /// pay it. A refusal is always `ERR_INSOLVENT`; an accepted call leaves `free ≥ escrow_near`.
+    #[test]
+    fn prop_ensure_solvent_refuses_exactly_when_escrow_would_pay(
+        inside in prop_oneof![Just(0u128), 2 * MILLI..5 * ONE_NEAR],
+        offer in prop_oneof![Just(0u128), 1u128..3 * ONE_NEAR],
+        credit in prop_oneof![Just(0u128), 2 * MILLI..ONE_NEAR],
+        to_len in 1usize..56,
+        existing in any::<bool>(),
+        sale in any::<bool>(),
+        bytes in -60i64..60,
+        yocto in -3i128..3,
+    ) {
+        let to = acc(&format!("t{}.testnet", "y".repeat(to_len)));
+        let (ok, g0, _) = m01_case(inside, offer, credit, &to, existing, sale, None);
+        prop_assert_eq!(ok, None);
+        let need = g0.max(0) as i128 * byte_cost() as i128;
+        let spare = (need + bytes as i128 * byte_cost() as i128 + yocto).max(0);
+        let (r, g, slack_after) = m01_case(inside, offer, credit, &to, existing, sale, Some(spare as u128));
+        prop_assert_eq!(g, g0, "the growth doesn't depend on the balance");
+        let kept = if sale { 0 } else { 1 }; // a transfer's 1 yocto stays; a buy's price leaves with the payout
+        let refuse = g > 0 && spare + kept < need;
+        match r {
+            Some(msg) => {
+                prop_assert!(refuse, "refused although the buffer covers it: {msg}");
+                prop_assert!(msg.starts_with("ERR_INSOLVENT: "), "{msg}");
+            }
+            None => {
+                prop_assert!(!refuse, "accepted although only escrow could pay {g} B");
+                prop_assert!(slack_after >= 0, "I-M1 broken after the call: free − escrow = {slack_after}");
+            }
+        }
+    }
+}
+
 // ── IdIndex: swap-remove property ──────────────────────────────────────────────────────────────
 
 /// Case count: `PROPTEST_CASES` if set (deep runs, docs/security/fuzzing.md §8), else the fast CI default.
