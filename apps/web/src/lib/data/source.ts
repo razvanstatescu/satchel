@@ -91,6 +91,10 @@ function fixtureView(): ViewFn {
         const ids = [...Object.keys(FIXTURE_TOKENS), ...sim.minted.map((m) => m.id)];
         return String(ids.map((i) => sim.token(i) ?? fixtureToken(i)).filter((t) => t?.owner_id === acct).length) as T;
       }
+      case "allowances_of":
+        return sim.allowancesOf(id) as T;
+      case "allowance":
+        return (sim.allowanceOf(id, String(args.delegate ?? "")) ?? null) as T | null;
       default:
         return null;
     }

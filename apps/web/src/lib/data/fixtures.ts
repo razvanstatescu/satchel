@@ -1,4 +1,4 @@
-import type { ConfigView, ListingView, NftToken, SatchelView, SigRecordView } from "@/lib/near/types";
+import type { AllowanceRecord, ConfigView, ListingView, NftToken, SatchelView, SigRecordView } from "@/lib/near/types";
 
 /**
  * Fixture mode (NEXT_PUBLIC_DATA_MODE=fixture): realistic views for the demo state of kb/90 + D-32, so every page renders
@@ -130,6 +130,26 @@ export const FIXTURE_TOKENS: Record<string, TokenFixture> = {
 };
 
 export const FIXTURE_IDS = Object.keys(FIXTURE_TOKENS);
+
+/**
+ * C5 (docs/specs/C5.md): the demo delegation on Satchel #1 (ALICE owns it) — BOB can sign BTC and ETH up to a daily
+ * cap, nothing spent yet, no expiry. `sim.ts` merges this with the in-browser mutations (set/revoke/spend) into the
+ * same `AllowanceView` shape the real `allowance`/`allowances_of` views return.
+ */
+export const FIXTURE_ALLOWANCES: Record<string, AllowanceRecord[]> = {
+  "1": [
+    {
+      delegate: BOB,
+      owner: ALICE,
+      set_at_ms: tAt(hAgo(5_000)),
+      expires_at_ms: null,
+      caps: [
+        { asset: "btc", limit: "50000", spends: [] },
+        { asset: { evm: { chain_id: 11155111 } }, limit: "20000000000000000", spends: [] },
+      ],
+    },
+  ],
+};
 
 export function fixtureSatchel(id: string, cooldown = 250): SatchelView | null {
   const t = FIXTURE_TOKENS[id];

@@ -1,5 +1,5 @@
 import type { SatchelStatus } from "@/lib/near/contract";
-import type { Chain, ConfigView, Listing, SigRecordView } from "@/lib/near/types";
+import type { AllowanceView, Chain, ConfigView, Listing, SigRecordView } from "@/lib/near/types";
 
 /** GET /api/satchels/[id] shape (kb/90 §9) — also feeds the blocking /s/[id] render. */
 export interface SatchelSnapshot {
@@ -27,6 +27,8 @@ export interface SatchelSnapshot {
   minted_at: number | null; // ms
   last_signature: { seq: number; chain: Chain; height: number; timestamp_ms: number; status: SigRecordView["status"]; url: string | null } | null;
   lock: LockFacts;
+  /** C5 (docs/specs/C5.md §1.2): the token's live delegates, a public fact (judge-visible; never gated on the viewer). */
+  allowances: AllowanceView[];
   errors: string[];
 }
 
@@ -115,4 +117,6 @@ export interface ActivityRow {
   price?: string;
   currency?: "near" | "usdc";
   status?: "final" | "signing" | "mempool" | "unused" | "failed";
+  /** C5: who called `sign_for` ("issued"/"sent" rows only). Shown only when it differs from the owner (a delegate). */
+  requester?: string;
 }

@@ -1,6 +1,9 @@
+import { revokeAllowanceCall, setAllowanceCall } from "@satchel/core/near";
+import type { CapInput } from "@satchel/core/policy";
 import { SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { ATTACH, signAttachDeposit, signAttachTgas, tgas } from "@/lib/near/constants";
 import type {
+  AllowanceView,
   Chain,
   ConfigView,
   Currency,
@@ -51,6 +54,9 @@ export function contractViews(view: ViewFn, contractId: string = SATCHEL_CONTRAC
       (await view<NftToken[]>(contractId, "nft_tokens_for_owner", { account_id, from_index, limit })) ?? [],
     nftSupplyForOwner: async (account_id: string) =>
       Number((await view<string>(contractId, "nft_supply_for_owner", { account_id })) ?? "0"),
+    // C5 (docs/specs/C5.md §1.2): at most MAX_DELEGATES (4) rows, insertion order; [] when none.
+    allowancesOf: async (token_id: TokenId) => (await view<AllowanceView[]>(contractId, "allowances_of", { token_id })) ?? [],
+    allowance: (token_id: TokenId, delegate: string) => view<AllowanceView>(contractId, "allowance", { token_id, delegate }),
   };
 }
 
@@ -123,6 +129,18 @@ export const calls = {
 
   usdcRegister: (account_id: string, usdc = USDC_CONTRACT) =>
     fc(usdc, "storage_deposit", { account_id, registration_only: true }, ATTACH.usdcRegister.gas, ATTACH.usdcRegister.deposit),
+
+  /** C5: owner only, deposit ≥ measured storage (the core builder validates caps and throws RangeError with the contract's code). */
+  setAllowance: (token_id: TokenId, delegate: string, caps: readonly CapInput[], expires_at_ms?: number, contractId = SATCHEL_CONTRACT): WalletTx => {
+    const p = setAllowanceCall(token_id, delegate, caps, expires_at_ms);
+    return fc(contractId, p.methodName, p.args, p.gas, p.deposit);
+  },
+
+  /** C5: owner only, exactly 1 yocto. */
+  revokeAllowance: (token_id: TokenId, delegate: string, contractId = SATCHEL_CONTRACT): WalletTx => {
+    const p = revokeAllowanceCall(token_id, delegate);
+    return fc(contractId, p.methodName, p.args, p.gas, p.deposit);
+  },
 };
 
 /** Status pill derived from contract state (kb/90 §5.10, kb/81 R3 precedence). */

@@ -55,7 +55,7 @@ export function ActivityView({ snap, act, before }: { snap: SatchelSnapshot; act
             }
           />
         ) : (
-          <Timeline rows={page.rows} />
+          <Timeline rows={page.rows} owner={snap.owner} />
         )}
         {empty ? null : (
           <div className="flex flex-col items-start gap-2">

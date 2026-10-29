@@ -1,5 +1,17 @@
-import type { NftToken, SatchelView, SigDetailView, SigRecordView } from "@/lib/near/types";
-import { FIXTURE_RECORDS, fixtureSatchel, fixtureToken, FIXTURE_TOKENS } from "@/lib/data/fixtures";
+import {
+  allowanceDebits,
+  applyDebits,
+  capsOfView,
+  isExpired,
+  MAX_DELEGATES,
+  sameAsset,
+  validateCaps,
+  type AllowanceView,
+  type CapInput,
+} from "@satchel/core/policy";
+import { MPC_CONTRACT, SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
+import { FIXTURE_ALLOWANCES, FIXTURE_RECORDS, fixtureSatchel, fixtureToken, FIXTURE_TOKENS } from "@/lib/data/fixtures";
+import type { AllowanceRecord, NftToken, SatchelView, SigDetailView, SigRecordView, SignRequest } from "@/lib/near/types";
 
 /**
  * FIXTURE MODE ONLY: an in-browser simulation of what the contract and the chains would do after a wallet call,
@@ -40,6 +52,8 @@ interface SimState {
   sales: Record<string, SimSale>;
   /** Escrow (`proceeds[(account, currency)]`): written only when a payout fails. */
   proceeds: Record<string, { near?: string; usdc?: string }>;
+  /** C5 (docs/specs/C5.md): mutations on top of `FIXTURE_ALLOWANCES`, keyed by token id. */
+  allowances: Record<string, AllowanceRecord[]>;
 }
 
 export interface SimSale {
@@ -55,7 +69,7 @@ export interface SimSale {
   payoutOk: boolean;
 }
 
-const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {} });
+const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {}, allowances: {} });
 
 function read(): SimState {
   if (typeof window === "undefined") return empty();
@@ -103,11 +117,52 @@ export function fixtureHash(input: string): string {
   return out;
 }
 
+/* ── C5 spending allowance: shared helpers (module scope, used by the overlay and the mutations below) ── */
+
+const ALLOWANCE_WINDOW_MS = 86_400_000;
+const MAX_SPENDS = 32;
+
+function ownerOf(s: SimState, id: string): string | null {
+  return s.owners[id] ?? s.minted.find((m) => m.id === id)?.owner ?? FIXTURE_TOKENS[id]?.owner ?? null;
+}
+
+function listingOf(s: SimState, id: string) {
+  return s.delisted.includes(id) ? null : s.listed[id] ?? fixtureSatchel(id)?.listing ?? null;
+}
+
+/** The fixture demo delegations, overridden entirely once this token has seen a set/revoke/transfer/sale this session. */
+function allowanceRecordsOf(s: SimState, tokenId: string): AllowanceRecord[] {
+  return s.allowances[tokenId] ?? FIXTURE_ALLOWANCES[tokenId] ?? [];
+}
+
+/** An `AllowanceRecord` → the contract's `AllowanceView` (spec §1.2), rolling the window forward to `nowMs`. */
+function allowanceToView(tokenId: string, rec: AllowanceRecord, nowMs: number, listed: boolean): AllowanceView {
+  const caps = rec.caps.map((c) => {
+    const liveSpends = c.spends.filter((sp) => nowMs < sp.at_ms + ALLOWANCE_WINDOW_MS);
+    const spent = liveSpends.reduce((a, sp) => a + BigInt(sp.amount), 0n);
+    const limit = BigInt(c.limit);
+    return { asset: c.asset, limit: c.limit, spent: spent.toString(), remaining: (spent >= limit ? 0n : limit - spent).toString(), spends: liveSpends };
+  });
+  return {
+    token_id: tokenId,
+    delegate: rec.delegate,
+    owner_id: rec.owner,
+    set_at_ms: rec.set_at_ms,
+    expires_at_ms: rec.expires_at_ms,
+    status: isExpired(rec.expires_at_ms, nowMs) ? "expired" : listed ? "paused" : "active",
+    now_ms: nowMs,
+    window_ms: ALLOWANCE_WINDOW_MS,
+    spends_in_window: caps.reduce((a, c) => a + c.spends.length, 0),
+    max_spends: MAX_SPENDS,
+    caps,
+  };
+}
+
 export function simOverlay() {
   const s = read();
   const now = Date.now();
   const baseCount = (id: string) => (FIXTURE_RECORDS[id]?.length ?? 0);
-  const owner = (id: string) => s.owners[id] ?? s.minted.find((m) => m.id === id)?.owner ?? FIXTURE_TOKENS[id]?.owner ?? null;
+  const owner = (id: string) => ownerOf(s, id);
 
   const records = (id: string): SigRecordView[] =>
     s.records
@@ -158,6 +213,21 @@ export function simOverlay() {
       const listing = s.delisted.includes(id) ? null : s.listed[id] ?? base.listing;
       return { ...base, owner_id: o, sig_count: baseCount(id) + extra.length, last_sign_height: last, listable_at: last === 0 ? 0 : last + 250, listing };
     },
+    /** C5: at most MAX_DELEGATES rows, dropping a record whose owner no longer matches (the backstop rule, spec §4). */
+    allowancesOf(id: string): AllowanceView[] {
+      const o = owner(id);
+      if (!o) return [];
+      const listed = !!listingOf(s, id);
+      return allowanceRecordsOf(s, id)
+        .filter((r) => r.owner === o)
+        .map((r) => allowanceToView(id, r, now, listed));
+    },
+    allowanceOf(id: string, delegate: string): AllowanceView | null {
+      const o = owner(id);
+      if (!o) return null;
+      const rec = allowanceRecordsOf(s, id).find((r) => r.delegate === delegate && r.owner === o);
+      return rec ? allowanceToView(id, rec, now, !!listingOf(s, id)) : null;
+    },
   };
 }
 
@@ -189,6 +259,7 @@ export function simSignFor(args: { tokenId: string; requester: string; items: { 
 export function simTransfer(tokenId: string, to: string) {
   const s = read();
   s.owners[tokenId] = to;
+  s.allowances[tokenId] = []; // C5 reset rule (spec §4): every ownership change clears all allowances
   write(s);
 }
 
@@ -219,6 +290,7 @@ export function simBuy(tokenId: string, buyer: string, tx = fixtureHash(`${token
   const listing = simOverlay().satchel(tokenId)?.listing ?? null;
   const s = read();
   s.owners[tokenId] = buyer;
+  s.allowances[tokenId] = []; // C5 reset rule (spec §4): a sale clears all allowances too
   delete s.listed[tokenId];
   if (!s.delisted.includes(tokenId)) s.delisted.push(tokenId);
   if (listing) {
@@ -245,6 +317,73 @@ export function simWithdraw(account: string, currency: "near" | "usdc"): { ok: t
   if (!paid) credit(s, account, currency, owed);
   write(s);
   return { ok: true, paid, amount: owed.toString() };
+}
+
+/* ── C5 spending allowance: mutations the mock wallet performs (mirrors contracts/satchel/src/allowance.rs) ── */
+
+const allowancePanic = (code: string, detail?: string) => new Error(`Smart contract panicked: ${code}${detail ? `: ${detail}` : ""}`);
+
+/** `set_allowance` (spec §2 steps 2, 4–7): owner only; validates and normalizes caps like the contract. */
+export function simSetAllowance(tokenId: string, caller: string, delegate: string, caps: readonly CapInput[], expiresAtMs: number | undefined, nowMs = Date.now()): void {
+  const s = read();
+  const owner = ownerOf(s, tokenId);
+  if (!owner) throw allowancePanic("ERR_TOKEN_NOT_FOUND");
+  if (caller !== owner) throw allowancePanic("ERR_NOT_OWNER");
+  if (delegate === owner || delegate === SATCHEL_CONTRACT || delegate === MPC_CONTRACT || delegate === USDC_CONTRACT) throw allowancePanic("ERR_ALLOWANCE_DELEGATE");
+  const v = validateCaps(caps);
+  if (!v.ok) throw allowancePanic(v.error, v.detail);
+  if (expiresAtMs !== undefined && expiresAtMs <= nowMs) throw allowancePanic("ERR_ALLOWANCE_EXPIRY");
+  // expired allowances are dropped first (step 7); a replace of an existing, still-live delegate never counts against the limit
+  const live = allowanceRecordsOf(s, tokenId).filter((r) => r.owner === owner && !isExpired(r.expires_at_ms, nowMs));
+  const existing = live.find((r) => r.delegate === delegate);
+  if (!existing && live.length >= MAX_DELEGATES) throw allowancePanic("ERR_ALLOWANCE_LIMIT");
+  // replacing keeps spends still inside the window for every asset that keeps a cap (step 9 note)
+  const nextCaps = v.caps.map((c) => {
+    const prior = existing?.caps.find((p) => sameAsset(p.asset, c.asset));
+    const spends = (prior?.spends ?? []).filter((sp) => nowMs < sp.at_ms + ALLOWANCE_WINDOW_MS);
+    return { asset: c.asset, limit: c.limit.toString(), spends };
+  });
+  const rec: AllowanceRecord = { delegate, owner, set_at_ms: nowMs, expires_at_ms: expiresAtMs ?? null, caps: nextCaps };
+  s.allowances[tokenId] = [...live.filter((r) => r.delegate !== delegate), rec];
+  write(s);
+}
+
+/** `revoke_allowance` (spec §2): owner only; works on an expired allowance too (cleanup). */
+export function simRevokeAllowance(tokenId: string, caller: string, delegate: string): void {
+  const s = read();
+  const owner = ownerOf(s, tokenId);
+  if (!owner) throw allowancePanic("ERR_TOKEN_NOT_FOUND");
+  if (caller !== owner) throw allowancePanic("ERR_NOT_OWNER");
+  const list = allowanceRecordsOf(s, tokenId).filter((r) => r.owner === owner);
+  if (!list.some((r) => r.delegate === delegate)) throw allowancePanic("ERR_ALLOWANCE_NOT_FOUND");
+  s.allowances[tokenId] = list.filter((r) => r.delegate !== delegate);
+  write(s);
+}
+
+/**
+ * `sign_for` by a delegate (spec §2 step 1 and 4c): would it pass, and if so debit it. Mirrors the contract's order
+ * (expiry, `ERR_FROZEN`, the classifier via `allowanceDebits`, then the caps via `applyDebits`) using the same
+ * `@satchel/core/policy` functions the real contract's behaviour is checked against.
+ */
+export function simDebitDelegated(tokenId: string, delegate: string, request: SignRequest, listed: boolean, nowMs = Date.now()): { ok: true } | { ok: false; error: string } {
+  const s = read();
+  const owner = ownerOf(s, tokenId);
+  if (!owner) return { ok: false, error: "ERR_NOT_OWNER" };
+  const list = allowanceRecordsOf(s, tokenId).filter((r) => r.owner === owner);
+  const idx = list.findIndex((r) => r.delegate === delegate);
+  if (idx < 0) return { ok: false, error: "ERR_NOT_OWNER" };
+  const rec = list[idx]!;
+  if (isExpired(rec.expires_at_ms, nowMs)) return { ok: false, error: "ERR_ALLOWANCE_EXPIRED" };
+  if (listed) return { ok: false, error: "ERR_FROZEN" };
+  const view = allowanceToView(tokenId, rec, nowMs, listed);
+  const d = allowanceDebits(request);
+  if (!d.ok) return { ok: false, error: d.error };
+  const r = applyDebits(capsOfView(view), d.debits, nowMs);
+  if (!r.ok) return { ok: false, error: r.error };
+  list[idx] = { ...rec, caps: r.caps.map((c) => ({ asset: c.asset, limit: c.limit.toString(), spends: c.spends.map((sp) => ({ at_ms: sp.at_ms, amount: sp.amount.toString() })) })) };
+  s.allowances[tokenId] = list;
+  write(s);
+  return { ok: true };
 }
 
 /** Broadcast simulation: "broadcast-fail" fails the first attempt per intent, then succeeds (Broadcast again). */

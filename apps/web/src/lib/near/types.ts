@@ -104,3 +104,19 @@ export function detailChain(d: SigDetailView): Chain {
   if ("btc" in d) return "btc";
   return "sol";
 }
+
+/** C5 spending allowance (docs/specs/C5.md): the TS mirror's JSON shapes, re-exported so the app imports one place. */
+export type { Asset, AllowanceStatus, AllowanceView, CapInput } from "@satchel/core/policy";
+
+/**
+ * FIXTURE MODE ONLY: the static demo shape of one delegate's allowance on a token (fixtures.ts), merged with
+ * `sim.ts`'s in-browser mutations into the same `AllowanceView` the real `allowance`/`allowances_of` views return.
+ */
+export interface AllowanceRecord {
+  delegate: string;
+  /** The owner who granted it (the backstop rule, spec §1.2 "Allowances of a previous owner never show"). */
+  owner: string;
+  set_at_ms: number;
+  expires_at_ms: number | null;
+  caps: { asset: import("@satchel/core/policy").Asset; limit: string; spends: { at_ms: number; amount: string }[] }[];
+}
