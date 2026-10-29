@@ -71,6 +71,13 @@ export type NearSnapshotResult = NearSnapshot | { source: string; error: string 
 export interface Policy {
   /** EVM: a nonce is spent once the count at `latest − evmConfirmations` exceeds it (spec §7.4: 3) */
   evmConfirmations: number
+  /**
+   * C3 (review SR-01): the depth per EVM chain id, overriding `evmConfirmations`. Block times differ (Sepolia 12 s,
+   * Base/OP Sepolia 2 s, Arbitrum Sepolia ≈ 0.25 s), so one block count would leave an L2 "spent" verdict, which is
+   * cached as final, only seconds deep. The defaults give each chain about the same wall-clock depth (≥ 36 s).
+   * The depth used is `max(evmConfirmations, evmConfirmationsByChain[id] ?? 0)`: never shallower than the global.
+   */
+  evmConfirmationsByChain?: Partial<Record<number, number>>
   /** BTC: confirmations K for a spend to count (testnet4 K = 1, disclosed weakness T11) */
   btcK: number
   /** SOL: minimum record age before a blockhash can be judged expired (120 s) */
@@ -83,6 +90,8 @@ export interface Policy {
 
 export const TESTNET_POLICY: Policy = {
   evmConfirmations: 3,
+  // ≈ 60 s on each L2; Sepolia keeps spec §7.4's `evmConfirmations` (3 blocks ≈ 36 s)
+  evmConfirmationsByChain: { 84532: 30, 11155420: 30, 421614: 240 },
   btcK: 1,
   solMinAgeMs: 120_000,
   allowSingleSource: true,
@@ -222,7 +231,14 @@ export interface ContractReport {
 export interface CleanHistoryReport {
   token_id: string
   checked_at: string
-  policy: { evm: string; btc_k: number; sol_min_age_s: number; allow_single_source: boolean }
+  policy: {
+    evm: string
+    /** C3 (SR-01): the tag used per EVM chain id, e.g. `{"84532":"latest-30"}` */
+    evm_by_chain?: Record<string, string>
+    btc_k: number
+    sol_min_age_s: number
+    allow_single_source: boolean
+  }
   sig_count: number | null
   aggregate: Aggregate
   buy_enabled: boolean
