@@ -154,9 +154,11 @@ async fn check_solvency(env: &Env, tokens: &[&str], accounts: &[&AccountId]) -> 
     assert_eq!(num(&t["inside_near"]), inside_near, "I-M2: totals.inside_near");
     assert_eq!(num(&t["offers_near"]), offers_near, "I-M2: totals.offers_near");
     assert_eq!(num(&t["storage_credit"]), credits, "I-M2: totals.storage_credit");
+    assert_eq!(num(&t["proceeds_near"]), proceeds_near, "I-M2: totals.proceeds_near (M-01)");
+    let owed = inside_near + offers_near + credits + proceeds_near;
+    assert_eq!(num(&t["escrow_near"]), owed, "I-M2: totals.escrow_near (M-01)");
     let a = env.worker.view_account(env.satchel.id()).await?;
     let free = a.balance.as_yoctonear() - a.storage_usage as u128 * STORAGE_BYTE_COST;
-    let owed = inside_near + offers_near + credits + proceeds_near;
     assert!(owed <= free, "I-M1: owed {owed} > free balance {free}");
     let fb = ft_balance(env, env.satchel.id()).await?;
     let owed_usdc = inside_usdc + offers_usdc + proceeds_usdc;
