@@ -79,6 +79,9 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
   Under load the testnet MPC times out often (≈ 1 in 4 requests on 2026-10-27; `research/spikes/smoke/RESULTS.md`).
   Retry an EVM send with the same nonce. `tools/e2e/{evm,btc,sol}.ts --sign-only` signs and verifies without funds.
 - EVM yParity = `recovery_id` (never the `big_r` prefix). MPC `s` is already low-S.
+- Never hardcode 21,000 gas for an EVM send. Since its 2026 fork, Sepolia charges **204,600 gas when a transfer
+  creates the recipient account**, so use `estimateTransferGas` (`@satchel/core/chains/evm`). A failed out-of-gas tx
+  still uses up its nonce.
 - Solana devnet blockhashes live about **36 s**. Reject durable-nonce messages (`04000000`).
 - Testnet4 blocks that carry transactions can be hours apart. Stage BTC funding and confirmations long before demos.
   `testnet4.mempool.space` is mainnet; use `mempool.space/testnet4`.

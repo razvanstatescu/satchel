@@ -13,6 +13,9 @@ import {
   prepareEvmSend,
   SEPOLIA_RPCS,
   serializeUnsignedEvmTx,
+  estimateTransferGas,
+  EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK,
+  EVM_CONTRACT_TRANSFER_GAS_FALLBACK,
 } from '../src/chains/evm'
 import { toHex } from '../src/bytes'
 import type { MpcSignature } from '../src/near'
@@ -100,6 +103,7 @@ describe('evm network helpers (mocked, no network)', () => {
       getTransactionCount: vi.fn(async () => 5),
       estimateFeesPerGas: vi.fn(async () => ({ maxFeePerGas: 200_028n, maxPriorityFeePerGas: 200_008n })),
       getBalance: vi.fn(async () => 10n ** 16n),
+      estimateGas: vi.fn(async () => 21_000n),
     } as unknown as PublicClient
     const p = await prepareEvmSend(client, { from: FROM, to: TO, value: 'max' })
     expect(client.getTransactionCount).toHaveBeenCalledWith({ address: FROM, blockTag: 'pending' })
@@ -109,6 +113,37 @@ describe('evm network helpers (mocked, no network)', () => {
     const reuse = await prepareEvmSend(client, { from: FROM, to: TO, value: 1n, nonce: 2 })
     expect(reuse.tx.nonce).toBe(2) // retry rule: reuse the earlier nonce (spec §8.7)
     await expect(prepareEvmSend(client, { from: FROM, to: TO, value: 10n ** 17n })).rejects.toThrow(/insufficient/)
+  })
+
+  it('gas: uses the node estimate (a new recipient costs 204,600 on Sepolia since its 2026 fork), never < 21,000', async () => {
+    const at = (g: bigint) => ({ estimateGas: vi.fn(async () => g) }) as unknown as PublicClient
+    expect(await estimateTransferGas(at(204_600n), { from: FROM, to: TO })).toBe(204_600n)
+    expect(await estimateTransferGas(at(20_000n), { from: FROM, to: TO })).toBe(21_000n)
+    const client = {
+      getTransactionCount: vi.fn(async () => 0),
+      estimateFeesPerGas: vi.fn(async () => ({ maxFeePerGas: 71n, maxPriorityFeePerGas: 51n })),
+      getBalance: vi.fn(async () => 5n * 10n ** 16n),
+      estimateGas: vi.fn(async () => 204_600n),
+    } as unknown as PublicClient
+    const p = await prepareEvmSend(client, { from: FROM, to: TO, value: 5n * 10n ** 15n })
+    expect(p.tx.gas).toBe(204_600n)
+    expect(p.feeMax).toBe(204_600n * 71n)
+    expect(parseUnsignedEvmTx(p.unsigned).gas).toBe(204_600n) // the gas limit is in the bytes the contract signs
+  })
+
+  it('gas: when the node cannot estimate, an empty recipient gets 250,000, a contract 100,000, an existing EOA 21,000', async () => {
+    const failing = (code: string, nonce: number, balance: bigint) =>
+      ({
+        estimateGas: vi.fn(async () => { throw new Error('method not found') }),
+        getCode: vi.fn(async () => code),
+        getTransactionCount: vi.fn(async () => nonce),
+        getBalance: vi.fn(async () => balance),
+      }) as unknown as PublicClient
+    expect(await estimateTransferGas(failing('0x', 0, 0n), { from: FROM, to: TO })).toBe(EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK)
+    expect(await estimateTransferGas(failing('0x6080', 1, 0n), { from: FROM, to: TO })).toBe(EVM_CONTRACT_TRANSFER_GAS_FALLBACK)
+    expect(await estimateTransferGas(failing('0x', 3, 10n), { from: FROM, to: TO })).toBe(21_000n)
+    const dead = { estimateGas: vi.fn(async () => { throw new Error('x') }), getCode: vi.fn(async () => { throw new Error('x') }) } as unknown as PublicClient
+    expect(await estimateTransferGas(dead, { from: FROM, to: TO })).toBe(EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK)
   })
 
   it('broadcast: "already known" after a fallback retry is treated as sent when the hash is found', async () => {

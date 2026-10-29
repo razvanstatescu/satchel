@@ -36,6 +36,8 @@ describe('e2e local: EVM send from a derived Satchel address (real MPC signature
       getTransactionCount: async () => 0,
       estimateFeesPerGas: async () => ({ maxFeePerGas: 200_028n, maxPriorityFeePerGas: 200_008n }),
       getBalance: async () => 10n ** 16n,
+      // the kb/31 vector is a transfer to an existing account: the node estimates the classic 21,000
+      estimateGas: async () => 21_000n,
     } as unknown as PublicClient
     const prep = await prepareEvmSend(client, { from: a.evm, to: '0x61739f33AdbB7F76c1b5B222E4119085257528BE', value: 10n ** 14n })
     expect(prep.unsigned).toBe('0x02ee83aa36a78083030d4883030d5c8252089461739f33adbb7f76c1b5b222e4119085257528be865af3107a400080c0')

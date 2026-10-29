@@ -18,6 +18,7 @@ import {
   serializeUnsignedEvmTx,
   waitEvmReceipt,
   EVM_TRANSFER_GAS,
+  estimateTransferGas,
 } from '@satchel/core/chains/evm'
 import { evmSignRequest } from '@satchel/core/near'
 import { toHex } from '@satchel/core/bytes'
@@ -34,6 +35,7 @@ const OPTIONS = {
   nonce: { type: 'string' },
   'max-fee-gwei': { type: 'string', default: '30' },
   'tip-gwei': { type: 'string', default: '1.5' },
+  gas: { type: 'string' },
   fanout: { type: 'boolean', default: false },
   targets: { type: 'string' },
   preset: { type: 'string' },
@@ -48,6 +50,8 @@ const HELP = `tools/e2e/evm.ts: Sepolia send from a Satchel via sign_for.
   --to <0x…|set#id>     recipient (default: the Satchel's own address)   --value <ETH> (default 0.0001)
   --nonce <n>           reuse a nonce (retry rule §8.7)
   --max-fee-gwei / --tip-gwei   fees used only with --offline
+  --gas <n>             gas limit per leg (default: eth_estimateGas per recipient; 21000 offline). A transfer that
+                        creates the recipient costs 204,600 on Sepolia since its 2026 fork
   --fanout              split across targets: --targets "final#1-7 rc#1+2" --amount-each 0.01, or --preset funding [--sets final,rc,dev1]
   --no-wait             do not wait for each receipt
   --sign-only           sign_for + verify the recovered address, print the raw tx, do not broadcast (works unfunded)
@@ -58,8 +62,8 @@ interface Fees {
   maxPriorityFeePerGas: bigint
 }
 
-export function buildLegTx(nonce: number, to: `0x${string}`, value: bigint, fees: Fees): { tx: TransactionSerializableEIP1559; unsigned: `0x${string}`; payload: string } {
-  const tx = buildUnsignedEvmTx({ nonce, to, value, ...fees })
+export function buildLegTx(nonce: number, to: `0x${string}`, value: bigint, fees: Fees, gas: bigint = EVM_TRANSFER_GAS): { tx: TransactionSerializableEIP1559; unsigned: `0x${string}`; payload: string } {
+  const tx = buildUnsignedEvmTx({ nonce, to, value, gas, ...fees })
   const unsigned = serializeUnsignedEvmTx(tx)
   return { tx, unsigned, payload: toHex(evmPayloadHash(unsigned)) }
 }
@@ -89,7 +93,9 @@ async function main(): Promise<void> {
   const client = ctx.offline ? null : createSepoliaClient(ctx.cfg.sepoliaRpcs)
   let nonce: number
   let fees: Fees
+  let gases: bigint[] = legs.map(() => (str(v, 'gas') ? BigInt(str(v, 'gas')!) : EVM_TRANSFER_GAS))
   if (client) {
+    if (!str(v, 'gas')) gases = await Promise.all(legs.map((l) => estimateTransferGas(client, { from, to: l.address as `0x${string}` })))
     const [n, f, bal] = await Promise.all([
       str(v, 'nonce') ? Promise.resolve(Number(str(v, 'nonce'))) : client.getTransactionCount({ address: from, blockTag: 'pending' }),
       client.estimateFeesPerGas(),
@@ -97,7 +103,7 @@ async function main(): Promise<void> {
     ])
     nonce = n
     fees = { maxFeePerGas: f.maxFeePerGas, maxPriorityFeePerGas: f.maxPriorityFeePerGas }
-    const need = legsTotal(legs) + EVM_TRANSFER_GAS * fees.maxFeePerGas * BigInt(legs.length)
+    const need = legsTotal(legs) + gases.reduce((a, g) => a + g, 0n) * fees.maxFeePerGas
     ctx.log(`    sepolia   balance ${formatUnits(bal, 'eth')} ETH, pending nonce ${n}, maxFee ${formatUnits(fees.maxFeePerGas, 'eth')} ETH/gas; worst-case need ${formatUnits(need, 'eth')} ETH${bal < need ? '  ← INSUFFICIENT' : ''}`)
     if (ctx.send && bal < need && !bool(v, 'sign-only')) throw new Error('insufficient Sepolia balance for all legs')
   } else {
@@ -107,8 +113,8 @@ async function main(): Promise<void> {
   }
 
   for (const [i, leg] of legs.entries()) {
-    const built = buildLegTx(nonce + i, leg.address as `0x${string}`, leg.amount, fees)
-    ctx.log(`\n-- leg ${i + 1}/${legs.length}: ${formatUnits(leg.amount, 'eth')} ETH → ${leg.label} ${leg.address}`)
+    const built = buildLegTx(nonce + i, leg.address as `0x${string}`, leg.amount, fees, gases[i]!)
+    ctx.log(`\n-- leg ${i + 1}/${legs.length}: ${formatUnits(leg.amount, 'eth')} ETH → ${leg.label} ${leg.address} (gas limit ${gases[i]})`)
     ctx.log(`    unsigned  ${built.unsigned}\n    keccak    ${built.payload}`)
     const request = evmSignRequest(built.unsigned)
     describeSignRequest(token, request).forEach((l) => ctx.log(l))

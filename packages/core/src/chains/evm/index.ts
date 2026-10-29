@@ -19,7 +19,15 @@ import { hexToBytesStrict, strip0x, toHex } from '../../bytes'
 import { toEvmSignature, type MpcSignature } from '../../near/mpc'
 
 export const SEPOLIA_CHAIN_ID = 11155111
+/** The classic intrinsic cost of a plain transfer to an existing account: the floor, never the assumption. */
 export const EVM_TRANSFER_GAS = 21_000n
+/**
+ * Fallbacks when the node can't estimate. Sepolia's 2026 fork (state-gas accounting: `regularGasUsed` and
+ * `stateGasUsed` in traces) charges 204,600 gas for a transfer that **creates** the recipient account. A 21,000 limit
+ * then fails "out of gas"; the nonce is used and the value never moves (dev1 #1, 2026-10-29).
+ */
+export const EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK = 250_000n
+export const EVM_CONTRACT_TRANSFER_GAS_FALLBACK = 100_000n
 
 /**
  * spec §8.3: publicnode → ethpandaops → 0xrpc → tenderly. Never thirdweb (viem default), tenderly or 1rpc as primary.
@@ -137,22 +145,48 @@ export interface PreparedEvmSend {
 }
 
 /**
- * Read nonce (pending), fees and balance, and build the unsigned tx (kb/31 recipe). Pass `nonce` to reuse one on retry
+ * Gas limit for a native transfer `from` → `to`: `eth_estimateGas` (with 1 wei, so the estimate never fails on
+ * "insufficient funds", and so a fresh recipient is priced as created), never below 21,000. If the node can't
+ * estimate: 250,000 for an empty recipient (no code, nonce 0, balance 0), 100,000 for a contract, else 21,000. If even
+ * those reads fail, use 250,000. The contract accepts any gas limit up to u64, so only the fee cap grows (spec §5.9).
+ */
+export async function estimateTransferGas(client: PublicClient, p: { from: `0x${string}`; to: `0x${string}` }): Promise<bigint> {
+  try {
+    const g = await client.estimateGas({ account: p.from, to: p.to, value: 1n })
+    return g > EVM_TRANSFER_GAS ? g : EVM_TRANSFER_GAS
+  } catch {
+    try {
+      const [code, nonce, balance] = await Promise.all([
+        client.getCode({ address: p.to }),
+        client.getTransactionCount({ address: p.to }),
+        client.getBalance({ address: p.to }),
+      ])
+      if (code && code !== '0x') return EVM_CONTRACT_TRANSFER_GAS_FALLBACK
+      return nonce === 0 && balance === 0n ? EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK : EVM_TRANSFER_GAS
+    } catch {
+      return EVM_NEW_ACCOUNT_TRANSFER_GAS_FALLBACK
+    }
+  }
+}
+
+/**
+ * Read nonce (pending), fees, balance and the transfer's gas limit, and build the unsigned tx (kb/31 recipe). Pass `nonce` to reuse one on retry
  * (spec §8.7). `value: 'max'` sends balance − gas × maxFee.
  */
 export async function prepareEvmSend(
   client: PublicClient,
   p: { from: `0x${string}`; to: `0x${string}`; value: bigint | 'max'; nonce?: number },
 ): Promise<PreparedEvmSend> {
-  const [nonce, fees, balance] = await Promise.all([
+  const [nonce, fees, balance, gas] = await Promise.all([
     p.nonce !== undefined ? Promise.resolve(p.nonce) : client.getTransactionCount({ address: p.from, blockTag: 'pending' }),
     client.estimateFeesPerGas(),
     client.getBalance({ address: p.from }),
+    estimateTransferGas(client, { from: p.from, to: p.to }),
   ])
-  const feeMax = EVM_TRANSFER_GAS * fees.maxFeePerGas
+  const feeMax = gas * fees.maxFeePerGas
   const value = p.value === 'max' ? balance - feeMax : p.value
   if (value <= 0n || value + feeMax > balance) throw new Error('insufficient funds')
-  const tx = buildUnsignedEvmTx({ nonce, to: p.to, value, maxFeePerGas: fees.maxFeePerGas, maxPriorityFeePerGas: fees.maxPriorityFeePerGas })
+  const tx = buildUnsignedEvmTx({ nonce, to: p.to, value, gas, maxFeePerGas: fees.maxFeePerGas, maxPriorityFeePerGas: fees.maxPriorityFeePerGas })
   const unsigned = serializeUnsignedEvmTx(tx)
   return { tx, unsigned, payload: evmPayloadHash(unsigned), balance, feeMax }
 }
