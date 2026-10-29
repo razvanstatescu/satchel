@@ -33,9 +33,9 @@
 | C1 | `history_digest` view | contract-sign | **contract merged + pushed** (e985d82) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
 | C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | USDC balances and sends per network; ETH-for-fee guard; USDC rows in Activity and clean history |
 | C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | per-network balances (server HTML), network picker in Send and Add coins, per-chain nonce check, EIP-681 `@chainId`; L-05 fixed (`evmByChain` in the live checker) |
-| C4 | Offers | contract-market → web-market (UI) | **contract merged + M-01 fixed** (32f9467); UI in progress | `ensure_solvent` guard on transfer, buy and accept; `market_totals.escrow_near`; monitor spare = free − escrow |
+| C4 | Offers | contract-market → web-market (UI) | **contract + M-01 fix + UI merged + pushed** | `/s/[id]/offer` (runs the full clean-history check first, binds sig_count and inside_epoch, 1/7/30-day expiry), incoming offers with Accept pre-check, "My offers" with Cancel. Gaps: USDC offers only in the data layer (no currency picker wired); no /market entry for unlisted Satchels |
 | C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **contract + UI merged + pushed** (1fb28f8) | UI: public allowance facts (no JS), owner add/revoke (max 4), delegate banner + cap-gated Send; unit 396, Playwright 169/169. The orchestrator fixed a stale-sheet bug (reset on each showing). Gaps: no USDC or L2 caps in the Add sheet yet (waits on C2/C3 UI) |
-| C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract merged + M-01 fixed** (32f9467); UI in progress | see C4 |
+| C6 | NEAR-side assets inside | contract-market → web-market (UI) | **contract + M-01 fix + UI merged + pushed** | "NEAR inside" row (server HTML), Add NEAR (anyone), owner withdraw blocked while listed. Gap: no UI for USDC/wNEAR deposits or the storage-credit prepay (data layer only) |
 | C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | `/s/[id]/sign`: escaped text + hex + digest flag (L-02, SR-04), live signature verify, message deposit fixed; "Messages (n)" never blocks Buy |
 
 ## Interface decisions fixed up front (so parallel branches agree)
@@ -170,3 +170,16 @@ it. Phase-2 UI work builds against those specs.
 - 21:05Z: merged `feat/ui-allowance` (C5 UI) into main (1fb28f8). Fixed its reported stale Add-sheet bug (reset form on each <Activity> showing) and replaced the e2e workaround with a regression check. Web unit 396, Playwright 169/169 on merged main. Pushed.
 - 21:40Z: merged `fix/m01-solvency` into main (32f9467). **M-01 is closed**: the reviewer's proof is un-ignored and passes. Contract unit 177, core 467, tools 72, web unit 396. The branch-side sandbox was 119/119 with an identical contract and tests tree. Wasm 423,977 B `10c6a8e9…` (branch build). The root state layout changed again, so deploy to a fresh devN.
 - 21:50Z: merged `feat/ui-sign` (C2, C3, C7 UI, plus review L-02 and L-05) into main (aeba7f3): web unit 422, typecheck and lint clean, Playwright 183/183. Pushed. The sandbox and wasm rebuild on final main are running. **Only web-market (C4/C6 UI) remains.**
+- 22:40Z: merged `feat/ui-market` (C4/C6 UI) into main. 5 additive conflicts were resolved by keeping both sides; `MarketTotalsView` gained the M-01 fields. **All sprint features are now merged**:
+  - A1–A4;
+  - C1–C7 contract and UI;
+  - M-01 fixed;
+  - the security review merged.
+
+  **Final main:** contract unit 177; sandbox **119/119** (0 ignored); core 467; tools 72; web unit 443; Playwright **194/194**; typecheck and lint clean. Wasm **423,977 B `10c6a8e9096b682791f4ebe282861314b0f51b8be0c54e11b7f057c53353614a`**, INV-22 OK.
+
+  **Open:**
+  - Live testnet verification on a fresh `dev2` (never in place over dev1). It covers L2 sends, USDC, message signatures, offers and inside, and allowances.
+  - Real-wallet tests by Razvan.
+  - The small UI gaps listed above (USDC offers and deposits).
+  - The Day-9 reproducible build.

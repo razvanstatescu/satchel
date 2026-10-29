@@ -77,3 +77,4 @@
 - 2026-10-29T20:30Z [C4-ui|C6-ui] merge: main (ac5b01b, includes C1/C2/C3/C7 + C5 allowance UI) merged into feat/ui-market @ff40b59; typecheck/lint/unit (417) all green
 - 2026-10-29T20:35Z [C4-ui|C6-ui] green: full suite post-merge — unit 417, typecheck clean, lint clean, Playwright 180/180 (desktop+mobile) @ff40b59
 - 2026-10-29T20:35Z [orchestrator] merged M-01 fix (32f9467) and C2/C3/C7 UI (aeba7f3); web unit 422, e2e 183/183; only C4/C6 UI left
+- 2026-10-29T20:42Z [orchestrator] ALL sprint features merged; final main: sandbox 119/119, e2e 194/194, wasm 423,977 B 10c6a8e9…
