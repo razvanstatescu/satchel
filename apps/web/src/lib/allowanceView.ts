@@ -19,8 +19,22 @@ export function assetChain(asset: Asset): UiChain | null {
 }
 
 export function assetTicker(asset: Asset): Ticker | null {
+  // C2 + C3: ETH on any of the four EVM testnets, USDC for an ERC-20 cap
+  if (typeof asset === "object" && "evm" in asset) return "ETH";
+  if (typeof asset === "object" && "erc20" in asset) return "USDC";
   const c = assetChain(asset);
-  return c === "btc" ? "BTC" : c === "evm" ? "ETH" : c === "sol" ? "SOL" : null;
+  return c === "btc" ? "BTC" : c === "sol" ? "SOL" : null;
+}
+
+/** C2 + C3: the asset an EVM send debits: ETH on `chainId`, or that chain's USDC (token as the contract writes it). */
+export function evmAsset(chainId: number, usdcToken?: string): Asset {
+  return usdcToken ? { erc20: { chain_id: chainId, token: usdcToken.replace(/^0x/, "").toLowerCase() } } : { evm: { chain_id: chainId } };
+}
+
+/** This view's cap row for an asset, if it has one. */
+export function capForAsset(view: Pick<AllowanceView, "caps">, asset: Asset): AllowanceView["caps"][number] | undefined {
+  const key = assetKey(asset);
+  return view.caps.find((c) => assetKey(c.asset) === key);
 }
 
 /** "0.0005 BTC", or the raw base-unit string for an asset the UI has no ticker for yet. */

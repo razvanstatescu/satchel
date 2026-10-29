@@ -53,10 +53,20 @@ export type SignatureView =
   | { r: string; s: string; recovery_id: number }
   | { signature: string };
 
+/** C2: a USDC transfer's token, recipient and amount (base units), derived by the contract from `unsigned_tx`. */
+export interface Erc20DetailView {
+  token: string;
+  to: string;
+  amount: string;
+}
+
 export type SigDetailView =
-  | { evm: { chain_id: number; nonce: number; unsigned_tx: string } }
+  | { evm: { chain_id: number; nonce: number; unsigned_tx: string; erc20?: Erc20DetailView } }
   | { btc: { txid: string; vout: number; amount_sats: string } }
-  | { sol: { recent_blockhash: string; lamports: string } };
+  | { sol: { recent_blockhash: string; lamports: string } }
+  /** C7: hex of the UTF-8 body; the record's `chain` is "evm" (EIP-191) or "sol" (Solana off-chain v0) */
+  | { evm_message: { message: string } }
+  | { sol_message: { message: string } };
 
 export interface SigRecordView {
   seq: number;
@@ -99,14 +109,21 @@ export interface NftToken {
 export type SignRequest =
   | { evm: { unsigned_tx: string } }
   | { btc: { preimages: string[]; outputs: string } }
-  | { sol: { message: string } };
+  | { sol: { message: string } }
+  | { evm_message: { message: string } }
+  | { sol_message: { message: string } };
 
 export const CHAINS: readonly Chain[] = ["btc", "evm", "sol"] as const;
 
 export function detailChain(d: SigDetailView): Chain {
-  if ("evm" in d) return "evm";
+  if ("evm" in d || "evm_message" in d) return "evm";
   if ("btc" in d) return "btc";
   return "sol";
+}
+
+/** C7: true for an `evm_message` / `sol_message` record (a signed message, never a transaction). */
+export function isMessageDetail(d: SigDetailView): d is Extract<SigDetailView, { evm_message: unknown } | { sol_message: unknown }> {
+  return "evm_message" in d || "sol_message" in d;
 }
 
 /** C5 spending allowance (docs/specs/C5.md): the TS mirror's JSON shapes, re-exported so the app imports one place. */

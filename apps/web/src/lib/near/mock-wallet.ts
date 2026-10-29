@@ -1,5 +1,5 @@
 import { toHex } from "@satchel/core/bytes";
-import { classifySignRequest, maxSignedEvmNonce, type Asset, type CapInput } from "@satchel/core/policy";
+import { classifySignRequest, signContextFromRecords, type Asset, type CapInput } from "@satchel/core/policy";
 import { IS_FIXTURE } from "@/lib/config";
 import { FIXTURE_HEIGHT } from "@/lib/data/fixtures";
 import { FIXTURE_RECORDS } from "@/lib/data/fixtures";
@@ -42,19 +42,21 @@ function knob(k: string) {
 function recordsFor(request: SignRequest, tokenId: string): { chain: "btc" | "evm" | "sol"; payload: string; detail: SigDetailView }[] {
   // Same nonce-gap rule as the contract (D-43): the token's prior records are the fixture records + this browser's sim records.
   const prior = [...(FIXTURE_RECORDS[tokenId] ?? []), ...simOverlay().records(tokenId)];
-  const r = classifySignRequest(request as never, { evmMaxSignedNonce: maxSignedEvmNonce(prior) });
+  // C3: the nonce-gap rule is per chain id (signContextFromRecords gives each chain's highest signed nonce).
+  const r = classifySignRequest(request as never, signContextFromRecords(prior));
   if (!r.ok) throw new Error(`Smart contract panicked: ${r.error}: refused by policy`);
   if (r.chain === "evm") {
     const f = r.fields;
-    return [{ chain: "evm", payload: toHex(r.recordPayloads[0]), detail: { evm: { chain_id: Number(f.chainId), nonce: Number(f.nonce), unsigned_tx: toHex(f.unsignedTx) } } }];
+    // C2: the view derives `erc20` from the classified tx (absent on native transfers, never null)
+    const erc20 = f.erc20 ? { token: f.erc20.token.slice(2), to: f.erc20.to.slice(2), amount: f.erc20.amount.toString() } : undefined;
+    return [{ chain: "evm", payload: toHex(r.recordPayloads[0]), detail: { evm: { chain_id: Number(f.chainId), nonce: Number(f.nonce), unsigned_tx: toHex(f.unsignedTx), ...(erc20 ? { erc20 } : {}) } } }];
   }
   if (r.chain === "btc") {
     return r.fields.inputs.map((inp, i) => ({ chain: "btc" as const, payload: toHex(r.recordPayloads[i]), detail: { btc: { txid: inp.txid, vout: inp.vout, amount_sats: inp.amountSats.toString() } } }));
   }
-  if (r.chain !== "sol") {
-    // C7 message kinds (evm_message / sol_message): not simulated by the mock wallet yet (phase-2 UI)
-    throw new Error(`mock wallet: ${r.chain} requests are not simulated`);
-  }
+  // C7: a message record (the EVM or the Solana key signs; the record payload is what core computes)
+  if (r.chain === "evm_message") return [{ chain: "evm", payload: toHex(r.recordPayloads[0]), detail: { evm_message: { message: toHex(r.fields.message) } } }];
+  if (r.chain === "sol_message") return [{ chain: "sol", payload: toHex(r.recordPayloads[0]), detail: { sol_message: { message: toHex(r.fields.message) } } }];
   return [{ chain: "sol", payload: toHex(r.recordPayloads[0]), detail: { sol: { recent_blockhash: toHex(r.fields.recentBlockhash), lamports: r.fields.lamports.toString() } } }];
 }
 

@@ -6,6 +6,8 @@ import { formatAmount, truncateMiddle } from "@/lib/format";
 import { makeNearProvider } from "@/lib/near/rpc";
 import type { SigRecordView } from "@/lib/near/types";
 import { satchelAddresses } from "@/lib/derive";
+import { EVM_IDS, evmNetworkName, evmRpcs, SEPOLIA } from "@/lib/evm-networks";
+import { safeMessage } from "@/lib/message";
 
 /**
  * The live clean-history check through @satchel/core/clean-history (spec §7): two NEAR sources (FastNEAR, dRPC),
@@ -69,8 +71,12 @@ export async function cleanSources(ch: CleanHistory, fetchImpl?: FetchLike) {
   const { SOL_DEVNET_RPC } = await import("@satchel/core/chains/sol");
   const f = fetchImpl ? { fetch: fetchImpl as never } : {};
   const solUrls = SOL_RPCS.length ? SOL_RPCS.slice(0, 1) : [SOL_DEVNET_RPC];
+  // C3 (SR-02): two providers per EVM testnet, so records on Base, Arbitrum or OP Sepolia are checked on their own
+  // chain instead of failing closed as `unknown` (which would block Buy). Sepolia keeps the env list.
+  const evmByChain = Object.fromEntries(EVM_IDS.map((id) => [id, evmRpcs(id).slice(0, 2).map((u) => ch.jsonRpcEvmSource(u, f))]));
   return {
     evm: SEPOLIA_RPCS.slice(0, 2).map((u) => ch.jsonRpcEvmSource(u, f)),
+    evmByChain,
     btc: [ch.esploraBtcSource(BTC_APIS[0] ?? MEMPOOL_TESTNET4, f), ch.esploraBtcSource(BTC_APIS[1] ?? EMZY_TESTNET4, f)],
     sol: solUrls.map((u) => ch.solRpcSource(u, f)),
   };
@@ -122,6 +128,8 @@ function evidenceLine(it: CoreReport["items"][number]): string {
       return "Blockhash still valid";
     case "expired":
       return "Blockhash expired. It can't be used.";
+    case "message_signature":
+      return it.message_text !== undefined ? copy.record.messageBody(safeMessage(it.message_text).text) : copy.record.messageNote;
     case "providers_disagree":
       return "Providers disagree";
     case "too_many_txids":
@@ -135,11 +143,22 @@ export function mapCoreReport(r: CoreReport, records: SigRecordView[], source: C
   const items: CleanItem[] = r.items.map((it) => {
     const rec = records.find((x) => x.seq === it.seq);
     let key = `${CHAIN_NAME[it.chain]} · `;
-    if (it.chain === "evm") key += `nonce ${it.nonce ?? "?"}`;
+    if (it.message_kind) key = copy.record.messageKey(CHAIN_NAME[it.chain]);
+    else if (it.chain === "evm" && it.chain_id && it.chain_id !== SEPOLIA) key = copy.record.chainNonce(evmNetworkName(it.chain_id), it.nonce ?? "?");
+    else if (it.chain === "evm") key += `nonce ${it.nonce ?? "?"}`;
     else if (it.chain === "btc") key += `coin ${it.outpoint ? truncateMiddle(it.outpoint, 4, 4) : "?"}`;
     else key += `blockhash ${(it.recent_blockhash ?? "").slice(0, 4)}…`;
-    const wouldPay = it.chain === "btc" && it.claimed_amount_sats ? copy.clean.item.wouldPay(formatAmount(it.claimed_amount_sats, "BTC"), "its recipient", true) : null;
+    const wouldPay =
+      it.chain === "btc" && it.claimed_amount_sats
+        ? copy.clean.item.wouldPay(formatAmount(it.claimed_amount_sats, "BTC"), "its recipient", true)
+        : it.erc20
+          ? copy.clean.item.wouldPay(formatAmount(it.erc20.amount, "USDC"), truncateMiddle(`0x${it.erc20.to.replace(/^0x/, "")}`, 6, 4), false)
+          : null;
+    const message = it.message_kind && it.message_text !== undefined ? { kind: it.message_kind, text: it.message_text } : undefined;
     return {
+      ...(message ? { message } : {}),
+      ...(it.erc20 ? { erc20: it.erc20 } : {}),
+      ...(it.chain_id ? { chainId: it.chain_id } : {}),
       seq: it.seq,
       chain: it.chain,
       key,
@@ -164,7 +183,9 @@ export function mapCoreReport(r: CoreReport, records: SigRecordView[], source: C
     birth_tx: null,
     birth_block: null,
   };
-  const evmAcct = r.accounts.find((a) => a.chain === "evm");
+  // C3: one EVM account check per chain that has records (Sepolia always); the row passes only if every one does
+  const evmAccts = r.accounts.filter((a) => a.chain === "evm");
+  const evmAcct = evmAccts.find((a) => a.status !== "ok") ?? evmAccts[0];
   const solAcct = r.accounts.find((a) => a.chain === "sol");
   const unsafeReason = r.aggregate !== "unsafe" ? null : evmAcct?.status === "unsafe" ? "delegated" : solAcct?.status === "unsafe" ? "sol" : c.locked === false ? "keys" : c.code_ok === false ? "code" : "keys";
   return {

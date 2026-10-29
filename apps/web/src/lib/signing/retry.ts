@@ -5,6 +5,8 @@ import type { PendingIntent, SigningStage } from "@/lib/signing/types";
  * Retry and replacement rules (kb/90 §8.7): at most one spendable signature per intent.
  */
 
+const SEPOLIA_ID = 11155111;
+
 /** Stages after which a signature may exist (or does) and no chain tx has consumed its nonce/inputs yet. */
 const SPENDABLE_UNSENT: ReadonlySet<SigningStage> = new Set([
   "awaiting_wallet",
@@ -18,11 +20,16 @@ const SPENDABLE_UNSENT: ReadonlySet<SigningStage> = new Set([
 // Not "expired": that stage exists only for SOL and means the blockhash is past lastValidBlockHeight, so the signature
 // can never land (kb/90 §8.6). It doesn't block a fresh send.
 
-/** An earlier intent of the same token and chain that blocks a fresh, independent send. */
-export function blockingIntent(intents: readonly PendingIntent[], tokenId: string, chain: Chain): PendingIntent | null {
+/**
+ * An earlier intent of the same token and chain that blocks a fresh, independent send. EVM nonces are per chain id
+ * (C3): pass `evmChainId` and only an intent on that chain blocks (an intent without one is Sepolia). Message intents
+ * (C7) never block: a message uses no nonce and no coin.
+ */
+export function blockingIntent(intents: readonly PendingIntent[], tokenId: string, chain: Chain, evmChainId?: number): PendingIntent | null {
   const superseded = new Set(intents.map((i) => i.replaces).filter(Boolean) as string[]);
   for (const i of intents) {
-    if (i.tokenId !== tokenId || i.chain !== chain || superseded.has(i.id)) continue;
+    if (i.tokenId !== tokenId || i.chain !== chain || superseded.has(i.id) || i.message) continue;
+    if (chain === "evm" && evmChainId !== undefined && (i.evmChainId ?? SEPOLIA_ID) !== evmChainId) continue;
     if (SPENDABLE_UNSENT.has(i.stage)) return i;
     // A verify failure after signatures came back still leaves a public signature.
     if (i.stage === "failed" && i.signatures?.some(Boolean)) return i;

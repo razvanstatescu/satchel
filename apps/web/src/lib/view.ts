@@ -3,6 +3,7 @@ import { formatAmount } from "@/lib/format";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import type { CardChip } from "@/components/SatchelCard";
 import { EXPLORERS, SOL_UI_ENABLED } from "@/lib/config";
+import { anyEvmFunds } from "@/lib/evm-networks";
 
 /** View helpers shared by server and client components. */
 
@@ -52,6 +53,10 @@ export function priceText(price: string, currency: "near" | "usdc") {
   return currency === "usdc" ? formatAmount(price, "USDC") : formatAmount(price, "NEAR");
 }
 
+/**
+ * Nothing inside at all: every chain reads zero, and (C2, C3) no EVM testnet holds ETH or USDC. A Satchel with only
+ * Base Sepolia ETH or only USDC is not empty, so Send stays on.
+ */
 export function allZero(s: Pick<SatchelSnapshot, "balances">): boolean {
-  return UI_CHAINS.every((c) => balanceBase(s, c) === 0n);
+  return UI_CHAINS.every((c) => balanceBase(s, c) === 0n) && !anyEvmFunds(s);
 }

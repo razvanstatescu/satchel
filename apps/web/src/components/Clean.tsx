@@ -11,6 +11,7 @@ import {
   Hourglass,
   Info,
   LoaderCircle,
+  MessageSquareText,
   Monitor,
   ShieldAlert,
   ShieldCheck,
@@ -22,6 +23,7 @@ import { ChainCharm } from "@/components/brand/ChainCharm";
 import { ExternalLink, Icon, ItemPill, cx } from "@/components/ui";
 import { CHAIN_NAME, copy } from "@/lib/copy";
 import { buyEnabled, counts } from "@/lib/data/clean";
+import { looksLikeDigest, safeMessage } from "@/lib/message";
 import type { Aggregate, CleanItem, CleanReport, ItemStatus } from "@/lib/data/types";
 import { relativeTime } from "@/lib/format";
 
@@ -59,6 +61,7 @@ export const MARK: Record<MarkStatus, { icon: LucideIcon; tone: Tone; spin?: boo
   expired: { icon: Check, tone: "success" },
   unfunded: { icon: Check, tone: "muted" },
   foreign: { icon: Check, tone: "muted" },
+  message: { icon: MessageSquareText, tone: "muted" },
   settling: { icon: Hourglass, tone: "frozen" },
   unused: { icon: TriangleAlert, tone: "danger", problem: true },
   unknown: { icon: CircleQuestionMark, tone: "muted" },
@@ -70,6 +73,7 @@ const ITEM_WORD: Record<MarkStatus, string> = {
   expired: copy.clean.item.expired,
   unfunded: copy.clean.item.unfunded,
   foreign: copy.clean.item.foreign,
+  message: copy.record.messageWord,
   settling: copy.clean.item.settling,
   unused: copy.clean.item.unused,
   unknown: copy.clean.item.unknown,
@@ -80,6 +84,8 @@ const ITEM_WORD: Record<MarkStatus, string> = {
 export const isDead = (s: MarkStatus) => s === "spent" || s === "expired" || s === "unfunded" || s === "foreign";
 /** Statuses that block Buy (or haven't been checked yet). */
 export const needsAttention = (s: MarkStatus) => s === "unused" || s === "settling" || s === "unknown";
+/** C7: a signed message. It can't move coins and never blocks Buy; the record lists it in its own group. */
+export const isMessage = (s: MarkStatus) => s === "message";
 
 /** "just now" under 5 s, then "8 s ago", "4 min ago"… (the gate line's freshness). */
 export function checkedAgo(at: number, now: number): string {
@@ -105,7 +111,8 @@ export function stripModel(statuses: readonly { seq: number; status: MarkStatus 
   const total = statuses.length;
   if (total === 0 || aggregate === "unsafe") return null;
   const c = counts([...statuses]);
-  const dead = statuses.filter((s) => isDead(s.status)).length;
+  // messages can't move coins either (C7), so they count with the dead ones in "n of m can't move coins"
+  const dead = statuses.filter((s) => isDead(s.status) || isMessage(s.status)).length;
   let label: string;
   switch (aggregate) {
     case "checking":
@@ -466,11 +473,49 @@ export function Verdict({
 }
 
 /** The item a record row shows: its real status once revealed, "checking" before. */
-export type RecordRow = Pick<CleanItem, "seq" | "chain" | "key" | "wouldPay" | "evidence" | "evidenceUrl"> & { status: MarkStatus };
+export type RecordRow = Pick<CleanItem, "seq" | "chain" | "key" | "wouldPay" | "evidence" | "evidenceUrl" | "message"> & { status: MarkStatus };
+
+/**
+ * C7: a message row's text, safe to show (SR-04): hidden and direction-changing characters as visible [U+XXXX] codes,
+ * and the bytes in hex when the text can't be shown at all.
+ */
+export function messageLine(m: NonNullable<RecordRow["message"]>): string {
+  const s = safeMessage(m.text);
+  return copy.record.messageBody(s.text.length > 280 ? `${s.text.slice(0, 280)}…` : s.text);
+}
+
+/**
+ * L-02: a message record's exact bytes in hex beside its escaped text (so a buyer can compare them with what a site
+ * shows), and a flag when the body looks like a 32-byte digest (signing a hash you can't read).
+ */
+export function MessageBytes({ text }: { text: string }) {
+  const s = safeMessage(text);
+  return (
+    <span className="col-start-2 flex flex-col gap-1">
+      {looksLikeDigest(text) ? (
+        <span className="flex items-center gap-1.5 font-sans text-body-sm font-semibold text-danger" data-message-digest="">
+          <Icon icon={TriangleAlert} size={14} />
+          {copy.msg.digestShort}
+        </span>
+      ) : null}
+      <code className="block font-mono text-[0.75rem]/4 break-all text-ink-muted" data-message-hex="">
+        {s.hex.length > 128 ? `${s.hex.slice(0, 128)}…` : s.hex}
+      </code>
+    </span>
+  );
+}
 
 function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: string; clearHref?: string }) {
   const body =
-    item.status === "checking" ? null : item.status === "unfunded" ? copy.clean.item.unfundedBody : item.status === "foreign" ? copy.clean.item.foreignBody : rowEvidence(item.key, item.evidence);
+    item.status === "checking"
+      ? null
+      : item.status === "unfunded"
+        ? copy.clean.item.unfundedBody
+        : item.status === "foreign"
+          ? copy.clean.item.foreignBody
+          : item.message
+            ? messageLine(item.message)
+            : rowEvidence(item.key, item.evidence);
   return (
     <li
       id={`sig-${tokenId}-${item.seq}`}
@@ -487,10 +532,11 @@ function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: st
       </span>
       {item.wouldPay ? <span className="col-start-2 font-sans text-body-sm text-ink-muted t-num">{item.wouldPay}</span> : null}
       {body ? (
-        <span className="col-start-2 font-sans text-body-sm text-ink-muted">
+        <span className={cx("col-start-2 font-sans text-body-sm text-ink-muted", item.message && "wrap-anywhere whitespace-pre-wrap")} data-message-text={item.message ? "" : undefined}>
           {item.evidenceUrl && item.status !== "unfunded" && item.status !== "foreign" ? <ExternalLink href={item.evidenceUrl}>{body}</ExternalLink> : body}
         </span>
       ) : null}
+      {item.message ? <MessageBytes text={item.message.text} /> : null}
       {clearHref && item.status === "unused" ? (
         <Link href={clearHref} className="col-start-2 w-fit font-sans text-body-sm font-semibold text-link underline decoration-1 underline-offset-3 hover:decoration-2">
           {copy.sell.history.howToSettle}
@@ -553,6 +599,7 @@ export function Record({
   const checking = rows.some((r) => r.status === "checking");
   const attention = rows.filter((r) => needsAttention(r.status));
   const dead = rows.filter((r) => isDead(r.status));
+  const messages = rows.filter((r) => isMessage(r.status));
   const sources = hintLine ?? sourcesLine(report.sources);
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-4" data-record>
@@ -582,6 +629,7 @@ export function Record({
           <>
             {attention.length ? <ItemGroup title={copy.clean.group.attention(attention.length)} items={attention} tokenId={tokenId} clearHref={clearHref} /> : null}
             {dead.length ? <ItemGroup title={copy.clean.group.dead(dead.length)} items={dead} tokenId={tokenId} clearHref={clearHref} /> : null}
+            {messages.length ? <ItemGroup title={copy.record.messages(messages.length)} items={messages} tokenId={tokenId} /> : null}
           </>
         )
       ) : null}
@@ -608,5 +656,5 @@ export function Record({
 
 /** Record rows from a report: `revealed` rows show their status, the rest "checking" (the reveal in list order). */
 export function recordRows(items: readonly CleanItem[], revealed = items.length): RecordRow[] {
-  return items.map((it, i) => ({ seq: it.seq, chain: it.chain, key: it.key, wouldPay: it.wouldPay, evidence: it.evidence, evidenceUrl: it.evidenceUrl, status: i < revealed ? it.status : "checking" }));
+  return items.map((it, i) => ({ seq: it.seq, chain: it.chain, key: it.key, wouldPay: it.wouldPay, evidence: it.evidence, evidenceUrl: it.evidenceUrl, message: it.message, status: i < revealed ? it.status : "checking" }));
 }

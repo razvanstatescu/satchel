@@ -39,6 +39,15 @@ export interface PendingIntent {
   };
   payloadHashes: string[];
   evmNonce?: number;
+  /** C3: the EVM chain id of an EVM intent (absent = Sepolia, every intent written before C3) */
+  evmChainId?: number;
+  /** C2: the asset an EVM intent moves (absent = the native coin) */
+  asset?: "usdc";
+  /**
+   * C7: a message-signing intent. It is never broadcast (the adapter verifies the signature and stops), never blocks
+   * a send and never uses a nonce.
+   */
+  message?: { kind: "evm_message" | "sol_message"; text: string };
   nearTxHash?: string;
   seqs?: number[];
   signatures?: (StoredSignature | null)[];

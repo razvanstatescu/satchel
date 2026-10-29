@@ -37,8 +37,9 @@ describe("allowanceView: Asset <-> UI chain", () => {
     expect(assetTicker("sol")).toBe("SOL");
     expect(formatCapAmount("btc", "100000")).toBe(`0.0010${NBSP}BTC`);
     expect(formatCapAmount(EVM_ASSET, "20000000000000000")).toBe(`0.0200${NBSP}ETH`);
-    // an asset with no UI chain yet: the raw base-unit string, never crashes
-    expect(formatCapAmount({ erc20: { chain_id: 11155111, token: "1c7d4b196cb0c7b01d743fbc6116a902379c7238" } }, "5000000")).toBe("5000000");
+    // C2 + C3: a USDC cap formats as USDC (6 decimals), and ETH on another testnet as ETH
+    expect(formatCapAmount({ erc20: { chain_id: 11155111, token: "1c7d4b196cb0c7b01d743fbc6116a902379c7238" } }, "5000000")).toBe(`5.00${NBSP}USDC`);
+    expect(formatCapAmount({ evm: { chain_id: 84532 } }, "20000000000000000")).toBe(`0.0200${NBSP}ETH`);
   });
   it("capForChain finds a view's row for a UI chain", () => {
     const view = { caps: [{ asset: "btc" as const, limit: "1", spent: "0", remaining: "1", spends: [] }] };

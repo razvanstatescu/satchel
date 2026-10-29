@@ -107,7 +107,8 @@ test.describe("judge facts without JavaScript", () => {
     // its age: "8 s ago", or "just now" under 5 s (as the browser's gate line says it; W4 design QA)
     await expect(items.nth(2).locator("[data-gate]")).toContainText(/^Server check (.+ ago|just now): needs attention$/);
     await expect(page.locator("[data-market]")).not.toContainText(/checked in your browser/i);
-    await expect(items.first().getByRole("link")).toHaveAccessibleName(/^Satchel #\d, .+ Listing #\d · 1 signature Server check (.+ ago|just now): clean$/);
+    // #5 (first: clean, newest) has 2 signatures since C7 added its message record; a message never blocks Buy
+    await expect(items.first().getByRole("link")).toHaveAccessibleName(/^Satchel #\d, .+ Listing #\d · \d+ signatures? Server check (.+ ago|just now): clean$/);
   });
 
   test("/s/4/sale shows the listing and the verdict hint without JS", async ({ page }) => {

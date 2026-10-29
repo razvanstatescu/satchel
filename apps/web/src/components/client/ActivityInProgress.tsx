@@ -78,8 +78,22 @@ export function ActivityInProgress({ tokenId }: { tokenId: string }) {
   return (
     <FeedGroup id="in-progress" heading={copy.act.inProgress}>
       {intents.map((i) => {
-        const href = `/s/${tokenId}/send?chain=${i.chain}&intent=${i.id}`;
+        const href = i.message ? `/s/${tokenId}/sign?intent=${i.id}` : `/s/${tokenId}/send?chain=${i.chain}&intent=${i.id}`;
         const to = i.display?.toShort ?? "";
+        if (i.message) {
+          return (
+            <li key={i.id} data-intent={i.id}>
+              <Link href={href} className={cx(ROW, "hover:bg-surface-sunken focus-visible:-outline-offset-2")}>
+                <Lead i={i} icon={LoaderCircle} tone="text-frozen" spin />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="line-clamp-2 font-sans text-[0.9375rem]/5 font-semibold wrap-break-word text-ink">{copy.msg.title}</span>
+                  <span className="font-sans text-body-sm text-ink-muted t-num">{stageLine(i, now).line}</span>
+                </span>
+                <Icon icon={ChevronRight} size={20} className="text-ink-muted" />
+              </Link>
+            </li>
+          );
+        }
         const amount = i.display?.amount ? `${MINUS}${i.display.amount}` : null;
         if (i.stage === "signed_not_sent") {
           return (

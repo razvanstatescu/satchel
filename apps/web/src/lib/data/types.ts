@@ -19,6 +19,11 @@ export interface SatchelSnapshot {
     btc: { confirmed_sats: string; unconfirmed_sats: string } | null;
     evm: { wei: string } | null;
     sol: { lamports: string } | null;
+    /**
+     * C2 + C3: ETH and USDC (base units) on each EVM testnet, Sepolia first (one address on all four). A null value
+     * means that read failed. Optional so older snapshots still type-check.
+     */
+    evm_chains?: EvmChainBalance[];
   };
   as_of: number; // ms
   links: { nearblocks_token: string; btc: string; evm: string; sol: string; contract_facts: string };
@@ -57,7 +62,14 @@ export interface ContractFacts extends LockFacts {
   errors: string[];
 }
 
-export type ItemStatus = "spent" | "expired" | "unfunded" | "foreign" | "settling" | "unused" | "unknown";
+export interface EvmChainBalance {
+  chain_id: number;
+  wei: string | null;
+  usdc: string | null;
+}
+
+/** `message` (C7): a signed message. It can't move coins and never blocks Buy (core clean-history gate.ts). */
+export type ItemStatus = "spent" | "expired" | "unfunded" | "foreign" | "message" | "settling" | "unused" | "unknown";
 export type Aggregate = "checking" | "empty" | "clean" | "settling" | "blocked" | "unknown" | "unsafe";
 
 export interface CleanItem {
@@ -72,6 +84,12 @@ export interface CleanItem {
   signedAt: number;
   height: number;
   requester: string;
+  /** C7: a message record's kind and decoded text (status `message`) */
+  message?: { kind: "evm_message" | "sol_message"; text: string };
+  /** C2: a USDC transfer record's token, recipient and amount (base units) */
+  erc20?: { token: string; to: string; amount: string };
+  /** C3: the EVM chain id of a transaction record */
+  chainId?: number;
 }
 
 export interface CleanCheck {
@@ -104,7 +122,7 @@ export interface MarketEntry {
 }
 
 export interface ActivityRow {
-  kind: "sent" | "signed_not_sent" | "issued" | "transferred" | "received" | "minted" | "listed" | "delisted" | "sold" | "bought";
+  kind: "sent" | "signed_not_sent" | "issued" | "message" | "transferred" | "received" | "minted" | "listed" | "delisted" | "sold" | "bought";
   tx: string;
   block: number;
   timestampMs: number | null;
@@ -116,7 +134,13 @@ export interface ActivityRow {
   chainTxId?: string;
   price?: string;
   currency?: "near" | "usdc";
-  status?: "final" | "signing" | "mempool" | "unused" | "failed";
+  status?: "final" | "signing" | "mempool" | "unused" | "failed" | "message";
+  /** C2: the token a row moved (absent = the chain's native coin) */
+  token?: "USDC";
+  /** C3: the EVM chain id (absent on EVM rows = Sepolia) */
+  evmChainId?: number;
+  /** C7: the exact text of a signed message (kind `message`) */
+  messageText?: string;
   /** C5: who called `sign_for` ("issued"/"sent" rows only). Shown only when it differs from the owner (a delegate). */
   requester?: string;
 }

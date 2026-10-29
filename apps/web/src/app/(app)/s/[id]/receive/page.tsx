@@ -5,6 +5,7 @@ import { copy } from "@/lib/copy";
 import { SOL_SEND_ENABLED, SOL_UI_ENABLED } from "@/lib/config";
 import { getSatchelSnapshot } from "@/lib/data/server";
 import type { UiChain } from "@/lib/view";
+import { pickEvmChainId } from "@/lib/evm-networks";
 import { ReceiveSheet } from "./ReceiveSheet";
 
 /**
@@ -39,7 +40,7 @@ export default async function ReceivePage(props: PageProps<"/s/[id]/receive">) {
   return (
     <>
       <WalletTab snap={snap} />
-      <ReceiveSheet snap={snap} chain={pickChain(sp.chain)} amount={pickAmount(sp.amount)} />
+      <ReceiveSheet snap={snap} chain={pickChain(sp.chain)} amount={pickAmount(sp.amount)} network={pickEvmChainId(sp.network)} asset={sp.asset === "usdc" ? "usdc" : "eth"} />
     </>
   );
 }

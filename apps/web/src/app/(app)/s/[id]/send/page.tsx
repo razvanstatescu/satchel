@@ -5,6 +5,7 @@ import { SendFlow } from "@/components/client/SendFlow";
 import { getSatchelSnapshot, getSigRecords } from "@/lib/data/server";
 import { SOL_SEND_ENABLED } from "@/lib/config";
 import { copy } from "@/lib/copy";
+import { pickEvmChainId } from "@/lib/evm-networks";
 
 /** /s/[id]/send?chain=btc|evm|sol (sol only with the P2 SOL send flag) — a client flow presented in the FlowShell over the server-rendered Satchel page. */
 export const instant = false;
@@ -30,7 +31,15 @@ export default async function SendPage(props: PageProps<"/s/[id]/send">) {
   return (
     <>
       <WalletTab snap={snap} />
-      <SendFlow key={intent ?? chain} snap={snap} initialChain={chain} intentId={intent} records={records} />
+      <SendFlow
+        key={intent ?? chain}
+        snap={snap}
+        initialChain={chain}
+        intentId={intent}
+        records={records}
+        initialNetwork={pickEvmChainId(sp.network)}
+        initialAsset={sp.asset === "usdc" ? "usdc" : "eth"}
+      />
     </>
   );
 }

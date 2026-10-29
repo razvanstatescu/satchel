@@ -12,6 +12,7 @@ import {
   Hourglass,
   Info,
   LoaderCircle,
+  MessageSquareText,
   QrCode,
   RefreshCw,
   ShieldAlert,
@@ -465,6 +466,12 @@ export function OwnerActions({ snap }: { snap: SatchelSnapshot }) {
       {!listed && !zero ? (
         <Button href={`${base}/empty`} size="md" block variant="link" className="justify-center" data-testid="empty-entry">
           {copy.empty.cta}
+        </Button>
+      ) : null}
+      {/* C7: owner only (this block renders for the owner alone; a delegate is never the owner) and paused while listed */}
+      {!listed ? (
+        <Button href={`${base}/sign`} size="md" block variant="link" icon={MessageSquareText} className="justify-center" data-testid="sign-message-entry">
+          {copy.msg.action}
         </Button>
       ) : null}
       {reason ? (

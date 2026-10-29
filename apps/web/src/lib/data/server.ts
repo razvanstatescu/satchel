@@ -8,7 +8,8 @@ import { buildSnapshot, isTokenId, UPSTREAM_MS } from "@/lib/data/snapshot";
 import { contractViews } from "@/lib/near/contract";
 import { satchelEvents } from "@/lib/near/history";
 import { withTimeout } from "@/lib/near/rpc";
-import type { ConfigView, SigRecordView } from "@/lib/near/types";
+import { isMessageDetail, type ConfigView, type SigRecordView } from "@/lib/near/types";
+import { messageFromHex } from "@/lib/message";
 
 /**
  * Server reads for the blocking judge pages and the JSON routes (kb/90 §8.1, §9).
@@ -125,6 +126,26 @@ export async function getMarket(): Promise<{ entries: MarketEntry[]; as_of: numb
   }
 }
 
+/**
+ * A `sign_requested` event as an Activity row (docs/specs/C1-C2-C3-C7.md §4.3): `details[0]` names a message kind (C7;
+ * the text comes from the record at that seq), or the EVM chain id (C3) and a USDC transfer (C2).
+ */
+export function signRow(base: Pick<ActivityRow, "tx" | "block" | "timestampMs">, data: Record<string, unknown>, records: readonly SigRecordView[]): ActivityRow {
+  const chain = (data.chain as "btc" | "evm" | "sol") ?? "evm";
+  const d = (Array.isArray(data.details) ? data.details[0] : null) as { seq?: number; kind?: string; chain_id?: number; erc20?: { to: string; amount: string } } | null;
+  const seq = d?.seq ?? (typeof data.first_seq === "number" ? data.first_seq : undefined);
+  const rec = seq !== undefined ? records.find((r) => r.seq === seq) : undefined;
+  if (d?.kind === "evm_message" || d?.kind === "sol_message" || (rec && isMessageDetail(rec.detail))) {
+    const hex = rec && "evm_message" in rec.detail ? rec.detail.evm_message.message : rec && "sol_message" in rec.detail ? rec.detail.sol_message.message : null;
+    const text = hex ? messageFromHex(hex).text : null;
+    return { kind: "message", ...base, chain: d?.kind === "sol_message" || rec?.chain === "sol" ? "sol" : "evm", status: "message", ...(text !== null ? { messageText: text } : {}) };
+  }
+  const row: ActivityRow = { kind: "issued", ...base, chain, status: "final" };
+  if (d?.chain_id) row.evmChainId = d.chain_id;
+  if (d?.erc20) Object.assign(row, { token: "USDC" as const, amount: d.erc20.amount, to: `0x${d.erc20.to.replace(/^0x/, "")}` });
+  return row;
+}
+
 /** Activity rows (first page) from NEP-297 events: FastNEAR tx API in live mode, fixtures otherwise. */
 export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; partial: boolean }> {
   "use cache";
@@ -138,7 +159,23 @@ export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; pa
         if (e.event === "listed") return { kind: "listed", tx: e.tx, block: e.block, timestampMs: e.timestampMs, price: String(e.data.price), currency: e.data.currency as "near" | "usdc" };
         // C5: a delegate's `requester` rides the event (fixtures only name it when the signer wasn't the owner).
         const requester = e.data.requester ? String(e.data.requester) : undefined;
-        if (e.chainTx) return { kind: "sent", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.chainTx.chain, amount: e.chainTx.amount, to: e.chainTx.to, fee: e.chainTx.fee, chainTxId: e.chainTx.id, status: "final", requester };
+        if (e.message) return { kind: "message", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.message.chain, messageText: e.message.text, status: "message" };
+        if (e.chainTx)
+          return {
+            kind: "sent",
+            tx: e.tx,
+            block: e.block,
+            timestampMs: e.timestampMs,
+            chain: e.chainTx.chain,
+            amount: e.chainTx.amount,
+            to: e.chainTx.to,
+            fee: e.chainTx.fee,
+            chainTxId: e.chainTx.id,
+            status: "final",
+            ...(e.chainTx.token ? { token: e.chainTx.token } : {}),
+            ...(e.chainTx.chainId ? { evmChainId: e.chainTx.chainId } : {}),
+            requester,
+          };
         return { kind: "issued", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.data.chain as "evm" | "btc", amount: e.data.amount ? String(e.data.amount) : undefined, to: e.data.to ? String(e.data.to) : undefined, status: "unused", requester };
       }),
     };
@@ -148,6 +185,8 @@ export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; pa
     const { historyClient } = await import("@/lib/near/history");
     const evs = await withTimeout(satchelEvents(SATCHEL_CONTRACT, id, { client: historyClient({ apiKey: key, timeoutMs: 3000 }), limit: 60 }), 4000, "activity");
     const rows: ActivityRow[] = [];
+    let recs: Promise<SigRecordView[]> | null = null;
+    const recordsOnce = () => (recs ??= getSigRecords(id));
     for (const e of evs) {
       const base = { tx: e.tx, block: e.block, timestampMs: e.timestampMs };
       if (e.event === "nft_mint") rows.push({ kind: "minted", ...base, from: String(e.data.owner_id ?? "") });
@@ -155,7 +194,7 @@ export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; pa
       else if (e.event === "listed") rows.push({ kind: "listed", ...base, price: String(e.data.price), currency: e.data.currency as "near" | "usdc" });
       else if (e.event === "delisted") rows.push({ kind: "delisted", ...base });
       else if (e.event === "sold") rows.push({ kind: "sold", ...base, to: String(e.data.buyer_id ?? ""), price: String(e.data.price), currency: e.data.currency as "near" | "usdc" });
-      else if (e.event === "sign_requested") rows.push({ kind: "issued", ...base, chain: e.data.chain as "btc" | "evm" | "sol", status: "final", requester: e.data.requester ? String(e.data.requester) : undefined });
+      else if (e.event === "sign_requested") rows.push({ ...signRow(base, e.data, await recordsOnce()), requester: e.data.requester ? String(e.data.requester) : undefined });
     }
     return { rows, partial: false };
   } catch {

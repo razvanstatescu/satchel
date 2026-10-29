@@ -1,6 +1,7 @@
 import { AddressDisplay } from "@/components/AddressDisplay";
 import { ChainCharm } from "@/components/brand/ChainCharm";
 import { RowAmount, RowTools } from "@/components/client/SatchelPage";
+import { EvmNetworks } from "@/components/client/EvmNetworks";
 import { CHAIN_NAME, NETWORK_LABEL } from "@/lib/copy";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import type { UiChain } from "@/lib/view";
@@ -30,6 +31,7 @@ export function ChainRow({ snap, chain }: { snap: SatchelSnapshot; chain: UiChai
         <AddressDisplay address={snap.addresses[chain]} fullAttr={chain} size="md" />
       </p>
       <RowTools snap={snap} chain={chain} />
+      {chain === "evm" ? <EvmNetworks snap={snap} /> : null}
     </li>
   );
 }

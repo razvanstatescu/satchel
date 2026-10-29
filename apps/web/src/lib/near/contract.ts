@@ -1,4 +1,4 @@
-import { revokeAllowanceCall, setAllowanceCall } from "@satchel/core/near";
+import { revokeAllowanceCall, setAllowanceCall, signAttachDepositFor } from "@satchel/core/near";
 import type { CapInput } from "@satchel/core/policy";
 import { SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { ATTACH, signAttachDeposit, signAttachTgas, tgas } from "@/lib/near/constants";
@@ -98,7 +98,9 @@ export const calls = {
 
   signFor: (token_id: TokenId, request: SignRequest, contractId = SATCHEL_CONTRACT) => {
     const n = requestCount(request);
-    return fc(contractId, "sign_for", { token_id, request }, tgas(signAttachTgas(n)), signAttachDeposit(n).toString());
+    // C7: a message pays its own storage (0.005 NEAR + len × 0.00001 NEAR, core `messageSignAttachDeposit`)
+    const deposit = "evm_message" in request || "sol_message" in request ? signAttachDepositFor(request).toString() : signAttachDeposit(n).toString();
+    return fc(contractId, "sign_for", { token_id, request }, tgas(signAttachTgas(n)), deposit);
   },
 
   nftTransfer: (token_id: TokenId, receiver_id: string, contractId = SATCHEL_CONTRACT) =>

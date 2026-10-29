@@ -10,9 +10,11 @@ import {
   fixtureSatchel,
   fixtureToken,
   FIXTURE_TOKENS,
+  fixtureEvmChains,
 } from "@/lib/data/fixtures";
+import { EVM_IDS, evmRpcs, SEPOLIA, usdcAddress } from "@/lib/evm-networks";
 import { simOverlay } from "@/lib/data/sim";
-import type { LockFacts } from "@/lib/data/types";
+import type { EvmChainBalance, LockFacts } from "@/lib/data/types";
 import type { ViewFn } from "@/lib/near/contract";
 import { historyClient, readBirthActions } from "@/lib/near/history";
 import { nearAccessKeys, nearBlockHeight, nearView, nearViewAccount, withTimeout } from "@/lib/near/rpc";
@@ -28,6 +30,8 @@ export interface Balances {
   btc: { confirmed_sats: string; unconfirmed_sats: string } | null;
   evm: { wei: string } | null;
   sol: { lamports: string } | null;
+  /** C2 + C3: ETH and USDC on each EVM testnet (Sepolia first); null fields = that read failed */
+  evm_chains?: EvmChainBalance[];
   errors: string[];
 }
 
@@ -107,7 +111,7 @@ const fixtureSource: DataSource = {
   blockHeight: async () => simOverlay().height(FIXTURE_HEIGHT),
   balances: async (_a, tokenId) => {
     const b = FIXTURE_BALANCES[tokenId] ?? { btc: { confirmed: "0", unconfirmed: "0" }, evm: "0", sol: "0" };
-    return { btc: { confirmed_sats: b.btc.confirmed, unconfirmed_sats: b.btc.unconfirmed }, evm: { wei: b.evm }, sol: { lamports: b.sol }, errors: [] };
+    return { btc: { confirmed_sats: b.btc.confirmed, unconfirmed_sats: b.btc.unconfirmed }, evm: { wei: b.evm }, sol: { lamports: b.sol }, evm_chains: fixtureEvmChains(tokenId), errors: [] };
   },
   lock: async () => {
     const expected = EXPECTED_CODE_HASH ?? FIXTURE_CODE_HASH;
@@ -207,14 +211,37 @@ const liveSource: DataSource = {
           getJson(u, ms, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [a.sol] }) }),
         ).then((j: { result?: { value: number } }) => ({ lamports: String(j.result?.value ?? 0) }))
       : Promise.resolve(null);
-    const [btc, evm, sol] = await Promise.allSettled([btcP, evmP, solP]);
+    // C2 + C3: ETH (eth_getBalance) and USDC (balanceOf) on the three other testnets, and USDC on Sepolia. Each read
+    // is bounded like the others; a failure leaves that one value null ("Balance unavailable"), never the page.
+    const rpc = (chainId: number, method: string, params: unknown[]) =>
+      firstOk(evmRpcs(chainId), (u) =>
+        getJson(u, ms, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }) }),
+      ).then((j: { result?: string }) => {
+        if (typeof j.result !== "string") throw new Error(method);
+        return BigInt(j.result === "0x" ? "0x0" : j.result).toString();
+      });
+    const balanceOfData = `0x70a08231${a.evm.slice(2).toLowerCase().padStart(64, "0")}`;
+    const chainReads = EVM_IDS.map((id) =>
+      Promise.allSettled([
+        id === SEPOLIA ? evmP.then((v) => v.wei) : rpc(id, "eth_getBalance", [a.evm, "latest"]),
+        rpc(id, "eth_call", [{ to: usdcAddress(id), data: balanceOfData }, "latest"]),
+      ]),
+    );
+    const [[btc, evm, sol], chains] = await Promise.all([Promise.allSettled([btcP, evmP, solP]), Promise.all(chainReads)]);
     if (btc.status === "rejected") errors.push("btc balance unavailable");
     if (evm.status === "rejected") errors.push("evm balance unavailable");
     if (sol.status === "rejected") errors.push("sol balance unavailable");
+    const evm_chains: EvmChainBalance[] = EVM_IDS.map((id, i) => {
+      const [wei, usdc] = chains[i];
+      if (wei.status === "rejected" && id !== SEPOLIA) errors.push(`evm ${id} balance unavailable`);
+      if (usdc.status === "rejected") errors.push(`usdc ${id} balance unavailable`);
+      return { chain_id: id, wei: wei.status === "fulfilled" ? wei.value : null, usdc: usdc.status === "fulfilled" ? usdc.value : null };
+    });
     return {
       btc: btc.status === "fulfilled" ? btc.value : null,
       evm: evm.status === "fulfilled" ? evm.value : null,
       sol: sol.status === "fulfilled" ? sol.value : null,
+      evm_chains,
       errors,
     };
   },

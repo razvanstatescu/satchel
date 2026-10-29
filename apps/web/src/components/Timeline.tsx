@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   ChevronDown,
   Handshake,
+  MessageSquareText,
   Signature,
   Sparkles,
   Tag,
@@ -19,8 +20,17 @@ import { ExternalLink, Icon, ItemPill, KeepWhole, SatchelThumb, cx } from "@/com
 import { CHAIN_NAME, copy, EXPLORER_NAME, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { EXPLORERS } from "@/lib/config";
 import type { ActivityRow } from "@/lib/data/types";
-import { formatAmount, formatSats, truncateAddress } from "@/lib/format";
+import { formatAmount, formatSats, truncateAddress, type Ticker } from "@/lib/format";
+import { evmExplorerName, evmNetworkName, evmTxLink, SEPOLIA } from "@/lib/evm-networks";
+import { safeMessage } from "@/lib/message";
 import { chainTxUrl, priceText } from "@/lib/view";
+
+/** C2: the ticker a row moved (USDC, or the chain's native coin). */
+const rowTicker = (r: ActivityRow): Ticker => (r.token === "USDC" ? "USDC" : TICKER[r.chain ?? "evm"]);
+/** C3: the row's network ("Base Sepolia"), or the chain's default network label. */
+const rowNetwork = (r: ActivityRow): string => (r.chain === "evm" && r.evmChainId && r.evmChainId !== SEPOLIA ? evmNetworkName(r.evmChainId) : r.chain ? NETWORK_LABEL[r.chain] : NETWORK_LABEL.near);
+const rowTxUrl = (r: ActivityRow, id: string) => (r.chain === "evm" && r.evmChainId ? evmTxLink(r.evmChainId, id) : chainTxUrl(r.chain!, id));
+const rowExplorer = (r: ActivityRow) => (r.chain === "evm" && r.evmChainId ? evmExplorerName(r.evmChainId) : EXPLORER_NAME[r.chain!]);
 
 /**
  * The Activity record (app-screens §4; proto app-activity.html): every NEAR event and every signature, newest first,
@@ -103,6 +113,8 @@ function badge(r: ActivityRow): { icon: LucideIcon; tone: Tone } {
       return { icon: ArrowDownLeft, tone: "success" };
     case "issued":
       return r.status === "unused" ? { icon: TriangleAlert, tone: "danger" } : { icon: Signature, tone: "ink" };
+    case "message":
+      return { icon: MessageSquareText, tone: "ink" };
     case "signed_not_sent":
       return { icon: TriangleAlert, tone: "danger" };
     case "transferred":
@@ -125,7 +137,9 @@ function title(r: ActivityRow): string {
   const to = r.to ? truncateAddress(r.to) : "";
   switch (r.kind) {
     case "sent":
-      return copy.act.row.sent(to);
+      return r.token === "USDC" ? copy.record.sentUsdc(to) : copy.act.row.sent(to);
+    case "message":
+      return copy.record.signedMessage(CHAIN_NAME[r.chain ?? "evm"]);
     case "received":
       return copy.act.row.received(r.from ?? "");
     case "issued":
@@ -149,7 +163,7 @@ function title(r: ActivityRow): string {
 /** The amount a row moved, signed (−0.0001 BTC out), or null. A signature moves nothing: its receipt says what it would. */
 function amountOf(r: ActivityRow): string | null {
   if (!r.amount || !r.chain || (r.kind !== "sent" && r.kind !== "received")) return null;
-  return formatAmount(r.amount, TICKER[r.chain], { sign: r.kind === "sent" ? "out" : r.kind === "received" ? "in" : undefined });
+  return formatAmount(r.amount, rowTicker(r), { sign: r.kind === "sent" ? "out" : r.kind === "received" ? "in" : undefined });
 }
 
 function Lead({ r }: { r: ActivityRow }) {
@@ -188,8 +202,21 @@ function details(r: ActivityRow, owner?: string): { label: string; value: ReactN
     out.push({ label: d.requestedBy, value: <span className="font-mono text-[0.8125rem]/5 break-all">{r.requester}</span> });
   }
   if (r.kind === "issued" && r.chain && r.amount && r.to) {
-    out.push({ label: d.wouldSend, value: d.wouldSendValue(formatAmount(r.amount, TICKER[r.chain]), truncateAddress(r.to)) });
+    out.push({ label: d.wouldSend, value: d.wouldSendValue(formatAmount(r.amount, rowTicker(r)), truncateAddress(r.to)) });
   }
+  // C7: the exact text that was signed, hidden and direction-changing characters shown as codes (SR-04)
+  if (r.kind === "message") {
+    const s = r.messageText !== undefined ? safeMessage(r.messageText) : null;
+    out.push({
+      label: copy.record.messageDetail,
+      value: <span data-message-text="" className="block wrap-anywhere whitespace-pre-wrap">{s ? s.text : "—"}</span>,
+    });
+    // L-02: the exact bytes beside the escaped text
+    if (s) out.push({ label: copy.msg.hex, value: <code data-message-hex="" className="block font-mono text-[0.75rem]/4 break-all text-ink-muted">{s.hex}</code> });
+    out.push({ label: d.status, value: <span className="inline-flex items-center gap-2"><ItemPill status="message" />{copy.record.messageNote}</span> });
+  }
+  if (r.token === "USDC") out.push({ label: copy.record.token, value: "USDC" });
+  if (r.chain === "evm" && r.evmChainId && r.kind !== "message") out.push({ label: copy.record.network, value: evmNetworkName(r.evmChainId) });
   if (r.kind === "issued" && r.status === "unused") out.push({ label: d.status, value: d.unusedNote });
   if (r.kind === "sent" && r.status === "final") out.push({ label: d.status, value: <span className="text-success">{d.confirmed}</span> });
   if (r.fee && r.chain) out.push({ label: d.fee, value: <span className="t-num">{r.chain === "btc" ? formatSats(r.fee) : formatAmount(r.fee, TICKER[r.chain])}</span> });
@@ -205,8 +232,8 @@ function details(r: ActivityRow, owner?: string): { label: string; value: ReactN
           {d.viewOn(EXPLORER_NAME.near)}
         </ExternalLink>
         {r.chainTxId && r.chain ? (
-          <ExternalLink href={chainTxUrl(r.chain, r.chainTxId)} className={linkCls}>
-            {d.viewOn(EXPLORER_NAME[r.chain])}
+          <ExternalLink href={rowTxUrl(r, r.chainTxId)} className={linkCls}>
+            {d.viewOn(rowExplorer(r))}
           </ExternalLink>
         ) : null}
       </span>
@@ -218,7 +245,7 @@ function details(r: ActivityRow, owner?: string): { label: string; value: ReactN
 export function ActivityItem({ r, owner }: { r: ActivityRow; owner?: string }) {
   const amount = amountOf(r);
   const pill = r.status === "unused" ? <ItemPill status="unused" /> : null;
-  const network = r.chain ? NETWORK_LABEL[r.chain] : NETWORK_LABEL.near;
+  const network = rowNetwork(r);
   return (
     <li data-activity={r.kind}>
       {/* an unused signature opens by default: what it could still do is the point of the record */}
