@@ -5,6 +5,7 @@
  * delegate would pass. `vectors/allowance.json` keeps both sides in exact agreement.
  */
 import { bytesToBigIntBE, hexToBytesStrict, strip0x, toHex } from '../bytes'
+import { EVM_CHAIN_IDS } from '../near/constants'
 import type { SignRequest } from '../near/sign-request'
 import { classifyBtc } from './btc'
 import { classifyEvm } from './evm'
@@ -17,7 +18,8 @@ export const MAX_DELEGATES = 4
 export const MAX_CAPS = 8
 export const MAX_SPENDS = 32
 export const SOL_FEE_LAMPORTS = 5_000n
-export const ALLOWANCE_EVM_CHAIN_IDS: readonly number[] = [11155111]
+/** Chain ids a cap may name: the contract's `EVM_CHAIN_IDS` (the same list `config().evm_chain_ids` returns). */
+export const ALLOWANCE_EVM_CHAIN_IDS: readonly number[] = EVM_CHAIN_IDS
 const ERC20_TRANSFER = 'a9059cbb'
 const U128_MAX = 2n ** 128n - 1n
 

@@ -401,7 +401,7 @@ fn asset_without_cap_and_strangers() {
     expect_err(ERR_ALLOWANCE_ASSET, || sign_as(&mut c, bot(), sol_req(), T0));
     let tx = btc::tests::sample_tx(1);
     let btc_req = SignRequest::Btc {
-        preimages: btc::tests::preimages(&tx).iter().map(|p| hex::encode(p)).collect(),
+        preimages: btc::tests::preimages(&tx).iter().map(hex::encode).collect(),
         outputs: hex::encode(&tx.outputs),
     };
     expect_err(ERR_ALLOWANCE_ASSET, || sign_as(&mut c, bot(), btc_req, T0));
@@ -543,7 +543,7 @@ fn btc_debit_ignores_change_and_counts_the_fee() {
     sign_as(
         &mut c,
         bot(),
-        SignRequest::Btc { preimages: pre.iter().map(|p| hex::encode(p)).collect(), outputs: hex::encode(&tx.outputs) },
+        SignRequest::Btc { preimages: pre.iter().map(hex::encode).collect(), outputs: hex::encode(&tx.outputs) },
         T0,
     );
     assert_eq!(sig_count(&c), 2);
@@ -915,6 +915,7 @@ proptest! {
     #[test]
     fn btc_debit_bounds(n in 1usize..4, amounts in prop::collection::vec(0u64..1_000_000, 4),
                         outs in prop::collection::vec((0u64..1_000_000, any::<bool>()), 1..6)) {
+        ctx(alice(), 0, T0); // a fresh mock per case: env::sha256 is gas-metered (docs/security/fuzzing.md §5 notes)
         let mut tx = btc::tests::sample_tx(n);
         for (i, inp) in tx.inputs.iter_mut().enumerate() { inp.amount = amounts[i]; }
         let own: Vec<u8> = [&[0x00, 0x14][..], &tx.pkh[..]].concat();
