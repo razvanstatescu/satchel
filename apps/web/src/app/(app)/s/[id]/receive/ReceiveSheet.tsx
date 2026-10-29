@@ -12,6 +12,7 @@ import type { SatchelSnapshot } from "@/lib/data/types";
 import { buildPaymentUri, validateChainAmount } from "@/lib/payment-uri";
 import { qrSvg } from "@/lib/qr";
 import { UI_CHAINS, type UiChain } from "@/lib/view";
+import { EVM_IDS, evmNetworkName, evmPickerName, SEPOLIA, usdcAddress } from "@/lib/evm-networks";
 
 export { qrSvg };
 
@@ -25,22 +26,44 @@ export { qrSvg };
  * of the chain's payment URI (BIP-21 / EIP-681 / Solana Pay), with its own copy-and-share actions. The amount is
  * never trusted for anything but display: this sheet signs nothing.
  */
-export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: SatchelSnapshot; chain: UiChain; amount?: string; incoming?: ReactNode }) {
+export async function ReceiveSheet({
+  snap,
+  chain,
+  amount,
+  incoming,
+  network = SEPOLIA,
+  asset = "eth",
+}: {
+  snap: SatchelSnapshot;
+  chain: UiChain;
+  amount?: string;
+  incoming?: ReactNode;
+  /** C3: the EVM testnet (same address on all four; the payment URI names it with `@<chainId>`) */
+  network?: number;
+  /** C2: ETH or USDC (EVM only) */
+  asset?: "eth" | "usdc";
+}) {
   const id = snap.token_id;
   const address = snap.addresses[chain];
   const svg = await qrSvg(address);
-  const net = NETWORK_LABEL[chain];
+  const evm = chain === "evm";
+  const usdc = evm && asset === "usdc";
+  const net = evm ? evmNetworkName(network) : NETWORK_LABEL[chain];
+  const ticker = usdc ? "USDC" : TICKER[chain];
   const chains: UiChain[] = UI_CHAINS.includes(chain) ? UI_CHAINS : [...UI_CHAINS, chain];
+  // the EVM query keeps the picked network and coin when the request form or a picker link reloads the sheet
+  const evmQuery = (n: number, a: "eth" | "usdc") => `chain=evm&network=${n}&asset=${a}`;
 
-  const validation = amount ? validateChainAmount(amount, chain) : null;
+  const validation = amount ? validateChainAmount(amount, chain, usdc ? "usdc" : "native") : null;
   const requestError = amount !== undefined && validation?.ok !== true;
+  const evmOpts = evm ? { chainId: network, ...(usdc ? { usdc: usdcAddress(network) } : {}) } : undefined;
   const request =
     validation?.ok === true
       ? {
           decimal: validation.decimal,
-          uri: buildPaymentUri(chain, address, validation.base),
-          svg: await qrSvg(buildPaymentUri(chain, address, validation.base)),
-          appLink: `${APP_URL}/s/${id}/receive?chain=${chain}&amount=${encodeURIComponent(validation.decimal)}`,
+          uri: buildPaymentUri(chain, address, validation.base, evmOpts),
+          svg: await qrSvg(buildPaymentUri(chain, address, validation.base, evmOpts)),
+          appLink: `${APP_URL}/s/${id}/receive?${evm ? evmQuery(network, asset) : `chain=${chain}`}&amount=${encodeURIComponent(validation.decimal)}`,
         }
       : null;
 
@@ -51,6 +74,22 @@ export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: Sa
         block
         options={chains.map((c) => ({ href: `/s/${id}/receive?chain=${c}`, label: CHAIN_NAME[c], current: c === chain, replace: true, lead: <ChainCharm chain={c} size={20} /> }))}
       />
+      {evm ? (
+        <div className="flex flex-col gap-2" data-testid="receive-network">
+          <SegmentedLinks
+            label={copy.nets.addNetwork}
+            block
+            size="sm"
+            options={EVM_IDS.map((n) => ({ href: `/s/${id}/receive?${evmQuery(n, asset)}`, label: evmPickerName(n), current: n === network, replace: true }))}
+          />
+          <SegmentedLinks
+            label={copy.nets.asset}
+            block
+            size="sm"
+            options={(["eth", "usdc"] as const).map((a) => ({ href: `/s/${id}/receive?${evmQuery(network, a)}`, label: a === "eth" ? "ETH" : "USDC", current: a === asset, replace: true }))}
+          />
+        </div>
+      ) : null}
       <section aria-labelledby="qr-title" className="overflow-hidden rounded-card border border-line bg-surface">
         <div className="flex h-13 items-center gap-2.5 border-b-2 border-sticker bg-brand px-4 text-on-brand">
           <p id="qr-title" className="m-0 font-display text-[1.125rem]/6 font-extrabold tracking-[-0.01em]">
@@ -79,7 +118,7 @@ export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: Sa
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
         <li className="flex items-start gap-2.5 font-sans text-body-sm text-ink">
           <Icon icon={TriangleAlert} size={16} className="mt-0.5 text-danger" />
-          {copy.fund.only[chain]}
+          {evm && (usdc || network !== SEPOLIA) ? copy.nets.addUsdcNote(net) : copy.fund.only[chain]}
         </li>
         <li className="flex items-start gap-2.5 font-sans text-body-sm text-ink">
           <Icon icon={Hourglass} size={16} className="mt-0.5 text-ink-muted" />
@@ -90,9 +129,15 @@ export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: Sa
           {copy.fund.anyone}
         </li>
       </ul>
-      <ExternalLink href={FAUCETS[chain]} className="-my-1 min-h-11 self-start font-semibold">
-        {copy.fund.faucet[chain]}
-      </ExternalLink>
+      {usdc ? (
+        <ExternalLink href={FAUCETS.usdc} className="-my-1 min-h-11 self-start font-semibold">
+          {copy.nets.usdcFaucet}
+        </ExternalLink>
+      ) : !evm || network === SEPOLIA ? (
+        <ExternalLink href={FAUCETS[chain]} className="-my-1 min-h-11 self-start font-semibold">
+          {copy.fund.faucet[chain]}
+        </ExternalLink>
+      ) : null}
       <section aria-labelledby="request-title" className="flex flex-col gap-3 border-t border-line pt-5">
         <h3 id="request-title" className="m-0 font-sans text-label text-ink-muted">
           {copy.fund.request.title}
@@ -101,8 +146,14 @@ export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: Sa
             works with JavaScript off, and a shared link lands on exactly the same markup. */}
         <form method="get" action={`/s/${id}/receive`} className="flex items-end gap-2.5">
           <input type="hidden" name="chain" value={chain} />
+          {evm ? (
+            <>
+              <input type="hidden" name="network" value={network} />
+              <input type="hidden" name="asset" value={asset} />
+            </>
+          ) : null}
           <Field id="request-amount" label={copy.fund.request.label} error={requestError ? copy.fund.request.invalid : undefined} className="flex-1">
-            <AmountInput id="request-amount" name="amount" ticker={TICKER[chain]} defaultValue={amount ?? ""} invalid={requestError} inputMode="decimal" placeholder="0.00" />
+            <AmountInput id="request-amount" name="amount" ticker={ticker} defaultValue={amount ?? ""} invalid={requestError} inputMode="decimal" placeholder="0.00" />
           </Field>
           <Button type="submit" size="lg">
             {request ? copy.fund.request.update : copy.fund.request.create}
@@ -120,13 +171,14 @@ export async function ReceiveSheet({ snap, chain, amount, incoming }: { snap: Sa
             <p className="m-0 self-center font-sans text-body-sm text-ink-muted t-num">
               {request.decimal}
               {" "}
-              {TICKER[chain]}
+              {ticker}
+              {evm ? ` · ${net}` : null}
             </p>
             <div className="flex flex-col gap-1.5 rounded-md bg-surface-sunken p-3.5">
               <p className="m-0 font-sans text-[0.9375rem]/5 font-semibold text-ink">{copy.fund.request.linkTitle}</p>
               <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.fund.request.linkBody}</p>
             </div>
-            <RequestLinkActions paymentUri={request.uri} appLink={request.appLink} shareTitle={copy.fund.request.shareTitle(id, request.decimal, TICKER[chain])} />
+            <RequestLinkActions paymentUri={request.uri} appLink={request.appLink} shareTitle={copy.fund.request.shareTitle(id, request.decimal, ticker)} />
           </>
         ) : null}
       </section>

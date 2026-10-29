@@ -30,6 +30,9 @@ export function pickEvmChainId(raw: unknown): EvmChainId {
 export const evmNet = (chainId: number) => EVM_NETWORKS[(isEvmChainId(chainId) ? chainId : SEPOLIA) as EvmChainId];
 /** "Ethereum Sepolia", "Base Sepolia", … */
 export const evmNetworkName = (chainId: number) => evmNet(chainId).name;
+/** One word per network, for compact pickers ("Sepolia · Base · Arbitrum · OP"). */
+const PICKER_NAMES: Record<EvmChainId, string> = { 11155111: "Sepolia", 84532: "Base", 421614: "Arbitrum", 11155420: "OP" };
+export const evmPickerName = (chainId: number) => PICKER_NAMES[evmNet(chainId).chainId];
 const EXPLORER_NAMES: Record<EvmChainId, string> = { 11155111: "Etherscan", 84532: "Basescan", 421614: "Arbiscan", 11155420: "Etherscan" };
 export const evmExplorerName = (chainId: number) => EXPLORER_NAMES[evmNet(chainId).chainId];
 export const evmAddressLink = (chainId: number, addr: string) => `${evmNet(chainId).explorer}/address/${addr}`;

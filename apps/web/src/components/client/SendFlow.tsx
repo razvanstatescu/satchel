@@ -28,6 +28,8 @@ import type { PendingIntent } from "@/lib/signing/types";
 import { validateBtc, validateEvm, validateSol, type Validation } from "@/lib/validate";
 import { SOL_REFRESH_MS, solBlockhashFresh } from "@/lib/signing/sol-timing";
 import { balanceBase, chainName } from "@/lib/view";
+import { EvmSendOptions } from "@/components/client/EvmSendOptions";
+import { anyEvmFunds, evmBalanceOf, evmNetworkName, SEPOLIA, USDC_DECIMALS, type EvmChainId } from "@/lib/evm-networks";
 import type { PreparedSend } from "@/lib/chains/send";
 
 /**
@@ -46,7 +48,7 @@ const DECIMALS: Record<Chain, number> = { btc: 8, evm: 18, sol: 9 };
 export const SEND_CHAINS: Chain[] = SOL_SEND_ENABLED ? ["btc", "evm", "sol"] : ["btc", "evm"];
 
 /** Map a prepare error to copy (SOL rent/balance rules carry a `problem`, kb/80 E25/E26). */
-function prepareErrorText(e: unknown): string {
+function prepareErrorText(e: unknown, net?: string): string {
   const problem = e && typeof e === "object" && "problem" in e ? String((e as { problem: unknown }).problem) : null;
   switch (problem) {
     case "below_rent_new_recipient":
@@ -59,9 +61,16 @@ function prepareErrorText(e: unknown): string {
       return copy.send.sol.E26;
     case "old_blockhash_valid":
       return copy.send.sol.oldValid;
+    case "usdc_insufficient":
+      return copy.usdc.tooMuch;
+    case "usdc_no_gas":
+      return copy.usdc.noGas(net ?? "this network");
   }
   return e instanceof Error ? e.message : String(e);
 }
+
+/** The network a send goes on: "Base Sepolia" for EVM (C3), the chain's network otherwise. */
+const networkOf = (chain: Chain, evmChainId: number): string => (chain === "evm" ? evmNetworkName(evmChainId) : NETWORK_LABEL[chain]);
 
 const noop = () => () => {};
 /** The wall clock, for event handlers (the click persists the intent with its time). */
@@ -69,12 +78,33 @@ const wallClock = () => Date.now();
 /** False on the server and while hydrating; true after (the intent store is client-only). */
 const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 
-export function SendFlow({ snap, initialChain, intentId, records }: { snap: SatchelSnapshot; initialChain: Chain; intentId: string | null; records: SigRecordView[] }) {
+export function SendFlow({
+  snap,
+  initialChain,
+  intentId,
+  records,
+  initialNetwork = SEPOLIA,
+  initialAsset = "eth",
+}: {
+  snap: SatchelSnapshot;
+  initialChain: Chain;
+  intentId: string | null;
+  records: SigRecordView[];
+  /** C3: the EVM testnet (`?network=`) */
+  initialNetwork?: EvmChainId;
+  /** C2: ETH or USDC (`?asset=`) */
+  initialAsset?: "eth" | "usdc";
+}) {
   const { live, isOwner, accountId } = useViewer(snap);
   const { wallet, ready } = useWallet();
   const intents = useIntents();
   const hydrated = useHydrated();
   const [chain, setChain] = useState<Chain>(initialChain);
+  const [evmChainId, setEvmChainId] = useState<EvmChainId>(initialNetwork);
+  const [asset, setAsset] = useState<"eth" | "usdc">(initialAsset);
+  const usdc = chain === "evm" && asset === "usdc";
+  /** The network the send goes on ("Base Sepolia" for EVM; the chain's network otherwise). */
+  const net = networkOf(chain, evmChainId);
   const [amountText, setAmountText] = useState("");
   const [useMax, setUseMax] = useState(false);
   const [toText, setToText] = useState("");
@@ -95,13 +125,18 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
   const [solBal, setSolBal] = useState<bigint | null>(null);
   const intent = useIntent(currentId);
   const self = live.addresses[chain];
-  const balance = chain === "sol" && live.balances.sol === null ? solBal : balanceBase(live, chain);
-  const ticker = TICKER[chain] as Ticker;
+  const balance = chain === "sol" && live.balances.sol === null ? solBal : chain === "evm" ? evmBalanceOf(live, evmChainId, asset) : balanceBase(live, chain);
+  // C2: a USDC send pays its fee in ETH on the same network; with none there, say so before Review
+  const gasBal = chain === "evm" ? evmBalanceOf(live, evmChainId, "eth") : null;
+  const noGas = usdc && gasBal === 0n;
+  const ticker = (usdc ? "USDC" : TICKER[chain]) as Ticker;
+  const decimals = usdc ? USDC_DECIMALS : DECIMALS[chain];
   const preparedRef = useRef<PreparedSend | null>(null);
   useEffect(() => {
     preparedRef.current = prepared;
   }, [prepared]);
-  const blocker = blockingIntent(intents, snap.token_id, chain);
+  // C3: nonces are per network, so only an unsent send on this same network blocks
+  const blocker = blockingIntent(intents, snap.token_id, chain, chain === "evm" ? evmChainId : undefined);
 
   // validate recipient on change (debounced lightly)
   useEffect(() => {
@@ -131,9 +166,18 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
     };
   }, [chain, live.balances.sol, live.addresses.sol]);
 
-  const amount = useMax ? "max" : parseUnits(amountText, DECIMALS[chain]);
-  const amountError =
-    !useMax && amountText && amount === null ? copy.send.val.amountDecimals(DECIMALS[chain]) : !useMax && amount !== null && amount !== "max" && amount <= 0n ? copy.send.val.amountPositive : !useMax && amount !== null && amount !== "max" && balance !== null && amount > balance ? copy.send.val.amountMax : null;
+  const amount = useMax ? "max" : parseUnits(amountText, decimals);
+  const amountError = noGas
+    ? copy.usdc.noGas(net)
+    : !useMax && amountText && amount === null
+      ? copy.send.val.amountDecimals(decimals)
+      : !useMax && amount !== null && amount !== "max" && amount <= 0n
+        ? copy.send.val.amountPositive
+        : !useMax && amount !== null && amount !== "max" && balance !== null && amount > balance
+          ? usdc
+            ? copy.usdc.tooMuch
+            : copy.send.val.amountMax
+          : null;
   const formOk = !!val && val.tier !== "error" && amount !== null && !amountError && (useMax || amountText !== "");
 
   // Prepare while Review is shown (nonce, fees, UTXOs, s0, h0) so the click handler can call the wallet synchronously.
@@ -145,18 +189,26 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
       setSolWait(reuse?.solNotBefore != null);
       try {
         const mod = await import("@/lib/chains/send");
-        const p = await mod.prepareSend({ tokenId: snap.token_id, chain, to: val && val.tier !== "error" ? val.normalized : toText, amount: amount === null ? 0n : amount, records, reuse });
+        const p = await mod.prepareSend({
+          tokenId: snap.token_id,
+          chain,
+          to: val && val.tier !== "error" ? val.normalized : toText,
+          amount: amount === null ? 0n : amount,
+          records,
+          reuse,
+          ...(chain === "evm" ? { evmChainId, asset } : {}),
+        });
         const src = dataSource();
         const [s, h] = await Promise.all([contractViews(src.view).satchel(snap.token_id), src.blockHeight()]);
         setBase({ s0: s?.sig_count ?? live.sig_count, h0: h });
         setPrepared(p);
       } catch (e) {
-        setPrepError(prepareErrorText(e));
+        setPrepError(prepareErrorText(e, networkOf(chain, evmChainId)));
       } finally {
         setSolWait(false);
       }
     },
-    [snap.token_id, chain, val, toText, amount, records, live.sig_count],
+    [snap.token_id, chain, val, toText, amount, records, live.sig_count, evmChainId, asset],
   );
 
   // Retry from the tracker: same nonce / same inputs (kb/90 §8.7).
@@ -213,8 +265,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
   const display = useMemo(() => {
     if (!prepared) return null;
     const amt = formatAmount(prepared.amount, ticker);
-    return { amount: amt, to: prepared.to, toShort: truncateAddress(prepared.to), network: NETWORK_LABEL[chain] };
-  }, [prepared, ticker, chain]);
+    return { amount: amt, to: prepared.to, toShort: truncateAddress(prepared.to), network: networkOf(chain, evmChainId) };
+  }, [prepared, ticker, chain, evmChainId]);
 
   /** The Send click: persist BEFORE the wallet opens, then call it synchronously (no await before signAndSendTransaction). */
   const onSend = () => {
@@ -238,6 +290,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
       unsigned: prepared.unsigned,
       payloadHashes: prepared.payloadHashes,
       evmNonce: prepared.evmNonce,
+      evmChainId: prepared.evmChainId,
+      asset: prepared.asset,
       display: display ?? undefined,
       signerId: accountId,
       chain,
@@ -258,6 +312,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
         unsigned: prepared.unsigned,
         payloadHashes: prepared.payloadHashes,
         evmNonce: prepared.evmNonce,
+        evmChainId: prepared.evmChainId,
+        asset: prepared.asset,
         stage: "preparing",
         display: display ?? undefined,
         signerId: accountId,
@@ -317,7 +373,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
         </Guard>
       ),
     };
-  } else if (balance === 0n && view === "form") {
+  } else if (view === "form" && (chain === "evm" ? !anyEvmFunds(live) : balance === 0n)) {
+    // C3: the Ethereum send only guards when no network holds anything; otherwise the network picker shows where
     guard = {
       node: (
         <Guard art={<ChainCharm chain={chain} size={40} />} title={copy.send.guard.zeroTitle} body={`${copy.send.guard.zero(ticker)} ${copy.send.guard.zeroHelp(chainName(chain))}`}>
@@ -349,6 +406,7 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
 
   const nonTerminal = !!intent && ["awaiting_wallet", "signing", "signed", "broadcasting"].includes(intent.stage);
   const titleChain = tracking && intent ? intent.chain : chain;
+  const titleUsdc = tracking && intent ? intent.asset === "usdc" : usdc;
 
   let body: ReactNode;
   let action: ReactNode = null;
@@ -364,7 +422,7 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
     action = guard.foot ?? null;
   } else if (view === "form") {
     stepNo = { index: 1, count: 2 };
-    const why = formOk ? null : amountError || val?.tier === "error" ? copy.send.form.fixField : copy.send.form.reviewWhy(NETWORK_LABEL[chain]);
+    const why = formOk ? null : noGas ? amountError : amountError || val?.tier === "error" ? copy.send.form.fixField : copy.send.form.reviewWhy(net);
     body = (
       <FormStep
         chain={chain}
@@ -374,7 +432,27 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
           setAmountText("");
           setUseMax(false);
         }}
-        balanceFor={(c) => (c === "sol" && live.balances.sol === null ? solBal : balanceBase(live, c))}
+        balanceFor={(c) => (c === "sol" && live.balances.sol === null ? solBal : c === "evm" ? evmBalanceOf(live, evmChainId, asset) : balanceBase(live, c))}
+        ticker={ticker}
+        network={net}
+        evmOptions={
+          chain === "evm" ? (
+            <EvmSendOptions
+              chainId={evmChainId}
+              asset={asset}
+              onChainId={(c) => {
+                setEvmChainId(c);
+                setAmountText("");
+                setUseMax(false);
+              }}
+              onAsset={(a) => {
+                setAsset(a);
+                setAmountText("");
+                setUseMax(false);
+              }}
+            />
+          ) : null
+        }
         amountText={amountText}
         setAmountText={(v) => {
           setUseMax(false);
@@ -418,6 +496,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
       <ReviewStep
         tokenId={snap.token_id}
         chain={chain}
+        ticker={ticker}
+        network={net}
         prepared={prepared}
         error={prepError}
         val={val}
@@ -432,7 +512,7 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
       <>
         <p className="mb-3 flex items-start gap-2 font-sans text-body-sm font-semibold text-ink">
           <Icon icon={Info} size={16} className="mt-0.5 text-ink-muted" />
-          {copy.send.review.final[chain]}
+          {usdc ? copy.usdc.final : copy.send.review.final[chain]}
         </p>
         <Button
           variant="primary"
@@ -469,7 +549,7 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
 
   return (
     <FlowShell
-      title={copy.send.title(chainName(titleChain))}
+      title={titleUsdc ? copy.usdc.sendTitle : copy.send.title(chainName(titleChain))}
       meta={copy.send.meta(snap.token_id)}
       thumb
       step={stepNo}
@@ -581,8 +661,14 @@ function FormStep(p: {
   toText: string;
   setToText: (v: string) => void;
   val: Validation | null;
+  /** C2: ETH, or USDC on an EVM network */
+  ticker: Ticker;
+  /** C3: the network name ("Base Sepolia") */
+  network: string;
+  /** C3 + C2: the EVM network and coin pickers */
+  evmOptions?: ReactNode;
 }) {
-  const ticker = TICKER[p.chain] as Ticker;
+  const ticker = p.ticker;
   const bal = p.balanceFor(p.chain);
   const maxText = bal === null ? "—" : formatAmount(bal, ticker);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -600,6 +686,7 @@ function FormStep(p: {
         block
         optionAttr="chain-select"
       />
+      {p.evmOptions}
       <div>
         <label htmlFor="amount" className="sr-only">
           {copy.send.form.amountIn(ticker)}
@@ -646,7 +733,7 @@ function FormStep(p: {
                 <AddressDisplay address={resolved.normalized} />
                 <span className="flex items-center gap-1.5 font-sans text-body-sm font-semibold text-success">
                   <Icon icon={Check} size={14} />
-                  {copy.send.recipient.label(NETWORK_LABEL[p.chain])}
+                  {copy.send.recipient.label(p.network)}
                 </span>
               </span>
               <IconButton
@@ -665,7 +752,7 @@ function FormStep(p: {
                 </p>
               ) : null}
               <span role="status" className="sr-only">
-                {copy.send.recipient.accepted(NETWORK_LABEL[p.chain])}
+                {copy.send.recipient.accepted(p.network)}
               </span>
             </div>
           </>
@@ -728,8 +815,13 @@ function ReviewStep(p: {
   onRetry: () => void;
   locked: boolean;
   solWait?: boolean;
+  ticker: Ticker;
+  network: string;
 }) {
-  const ticker = TICKER[p.chain] as Ticker;
+  const ticker = p.ticker;
+  // C2: a USDC send's fee is ETH on the same network, shown on its own line
+  const usdc = ticker === "USDC";
+  const feeTicker = (usdc ? "ETH" : ticker) as Ticker;
   if (p.error) {
     return (
       <Banner
@@ -772,7 +864,7 @@ function ReviewStep(p: {
     );
   const pr = p.prepared;
   const amount = formatAmount(pr.amount, ticker);
-  const fee = p.chain === "btc" ? formatSats(pr.fee) : formatAmount(pr.fee, ticker);
+  const fee = p.chain === "btc" ? formatSats(pr.fee) : formatAmount(pr.fee, feeTicker);
   // the NEAR fee line stays verbatim (kb/90 §8.9): the value, then its explanation on the next line
   const [nearValue, ...nearRest] = copy.send.review.near.split(" (");
   return (
@@ -783,7 +875,7 @@ function ReviewStep(p: {
           <p className="font-display text-balance-hero-sm text-ink t-num" data-testid="review-amount">
             {amount}
           </p>
-          <p className="font-sans text-body-sm text-ink-muted">{copy.send.review.sub(truncateAddress(pr.to), NETWORK_LABEL[p.chain])}</p>
+          <p className="font-sans text-body-sm text-ink-muted">{copy.send.review.sub(truncateAddress(pr.to), p.network)}</p>
         </div>
         <ul className="m-0 list-none rounded-md bg-surface-sunken p-0">
           <li className="grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-x-3 px-4 py-3.5">
@@ -793,8 +885,8 @@ function ReviewStep(p: {
               <small className="block text-caption font-normal text-ink-muted">{copy.card.name(p.tokenId)}</small>
             </span>
             <span className="text-right font-sans text-label font-bold whitespace-nowrap text-ink t-num">
-              {formatAmount(pr.amount + pr.fee, ticker, { sign: "out" })}
-              <small className="block text-caption font-normal text-ink-muted">{copy.send.review.amountFee}</small>
+              {formatAmount(usdc ? pr.amount : pr.amount + pr.fee, ticker, { sign: "out" })}
+              <small className="block text-caption font-normal text-ink-muted">{usdc ? copy.usdc.gasNote(p.network) : copy.send.review.amountFee}</small>
             </span>
           </li>
           <li className="relative grid grid-cols-[40px_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 px-4 py-3.5 before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-line before:content-['']">
@@ -807,7 +899,7 @@ function ReviewStep(p: {
               <AddressDisplay address={pr.to} />
               <span className="flex items-center gap-1.5 font-sans text-body-sm font-semibold text-success">
                 <Icon icon={Check} size={14} />
-                {copy.send.review.networkAddress(NETWORK_LABEL[p.chain])}
+                {copy.send.review.networkAddress(p.network)}
               </span>
             </span>
           </li>
@@ -817,11 +909,11 @@ function ReviewStep(p: {
             <dt className="whitespace-nowrap text-ink-muted">{copy.send.review.fee}</dt>
             <dd className="m-0 text-right text-ink t-num">
               ~{fee}
-              <small className="block text-caption text-ink-muted">{copy.send.review.feePaid}</small>
+              <small className="block text-caption text-ink-muted">{usdc ? copy.usdc.feeIn : copy.send.review.feePaid}</small>
             </dd>
           </div>
           <div className="flex justify-between gap-4">
-            <dt className="whitespace-nowrap text-ink-muted">{copy.send.review.after(p.tokenId)}</dt>
+            <dt className="whitespace-nowrap text-ink-muted">{usdc ? copy.usdc.after(p.tokenId) : copy.send.review.after(p.tokenId)}</dt>
             <dd className="m-0 text-right text-ink t-num">{formatAmount(pr.after < 0n ? 0n : pr.after, ticker)}</dd>
           </div>
           <div className="flex justify-between gap-4">

@@ -14,6 +14,10 @@ import { intentStore } from "@/lib/signing/store";
 import { startRunner, useIntents } from "@/lib/signing/client";
 import type { PendingIntent, SigningStage } from "@/lib/signing/types";
 import { chainTxUrl } from "@/lib/view";
+import { evmExplorerName, evmNetworkName, evmTxLink } from "@/lib/evm-networks";
+
+/** C3: "Base Sepolia" for an EVM intent on another testnet, else the chain's network ("Ethereum Sepolia"). */
+const intentNetwork = (i: PendingIntent) => (i.chain === "evm" && i.evmChainId ? evmNetworkName(i.evmChainId) : NETWORK_LABEL[i.chain]);
 import { announce, toast } from "@/components/client/Toaster";
 import { Banner, Button, ExternalLink, Icon, cx } from "@/components/ui";
 
@@ -119,7 +123,7 @@ export function SigningProgress({ intent }: { intent: PendingIntent }) {
 function rowViews(intent: PendingIntent, elapsed: number, clock: boolean): RowView[] {
   const stage = intent.stage;
   const [r0, r1, r2, r3] = trackerRows(stage);
-  const net = NETWORK_LABEL[intent.chain];
+  const net = intentNetwork(intent);
   const receipt = stage === "sent" || stage === "confirmed";
   const s = copy.sign.steps;
   const took = signedIn.get(intent.id);
@@ -164,7 +168,9 @@ function rowViews(intent: PendingIntent, elapsed: number, clock: boolean): RowVi
         <>
           <span className="font-mono text-address">{truncateMiddle(intent.chainTxId, 6, 4)}</span>
           {" · "}
-          <ExternalLink href={chainTxUrl(intent.chain, intent.chainTxId)}>{EXPLORER_NAME[intent.chain]}</ExternalLink>
+          <ExternalLink href={intent.chain === "evm" && intent.evmChainId ? evmTxLink(intent.evmChainId, intent.chainTxId) : chainTxUrl(intent.chain, intent.chainTxId)}>
+            {intent.chain === "evm" && intent.evmChainId ? evmExplorerName(intent.evmChainId) : EXPLORER_NAME[intent.chain]}
+          </ExternalLink>
           {intent.sentAt ? (
             <>
               {" · "}
@@ -477,7 +483,7 @@ function BroadcastAgain({ intent, size = "md", block = true }: { intent: Pending
       onClick={() => {
         intentStore().dispatch(intent.id, { type: "BROADCAST_AGAIN" });
         startRunner(intent.id);
-        toast(copy.sign.steps.broadcast.active(NETWORK_LABEL[intent.chain]), { tone: "progress" });
+        toast(copy.sign.steps.broadcast.active(intentNetwork(intent)), { tone: "progress" });
       }}
     >
       {copy.sign.notSent.again}

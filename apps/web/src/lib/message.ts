@@ -90,6 +90,15 @@ export function messageFromHex(hex: string): { text: string | null; safe: SafeMe
   return text === null ? { text: null, safe: null, hex: toHex(bytes) } : { text, safe: safeMessage(text), hex: toHex(bytes) };
 }
 
+/**
+ * L-02: a body that looks like a 32-byte digest (exactly 32 bytes, or 64 hex digits with or without 0x). Signing a
+ * hash you can't read is signing something you can't check, so the UI flags it (the contract still accepts it: it is
+ * prefixed, so it can never be a transaction signature).
+ */
+export function looksLikeDigest(text: string): boolean {
+  return utf8(text).length === 32 || /^\s*(0x)?[0-9a-fA-F]{64}\s*$/.test(text);
+}
+
 /** EIP-191 signature as wallets and viem's verifyMessage take it: 0x ‖ r ‖ s ‖ v, v = 27 + recovery_id. */
 export function evmSignatureHex(sig: { r: string; s: string; recoveryId: number }): `0x${string}` {
   const p = (h: string) => h.replace(/^0x/, "").toLowerCase().padStart(64, "0");
