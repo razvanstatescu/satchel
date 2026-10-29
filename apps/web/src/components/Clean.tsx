@@ -23,7 +23,7 @@ import { ChainCharm } from "@/components/brand/ChainCharm";
 import { ExternalLink, Icon, ItemPill, cx } from "@/components/ui";
 import { CHAIN_NAME, copy } from "@/lib/copy";
 import { buyEnabled, counts } from "@/lib/data/clean";
-import { safeMessage } from "@/lib/message";
+import { looksLikeDigest, safeMessage } from "@/lib/message";
 import type { Aggregate, CleanItem, CleanReport, ItemStatus } from "@/lib/data/types";
 import { relativeTime } from "@/lib/format";
 
@@ -484,6 +484,27 @@ export function messageLine(m: NonNullable<RecordRow["message"]>): string {
   return copy.record.messageBody(s.text.length > 280 ? `${s.text.slice(0, 280)}…` : s.text);
 }
 
+/**
+ * L-02: a message record's exact bytes in hex beside its escaped text (so a buyer can compare them with what a site
+ * shows), and a flag when the body looks like a 32-byte digest (signing a hash you can't read).
+ */
+export function MessageBytes({ text }: { text: string }) {
+  const s = safeMessage(text);
+  return (
+    <span className="col-start-2 flex flex-col gap-1">
+      {looksLikeDigest(text) ? (
+        <span className="flex items-center gap-1.5 font-sans text-body-sm font-semibold text-danger" data-message-digest="">
+          <Icon icon={TriangleAlert} size={14} />
+          {copy.msg.digestShort}
+        </span>
+      ) : null}
+      <code className="block font-mono text-[0.75rem]/4 break-all text-ink-muted" data-message-hex="">
+        {s.hex.length > 128 ? `${s.hex.slice(0, 128)}…` : s.hex}
+      </code>
+    </span>
+  );
+}
+
 function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: string; clearHref?: string }) {
   const body =
     item.status === "checking"
@@ -515,6 +536,7 @@ function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: st
           {item.evidenceUrl && item.status !== "unfunded" && item.status !== "foreign" ? <ExternalLink href={item.evidenceUrl}>{body}</ExternalLink> : body}
         </span>
       ) : null}
+      {item.message ? <MessageBytes text={item.message.text} /> : null}
       {clearHref && item.status === "unused" ? (
         <Link href={clearHref} className="col-start-2 w-fit font-sans text-body-sm font-semibold text-link underline decoration-1 underline-offset-3 hover:decoration-2">
           {copy.sell.history.howToSettle}

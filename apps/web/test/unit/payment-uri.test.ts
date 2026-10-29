@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildBip21, buildEip681, buildPaymentUri, buildSolanaPay, validateChainAmount } from "@/lib/payment-uri";
+import { buildBip21, buildEip681, buildEip681Erc20, buildPaymentUri, buildSolanaPay, validateChainAmount } from "@/lib/payment-uri";
 
 /**
  * A4: Request coins' payment URIs (Add coins' optional amount field). Exact-string vectors, so a future change to
@@ -22,6 +22,29 @@ describe("EIP-681 (Ethereum Sepolia)", () => {
   it("ethereum:<address>@11155111?value=<integer wei>, never decimal ETH", () => {
     expect(buildEip681(EVM_ADDR, 1_000_000_000_000_000_000n)).toBe(`ethereum:${EVM_ADDR}@11155111?value=1000000000000000000`);
     expect(buildEip681(EVM_ADDR, 1n)).toBe(`ethereum:${EVM_ADDR}@11155111?value=1`);
+  });
+});
+
+describe("EIP-681 with a chain id (C3: Base, Arbitrum and OP Sepolia)", () => {
+  it("names the network with @<chainId>", () => {
+    expect(buildEip681(EVM_ADDR, 1_000_000_000_000_000n, 84532)).toBe(`ethereum:${EVM_ADDR}@84532?value=1000000000000000`);
+    expect(buildEip681(EVM_ADDR, 1n, 421614)).toBe(`ethereum:${EVM_ADDR}@421614?value=1`);
+    expect(buildEip681(EVM_ADDR, 1n, 11155420)).toBe(`ethereum:${EVM_ADDR}@11155420?value=1`);
+    expect(buildPaymentUri("evm", EVM_ADDR, 1n, { chainId: 84532 })).toBe(`ethereum:${EVM_ADDR}@84532?value=1`);
+  });
+});
+
+describe("EIP-681 token transfer (C2: USDC, 6 decimals)", () => {
+  const BASE_USDC = "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+  it("ethereum:<token>@<chainId>/transfer?address=<this Satchel>&uint256=<base units>", () => {
+    expect(buildEip681Erc20(BASE_USDC, EVM_ADDR, 1_500_000n, 84532)).toBe(`ethereum:${BASE_USDC}@84532/transfer?address=${EVM_ADDR}&uint256=1500000`);
+    expect(buildPaymentUri("evm", EVM_ADDR, 1_500_000n, { chainId: 84532, usdc: BASE_USDC })).toBe(`ethereum:${BASE_USDC}@84532/transfer?address=${EVM_ADDR}&uint256=1500000`);
+  });
+  it("validates USDC amounts to 6 decimals", () => {
+    expect(validateChainAmount("1.5", "evm", "usdc")).toEqual({ ok: true, base: 1_500_000n, decimal: "1.5" });
+    expect(validateChainAmount("0.000001", "evm", "usdc")).toMatchObject({ ok: true, base: 1n });
+    expect(validateChainAmount("0.0000001", "evm", "usdc")).toEqual({ ok: false });
+    expect(validateChainAmount("0", "evm", "usdc")).toEqual({ ok: false });
   });
 });
 

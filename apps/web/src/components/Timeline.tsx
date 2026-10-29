@@ -211,6 +211,8 @@ function details(r: ActivityRow, owner?: string): { label: string; value: ReactN
       label: copy.record.messageDetail,
       value: <span data-message-text="" className="block wrap-anywhere whitespace-pre-wrap">{s ? s.text : "—"}</span>,
     });
+    // L-02: the exact bytes beside the escaped text
+    if (s) out.push({ label: copy.msg.hex, value: <code data-message-hex="" className="block font-mono text-[0.75rem]/4 break-all text-ink-muted">{s.hex}</code> });
     out.push({ label: d.status, value: <span className="inline-flex items-center gap-2"><ItemPill status="message" />{copy.record.messageNote}</span> });
   }
   if (r.token === "USDC") out.push({ label: copy.record.token, value: "USDC" });

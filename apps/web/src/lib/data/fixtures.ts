@@ -272,7 +272,8 @@ export const FIXTURE_BALANCES: Record<string, { btc: { confirmed: string; unconf
  * ETH stays `FIXTURE_BALANCES[id].evm`. Tokens not listed hold nothing on the other networks.
  */
 export const FIXTURE_EVM_CHAINS: Record<string, Partial<Record<number, { wei?: string; usdc?: string }>>> = {
-  "1": { 11155111: { usdc: "25000000" }, 84532: { wei: "20000000000000000", usdc: "10000000" }, 11155420: { wei: "5000000000000000" } },
+  // #1 also holds USDC on Arbitrum Sepolia with no ETH there: the USDC send's "needs ETH for the fee" case
+  "1": { 11155111: { usdc: "25000000" }, 84532: { wei: "20000000000000000", usdc: "10000000" }, 421614: { usdc: "4000000" }, 11155420: { wei: "5000000000000000" } },
   "2": { 11155111: { usdc: "3500000" }, 84532: { wei: "17000000000000000" } },
   "7": { 84532: { wei: "8000000000000000" } },
 };
