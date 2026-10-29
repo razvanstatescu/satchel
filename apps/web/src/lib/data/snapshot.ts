@@ -66,7 +66,7 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
     listable_at: satchel?.listable_at ?? 0,
     addresses: { btc: addr.btc, evm: addr.evm, sol: addr.sol },
     paths: addr.paths,
-    balances: { btc: balances.btc, evm: balances.evm, sol: balances.sol },
+    balances: { btc: balances.btc, evm: balances.evm, sol: balances.sol, ...(balances.evm_chains ? { evm_chains: balances.evm_chains } : {}) },
     as_of: now,
     links: {
       nearblocks_token: EXPLORERS.nearAccount(SATCHEL_CONTRACT),

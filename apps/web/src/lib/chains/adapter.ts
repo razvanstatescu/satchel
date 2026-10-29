@@ -1,9 +1,10 @@
 import type { MpcSignature } from "@satchel/core/near";
 import { attachBtcSignatures, btcTxFromPreimages, MempoolClient } from "@satchel/core/chains/btc";
-import { broadcastEvm, createSepoliaClient, finalizeEvmTx, parseUnsignedEvmTx } from "@satchel/core/chains/evm";
+import { broadcastEvm, createEvmClient, finalizeEvmTx, parseUnsignedEvmTx } from "@satchel/core/chains/evm";
 import { attachSolSignature, broadcastSol, createSolConnection, isSolConfirmed, isSolExpired, solTransferFromMessage, SolSignatureError, type SignedSolTx } from "@satchel/core/chains/sol";
 import { hexToBytesStrict } from "@satchel/core/bytes";
-import { BTC_APIS, IS_FIXTURE, SEPOLIA_RPCS, SOL_RPCS } from "@/lib/config";
+import { BTC_APIS, IS_FIXTURE, SOL_RPCS } from "@/lib/config";
+import { evmRpcs } from "@/lib/evm-networks";
 import { simBroadcast, simSolHeight } from "@/lib/data/sim";
 import { satchelAddresses } from "@/lib/derive";
 import type { ChainAdapter } from "@/lib/signing/runner";
@@ -37,8 +38,9 @@ const fixtureAdapter: ChainAdapter = {
   },
 };
 
-function evmLive(): ChainAdapter {
-  const client = createSepoliaClient(SEPOLIA_RPCS);
+/** C3: one adapter per EVM chain id (each with its own client on that chain's RPCs). */
+function evmLive(chainId: number): ChainAdapter {
+  const client = createEvmClient(chainId, evmRpcs(chainId));
   const signedCache = new Map<string, `0x${string}`>();
   return {
     async verify(intent, sigs) {
@@ -151,13 +153,55 @@ function solLive(): ChainAdapter {
   };
 }
 
-let evm: ChainAdapter | null = null;
+/**
+ * C7: a signed message is never broadcast. `verify` checks the signature the way any verifier would (EIP-191 with
+ * v = 27 + recovery_id, or ed25519 over the Solana off-chain v0 bytes) against the Satchel's own address; then the
+ * intent ends at once (`broadcast` is a no-op, `isConfirmed` is true). Fixture mode verifies nothing (fake signatures).
+ */
+export function messageAdapter(live: boolean): ChainAdapter {
+  return {
+    async verify(intent, sigs) {
+      if (!live) return true;
+      const m = intent.message;
+      const s = sigs[0];
+      if (!m || !s) return false;
+      const addr = satchelAddresses(intent.tokenId, intent.contract);
+      try {
+        if (m.kind === "evm_message") {
+          if (!("r" in s)) return false;
+          const { verifyEvmMessageSignature } = await import("@satchel/core/chains/evm");
+          return await verifyEvmMessageSignature(m.text, { r: s.r, s: s.s, recovery_id: s.recoveryId }, addr.evm);
+        }
+        if (!("ed25519" in s)) return false;
+        const { verifySolOffchainSignature } = await import("@satchel/core/chains/sol");
+        return verifySolOffchainSignature(m.text, s.ed25519, addr.sol);
+      } catch {
+        return false;
+      }
+    },
+    async broadcast(intent) {
+      return { ok: true, chainTxId: `message:${intent.payloadHashes[0] ?? ""}` };
+    },
+    async isConfirmed() {
+      return true;
+    },
+  };
+}
+
+const evm = new Map<number, ChainAdapter>();
 let btc: ChainAdapter | null = null;
 let sol: ChainAdapter | null = null;
+let msg: ChainAdapter | null = null;
 
 export function chainAdapterFor(intent: PendingIntent): ChainAdapter {
+  if (intent.message) return (msg ??= messageAdapter(!IS_FIXTURE));
   if (IS_FIXTURE) return fixtureAdapter;
-  if (intent.chain === "evm") return (evm ??= evmLive());
+  if (intent.chain === "evm") {
+    const id = intent.evmChainId ?? 11155111;
+    let a = evm.get(id);
+    if (!a) evm.set(id, (a = evmLive(id)));
+    return a;
+  }
   if (intent.chain === "btc") return (btc ??= btcLive());
   return (sol ??= solLive());
 }

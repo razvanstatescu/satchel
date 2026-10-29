@@ -283,7 +283,8 @@ export const commerce = {
       "Every signature this Satchel makes is recorded on NEAR before it's signed. Your browser checks each one on its own chain: a used nonce, a spent coin or an expired blockhash can never move coins again.",
     notCovered: "What it doesn't cover",
     notCoveredList: [
-      "Chains, tokens and accounts other than the three derived addresses on the three listed networks.",
+      "Chains, tokens and accounts other than the three derived addresses: Bitcoin testnet4, Solana devnet, and ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia.",
+      "What a site makes of a signed message: a message can't move coins, but a site may treat it as a login.",
       "Any signature made after the purchase.",
       "The honesty of NEAR's signer network.",
       "Testnet4 reorgs: one confirmation can be undone by anyone mining two difficulty-1 blocks.",

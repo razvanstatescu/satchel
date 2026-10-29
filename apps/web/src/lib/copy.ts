@@ -24,6 +24,7 @@ import { landing } from "@/lib/copy/landing";
 import { satchel } from "@/lib/copy/satchel";
 import { shell } from "@/lib/copy/shell";
 import { walletOps } from "@/lib/copy/wallet-ops";
+import { multichain } from "@/lib/copy/multichain";
 
 export type { SolVariant } from "@/lib/copy/landing";
 
@@ -67,7 +68,7 @@ const card = {
   ogClean: "Clean history",
 } as const;
 
-export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, pill, card, landing } as const;
+export const copy = { ...shell, ...satchel, ...flows, ...commerce, ...walletOps, ...multichain, pill, card, landing } as const;
 
 /** Map a contract/MPC failure code to user copy (kb/80 R3 §Error map): what happened, what didn't move, one action. */
 export function errorCopy(code: string, ctx: { id: string; chain?: "btc" | "evm" | "sol" }): string {
