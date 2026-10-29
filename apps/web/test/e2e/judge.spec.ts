@@ -188,3 +188,20 @@ test.describe("JSON and media routes", () => {
     expect((await h.json()).aggregate).toBe("blocked");
   });
 });
+
+test("robots.txt allows every crawler and sitemap.xml lists every minted Satchel (judges crawl too, Q-017)", async ({ request }) => {
+  const robots = await request.get("/robots.txt");
+  expect(robots.status()).toBe(200);
+  const r = await robots.text();
+  expect(r).toMatch(/User-Agent: \*\s+Allow: \//i);
+  expect(r).not.toMatch(/Disallow: \/\S/);
+  expect(r).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
+  const sitemap = await request.get("/sitemap.xml");
+  expect(sitemap.status()).toBe(200);
+  const x = await sitemap.text();
+  // fixture config: next_token_id 8 → Satchels 1 … 7, three tabs each, plus the five public pages
+  expect(x.match(/<url>/g)).toHaveLength(5 + 7 * 3);
+  expect(x).toMatch(/<loc>[^<]*\/s\/7\/activity<\/loc>/);
+  expect(x).not.toMatch(/\/s\/8</);
+  expect(x).not.toMatch(/\/(send|transfer)</);
+});
