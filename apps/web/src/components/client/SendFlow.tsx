@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { ArrowDown, Check, ClipboardPaste, Hourglass, Info, LoaderCircle, Lock, RefreshCw, Snowflake, TriangleAlert, Undo2, Wallet, X, type LucideIcon } from "lucide-react";
+import { checkDelegatedSign } from "@satchel/core/policy";
 import { ChainCharm } from "@/components/brand/ChainCharm";
 import { ConnectButton } from "@/components/client/ConnectButton";
 import { FlowShell } from "@/components/client/FlowShell";
@@ -9,7 +10,8 @@ import { BroadcastAgain, SigningActions, SigningProgress, UnsentCard } from "@/c
 import { useViewer } from "@/components/client/SatchelPage";
 import { AddressDisplay } from "@/components/AddressDisplay";
 import { AmountInput, Banner, Button, Icon, IconButton, Morph, SatchelThumb, Segmented, Skeleton, TextInput, cx } from "@/components/ui";
-import { copy, NETWORK_LABEL, TICKER } from "@/lib/copy";
+import { capForChain, formatCapAmount } from "@/lib/allowanceView";
+import { copy, errorCopy, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { SATCHEL_CONTRACT, SOL_SEND_ENABLED } from "@/lib/config";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { formatAmount, formatSats, parseUnits, truncateAddress, type Ticker } from "@/lib/format";
@@ -70,7 +72,7 @@ const wallClock = () => Date.now();
 const useHydrated = () => useSyncExternalStore(noop, () => true, () => false);
 
 export function SendFlow({ snap, initialChain, intentId, records }: { snap: SatchelSnapshot; initialChain: Chain; intentId: string | null; records: SigRecordView[] }) {
-  const { live, isOwner, accountId } = useViewer(snap);
+  const { live, isOwner, isDelegate, myAllowance, accountId } = useViewer(snap);
   const { wallet, ready } = useWallet();
   const intents = useIntents();
   const hydrated = useHydrated();
@@ -97,6 +99,9 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
   const self = live.addresses[chain];
   const balance = chain === "sol" && live.balances.sol === null ? solBal : balanceBase(live, chain);
   const ticker = TICKER[chain] as Ticker;
+  // C5 (docs/specs/C5.md): this chain's cap for a delegate, if any; the owner has no cap (everything is theirs).
+  const myCap = isDelegate && myAllowance ? capForChain(myAllowance, chain) : undefined;
+  const chainAllowedForMe = isOwner || !isDelegate || !!myCap;
   const preparedRef = useRef<PreparedSend | null>(null);
   useEffect(() => {
     preparedRef.current = prepared;
@@ -132,9 +137,18 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
   }, [chain, live.balances.sol, live.addresses.sol]);
 
   const amount = useMax ? "max" : parseUnits(amountText, DECIMALS[chain]);
+  const overCap = !useMax && amount !== null && amount !== "max" && myCap && amount > BigInt(myCap.remaining);
   const amountError =
-    !useMax && amountText && amount === null ? copy.send.val.amountDecimals(DECIMALS[chain]) : !useMax && amount !== null && amount !== "max" && amount <= 0n ? copy.send.val.amountPositive : !useMax && amount !== null && amount !== "max" && balance !== null && amount > balance ? copy.send.val.amountMax : null;
-  const formOk = !!val && val.tier !== "error" && amount !== null && !amountError && (useMax || amountText !== "");
+    !useMax && amountText && amount === null
+      ? copy.send.val.amountDecimals(DECIMALS[chain])
+      : !useMax && amount !== null && amount !== "max" && amount <= 0n
+        ? copy.send.val.amountPositive
+        : !useMax && amount !== null && amount !== "max" && balance !== null && amount > balance
+          ? copy.send.val.amountMax
+          : overCap && myCap
+            ? copy.allowance.send.overCap(formatCapAmount(myCap.asset, myCap.remaining))
+            : null;
+  const formOk = !!val && val.tier !== "error" && amount !== null && !amountError && (useMax || amountText !== "") && chainAllowedForMe;
 
   // Prepare while Review is shown (nonce, fees, UTXOs, s0, h0) so the click handler can call the wallet synchronously.
   const prepare = useCallback(
@@ -227,6 +241,14 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
       void refreshSol();
       return;
     }
+    // C5: a defensive client-side re-check right before the wallet opens (the contract is authoritative either way).
+    if (isDelegate && myAllowance) {
+      const chk = checkDelegatedSign(myAllowance, prepared.request, { nowMs: wallClock(), listed: !!live.listing });
+      if (!chk.ok) {
+        setPrepError(errorCopy(chk.error, { id: snap.token_id, chain }));
+        return;
+      }
+    }
     setCta("preparing");
     setCancelMsg(null);
     const store = intentStore();
@@ -297,7 +319,7 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
         </Guard>
       ),
     };
-  } else if (ready && accountId && !isOwner && !tracking) {
+  } else if (ready && accountId && !isOwner && !isDelegate && !tracking) {
     guard = {
       node: (
         <Guard icon={Lock} title={copy.send.guard.notOwnerTitle(snap.token_id)} body={copy.send.guard.notOwnerBody(accountId, live.owner)}>
@@ -364,10 +386,26 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
     action = guard.foot ?? null;
   } else if (view === "form") {
     stepNo = { index: 1, count: 2 };
-    const why = formOk ? null : amountError || val?.tier === "error" ? copy.send.form.fixField : copy.send.form.reviewWhy(NETWORK_LABEL[chain]);
+    const why = formOk
+      ? null
+      : amountError || val?.tier === "error"
+        ? copy.send.form.fixField
+        : isDelegate && !chainAllowedForMe
+          ? copy.allowance.send.chainNotAllowed(ticker)
+          : copy.send.form.reviewWhy(NETWORK_LABEL[chain]);
     body = (
-      <FormStep
-        chain={chain}
+      <>
+        {isDelegate ? (
+          !chainAllowedForMe ? (
+            <Banner icon={TriangleAlert} tone="danger" title={copy.allowance.send.chainNotAllowed(ticker)} />
+          ) : myCap ? (
+            <p className="m-0 font-sans text-body-sm text-ink-muted" data-testid="allowance-remaining">
+              {copy.allowance.send.remaining(formatCapAmount(myCap.asset, myCap.remaining))}
+            </p>
+          ) : null
+        ) : null}
+        <FormStep
+          chain={chain}
         setChain={(c) => {
           setChain(c);
           setToText("");
@@ -386,7 +424,8 @@ export function SendFlow({ snap, initialChain, intentId, records }: { snap: Satc
         toText={toText}
         setToText={setToText}
         val={val}
-      />
+        />
+      </>
     );
     action = (
       <>

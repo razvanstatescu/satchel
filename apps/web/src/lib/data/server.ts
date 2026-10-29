@@ -136,8 +136,10 @@ export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; pa
         if (e.event === "nft_mint") return { kind: "minted", tx: e.tx, block: e.block, timestampMs: e.timestampMs, from: String(e.data.owner_id) };
         if (e.event === "nft_transfer") return { kind: "transferred", tx: e.tx, block: e.block, timestampMs: e.timestampMs, from: String(e.data.old_owner_id), to: String(e.data.new_owner_id) };
         if (e.event === "listed") return { kind: "listed", tx: e.tx, block: e.block, timestampMs: e.timestampMs, price: String(e.data.price), currency: e.data.currency as "near" | "usdc" };
-        if (e.chainTx) return { kind: "sent", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.chainTx.chain, amount: e.chainTx.amount, to: e.chainTx.to, fee: e.chainTx.fee, chainTxId: e.chainTx.id, status: "final" };
-        return { kind: "issued", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.data.chain as "evm" | "btc", amount: e.data.amount ? String(e.data.amount) : undefined, to: e.data.to ? String(e.data.to) : undefined, status: "unused" };
+        // C5: a delegate's `requester` rides the event (fixtures only name it when the signer wasn't the owner).
+        const requester = e.data.requester ? String(e.data.requester) : undefined;
+        if (e.chainTx) return { kind: "sent", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.chainTx.chain, amount: e.chainTx.amount, to: e.chainTx.to, fee: e.chainTx.fee, chainTxId: e.chainTx.id, status: "final", requester };
+        return { kind: "issued", tx: e.tx, block: e.block, timestampMs: e.timestampMs, chain: e.data.chain as "evm" | "btc", amount: e.data.amount ? String(e.data.amount) : undefined, to: e.data.to ? String(e.data.to) : undefined, status: "unused", requester };
       }),
     };
   }
@@ -153,7 +155,7 @@ export async function getActivity(id: string): Promise<{ rows: ActivityRow[]; pa
       else if (e.event === "listed") rows.push({ kind: "listed", ...base, price: String(e.data.price), currency: e.data.currency as "near" | "usdc" });
       else if (e.event === "delisted") rows.push({ kind: "delisted", ...base });
       else if (e.event === "sold") rows.push({ kind: "sold", ...base, to: String(e.data.buyer_id ?? ""), price: String(e.data.price), currency: e.data.currency as "near" | "usdc" });
-      else if (e.event === "sign_requested") rows.push({ kind: "issued", ...base, chain: e.data.chain as "btc" | "evm" | "sol", status: "final" });
+      else if (e.event === "sign_requested") rows.push({ kind: "issued", ...base, chain: e.data.chain as "btc" | "evm" | "sol", status: "final", requester: e.data.requester ? String(e.data.requester) : undefined });
     }
     return { rows, partial: false };
   } catch {

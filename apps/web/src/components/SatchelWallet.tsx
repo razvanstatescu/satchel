@@ -1,6 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { ChainRow } from "@/components/ChainRow";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
+import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
 import { Freshness, InsideAddCoins, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
 import { cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
@@ -40,6 +41,8 @@ export function WalletTab({ snap }: { snap: SatchelSnapshot }) {
     <>
       <ObjCol>
         <WalletColumn snap={snap} />
+        <DelegateBanner snap={snap} />
+        <AllowanceOwnerPanel snap={snap} />
       </ObjCol>
       <ObjMain data-judge-facts="">
         <section aria-labelledby="inside-title">
@@ -52,6 +55,8 @@ export function WalletTab({ snap }: { snap: SatchelSnapshot }) {
           <Freshness snap={snap} />
         </section>
         <FactsGrid snap={snap} />
+        {/* C5 (docs/specs/C5.md §1.2): a public fact — who else can spend from this Satchel, and under what caps. */}
+        <AllowanceFacts snap={snap} />
         <VerifyDisclosure snap={snap} />
         <VisitorOnly snap={snap}>
           <HowItWorks />

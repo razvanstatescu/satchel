@@ -76,7 +76,12 @@ export function useViewer(snap: SatchelSnapshot) {
     if (stuck.length) status = "needs_attention";
     else if (inFlight) status = "signing";
   }
-  return { live, accountId, isOwner, status, mine, stuck, sale: soldByMe ? sale : null };
+  // C5 (docs/specs/C5.md): `allowances_of` is a public view, already in the shared snapshot, so a connected account's
+  // own row (if any) needs no extra fetch. Expired access never counts (it behaves like "not owner" at all); a
+  // paused one (the token is listed) still counts, since that's the same "not now" the owner's own actions show.
+  const myAllowance = !isOwner && accountId ? (live.allowances.find((a) => a.delegate === accountId) ?? null) : null;
+  const isDelegate = !!myAllowance && myAllowance.status !== "expired";
+  return { live, accountId, isOwner, isDelegate, myAllowance, status, mine, stuck, sale: soldByMe ? sale : null };
 }
 
 /** The card's state word: the seller sees Sold after a sale; everyone else the live status. */
