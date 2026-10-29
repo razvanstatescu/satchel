@@ -14,7 +14,7 @@ export const market = {
     addTitle: (id: string) => `Add NEAR to Satchel #${id}`,
     addFtTitle: (id: string, ticker: string) => `Add ${ticker} to Satchel #${id}`,
     addBody: "Anyone can add coins here. Only the owner can take them out, and never while it's for sale.",
-    amount: "Amount",
+    amount: "NEAR to add",
     adding: "Adding…",
     added: (amount: string) => `${amount} added`,
     withdraw: "Take out",

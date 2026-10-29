@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CircleCheck, Hourglass, Info, LoaderCircle, TriangleAlert, Undo2, type LucideIcon } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { gateModel, type ReportMode } from "@/components/Clean";
 import { FlowShell } from "@/components/client/FlowShell";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
 import { AmountInput, Button, Icon, Morph, Segmented, buttonClass } from "@/components/ui";
-import { SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
+import { IS_FIXTURE, SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { copy, errorCopy } from "@/lib/copy";
 import { buyEnabled } from "@/lib/data/clean";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
@@ -357,8 +357,35 @@ function OfferRow({ snap, offer, mine }: { snap: SatchelSnapshot; offer: OfferVi
   );
 }
 
-export function IncomingOffers({ snap, offers }: { snap: SatchelSnapshot; offers: OfferView[] }) {
+/**
+ * The server renders the initial `offers` (the no-JS judge fact). Fixture mode's offers only ever exist in THIS
+ * browser's sessionStorage simulation (sim.ts), which a Node server request can never see, so a client-side
+ * mutation (make/accept/cancel) needs its own refresh here — the same reason `useLiveSnapshot` re-derives the
+ * snapshot client-side in fixture mode instead of trusting a server re-fetch after a sim mutation.
+ */
+function useOffersFor(tokenId: string, initial: OfferView[]): OfferView[] {
+  const [offers, setOffers] = useState(initial);
+  useEffect(() => {
+    if (!IS_FIXTURE) return; // live mode: the server prop is a real contract read, refreshed on navigation
+    let alive = true;
+    const tick = () =>
+      contractViews(dataSource().view, SATCHEL_CONTRACT)
+        .offersFor(tokenId, 0, 50)
+        .then((list) => alive && setOffers(list))
+        .catch(() => undefined);
+    void tick();
+    const t = setInterval(tick, 2000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+    };
+  }, [tokenId]);
+  return offers;
+}
+
+export function IncomingOffers({ snap, offers: initial }: { snap: SatchelSnapshot; offers: OfferView[] }) {
   const { isOwner } = useViewer(snap);
+  const offers = useOffersFor(snap.token_id, initial);
   if (!offers.length) return null;
   return (
     <section aria-labelledby="offers-title" data-testid="incoming-offers" className="flex flex-col gap-2.5">
