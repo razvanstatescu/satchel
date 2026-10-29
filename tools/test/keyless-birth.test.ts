@@ -16,7 +16,7 @@ const opts = (o: Partial<BirthOptions> = {}): BirthOptions => ({
   wasm: FAKE_WASM,
   mpc: 'v1.signer-prod.testnet',
   usdc: '3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af',
-  baseUri: 'https://satchelhq.vercel.app/api/card/',
+  baseUri: 'https://usesatchel.xyz/api/card/',
   mintTo: 'alice.satchelhq.testnet',
   mints: BIRTH_DEFAULTS.mints,
   transfer: defaultTransfer('rc.satchelhq.testnet', 'satchelhq.testnet')!,
@@ -38,7 +38,7 @@ describe('keyless birth batch (spec §5.16)', () => {
     expect(fc[0]!.type === 'FunctionCall' && fc[0]!.args).toEqual({
       mpc: 'v1.signer-prod.testnet',
       usdc: '3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af',
-      base_uri: 'https://satchelhq.vercel.app/api/card/',
+      base_uri: 'https://usesatchel.xyz/api/card/',
     })
     expect(fc.slice(1).every((a) => a.type === 'FunctionCall' && a.args.receiver_id === 'alice.satchelhq.testnet' && a.gas === 20n * TGAS && a.deposit === parseNear('0.02'))).toBe(true)
     expect(totalGas(plan)).toBe(170n * TGAS)
@@ -69,8 +69,8 @@ describe('keyless birth batch (spec §5.16)', () => {
   it('refuses bad inputs before anything is printed for signing', () => {
     expect(() => validateBirth(opts({ child: 'satchel.other.testnet' }))).toThrow(/direct sub-account/)
     expect(() => validateBirth(opts({ child: 'a.rc.satchelhq.testnet' }))).toThrow(/direct sub-account/)
-    expect(() => validateBirth(opts({ baseUri: 'http://satchelhq.vercel.app/api/card/' }))).toThrow(/base_uri/)
-    expect(() => validateBirth(opts({ baseUri: 'https://satchelhq.vercel.app/api/card' }))).toThrow(/base_uri/)
+    expect(() => validateBirth(opts({ baseUri: 'http://usesatchel.xyz/api/card/' }))).toThrow(/base_uri/)
+    expect(() => validateBirth(opts({ baseUri: 'https://usesatchel.xyz/api/card' }))).toThrow(/base_uri/)
     expect(() => validateBirth(opts({ wasm: new Uint8Array([1, 2, 3, 4]) }))).toThrow(/magic/)
     expect(() => validateBirth(opts({ expectedSha256: '00'.repeat(32) }))).toThrow(/!= --expected-sha256/)
     expect(() => validateBirth(opts({ mintTo: 'rc.satchelhq.testnet' }))).toThrow(/persona/)

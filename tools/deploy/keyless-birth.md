@@ -29,7 +29,7 @@ Approvals:
 - [ ] The sandbox suite and `tools/check-wasm-imports.sh` both pass on **that** artifact
   (`SATCHEL_WASM=… cargo test -p satchel-tests`).
 - [ ] MPC `version` = `3.17.0` (the tool's pre-check, A-01).
-- [ ] App host is final (D-23, H-05). `base_uri` = `https://satchelhq.vercel.app/api/card/` unless H-05 changed;
+- [ ] App host is final (D-23, H-05). `base_uri` = `https://usesatchel.xyz/api/card/` unless H-05 changed;
   it is immutable after birth.
 - [ ] H-26 is decided: either USDC init (default) or `--no-usdc`. rc and final must use the **same** init args.
 - [ ] The parent balance covers the Transfer, 7 × 0.02 NEAR and the 10× gas hold. The tool prints the requirement:
@@ -41,11 +41,11 @@ Approvals:
 ```bash
 # rc (Day 9)
 pnpm --filter @satchel/tools deploy:keyless-birth \
-  --child rc.satchelhq.testnet --base-uri https://satchelhq.vercel.app/api/card/ \
+  --child rc.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/ \
   --expected-sha256 <H>
 # final (Day 10): --expected-sha256 is mandatory
 pnpm --filter @satchel/tools deploy:keyless-birth \
-  --child satchel.satchelhq.testnet --base-uri https://satchelhq.vercel.app/api/card/ \
+  --child satchel.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/ \
   --expected-sha256 <H>
 ```
 

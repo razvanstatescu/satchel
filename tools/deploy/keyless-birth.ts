@@ -9,7 +9,7 @@
  * The final `satchel.<team>.testnet` birth additionally needs the human's explicit "yes" (H-15) quoting the receiver
  * and H. Runbook: tools/deploy/keyless-birth.md.
  *
- *   pnpm --filter @satchel/tools deploy:keyless-birth --child rc.satchelhq.testnet --base-uri https://satchelhq.vercel.app/api/card/
+ *   pnpm --filter @satchel/tools deploy:keyless-birth --child rc.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'

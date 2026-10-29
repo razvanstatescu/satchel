@@ -49,7 +49,7 @@ const SATCHEL_ACTIONS = [
   "CreateAccount",
   { Transfer: { deposit: "10000000000000000000000000" } },
   { DeployContract: { code: Buffer.from(FIXTURE_CODE_HASH, "hex").toString("base64") } },
-  fc("new", { mpc: "v1.signer-prod.testnet", usdc: "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af", base_uri: "https://satchelhq.vercel.app/api/card/" }),
+  fc("new", { mpc: "v1.signer-prod.testnet", usdc: "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af", base_uri: "https://usesatchel.xyz/api/card/" }),
   ...ONE_TO_SEVEN.map(() => fc("nft_mint", { receiver_id: ALICE }, "20000000000000000000000")),
 ];
 /** Each Satchel `nft_mint` logs one NEP-171 `nft_mint` event; in a batch, the receipt's logs follow the action order. */

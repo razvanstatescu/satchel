@@ -1090,11 +1090,33 @@ and sign testnet transactions (it covers H-20 (b), apart from caps). It does **n
 | Team account | `satchelhq.testnet` created with 9 NEAR from `satchel-spk-pay`, using the key prepared on Oct 21 (`ed25519:6WmrWh72…`) |
 | Sweep | 19.8 NEAR swept from the spikes (each keeps 0.5 NEAR) |
 | Sub-accounts | `dev1` (5 NEAR), `alice` (3), `bob` (2), `carol` (3). This is less than D-34 planned; top them up as needed |
-| Contract | `dev1.satchelhq.testnet` deployed with the audited wasm `aea0b2e9…1bd6` and `new(mpc = v1.signer-prod.testnet, usdc = 3e2210e1…b8af, base_uri = https://satchelhq.vercel.app/api/card/)`; registered at USDC |
+| Contract | `dev1.satchelhq.testnet` deployed with the audited wasm `aea0b2e9…1bd6` and `new(mpc = v1.signer-prod.testnet, usdc = 3e2210e1…b8af, base_uri = https://satchelhq.vercel.app/api/card/)`; registered at USDC. **Re-created the same day with `https://usesatchel.xyz/api/card/` (D-49)** |
 | Tokens | Satchels #1–#3 minted to alice; their addresses equal `research/final-addresses.md` |
 
 **Budget left:** `satchelhq.testnet` holds about 15.8 NEAR. The rc birth (10) plus the final birth (20) need about
 15 NEAR more by Day 9. Get it from near-faucet.io (Q-008) or the CLI faucet into fresh throwaway accounts, then sweep.
+
+## D-49 · The app domain is `usesatchel.xyz` (2026-10-29, Razvan; replaces D-38's `satchelhq.vercel.app`)
+
+**Decision.** The app is served at **`https://usesatchel.xyz`** (on Vercel). Every Satchel contract's `base_uri` is
+**`https://usesatchel.xyz/api/card/`**. That covers dev1 now, and rc and the final contract at their births (where it
+is immutable). `NEXT_PUBLIC_APP_URL=https://usesatchel.xyz`.
+
+**Done the same day:**
+- `dev1.satchelhq.testnet` had `satchelhq.vercel.app` in its immutable metadata, and it had no signature records or
+  listings. It was **deleted (its balance went back to `satchelhq.testnet`) and re-created under the same name**:
+  - same audited wasm `aea0b2e9…`;
+  - new `base_uri`;
+  - registered at USDC;
+  - #1–#3 re-minted to alice.
+- The derived addresses depend only on the account id and the path, so they are unchanged. The coins already sent to
+  dev1 #1 stay usable.
+- Updated: the keyless-birth runbook and tool example, the tests and the fixtures, the launch checklist (A-11, E-01)
+  and `apps/web/.env.production`.
+
+**The human still has to:**
+- add `usesatchel.xyz` to the Vercel project and point the DNS at it (none existed on 2026-10-29);
+- check that `https://usesatchel.xyz/api/contract` answers before the Day-9 rc birth.
 
 ## Decisions that need the human (Razvan / team)
 

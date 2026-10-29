@@ -38,6 +38,10 @@ export default defineConfig({
           NEXT_PUBLIC_APP_URL: `http://127.0.0.1:${PORT}`,
           // Solana: the SOL UI defaults to on (D-46); SOL_SEND is kept explicit for older builds
           NEXT_PUBLIC_SOL_SEND: "on",
+          // Defined but empty, so a local .env.production (the Vercel live values) cannot leak its hash into this
+          // fixture build: @next/env only fills keys that are undefined, and "" parses as unset (fixture hash).
+          NEXT_PUBLIC_EXPECTED_CODE_HASH: "",
+          FASTNEAR_API_KEY: "",
         },
       },
 });

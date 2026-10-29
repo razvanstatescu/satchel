@@ -164,7 +164,7 @@ export const FIXTURE_CONFIG: ConfigView = {
   min_sign_prepaid_tgas: { base: 30, per_request: 18 },
   max_mpc_deposit: "10000000000000000000000",
   storage_byte_cost: "10000000000000000000",
-  base_uri: "https://satchelhq.vercel.app/api/card/",
+  base_uri: "https://usesatchel.xyz/api/card/",
   next_token_id: 8,
   next_listing_id: 6,
 };

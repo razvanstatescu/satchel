@@ -56,7 +56,7 @@ describe('e2e scripts: offline dry runs print the plan and sign nothing', () => 
 
 describe('keyless-birth tool', () => {
   it('dry run prints the 11 actions and H; refuses --yes; requires H for the final', () => {
-    const base = ['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://satchelhq.vercel.app/api/card/', '--wasm', 'tools/test/fixtures/tiny.wasm']
+    const base = ['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://usesatchel.xyz/api/card/', '--wasm', 'tools/test/fixtures/tiny.wasm']
     const r = tsx([...base, '--child', 'rc.satchelhq.testnet'])
     expect(r.status, r.stderr).toBe(0)
     expect(r.stdout).toContain('CreateAccount · Transfer · DeployContract · FunctionCall')
