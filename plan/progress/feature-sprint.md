@@ -183,3 +183,13 @@ it. Phase-2 UI work builds against those specs.
   - Real-wallet tests by Razvan.
   - The small UI gaps listed above (USDC offers and deposits).
   - The Day-9 reproducible build.
+- 22:55Z: live phase.
+  - Deleted `smoke1` (4.0 NEAR back to satchelhq; satchelhq now 19.8 NEAR).
+  - Created **`dev2.satchelhq.testnet`** (5.5 NEAR): wasm `10c6a8e9…` (main 56cd631), init with USDC and base_uri usesatchel.xyz, registered at USDC and wrap.testnet, #1–#3 minted to alice.
+  - Funded dev2 #1 from dev1 #1 through `sign_for`:
+    - Sepolia 0.02 ETH, `0x12649022…`, gas 207,391;
+    - devnet 0.2 SOL, `4gwTkeub…`;
+    - 300k testnet4 sats, `68a0ee8a…`, unconfirmed.
+  - **Switching production to dev2 needs Razvan.** Committing `apps/web/.env.production` was blocked by the auto-mode classifier (credential-leakage rule for `.env*`). Vercel's env must be set to `NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet` and `NEXT_PUBLIC_EXPECTED_CODE_HASH=10c6a8e9096b682791f4ebe282861314b0f51b8be0c54e11b7f057c53353614a`, then redeployed. Until then, the live site (on dev1, the pre-sprint contract) will show errors for the new views if it is redeployed from main.
+  - Spawned **tools-live** (Sonnet): extends `tools/e2e` (multi-chain/USDC EVM, message, market, allowance, history) and runs it live on dev2 within caps, producing `research/spikes/dev2-live/RESULTS.md`.
+  - Spawned **web-gaps** (Sonnet): USDC offers with storage prepay, FT deposits and withdrawals, storage-credit withdraw, `/market` offer entry.
