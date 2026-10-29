@@ -2,7 +2,7 @@
 export * from './types'
 export { checkCleanHistory, mergeNearSnapshots, type NearMerge } from './checker'
 export { gate, roleBanner, BUY_ENABLED, type GateInput, type GateResult } from './gate'
-export { checkEvm, EVM_CHECK_CHAINS, type EvmCheckResult } from './evm'
+export { checkEvm, EVM_CHECK_CHAINS, evmDepth, type EvmCheckResult } from './evm'
 export { checkMessages, isMessageRecord } from './messages'
 export { historyDigest, historyEntry, historyHeader, HISTORY_DOMAIN } from './history'
 export { checkBtc, ownBtcScripts, requestStatus, verifiedBtcBalance, type BtcCheckResult } from './btc'
