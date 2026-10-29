@@ -36,7 +36,8 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
 
 ## Hard rules
 1. **Implementation started 2026-10-21 by Razvan's decision (D-39)**, overriding the plan's "no product code before Nov 1"
-   rule (inside the window per Q-001, D-47). **Do not create a git repo** until Razvan says so. Product code lives at the project root (`contracts/`, `tests/`,
+   rule (inside the window per Q-001, D-47). The git repo exists: `github.com/razvanstatescu/satchel`, **private**, branch `main`, created by Razvan on
+   2026-10-29. Push to `main` when Razvan asks. Making it public needs his explicit "yes" (Day 13). Product code lives at the project root (`contracts/`, `tests/`,
    `packages/core`, `apps/web`, `tools/`, `vectors/`). Never copy or import `research/spikes` code. Implement from
    `kb/` instead. Every big chunk of work ships with unit tests and an end-to-end test (sandbox, local or testnet).
 2. **HACKATHON.md AI-agent rules.** Never do any of the following without the human's explicit confirmation: send
