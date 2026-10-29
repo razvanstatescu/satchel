@@ -23,3 +23,11 @@
 - 2026-10-29T16:05Z [C1,C2,C3,C7] wip: core TS tests added (379 green); next sandbox tests, deep fuzz, wasm build
 - 2026-10-29T16:05Z [A2,A3] progress: Playwright specs green (give->link->claim, empty-everything); fixed hashchange, fixture UTXO depletion, and a stale-closure bug in EmptyFlow
 - 2026-10-29T16:08Z [orchestrator] main (A1+A4+C5) verified: sandbox 91/91, wasm 329,320 B e7ded724…, INV-22 OK
+- 2026-10-29T16:08Z [C4|C6] progress: merged main (C5) into feat/contract-market; accept_offer clears allowances via on_owner_change -> clear_allowances; delegates refused (ERR_NOT_OWNER); StorageKey C4/C6 variants after Allowances; lib 142/142, market sandbox 16/16
+- 2026-10-29T16:11Z [A2,A3] progress: axe (Day+Night) added for give-link/claim/empty; full e2e suite (139 tests) and unit suite green
+- 2026-10-29T16:15Z [A2,A3] done: full suite green (151 e2e, 357 unit, tsc, lint) on feat/web-flows @ c0538ec
+- 2026-10-29T16:16Z [C1,C2,C3,C7] wip: sandbox suite green (88 incl. 5 new in features.rs); wasm 309,266 B sha256 1cac1e97…077e, INV-22 OK; next deep fuzz + C5 trial merge
+- 2026-10-29T16:17Z [C4|C6] done: feat/contract-market @ 4cfb33f (main 24a680b+bd94fcc merged in); lib 142/142, sandbox 107/107 (market 16), core 371/371, proptest 1000 cases clean; wasm 403,886 B sha256 f5527f72…ddd06, INV-22 OK; spec docs/specs/C4-C6.md
+- 2026-10-29T16:18Z [C5-ui] in progress: data layer done (views/calls in near/contract.ts, snapshot+source+sim.ts fixture mirror of set/revoke/delegated debit, mock wallet, requester threaded through Activity); typecheck green; UI next
+- 2026-10-29T16:20Z [C2,C3,C7] fuzz: 4.0M Rust property cases + 400k Rust/TS differential (0 disagreements) + 400k TS self-check; docs/security/fuzzing.md §0b
+- 2026-10-29T16:24Z [orchestrator] merged A2+A3 (94428ea, pushed) and C4+C6 (a512d45); spawned web-market UI agent; contract-sign asked to merge main
