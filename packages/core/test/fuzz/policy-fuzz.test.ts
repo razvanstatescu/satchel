@@ -49,14 +49,16 @@ function invariantViolation(chain: Chain, c: Case): string | null {
     const head = b[1]! <= 0xf7 ? 2 : 3
     const token = CHAIN_HEADS[toHex(b.subarray(head, head + 4))]
     if (!token) return 'chain id is not the first item = one of the four testnets'
-    if (toHex(b.subarray(-2)) !== '80c0') {
-      // C2: … 94 ‖ token(20) ‖ 80 (value 0) ‖ b8 44 ‖ a9059cbb ‖ 12 zero ‖ to ‖ 16 zero ‖ amount ‖ c0
-      const t = b.subarray(-93)
-      if (t[0] !== 0x94 || toHex(t.subarray(1, 21)) !== token || t[21] !== 0x80 || toHex(t.subarray(22, 28)) !== 'b844a9059cbb' || t[92] !== 0xc0)
-        return 'data is not a USDC transfer to this chain\'s token with value 0'
+    // C2: … 94 ‖ token(20) ‖ 80 (value 0) ‖ b8 44 ‖ a9059cbb ‖ 12 zero ‖ to ‖ 16 zero ‖ amount ‖ c0. Decide by this shape,
+    // not by the last two bytes: an amount ending in 0x80 also ends the tx with `80c0`.
+    const t = b.subarray(-93)
+    const transferShape = b.length >= 93 + 6 && t[0] === 0x94 && t[21] === 0x80 && toHex(t.subarray(22, 28)) === 'b844a9059cbb' && t[92] === 0xc0
+    if (transferShape) {
+      if (toHex(t.subarray(1, 21)) !== token) return "a transfer to something other than this chain's USDC"
       if (t.subarray(28, 40).some((x) => x !== 0) || t.subarray(60, 76).some((x) => x !== 0)) return 'non-canonical transfer words'
       if (!c.f?.erc20) return 'erc20 fields missing'
-    } else if (c.f?.erc20) return 'erc20 fields on a native transfer'
+    } else if (toHex(b.subarray(-2)) !== '80c0') return 'data is neither empty nor a USDC transfer with value 0'
+    else if (c.f?.erc20) return 'erc20 fields on a native transfer'
     if (c.h?.[0] !== toHex(keccak_256(b))) return 'hash/fields'
     return null
   }
