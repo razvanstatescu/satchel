@@ -154,3 +154,4 @@ it. Phase-2 UI work builds against those specs.
     - C5 ships (L-01 documented);
     - C7 ships (with L-02 UI hardening);
     - **C4/C6 need the M-01 fix.**
+- 20:00Z (local 22:00): Razvan said "you can continue". Verified main e985d82: wasm 422,562 B `bd5d8e01…`, INV-22 OK, Playwright 161/161 (the sandbox is 112/112 per the reviewer on the same tree). Resumed web-allowance, web-market, the nested web-sign agent (C2/C3/C7 UI, told to wire `evmByChain` and escape message text) and the reviewer (told M-01 is fixed elsewhere). Spawned **contract-fix-m01** (Opus) on `fix/m01-solvency` in a manually created worktree `.claude/worktrees/fix-m01`, since harness worktree creation keeps racing: failing test first, then `ensure_solvent()` plus an escrow-total view, plus a monitor update.
