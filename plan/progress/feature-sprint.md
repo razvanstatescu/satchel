@@ -155,3 +155,15 @@ it. Phase-2 UI work builds against those specs.
     - C7 ships (with L-02 UI hardening);
     - **C4/C6 need the M-01 fix.**
 - 20:00Z (local 22:00): Razvan said "you can continue". Verified main e985d82: wasm 422,562 B `bd5d8e01…`, INV-22 OK, Playwright 161/161 (the sandbox is 112/112 per the reviewer on the same tree). Resumed web-allowance, web-market, the nested web-sign agent (C2/C3/C7 UI, told to wire `evmByChain` and escape message text) and the reviewer (told M-01 is fixed elsewhere). Spawned **contract-fix-m01** (Opus) on `fix/m01-solvency` in a manually created worktree `.claude/worktrees/fix-m01`, since harness worktree creation keeps racing: failing test first, then `ensure_solvent()` plus an escrow-total view, plus a monitor update.
+- 20:30Z: **security review complete** (`docs/security/sprint-review.md`), merged into main (cf70d63) and pushed. No Critical or High.
+  - **M-01, Medium:** the escrow solvency issue. The fix is in progress on `fix/m01-solvency`; the proof `review.rs::m01_…` is `#[ignore]`d until it lands.
+  - **L-01:** OP-stack L1 fee, documented.
+  - **L-02:** message display hardening; assigned to web-sign.
+  - **L-03:** `history_digest` ceiling measured (≈ 3,000 small or 2,000 1-KiB records; ~1,500 cross-contract), docs corrected.
+  - **L-04 (SR-01):** fixed, `evmConfirmationsByChain` (Base and OP 30, Arbitrum 240).
+  - **L-05:** the web app's `evmByChain` and `mapCoreReport`; assigned to web-sign; the release gate for L2 sends.
+  - **I-01..I-09:** accepted or documented.
+
+  Verdicts: C1, C2, C5 ship; C3 ships (app needs L-05); C7 ships (L-02 UI); **C4/C6 ship with the M-01 fix**.
+
+  Suites on the review branch: contract unit 172, sandbox 115 + 1 ignored, core 465, tools 72, differential fuzz 400k with 0 disagreements.

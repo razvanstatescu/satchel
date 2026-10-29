@@ -62,3 +62,4 @@
 - 2026-10-29T19:57Z [M-01] wip: failing sandbox tests committed (transfer 150 B → LackBalanceForState on last withdraw; NEAR buy +63 B breaks I-M1; accept nets -194 B)
 - 2026-10-29T19:57Z [C2-ui C3-ui C7-ui] wip: data layer committed (per-chain send/nonce, message adapter, mock wallet msgs, Messages group, evmByChain SR-02, safe text SR-04); unit 379/379, tsc clean
 - 2026-10-29T20:01Z [review] DONE: final unit 172/172, sandbox 115 passed 0 failed 1 ignored (M-01 proof), core 465/465, tools 72/72, diff fuzz 400k/0. Commits 072afea, 0b64dbe, 9ee2696 on review/sprint (not pushed).
+- 2026-10-29T20:02Z [orchestrator] review merged (cf70d63): no Crit/High; M-01 fix pending; L-02/L-05 to web-sign; M-01 proof handed to the fixer
