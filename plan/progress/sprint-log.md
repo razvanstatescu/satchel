@@ -35,3 +35,8 @@
 - 2026-10-29T16:40Z [C5-ui] in progress: copy deck added (copy/allowance.ts, errorCopy ERR_ALLOWANCE_* mapping); config-copy-theme unit test passes (house rule: never say 'delegate' in UI copy); building the owner/delegate UI next
 - 2026-10-29T16:42Z [C1,C2,C3,C7] merge: main a512d45 (C5, C4/C6) merged into feat/contract-sign; EvmNonces after StorageCredit; C7 kinds refused for delegates; unit 172 green
 - 2026-10-29T16:46Z [orchestrator] main (A1-A4, C4, C5, C6) confirmed: sandbox 107/107, web unit 379, typecheck clean
+- 2026-10-29T16:47Z [C5-ui] in progress: owner panel + add sheet + delegate banner + Send gating built; typecheck/lint/unit (366) all green; unit+e2e tests for allowance next
+- 2026-10-29T16:50Z [C1,C2,C3,C7] done: feat/contract-sign at a6de2ae incl. main a512d45; unit 172, sandbox 112, core 459, tools 72, web 379, vectors:check ok; merged wasm 422,562 B sha256 bd5d8e01…a1a5, INV-22 OK
+- 2026-10-29T16:51Z [C5-ui] in progress: unit tests added (test/unit/allowance.test.ts, 17 tests); full unit suite 383 passed, typecheck/lint green; Playwright next (owner add/revoke, delegate send within/over cap, server HTML)
+- 2026-10-29T17:11Z [C4-ui|C6-ui] wip: data layer committed (market views/calls, fixtures, sim engine, mock wallet) on feat/ui-market @44a0ae9
+- 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (e985d82, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
