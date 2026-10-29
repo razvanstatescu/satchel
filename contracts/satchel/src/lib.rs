@@ -278,3 +278,5 @@ impl NonFungibleTokenMetadataProvider for Contract {
 mod tests;
 #[cfg(test)]
 mod security_tests;
+#[cfg(test)]
+mod allowance_tests;
