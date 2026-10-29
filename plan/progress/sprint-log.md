@@ -2,3 +2,17 @@
 - 2026-10-29T14:32Z [orchestrator] started: tracker, role definitions, 5 agents (contract-sign, contract-allowance, contract-market, web-share, web-flows)
 - 2026-10-29T14:35Z [orchestrator] spawned 5 agents in worktrees: contract-sign/allowance/market (Opus), web-share/web-flows (Sonnet)
 - 2026-10-29T14:56Z [orchestrator] restart: previous session ended before any agent committed; respawning 5 agents under the satchel-contract/satchel-web roles
+- 2026-10-29T14:57Z [orchestrator] respawned 5 agents (satchel-contract ×3 Opus/high; satchel-web ×2 Sonnet/medium), branched from bff1397
+- 2026-10-29T15:04Z [A2,A3] progress: claim-link + btc-sweep pure logic with unit tests, committed on feat/web-flows
+- 2026-10-29T15:04Z [C5] spec: docs/specs/C5.md committed on feat/contract-allowance (set/revoke_allowance, allowances_of/allowance views, ERR_ALLOWANCE_* codes, rolling 24 h window, clear on transfer+sale)
+- 2026-10-29T15:07Z [C1,C2,C3,C7] spec: docs/specs/C1-C2-C3-C7.md committed on feat/contract-sign (request/record/view JSON, error codes, digest encoding; USDC x4 verified on-chain)
+- 2026-10-29T15:08Z [C4|C6] spec: docs/specs/C4-C6.md committed on feat/contract-market (deposit_near/withdraw_near/withdraw_ft, ft_on_transfer deposit+offer msgs, make/cancel/accept_offer, inside_of/offers_for/offers_by, ERR_* codes, invariants I-M1..I-M8)
+- 2026-10-29T15:12Z [A1] wip: props builder (lib/og.ts) + shared og-card.tsx renderer, TTF font subsets, opengraph-image.tsx/twitter-image.tsx under /s/[id]; unit tests green (351 passed). Next: dev-server check, metadata wiring, Playwright.
+- 2026-10-29T15:16Z [A1] done: /s/[id] opengraph-image + twitter-image render per-Satchel social cards (status, signatures/Clean history, chain amounts, Testnet); data-free branded fallback on error/unknown id; metadata already points at them (no layout.tsx change needed, Next's file convention wins). Unit (og.test.ts) + 3 Playwright tests green.
+- 2026-10-29T15:17Z [A2] progress: give-by-link flow + /claim page + sim/wallet batch support, typecheck/lint/unit green
+- 2026-10-29T15:17Z [C5] implemented: allowance.rs + sign_for hooks + clear on transfer/sale; 115 unit tests green (29 new incl. proptest oracle); TS mirror in @satchel/core; vectors/allowance.json (55) agree Rust/TS
+- 2026-10-29T15:18Z [C1,C2,C3,C7] wip: contract side implemented on feat/contract-sign (unit + fuzz properties green; vectors/corpus regen pending TS mirror)
+- 2026-10-29T15:22Z [C4|C6] progress: contract code + 26 unit tests (incl. accounting proptest vs model, swap-remove index property) on feat/contract-market; lib suite 112/112
+- 2026-10-29T15:22Z [A3] progress: empty-the-satchel flow (multi-chain drain, BTC auto-batching), typecheck/lint/unit green
+- 2026-10-29T15:26Z [A4] done: request coins — BIP-21/EIP-681/Solana Pay builders (lib/payment-uri.ts, vector-tested), Add coins' optional amount field (GET form, works with JS off), payment-URI QR + Copy payment link + Share, shareable app link /s/<id>/receive?chain=&amount= (display only). Unit (payment-uri.test.ts) + Playwright (request-coins.spec.ts incl. axe Day/Night) green.
+- 2026-10-29T15:26Z [C4|C6] progress: sandbox tests/tests/market.rs 15/15 green (deposit/withdraw, listed freeze, transfer+buy move balances, NEAR+USDC offers, stale/quiet/expiry, FT failure re-credit, per-offerer cap, solvency I-M1/I-M3 incl. drained contract)

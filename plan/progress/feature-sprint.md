@@ -26,16 +26,16 @@
 ## Status
 | ID | Feature | Owner | Status | Notes |
 |---|---|---|---|---|
-| A1 | A social card per Satchel (OG/Twitter image) | web-share | in progress | |
-| A2 | Give by link (claim link) | web-flows | in progress | |
-| A3 | Empty the Satchel | web-flows | in progress | |
-| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | in progress | |
-| C1 | `history_digest` view | contract-sign | in progress | |
+| A1 | A social card per Satchel (OG/Twitter image) | web-share | **done on branch** (15:16Z) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
+| A2 | Give by link (claim link) | web-flows | in progress | flow + `/claim` built (15:17Z); Playwright next |
+| A3 | Empty the Satchel | web-flows | in progress | multi-chain drain with BTC batching built (15:22Z) |
+| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **done on branch** (15:26Z) | URI builders with vectors, QR, copy/share, `?chain=&amount=` link works without JS |
+| C1 | `history_digest` view | contract-sign | in progress | spec `docs/specs/C1-C2-C3-C7.md` (15:07Z); contract side done, TS mirror pending (15:18Z) |
 | C2 | ERC-20 USDC transfers on EVM | contract-sign | in progress | the UI comes in phase 2 |
 | C3 | More EVM testnets | contract-sign | in progress | the UI comes in phase 2 |
-| C4 | Offers | contract-market | in progress | the UI comes in phase 2 |
-| C5 | Spending allowance (delegated signer) | contract-allowance | in progress | the UI comes in phase 2 |
-| C6 | NEAR-side assets inside | contract-market | in progress | the UI comes in phase 2 |
+| C4 | Offers | contract-market | in progress | spec `docs/specs/C4-C6.md`; 26 unit + 15 sandbox (15:26Z) |
+| C5 | Spending allowance (delegated signer) | contract-allowance | in progress | spec `docs/specs/C5.md`; implemented, 115 unit (proptest), TS mirror + 55 shared vectors (15:17Z) |
+| C6 | NEAR-side assets inside | contract-market | in progress | with C4; the solvency invariants I-M1/I-M3 are tested |
 | C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign | in progress | the UI comes in phase 2 |
 
 ## Interface decisions fixed up front (so parallel branches agree)
@@ -101,3 +101,4 @@ it. Phase-2 UI work builds against those specs.
   changes, so nothing was lost. The empty worktrees and branches were removed, and the agents were respawned under
   the now-loaded role definitions (`satchel-contract` Opus/high, `satchel-web` Sonnet/medium). They are told to
   commit WIP at every milestone, so a session end can't lose work again.
+- 2026-10-29 15:27Z: all three contract specs are committed. Phase-2 UI agents start once each contract branch's TS mirror (core) is final, to avoid rework.
