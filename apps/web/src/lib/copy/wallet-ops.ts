@@ -91,7 +91,7 @@ export const walletOps = {
     chainTitle: (chain: string) => `Sending ${chain}`,
     chainDone: (chain: string) => `${chain} sent`,
     chainFailed: (chain: string) => `${chain} didn't go through`,
-    batchProgress: (i: number, total: number) => `Bitcoin send ${i} of ${total}`,
+    batchProgress: (i: number) => `Bitcoin send ${i} (more coins to sweep)`,
     skip: "Skip this chain",
     retryChain: "Try this chain again",
     allDoneTitle: "Everything's out",
