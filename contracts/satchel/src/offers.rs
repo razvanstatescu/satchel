@@ -284,6 +284,7 @@ impl Contract {
             fail_with(ERR_QUIET_PERIOD, &["acceptable at block ", &listable_at.to_string()].concat());
         }
         // ── all checks passed; one receipt from here ──
+        let s0 = env::storage_usage();
         let token_id = o.token_id.clone();
         if let Some(listing) = st.listing.take() {
             self.state.insert(token_id.clone(), st);
@@ -305,6 +306,9 @@ impl Contract {
         }
         .emit();
         self.payout(owner, o.currency, o.amount); // detached: never the returned promise
+        // M-01: last, after the NEAR payout is deducted. The freed offer record usually outweighs the new holder's
+        // entries (measured −194 B), so this only bites if an accept ever grows storage the buffer can't pay.
+        self.ensure_solvent(s0);
     }
 
     pub fn offer(&self, offer_id: u64) -> Option<OfferView> {

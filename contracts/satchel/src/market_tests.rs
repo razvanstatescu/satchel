@@ -56,11 +56,18 @@ struct Ctx {
     height: u64,
     now_ms: u64,
     results: Vec<PromiseResult>,
+    balance: u128,
 }
 
 impl Ctx {
+    /// The mock's account balance is fixed per call (it never accumulates deposits), so it defaults to far more than
+    /// any test escrows; the M-01 tests set it exactly with `bal`.
     fn new(predecessor: AccountId) -> Self {
-        Ctx { predecessor, deposit: 0, height: 1_000, now_ms: T0, results: vec![] }
+        Ctx { predecessor, deposit: 0, height: 1_000, now_ms: T0, results: vec![], balance: 1_000_000 * ONE_NEAR }
+    }
+    fn bal(mut self, b: u128) -> Self {
+        self.balance = b;
+        self
     }
     fn dep(mut self, d: u128) -> Self {
         self.deposit = d;
@@ -87,7 +94,7 @@ impl Ctx {
             .prepaid_gas(Gas::from_tgas(300))
             .block_height(self.height)
             .block_timestamp(self.now_ms * 1_000_000)
-            .account_balance(NearToken::from_near(100))
+            .account_balance(NearToken::from_yoctonear(self.balance))
             .build();
         testing_env!(ctx, near_sdk::test_vm_config(), RuntimeFeesConfig::test(), Default::default(), self.results);
     }
@@ -239,7 +246,11 @@ fn deposit_near_charges_storage_only_on_the_first_deposit() {
     assert_eq!(c.deposit_near(id.clone()).0, 7, "a top-up costs no storage");
     assert_eq!(usage(&mut c), s1);
     assert_eq!(inside(&c, &id)["near"], (credited + 7).to_string());
-    assert_eq!(totals(&c), json!({"inside_near": (credited + 7).to_string(), "offers_near": "0", "storage_credit": "0"}));
+    assert_eq!(
+        totals(&c),
+        json!({"inside_near": (credited + 7).to_string(), "offers_near": "0", "storage_credit": "0", "proceeds_near": "0",
+               "escrow_near": (credited + 7).to_string()})
+    );
 }
 
 #[test]
@@ -913,6 +924,160 @@ fn a_full_token_of_offers_costs_the_same_to_accept() {
     assert_eq!(c.offers_for(id.clone(), 0, 100).len(), 50, "pages are capped at MAX_PAGE");
 }
 
+// ── M-01: contract-paid storage is paid by the contract's own NEAR, never by escrow ──────────────
+// The mock never rolls state back after a panic, so every refused case runs on its own fresh contract. And
+// `testing_env!` keeps the storage but restarts the usage counter at the `VMContextBuilder` default on every call, so
+// a storage delta is only meaningful inside one call: flush first (`bal_for`), then measure in the call's own context.
+
+/// Where every mocked call's `env::storage_usage()` starts (the `VMContextBuilder` default, 300 KiB).
+const CALL_BASE_USAGE: u64 = 1024 * 300;
+
+/// Flushes pending writes, then returns the account balance at which the next call starts with exactly
+/// `escrow_near + spare` above its storage stake.
+fn bal_for(c: &mut Contract, spare: u128) -> u128 {
+    usage(c);
+    CALL_BASE_USAGE as u128 * byte_cost() + c.market.totals.escrow_near() + spare
+}
+/// Bytes the last call added (negative: freed), measured in its own context.
+fn grew(c: &mut Contract) -> i64 {
+    usage(c) as i64 - CALL_BASE_USAGE as i64
+}
+/// A 64-char account id, the longest NEAR allows: a new holder's entries are as large as they get.
+fn long_acc(first: char) -> AccountId {
+    acc(&format!("{first}{}.testnet", "x".repeat(55)))
+}
+/// alice holds `1` (2 NEAR inside, deposited by bob) and `2`; bob escrows a NEAR offer on `2` and a storage credit.
+fn m01_setup() -> (Contract, String) {
+    let mut c = setup();
+    let id = funded(&mut c, 2 * ONE_NEAR);
+    let other = mint_to(&mut c, alice());
+    near_offer(&mut c, bob(), &other, ONE_NEAR);
+    Ctx::new(bob()).dep(10 * MILLI).set();
+    c.prepay_storage(None);
+    (c, id)
+}
+/// `nft_transfer(1 → carol)` with `spare` yocto above escrow. Returns the panic (if any) and the storage it grew.
+fn m01_transfer(spare: u128) -> (Option<String>, i64) {
+    let (mut c, id) = m01_setup();
+    let b = bal_for(&mut c, spare);
+    Ctx::new(alice()).dep(1).bal(b).set();
+    let r = panic_msg(|| c.nft_transfer(carol(), id.clone(), None, None));
+    (r, grew(&mut c))
+}
+
+#[test]
+fn m01_transfer_growth_is_paid_by_the_buffer_never_by_escrow() {
+    let (ok, grew) = m01_transfer(ONE_NEAR);
+    assert_eq!(ok, None);
+    assert!((100..400).contains(&grew), "a new holder costs the contract {grew} B (S-02; sandbox: 150–250 B)");
+    // exactly enough spare NEAR passes (the attached yocto is part of the balance and stays); one yocto less would
+    // dip into escrow and is refused, naming the shortfall
+    let exact = grew as u128 * byte_cost() - 1;
+    assert_eq!(m01_transfer(exact).0, None);
+    let (r, _) = m01_transfer(exact - 1);
+    assert_eq!(r.as_deref(), Some("ERR_INSOLVENT: top the contract up by ≥ 1 yocto (a plain transfer); its own NEAR pays storage, never escrow"));
+    // with no spare at all, every kind of escrow counts: inside NEAR, the NEAR offer and the storage credit
+    let (mut c, id) = m01_setup();
+    let t = c.market.totals;
+    assert!(t.inside_near > 0 && t.offers_near > 0 && t.storage_credit > 0);
+    assert_eq!(t.escrow_near(), t.inside_near + t.offers_near + t.storage_credit + t.proceeds_near);
+    let b = bal_for(&mut c, 0);
+    Ctx::new(alice()).dep(1).bal(b).set();
+    expect_err(ERR_INSOLVENT, || c.nft_transfer(carol(), id.clone(), None, None));
+}
+
+#[test]
+fn m01_sales_to_a_new_holder_are_refused_when_only_escrow_could_pay() {
+    // NEAR buy by a 64-char holder: grows storage even though the listing is freed. The attached price is part of the
+    // balance during the call (the mock adds it, as the runtime does), and the payout takes it out before the guard.
+    let near_buy = |spare: u128| {
+        let (mut c, id) = m01_setup();
+        Ctx::new(alice()).dep(10 * MILLI).set();
+        let lid = c.list(id.clone(), U128(ONE_NEAR), Currency::Near);
+        let b = bal_for(&mut c, spare);
+        Ctx::new(long_acc('e')).dep(ONE_NEAR).bal(b).set();
+        let r = panic_msg(|| c.buy(id.clone(), lid, 0));
+        (r, grew(&mut c))
+    };
+    let (ok, grew) = near_buy(ONE_NEAR);
+    assert_eq!(ok, None);
+    assert!(grew > 0, "this sale grows storage by {grew} B");
+    assert_eq!(near_buy(grew as u128 * byte_cost()).0, None);
+    assert!(near_buy(grew as u128 * byte_cost() - 1).0.unwrap().starts_with("ERR_INSOLVENT: "));
+    // USDC buy through ft_on_transfer: the panic makes the FT refund 100 %
+    let usdc_buy = |spare: u128| {
+        let (mut c, id) = m01_setup();
+        Ctx::new(alice()).dep(10 * MILLI).set();
+        let lid = c.list(id.clone(), U128(4_000_000), Currency::Usdc);
+        let b = bal_for(&mut c, spare);
+        Ctx::new(usdc()).bal(b).set();
+        let msg = json!({"buy":{"token_id":id,"listing_id":lid,"expected_sig_count":0}}).to_string();
+        panic_msg(|| c.ft_on_transfer(long_acc('f'), U128(4_000_000), msg))
+    };
+    assert_eq!(usdc_buy(ONE_NEAR), None);
+    assert!(usdc_buy(0).unwrap().starts_with("ERR_INSOLVENT: "));
+}
+
+#[test]
+fn m01_calls_that_free_storage_never_trip_the_guard() {
+    // The balance covers the stake and the offer being paid out, but none of the remaining escrow: already short.
+    // An accept frees the offer record, so it can't make I-M1 worse and must still go through.
+    let (mut c, id) = m01_setup();
+    let oid = near_offer(&mut c, long_acc('g'), &id, ONE_NEAR);
+    let b = bal_for(&mut c, 0) - c.market.totals.escrow_near() + ONE_NEAR;
+    Ctx::new(alice()).dep(1).bal(b).set();
+    c.accept_offer(oid);
+    let g = grew(&mut c);
+    assert!(g < 0, "the accept freed storage ({g} B)");
+    assert_eq!(c.owner_of(&id), long_acc('g'));
+    // a NEAR buy by a short-id holder frees the listing and adds less than it frees
+    let (mut c, id) = m01_setup();
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(ONE_NEAR), Currency::Near);
+    let b = bal_for(&mut c, 0) - c.market.totals.escrow_near() + ONE_NEAR;
+    Ctx::new(carol()).dep(ONE_NEAR).bal(b).set();
+    c.buy(id.clone(), lid, 0);
+    let g = grew(&mut c);
+    assert!(g <= 0, "a short-id buyer adds less than the listing frees ({g} B)");
+    assert_eq!(c.owner_of(&id), carol());
+}
+
+#[test]
+fn m01_proceeds_near_follows_failed_payouts_and_withdrawals() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(3 * ONE_NEAR), Currency::Near);
+    Ctx::new(bob()).dep(3 * ONE_NEAR).set();
+    c.buy(id.clone(), lid, 0);
+    assert_eq!(totals(&c)["proceeds_near"], "0", "the payout is in flight, not owed");
+    let near_payout = |c: &mut Contract, results: Vec<PromiseResult>| {
+        Ctx::new(me()).results(results).set();
+        c.on_payout(alice(), Currency::Near, U128(3 * ONE_NEAR));
+    };
+    near_payout(&mut c, vec![PromiseResult::Successful(vec![])]);
+    assert_eq!(totals(&c)["proceeds_near"], "0");
+    near_payout(&mut c, vec![]); // not a callback of one payout (S-13): a no-op
+    assert_eq!(totals(&c)["proceeds_near"], "0");
+    near_payout(&mut c, vec![PromiseResult::Failed]);
+    assert_eq!(totals(&c)["proceeds_near"], (3 * ONE_NEAR).to_string());
+    assert_eq!(totals(&c)["escrow_near"], (3 * ONE_NEAR).to_string());
+    // failed USDC payouts are owed in USDC (I-M3), never counted as NEAR
+    Ctx::new(me()).results(vec![PromiseResult::Failed]).set();
+    c.on_payout(alice(), Currency::Usdc, U128(5_000_000));
+    assert_eq!(totals(&c)["proceeds_near"], (3 * ONE_NEAR).to_string());
+    // withdraw_proceeds takes it out of the total before the transfer; a failed transfer puts it back
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_proceeds(Currency::Near);
+    assert_eq!(transfers(), vec![(alice(), 3 * ONE_NEAR)]);
+    assert_eq!(totals(&c)["proceeds_near"], "0");
+    near_payout(&mut c, vec![PromiseResult::Failed]);
+    assert_eq!(totals(&c)["proceeds_near"], (3 * ONE_NEAR).to_string());
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_proceeds(Currency::Usdc);
+    assert_eq!(totals(&c)["proceeds_near"], (3 * ONE_NEAR).to_string(), "a USDC withdrawal leaves the NEAR total alone");
+}
+
 // ── IdIndex: swap-remove property ──────────────────────────────────────────────────────────────
 
 /// Case count: `PROPTEST_CASES` if set (deep runs, docs/security/fuzzing.md §8), else the fast CI default.
@@ -965,6 +1130,8 @@ enum Op {
     Cancel { pick: usize, by_offerer: bool, fail: bool },
     Accept { pick: usize, fail: bool },
     Transfer { t: usize, to: usize },
+    /// M-01: `withdraw_proceeds(near)`, the only path that lowers `proceeds_near` (a failed payout raises it again).
+    WithdrawProceeds { who: usize, fail: bool },
     Sign { t: usize },
     Tick,
 }
@@ -982,6 +1149,7 @@ fn op_strategy() -> impl Strategy<Value = Op> {
         (t.clone(), who.clone(), 1u128..10_000_000).prop_map(|(t, who, amount)| Op::OfferUsdc { t, who, amount }),
         (any::<usize>(), any::<bool>(), any::<bool>()).prop_map(|(pick, by_offerer, fail)| Op::Cancel { pick, by_offerer, fail }),
         (any::<usize>(), any::<bool>()).prop_map(|(pick, fail)| Op::Accept { pick, fail }),
+        (who.clone(), any::<bool>()).prop_map(|(who, fail)| Op::WithdrawProceeds { who, fail }),
         (t.clone(), who).prop_map(|(t, to)| Op::Transfer { t, to }),
         t.prop_map(|t| Op::Sign { t }),
         Just(Op::Tick),
@@ -1122,6 +1290,21 @@ proptest! {
                     Ctx::new(owner).dep(1).at(height).set();
                     c.nft_transfer(people[to].clone(), id, None, None);
                 }
+                Op::WithdrawProceeds { who, fail } => {
+                    let p = people[who].clone();
+                    let owed = m.proceeds.get(&(p.clone(), Currency::Near)).copied().unwrap_or(0);
+                    Ctx::new(p.clone()).dep(1).at(height).set();
+                    let r = panic_msg(|| c.withdraw_proceeds(Currency::Near));
+                    if owed == 0 {
+                        prop_assert!(r.is_some(), "nothing owed");
+                        continue;
+                    }
+                    prop_assert_eq!(r, None);
+                    m.proceeds.insert((p.clone(), Currency::Near), 0);
+                    Ctx::new(me()).at(height).results(vec![if fail { PromiseResult::Failed } else { PromiseResult::Successful(vec![]) }]).set();
+                    c.on_payout(p.clone(), Currency::Near, U128(owed));
+                    if fail { *m.proceeds.entry((p, Currency::Near)).or_default() += owed; }
+                }
                 Op::Sign { t } => {
                     let id = toks[t].clone();
                     if c.token_state(&id).listing.is_some() { continue; }
@@ -1151,6 +1334,9 @@ proptest! {
             prop_assert_eq!(tv.offers_near.0, offers_near);
             let credits: u128 = people.iter().map(|p| c.storage_credit_of(p.clone()).0).sum();
             prop_assert_eq!(tv.storage_credit.0, credits);
+            let proceeds_near: u128 = m.proceeds.iter().filter(|(k, _)| k.1 == Currency::Near).map(|(_, v)| *v).sum();
+            prop_assert_eq!(tv.proceeds_near.0, proceeds_near);
+            prop_assert_eq!(tv.escrow_near.0, sum_near + offers_near + credits + proceeds_near);
             for p in &people {
                 let mut by: Vec<u64> = c.offers_by(p.clone(), 0, 50).into_iter().map(|o| o.id).collect();
                 by.sort();

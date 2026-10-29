@@ -244,14 +244,18 @@ pub(crate) mod promise {
 #[near]
 impl NonFungibleTokenCore for Contract {
     /// Owner only (checked here first, R-16); refused while listed; refuses the contract itself, the MPC and USDC (R-18).
+    /// NEP-171: exactly 1 yocto, so the contract pays a new holder's storage from its own NEAR, never from escrow
+    /// (M-01: `ERR_INSOLVENT` if that buffer is exhausted).
     #[payable]
     fn nft_transfer(&mut self, receiver_id: AccountId, token_id: TokenId, approval_id: Option<u64>, memo: Option<String>) {
         let owner = self.owner_of(&token_id);
         ensure(env::predecessor_account_id() == owner, ERR_NOT_OWNER);
         ensure(self.token_state(&token_id).listing.is_none(), ERR_LISTED);
         self.ensure_receiver(&receiver_id);
+        let s0 = env::storage_usage();
         self.tokens.nft_transfer(receiver_id, token_id.clone(), approval_id, memo);
         self.on_owner_change(&token_id, "transfer");
+        self.ensure_solvent(s0);
     }
 
     /// Disabled in v1 (D-07). Present so NEP-171 tooling gets a clear error instead of MethodNotFound.
