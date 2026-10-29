@@ -17,7 +17,8 @@
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "check:rpc": "node scripts/check-no-near-org.mjs",
-    "fonts:card": "node scripts/build-card-fonts.mjs"
+    "fonts:card": "node scripts/build-card-fonts.mjs",
+    "fonts:og": "node scripts/build-og-fonts.mjs"
   },
   "dependencies": {
     "@hot-labs/near-connect": "0.11.4",
