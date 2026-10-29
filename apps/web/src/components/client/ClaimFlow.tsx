@@ -43,8 +43,7 @@ export function ClaimFlow() {
   };
 
   useEffect(() => {
-    // deferred (not called synchronously in the effect body, react-hooks/set-state-in-effect): reads the fragment once.
-    const t = setTimeout(() => {
+    const read = () => {
       const k = parseClaimFragment(window.location.hash);
       if (!k) {
         setPhase(window.location.hash ? "invalid" : "missing");
@@ -52,8 +51,15 @@ export function ClaimFlow() {
       }
       setKey(k);
       void load(k);
-    }, 0);
-    return () => clearTimeout(t);
+    };
+    // deferred (not called synchronously in the effect body, react-hooks/set-state-in-effect): reads the fragment
+    // on mount, and again on a same-document fragment change (e.g. the hash alone changes without a full reload).
+    const t = setTimeout(read, 0);
+    window.addEventListener("hashchange", read);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("hashchange", read);
+    };
   }, []);
 
   const onClaim = async () => {

@@ -42,6 +42,8 @@ interface SimState {
   proceeds: Record<string, { near?: string; usdc?: string }>;
   /** A2 Give by link: NEAR yocto held by fresh implicit (claim) accounts. Regular accounts are never tracked here. */
   near: Record<string, string>;
+  /** Implicit accounts ever funded (A2): existence persists even after a claim drains the balance, like real NEAR. */
+  funded: Record<string, true>;
 }
 
 export interface SimSale {
@@ -57,7 +59,7 @@ export interface SimSale {
   payoutOk: boolean;
 }
 
-const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {}, near: {} });
+const empty = (): SimState => ({ startedAt: Date.now(), records: [], owners: {}, minted: [], delisted: [], listed: {}, broadcastAttempts: {}, nextListingId: 6, sales: {}, proceeds: {}, near: {}, funded: {} });
 
 function read(): SimState {
   if (typeof window === "undefined") return empty();
@@ -200,6 +202,7 @@ export function simFundNear(accountId: string, amountYocto: string) {
   const s = read();
   const cur = BigInt(s.near[accountId] ?? "0");
   s.near[accountId] = (cur + BigInt(amountYocto)).toString();
+  s.funded[accountId] = true;
   write(s);
 }
 
@@ -207,8 +210,9 @@ export function simNearBalance(accountId: string): string {
   return read().near[accountId] ?? "0";
 }
 
+/** Existence persists once funded, even after a claim drains the balance (like a real NEAR account). */
 export function simImplicitExists(accountId: string): boolean {
-  return BigInt(simNearBalance(accountId)) > 0n;
+  return !!read().funded[accountId];
 }
 
 /** The claim: every Satchel this implicit account owns moves to `to`, and its leftover NEAR goes along too. */

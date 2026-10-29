@@ -11,7 +11,8 @@ import { Button, Icon, TextInput } from "@/components/ui";
 import { copy, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { SATCHEL_CONTRACT } from "@/lib/config";
 import { formatAmount, type Ticker } from "@/lib/format";
-import { calls } from "@/lib/near/contract";
+import { calls, contractViews } from "@/lib/near/contract";
+import { dataSource } from "@/lib/data/source";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import type { SigRecordView } from "@/lib/near/types";
 import { callWallet } from "@/lib/signing/runner";
@@ -59,6 +60,10 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
   const [currentId, setCurrentId] = useState<string | null>(null);
   const intent = useIntent(currentId);
   const runToken = useRef(0);
+  const recsRef = useRef<SigRecordView[]>(records);
+  // mirrors `attempts` but updated synchronously (state updates don't apply before the very next prepareCurrent
+  // call in the same effect tick, so the catch below must not trust the closed-over `attempts` state).
+  const attemptsRef = useRef(0);
 
   const chain = chains[chainIdx];
   const addresses = live.addresses;
@@ -85,13 +90,18 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     setPrepError(null);
     try {
       const to = val[chain]?.tier !== "error" ? (val[chain] as Exclude<Validation, { tier: "error" }>).normalized : (addr[chain] ?? "").trim();
+      // re-read the sig records right before preparing: an earlier batch THIS run adds records (the BTC
+      // forbidden-txid rule and the EVM nonce-gap rule both need to see them, or a later batch would collide).
+      const views = contractViews(dataSource().view);
+      const s = await views.satchel(snap.token_id).catch(() => null);
+      if (s) recsRef.current = await views.allSigRecords(snap.token_id, s.sig_count).catch(() => recsRef.current);
       const mod = await import("@/lib/chains/send");
-      const p = await mod.prepareSend({ tokenId: snap.token_id, chain, to, amount: "max", records });
+      const p = await mod.prepareSend({ tokenId: snap.token_id, chain, to, amount: "max", records: recsRef.current });
       if (runToken.current !== my) return;
       setPrepared(p);
     } catch (e) {
       if (runToken.current !== my) return;
-      if (attempts > 0) {
+      if (attemptsRef.current > 0) {
         // already sent at least one batch on this chain this run: no more to sweep, move on quietly.
         advanceChain();
         return;
@@ -107,6 +117,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     setPrepError(null);
     setCurrentId(null);
     setAttempts(0);
+    attemptsRef.current = 0;
     setChainIdx((i) => {
       const next = i + 1;
       if (next >= chains.length) setStep("done");
@@ -134,10 +145,16 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     const t = setTimeout(() => {
       setResults((r) => [...r, { chain: intent.chain, batch: attempts + 1, ok: true, amount: intent.display?.amount, intentId: intent.id }]);
       setAttempts((n) => n + 1);
+      attemptsRef.current += 1;
       setCurrentId(null);
       setPrepared(null);
-      const my = ++runToken.current;
-      void prepareCurrent(my);
+      // only BTC can need a second sweep (more than MAX_BTC_INPUTS coins); EVM and SOL always drain in one send.
+      if (intent.chain === "btc") {
+        const my = ++runToken.current;
+        void prepareCurrent(my);
+      } else {
+        advanceChain();
+      }
     }, 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- prepareCurrent closes over the latest state it needs
