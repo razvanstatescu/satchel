@@ -126,3 +126,11 @@ it. Phase-2 UI work builds against those specs.
 - 17:05Z: a Claude authentication outage stopped web-sign, web-market and web-allowance, and two spawns (reviewer, docs) failed on worktree races. Empty worktrees were removed; web-allowance (4 commits) and web-market (uncommitted data layer) were resumed and told to commit, then merge main; reviewer (Opus), web-sign (Sonnet) and docs-spec (Sonnet, kb/90 update) were respawned from e985d82. The full verification on main (wasm, sandbox, e2e) is re-running.
 - 17:15–17:30Z: web-allowance and web-market reported file writes and reads refused with "the user doesn't want to take this action … STOP". The orchestrator paused resumes and asked Razvan.
 - 17:40Z: Razvan said "continue". Session restart #4. All five agents resumed with the PATH fix (this session's shell lacked cargo, node and pnpm): web-allowance (fd6ce38 + 2 uncommitted), web-market (44a0ae9 + 4 uncommitted), reviewer, web-sign and docs-spec (8 uncommitted). The main verification (wasm, sandbox, e2e) is re-running with PATH set.
+- 17:50Z: web-sign handed its build to a nested satchel-web agent (running on `feat/ui-sign`, nothing committed yet). Its survey found web gaps on main that the C2/C3/C7 UI must close:
+  - `clean-live.ts` passes only Sepolia `evm` sources, so records on the other three chains would be "unknown" and block Buy;
+  - `Clean.tsx` drops "message" items;
+  - `send.ts`, `adapter.ts`, the retry intents and `view.allZero()` are Sepolia-only;
+  - `buildEip681` hard-codes 11155111;
+  - the `notCoveredList` copy says three networks.
+
+  **Release gate:** these must be fixed before the web deploy switches to a contract that has C2, C3 or C7.

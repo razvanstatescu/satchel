@@ -42,3 +42,4 @@
 - 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (e985d82, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
 - 2026-10-29T17:40Z [review] start: branch review/sprint @ e985d82, reviewing bff1397..e985d82 (C1-C7)
 - 2026-10-29T17:40Z [orchestrator] Razvan: continue. Restart #4: resumed web-allowance, web-market, reviewer, web-sign, docs-spec with the PATH fix; main verification re-running
+- 2026-10-29T17:41Z [orchestrator] web-sign delegated to a nested agent; web multi-chain gaps recorded as a release gate in the tracker
