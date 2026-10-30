@@ -245,3 +245,17 @@ it. Phase-2 UI work builds against those specs.
     - A pick scrolls the destination into view on phones.
     - The tiles stay real links, so a new tab or no JavaScript still works.
   - Web unit 477, Playwright **213/213**.
+- 2026-10-30 (Razvan's real-wallet notes):
+  - **Send:** without `?chain=` it opens on the first coin the Satchel holds, including the right EVM network and coin. An empty chain's "Nothing to send yet" now offers "Send ETH on Base Sepolia"-style switches to the coins it does hold.
+  - **Take everything out:** the plan now covers every holding (BTC; USDC then ETH on each EVM network; SOL; NEAR, USDC and wNEAR inside, back to the owner's account).
+    - The plan is frozen at Review, so balance updates can't shift the queue (a latent bug).
+    - On each EVM network the ETH sweep waits for the USDC send to confirm.
+    - USDC on a network with no ETH for the fee is named, not planned.
+  - **Stuck popups:** a reused (`<Activity>`) flow kept its closing flag and exit animation (an invisible panel over the scrim). Flows now reset on every show, and the background lock and scroll lock are reference-counted, so the last flow out always unlocks.
+  - **"Satchel doesn't exist" after mint:** a missing snapshot was cached for 15 s. It now gets `revalidate: 0`; the prerendered social-card route keeps its own read.
+  - **Loading feedback:** in-app links now show feedback at once (direct loads keep their server-rendered facts and no Suspense):
+    - a top progress bar;
+    - a skeleton popup naming the popup and what it's reading;
+    - a tab-area skeleton for Activity, Transactions and Sell;
+    - a page-area skeleton for Market, My Satchels and others.
+  - Web unit 481, Playwright **221/221**.

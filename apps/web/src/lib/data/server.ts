@@ -52,12 +52,29 @@ export async function getLock(): Promise<LockRead> {
   }
 }
 
-export async function getSatchelSnapshot(id: string): Promise<SatchelSnapshot | null> {
+/** For prerendered routes (the social card): the plain 15 s cache, a missing id included (they can't hold an uncached
+ * read, and their fallback image for an unknown id is fine to keep briefly). */
+export async function getSatchelSnapshotStatic(id: string): Promise<SatchelSnapshot | null> {
   "use cache";
   cacheLife({ revalidate: 15, expire: 3600 });
   if (!isTokenId(id)) return null;
   const [config, lock] = await Promise.all([getConfig(), getLock()]);
   return buildSnapshot(id, dataSource(), { config, lock }, Date.now());
+}
+
+/** The cached read. A found Satchel is kept 15 s; a missing one is not kept at all (`revalidate: 0`), so a Satchel
+ * minted a moment ago, or asked for by a prefetch just before its mint landed, never stays a 404. */
+export async function getSatchelSnapshot(id: string): Promise<SatchelSnapshot | null> {
+  "use cache";
+  if (!isTokenId(id)) {
+    cacheLife({ revalidate: 15, expire: 3600 });
+    return null;
+  }
+  const [config, lock] = await Promise.all([getConfig(), getLock()]);
+  const s = await buildSnapshot(id, dataSource(), { config, lock }, Date.now());
+  if (s) cacheLife({ revalidate: 15, expire: 3600 });
+  else cacheLife({ stale: 0, revalidate: 0, expire: 1 });
+  return s;
 }
 
 export async function getContractFacts(): Promise<ContractFacts> {

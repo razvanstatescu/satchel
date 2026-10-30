@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { ART, S_PATH } from "@/components/brand/art";
 import { copy } from "@/lib/copy";
-import { getSatchelSnapshot } from "@/lib/data/server";
+import { getSatchelSnapshotStatic as getSatchelSnapshot } from "@/lib/data/server";
 import { buildOgCardProps, type OgCardProps } from "@/lib/og";
 import { OG_FONTS } from "@/lib/og-fonts.generated";
 

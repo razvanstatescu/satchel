@@ -3,74 +3,115 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, CircleX, Info, LoaderCircle, Lock, PackageOpen, Snowflake, TriangleAlert, Wallet } from "lucide-react";
 import { ChainCharm } from "@/components/brand/ChainCharm";
+import { CoinIcon } from "@/components/brand/CoinIcon";
 import { ConnectButton } from "@/components/client/ConnectButton";
 import { FlowShell } from "@/components/client/FlowShell";
 import { SigningActions, SigningProgress } from "@/components/client/SigningProgress";
 import { useViewer } from "@/components/client/SatchelPage";
 import { Button, Icon, TextInput } from "@/components/ui";
-import { copy, NETWORK_LABEL, TICKER } from "@/lib/copy";
+import { copy, errorCopy, NETWORK_LABEL } from "@/lib/copy";
 import { SATCHEL_CONTRACT } from "@/lib/config";
-import { formatAmount, type Ticker } from "@/lib/format";
-import { calls, contractViews } from "@/lib/near/contract";
+import { refreshSnapshot } from "@/lib/data/client";
 import { dataSource } from "@/lib/data/source";
 import type { SatchelSnapshot } from "@/lib/data/types";
+import { evmNetworkName } from "@/lib/evm-networks";
+import { formatAmount, truncateAddress } from "@/lib/format";
+import { hasCoins, holdings, type Holding } from "@/lib/holdings";
+import { calls, contractViews, marketCalls } from "@/lib/near/contract";
+import { runCall } from "@/lib/near/run-call";
 import type { SigRecordView } from "@/lib/near/types";
+import { useWallet } from "@/lib/near/wallet";
 import { callWallet } from "@/lib/signing/runner";
 import { startRunner, useIntent } from "@/lib/signing/client";
 import { intentStore, newIntentId } from "@/lib/signing/store";
-import { useWallet } from "@/lib/near/wallet";
 import { validateBtc, validateEvm, validateSol, type Validation } from "@/lib/validate";
-import { balanceBase, chainName, UI_CHAINS, type UiChain } from "@/lib/view";
+import { chainName, UI_CHAINS, type UiChain } from "@/lib/view";
 import type { PreparedSend } from "@/lib/chains/send";
 
 /**
- * Empty the Satchel (A3, plan/feature-ideas.md A3; kb/90 §5.11, §8.9): one chain at a time, reusing the Send
- * building blocks (`prepareSend`, `callWallet`, `SigningProgress`). Addresses → Review → run: each chain gets its
- * own pending intent (the same store Send and the Wallet tab read), so a failure on one never loses another's
- * state, and the Satchel's Activity still shows every send this flow made.
+ * Empty the Satchel (A3; kb/90 §5.11, §8.9): every coin it holds, wherever it is (lib/holdings.ts), one send at a time,
+ * reusing the Send building blocks (`prepareSend`, `callWallet`, `SigningProgress`). Addresses (one per chain: the
+ * Ethereum address takes every EVM testnet's ETH and USDC) → Review (the plan is frozen here, so balances that update
+ * mid-run can't shift it) → run. On each EVM network USDC goes first, because its fee is paid in that network's ETH, and
+ * the ETH sweep waits until the USDC send has confirmed. Coins held inside go back to the owner's NEAR account. USDC on
+ * a network without ETH for the fee can't move and is named in the review instead. Each send is its own pending
+ * intent, so a failure on one never loses another's state.
  */
 
 type Step = "form" | "review" | "running" | "done";
 
-interface JobResult {
-  chain: UiChain;
-  batch: number;
-  ok: boolean;
-  amount?: string;
-  intentId: string;
+/** One send in the plan: a coin at one of the Satchel's addresses (a `sign_for`), or a coin inside (a withdrawal). */
+interface Job {
+  key: string;
+  h: Holding;
+  /** "BTC on Bitcoin testnet4", "USDC on Base Sepolia", "NEAR inside" */
+  label: string;
 }
 
-const ORDER: UiChain[] = ["btc", "evm", "sol"];
+interface JobResult {
+  key: string;
+  label: string;
+  ok: boolean;
+  amount?: string;
+}
+
+const jobLabel = (h: Holding) => (h.place === "inside" ? copy.inside.row(h.ticker) : `${h.ticker} on ${h.networkName}`);
+
+/** The plan: every holding with coins, USDC before ETH on each EVM network; inside coins last. USDC with no ETH on
+ * its network for the fee is left out (`stuck`). */
+export function emptyPlan(list: Holding[]): { jobs: Job[]; stuck: Holding[] } {
+  const held = list.filter(hasCoins);
+  const ethOn = (chainId: number | null) => held.some((h) => h.coin === "ETH" && h.chainId === chainId);
+  const stuck = held.filter((h) => h.place === "chain" && h.coin === "USDC" && !ethOn(h.chainId));
+  const movable = held.filter((h) => !stuck.includes(h));
+  const rank = (h: Holding) => (h.place === "inside" ? 3 : h.chain === "sol" ? 2 : h.chain === "evm" ? 1 : 0);
+  const ordered = [...movable].sort((a, b) => {
+    const r = rank(a) - rank(b);
+    if (r) return r;
+    if (a.chain === "evm" && b.chain === "evm" && a.chainId !== b.chainId) return list.indexOf(a) - list.indexOf(b);
+    if (a.chain === "evm" && b.chain === "evm") return a.coin === "USDC" ? -1 : b.coin === "USDC" ? 1 : 0;
+    return list.indexOf(a) - list.indexOf(b);
+  });
+  return { jobs: ordered.map((h) => ({ key: h.key, h, label: jobLabel(h) })), stuck };
+}
+
+const ADDRESS_CHAINS: UiChain[] = ["btc", "evm", "sol"];
+
+/** Module scope, as SendFlow's `wallClock`: the react-hooks purity rule flags a `Date.now()` in a component body. */
+const wallClock = () => Date.now();
 
 export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: SigRecordView[] }) {
   const { live, isOwner, accountId } = useViewer(snap);
   const { wallet, ready } = useWallet();
   const closeHref = `/s/${snap.token_id}`;
-  const chains = ORDER.filter((c) => UI_CHAINS.includes(c) && (balanceBase(live, c) ?? 0n) > 0n);
+  const draft = emptyPlan(holdings(live));
 
   const [step, setStep] = useState<Step>("form");
+  const [plan, setPlan] = useState<Job[]>([]);
   const [addr, setAddr] = useState<Partial<Record<UiChain, string>>>({});
   const [val, setVal] = useState<Partial<Record<UiChain, Validation>>>({});
-  const [chainIdx, setChainIdx] = useState(0);
-  const [attempts, setAttempts] = useState(0); // successful batches sent so far for the CURRENT chain
+  const [jobIdx, setJobIdx] = useState(0);
+  const [attempts, setAttempts] = useState(0); // successful batches so far for the CURRENT job (BTC can need several)
   const [results, setResults] = useState<JobResult[]>([]);
   const [prepared, setPrepared] = useState<PreparedSend | null>(null);
   const [prepError, setPrepError] = useState<string | null>(null);
   const [preparing, setPreparing] = useState(false);
+  const [insidePhase, setInsidePhase] = useState<"idle" | "wallet" | "doing">("idle");
   const [currentId, setCurrentId] = useState<string | null>(null);
   const intent = useIntent(currentId);
   const runToken = useRef(0);
   const recsRef = useRef<SigRecordView[]>(records);
-  // mirrors `attempts` but updated synchronously (state updates don't apply before the very next prepareCurrent
-  // call in the same effect tick, so the catch below must not trust the closed-over `attempts` state).
   const attemptsRef = useRef(0);
 
-  const chain = chains[chainIdx];
+  // the address inputs the plan needs (inside coins need none: they go to the owner's NEAR account)
+  const jobsNow = step === "form" ? draft.jobs : plan;
+  const chainsNeeded = ADDRESS_CHAINS.filter((c) => UI_CHAINS.includes(c) && jobsNow.some((j) => j.h.chain === c));
+  const job = plan[jobIdx];
   const addresses = live.addresses;
 
   // debounced validation per chain text input
   useEffect(() => {
-    const timers = chains.map((c) => {
+    const timers = chainsNeeded.map((c) => {
       const text = (addr[c] ?? "").trim();
       if (!text) return null;
       return setTimeout(async () => {
@@ -80,30 +121,38 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     });
     return () => timers.forEach((t) => t && clearTimeout(t));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- re-validate only when the relevant text changes
-  }, [chains.map((c) => addr[c]).join("|")]);
+  }, [chainsNeeded.map((c) => addr[c]).join("|")]);
 
-  const formOk = chains.length > 0 && chains.every((c) => val[c]?.tier !== "error" && !!val[c] && (addr[c] ?? "").trim());
+  const formOk = draft.jobs.length > 0 && chainsNeeded.every((c) => val[c]?.tier !== "error" && !!val[c] && (addr[c] ?? "").trim());
+  const toFor = (c: UiChain) => (val[c] && val[c]!.tier !== "error" ? (val[c] as Exclude<Validation, { tier: "error" }>).normalized : (addr[c] ?? "").trim());
 
   const prepareCurrent = async (my: number) => {
-    if (!chain) return;
+    if (!job || job.h.place === "inside") return;
+    const h = job.h;
     setPreparing(true);
     setPrepError(null);
     try {
-      const to = val[chain]?.tier !== "error" ? (val[chain] as Exclude<Validation, { tier: "error" }>).normalized : (addr[chain] ?? "").trim();
-      // re-read the sig records right before preparing: an earlier batch THIS run adds records (the BTC
-      // forbidden-txid rule and the EVM nonce-gap rule both need to see them, or a later batch would collide).
+      // re-read the sig records right before preparing: an earlier send THIS run adds records (the BTC
+      // forbidden-txid rule and the EVM nonce-gap rule both need to see them, or a later send would collide).
       const views = contractViews(dataSource().view);
       const s = await views.satchel(snap.token_id).catch(() => null);
       if (s) recsRef.current = await views.allSigRecords(snap.token_id, s.sig_count).catch(() => recsRef.current);
       const mod = await import("@/lib/chains/send");
-      const p = await mod.prepareSend({ tokenId: snap.token_id, chain, to, amount: "max", records: recsRef.current });
+      const p = await mod.prepareSend({
+        tokenId: snap.token_id,
+        chain: h.chain!,
+        to: toFor(h.chain!),
+        amount: "max",
+        records: recsRef.current,
+        ...(h.chain === "evm" ? { evmChainId: h.chainId!, asset: h.coin === "USDC" ? ("usdc" as const) : ("eth" as const) } : {}),
+      });
       if (runToken.current !== my) return;
       setPrepared(p);
     } catch (e) {
       if (runToken.current !== my) return;
       if (attemptsRef.current > 0) {
-        // already sent at least one batch on this chain this run: no more to sweep, move on quietly.
-        advanceChain();
+        // already sent at least one batch for this coin this run: nothing more to sweep, move on quietly.
+        advance();
         return;
       }
       setPrepError(e instanceof Error ? e.message : String(e));
@@ -112,82 +161,117 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     }
   };
 
-  const advanceChain = () => {
+  const advance = () => {
     setPrepared(null);
     setPrepError(null);
     setCurrentId(null);
     setAttempts(0);
+    setInsidePhase("idle");
     attemptsRef.current = 0;
-    setChainIdx((i) => {
-      const next = i + 1;
-      if (next >= chains.length) setStep("done");
-      return next;
-    });
+    const next = jobIdx + 1;
+    setJobIdx(next);
+    if (next >= plan.length) {
+      setStep("done");
+      refreshSnapshot(snap.token_id);
+    }
   };
 
-  // enter "running": prepare the first chain; also re-prepare whenever we move to a new chain
+  // enter "running": prepare the first send; also re-prepare whenever we move to the next one
   useEffect(() => {
-    if (step !== "running" || !chain) return;
+    if (step !== "running" || !job) return;
     const my = ++runToken.current;
     void prepareCurrent(my);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately only on step/chainIdx change
-  }, [step, chainIdx]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deliberately only on step/jobIdx change
+  }, [step, jobIdx]);
 
-  // react to the active intent reaching a terminal stage (an effect, not render: this does real work)
+  // the active intent reached a terminal stage (an effect, not render: this does real work)
   const seenStage = useRef<string | null>(null);
   useEffect(() => {
-    if (!intent) return;
+    if (!intent || !job) return;
     const key = `${intent.id}:${intent.stage}`;
     if (key === seenStage.current) return;
     seenStage.current = key;
-    if (intent.stage !== "sent" && intent.stage !== "confirmed") return;
-    // deferred (not synchronous in the effect body, react-hooks/set-state-in-effect): a batch just landed.
+    // a USDC send waits for "confirmed" when ETH on the same network comes next (its fee must be spent first, or the
+    // ETH sweep would overspend); everything else moves on at "sent"
+    const next = plan[jobIdx + 1];
+    const waitConfirm = job.h.coin === "USDC" && next?.h.chain === "evm" && next.h.chainId === job.h.chainId;
+    if (!(intent.stage === "confirmed" || (intent.stage === "sent" && !waitConfirm))) return;
     const t = setTimeout(() => {
-      setResults((r) => [...r, { chain: intent.chain, batch: attempts + 1, ok: true, amount: intent.display?.amount, intentId: intent.id }]);
+      setResults((r) => [...r, { key: job.key, label: job.label, ok: true, amount: intent.display?.amount }]);
       setAttempts((n) => n + 1);
       attemptsRef.current += 1;
       setCurrentId(null);
       setPrepared(null);
-      // only BTC can need a second sweep (more than MAX_BTC_INPUTS coins); EVM and SOL always drain in one send.
-      if (intent.chain === "btc") {
+      // only BTC can need a second sweep (more than MAX_BTC_INPUTS coins); every other coin drains in one send.
+      if (job.h.chain === "btc") {
         const my = ++runToken.current;
         void prepareCurrent(my);
       } else {
-        advanceChain();
+        advance();
       }
     }, 0);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- prepareCurrent closes over the latest state it needs
   }, [intent?.id, intent?.stage]);
 
-  const onSendChain = () => {
-    if (!prepared || !wallet || !accountId || currentId) return;
+  const onSend = () => {
+    if (!job || !wallet || !accountId) return;
+    if (job.h.place === "inside") return onWithdraw();
+    if (!prepared || currentId) return;
+    const h = job.h;
     const id = newIntentId();
     const store = intentStore();
+    const network = h.chain === "evm" ? evmNetworkName(h.chainId!) : NETWORK_LABEL[h.chain!];
     store.upsert({
       id,
       tokenId: snap.token_id,
       chain: prepared.chain,
-      createdAt: Date.now(),
+      createdAt: wallClock(),
       contract: SATCHEL_CONTRACT,
       sigCountBefore: live.sig_count,
       heightBefore: 0,
       unsigned: prepared.unsigned,
       payloadHashes: prepared.payloadHashes,
       evmNonce: prepared.evmNonce,
+      evmChainId: prepared.evmChainId,
+      asset: prepared.asset,
       stage: "preparing",
-      display: { amount: formatAmount(prepared.amount, TICKER[prepared.chain] as Ticker), to: prepared.to, toShort: prepared.to, network: NETWORK_LABEL[prepared.chain] },
+      display: { amount: formatAmount(prepared.amount, h.ticker), to: prepared.to, toShort: truncateAddress(prepared.to), network },
       signerId: accountId,
     });
-    store.dispatch(id, { type: "PERSISTED", now: Date.now() });
+    store.dispatch(id, { type: "PERSISTED", now: wallClock() });
     setCurrentId(id);
     callWallet(id, wallet, { ...calls.signFor(snap.token_id, prepared.request), signerId: accountId } as never, { store });
     startRunner(id);
   };
 
-  const onSkipChain = () => {
-    if (intent) setResults((r) => [...r, { chain: intent.chain, batch: attempts + 1, ok: false, intentId: intent.id }]);
-    advanceChain();
+  /** A coin inside: the owner's withdrawal (to the connected account), one NEAR transaction. */
+  const onWithdraw = () => {
+    if (!job || !wallet || !accountId || insidePhase !== "idle") return;
+    const h = job.h;
+    const amount = h.amount ?? 0n;
+    const tx = h.coin === "NEAR" ? marketCalls.withdrawNear(snap.token_id, amount) : marketCalls.withdrawFt(snap.token_id, h.ft!, amount);
+    setPrepError(null);
+    void runCall(wallet, tx, accountId, (s) => setInsidePhase(s === "wallet" ? "wallet" : "doing")).then((r) => {
+      setInsidePhase("idle");
+      if (r.ok) {
+        setResults((rs) => [...rs, { key: job.key, label: job.label, ok: true, amount: formatAmount(amount, h.ticker) }]);
+        advance();
+      } else if ("cancelled" in r) setPrepError(copy.sell.cancelled);
+      else setPrepError(errorCopy(r.failure.code, { id: snap.token_id }));
+    });
+  };
+
+  const onSkip = () => {
+    if (job) setResults((r) => [...r, { key: job.key, label: job.label, ok: false }]);
+    advance();
+  };
+
+  const start = () => {
+    setPlan(draft.jobs);
+    setJobIdx(0);
+    setResults([]);
+    setStep("running");
   };
 
   let body: ReactNode;
@@ -220,10 +304,10 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
         </Button>
       </Guard>
     );
-  } else if (chains.length === 0 && step === "form") {
+  } else if (draft.jobs.length === 0 && step === "form") {
     guarded = true;
     body = (
-      <Guard icon={PackageOpen} title={copy.empty.guard.zeroTitle} body={copy.empty.guard.zeroBody}>
+      <Guard icon={PackageOpen} title={copy.empty.guard.zeroTitle} body={draft.stuck.length ? copy.empty.stuckOnly : copy.empty.guard.zeroBody}>
         <Button size="lg" href={closeHref} replace>
           {copy.sign.close}
         </Button>
@@ -234,10 +318,11 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     body = (
       <>
         <p className="m-0 font-sans text-body text-ink-muted">{copy.empty.intro}</p>
-        {chains.map((c) => {
+        {chainsNeeded.map((c) => {
           const text = addr[c] ?? "";
           const v = text.trim() ? val[c] : null;
           const err = v?.tier === "error" ? v.message : null;
+          const coins = draft.jobs.filter((j) => j.h.chain === c);
           return (
             <div key={c} className="flex flex-col gap-1.5">
               <label htmlFor={`empty-${c}`} className="flex items-center gap-2 font-sans text-label text-ink">
@@ -255,6 +340,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
                 invalid={!!err}
                 data-testid={`empty-addr-${c}`}
               />
+              {c === "evm" && coins.length > 1 ? <p className="m-0 font-sans text-caption text-ink-muted">{copy.empty.evmAll(coins.map((j) => j.label).join(", "))}</p> : null}
               {err ? (
                 <p role="alert" className="flex items-start gap-1.5 font-sans text-body-sm text-danger">
                   <Icon icon={TriangleAlert} size={16} className="mt-0.5" />
@@ -264,6 +350,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
             </div>
           );
         })}
+        {draft.jobs.some((j) => j.h.place === "inside") ? <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.empty.insideTo(accountId ?? "")}</p> : null}
       </>
     );
     action = (
@@ -275,14 +362,22 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
     meta = copy.empty.stepReview;
     body = (
       <>
-        <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-          {chains.map((c) => (
-            <li key={c} className="flex items-center gap-2.5 rounded-md bg-surface-sunken px-3.5 py-3 font-sans text-body text-ink">
-              <ChainCharm chain={c} size={28} />
-              <span className="min-w-0 flex-1 wrap-anywhere">{copy.empty.reviewRow(chainName(c), formatAmount(balanceBase(live, c) ?? 0n, TICKER[c] as Ticker), addr[c] ?? "")}</span>
+        <ul className="m-0 flex list-none flex-col gap-2.5 p-0" data-testid="empty-plan">
+          {draft.jobs.map((j) => (
+            <li key={j.key} data-empty-job={j.key} className="flex items-center gap-2.5 rounded-md bg-surface-sunken px-3.5 py-3 font-sans text-body text-ink">
+              <CoinIcon coin={j.h.coin} badge={j.h.badge} size={28} className="flex-none" />
+              <span className="min-w-0 flex-1 wrap-anywhere">
+                {copy.empty.reviewRow(j.h.place === "inside" ? j.label : j.h.networkName, formatAmount(j.h.amount ?? 0n, j.h.ticker), j.h.place === "inside" ? (accountId ?? "") : toFor(j.h.chain!))}
+              </span>
             </li>
           ))}
         </ul>
+        {draft.stuck.length ? (
+          <p className="m-0 flex items-start gap-2 rounded-md bg-surface-sunken p-3.5 font-sans text-body-sm text-ink" data-testid="empty-stuck">
+            <Icon icon={TriangleAlert} size={16} className="mt-0.5 flex-none text-frozen" />
+            {draft.stuck.map((h) => copy.empty.stuck(formatAmount(h.amount ?? 0n, h.ticker), h.networkName)).join(" ")}
+          </p>
+        ) : null}
         <p className="flex items-start gap-2 rounded-md bg-surface-sunken p-3.5 font-sans text-body-sm text-ink">
           <Icon icon={Info} size={16} className="mt-0.5 flex-none text-ink-muted" />
           {copy.empty.confirmNote}
@@ -290,7 +385,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
       </>
     );
     action = (
-      <Button variant="primary" size="lg" block onClick={() => setStep("running")} data-testid="empty-start">
+      <Button variant="primary" size="lg" block onClick={start} data-testid="empty-start">
         {copy.empty.cta}
       </Button>
     );
@@ -305,11 +400,11 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
         <p className="font-sans text-body text-ink-muted">{failed.length ? copy.empty.partialBody : copy.empty.allDoneBody}</p>
         <ul className="m-0 flex w-full list-none flex-col gap-2 p-0 text-left" data-testid="empty-results">
           {results.map((r, i) => (
-            <li key={i} className="flex items-center gap-2.5 rounded-md bg-surface-sunken px-3.5 py-2.5 font-sans text-body-sm text-ink" data-testid={`empty-result-${r.chain}`}>
+            <li key={`${r.key}-${i}`} className="flex items-center gap-2.5 rounded-md bg-surface-sunken px-3.5 py-2.5 font-sans text-body-sm text-ink" data-testid={`empty-result-${r.key}`}>
               <Icon icon={r.ok ? Check : CircleX} size={16} className={r.ok ? "text-success" : "text-danger"} />
-              {chainName(r.chain)}
+              {r.label}
               {r.amount ? ` — ${r.amount}` : ""}
-              {!r.ok ? ` — ${copy.empty.chainFailed(chainName(r.chain))}` : ""}
+              {!r.ok ? ` — ${copy.empty.chainFailed(r.label)}` : ""}
             </li>
           ))}
         </ul>
@@ -320,15 +415,15 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
         <Button variant="primary" size="lg" block href={closeHref} replace>
           {copy.empty.doneBtn}
         </Button>
-        <Button size="lg" block href={`/s/${snap.token_id}/activity`}>
+        <Button size="lg" block href={`/s/${snap.token_id}/transactions`}>
           {copy.empty.viewActivity}
         </Button>
       </div>
     );
-  } else {
+  } else if (job) {
     // running
-    meta = copy.empty.stepRunning;
-    const batchLabel = chain === "btc" && attempts > 0 ? copy.empty.batchProgress(attempts + 1) : null;
+    meta = copy.empty.progress(jobIdx + 1, plan.length);
+    const batchLabel = job.h.chain === "btc" && attempts > 0 ? copy.empty.batchProgress(attempts + 1) : null;
     if (intent) {
       body = (
         <>
@@ -340,25 +435,30 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
       action = terminal ? (
         <div className="flex flex-col gap-2.5">
           <SigningActions intent={intent} closeHref={closeHref} />
-          <Button size="lg" block onClick={onSkipChain} data-testid="empty-skip">
+          <Button size="lg" block onClick={onSkip} data-testid="empty-skip">
             {copy.empty.skip}
           </Button>
         </div>
       ) : null;
     } else {
+      const inside = job.h.place === "inside";
       body = (
         <div className="flex flex-col gap-4">
-          <p className="flex items-center gap-2.5 font-sans text-label text-ink">
-            <ChainCharm chain={chain ?? "btc"} size={24} />
-            {copy.empty.chainTitle(chainName(chain ?? "btc"))}
+          <p className="m-0 flex items-center gap-2.5 font-sans text-label text-ink">
+            <CoinIcon coin={job.h.coin} badge={job.h.badge} size={24} />
+            {copy.empty.chainTitle(job.label)}
           </p>
           {prepError ? (
             <p role="alert" className="flex items-start gap-1.5 font-sans text-body-sm text-danger">
               <Icon icon={TriangleAlert} size={16} className="mt-0.5" />
               {prepError}
             </p>
+          ) : inside ? (
+            <p className="m-0 font-sans text-body text-ink t-num">
+              {formatAmount(job.h.amount ?? 0n, job.h.ticker)} → {accountId}
+            </p>
           ) : prepared ? (
-            <p className="font-sans text-body text-ink t-num">{formatAmount(prepared.amount, TICKER[prepared.chain] as Ticker)}</p>
+            <p className="m-0 font-sans text-body text-ink t-num">{formatAmount(prepared.amount, job.h.ticker)}</p>
           ) : (
             <p className="flex items-center gap-2 font-sans text-body-sm text-ink-muted">
               <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />
@@ -369,22 +469,26 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
       );
       action = (
         <div className="flex flex-col gap-2.5">
-          <Button variant="primary" size="lg" block disabled={!prepared || preparing} loading={preparing} spinner="none" onClick={onSendChain} data-testid="empty-send">
-            {copy.empty.cta}
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            disabled={inside ? insidePhase !== "idle" : !prepared || preparing}
+            loading={inside ? insidePhase !== "idle" : preparing}
+            spinner={inside ? "auto" : "none"}
+            onClick={onSend}
+            data-testid="empty-send"
+          >
+            {inside ? copy.empty.takeOut(job.h.ticker) : copy.empty.cta}
           </Button>
           {prepError ? (
-            <Button size="lg" block onClick={onSkipChainNoIntent}>
+            <Button size="lg" block onClick={onSkip} data-testid="empty-skip">
               {copy.empty.skip}
             </Button>
           ) : null}
         </div>
       );
     }
-  }
-
-  function onSkipChainNoIntent() {
-    if (chain) setResults((r) => [...r, { chain, batch: attempts + 1, ok: false, intentId: "" }]);
-    advanceChain();
   }
 
   return (

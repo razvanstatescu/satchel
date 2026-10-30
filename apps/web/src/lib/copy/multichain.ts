@@ -7,6 +7,38 @@
 import { plural as n } from "@/lib/format";
 
 export const multichain = {
+  /** Navigation feedback (lib/nav-pending.ts): what shows the moment a link is clicked, until the page is there. */
+  loading: {
+    label: "Loading",
+    flows: {
+      send: { title: "Send", detail: "Reading this Satchel's balances and signatures…" },
+      receive: { title: "Add coins", detail: "Drawing its address…" },
+      transfer: { title: "Give", detail: "Checking who owns it…" },
+      giveLink: { title: "Give by link", detail: "Checking who owns it…" },
+      empty: { title: "Take everything out", detail: "Reading every coin it holds…" },
+      sign: { title: "Sign a message", detail: "Reading its signatures…" },
+      offer: { title: "Make an offer", detail: "Checking this Satchel's history…" },
+      coin: { title: "Coin", detail: "Reading its balance…" },
+      allowance: { title: "Spending allowance", detail: "Reading who can spend…" },
+      sell: { title: "Sell", detail: "Checking this Satchel's history before you list it…" },
+    } as Record<string, { title: string; detail: string }>,
+    tabs: {
+      wallet: "Reading its balances…",
+      activity: "Reading this Satchel's record from NEAR testnet…",
+      transactions: "Opening its transactions…",
+      sale: "Reading the listing and the history a buyer checks…",
+    } as Record<string, string>,
+    pages: {
+      market: { title: "Market", detail: "Reading every listing and its server check…" },
+      satchels: { title: "My Satchels", detail: "Finding the Satchels your wallet owns…" },
+      contract: { title: "Contract facts", detail: "Reading the contract from NEAR testnet…" },
+      mint: { title: "Mint a Satchel", detail: "Opening Mint…" },
+      fund: { title: "Add coins", detail: "Reading this Satchel's addresses…" },
+      claim: { title: "Claim", detail: "Opening the claim…" },
+      satchel: { title: "Satchel", detail: "Reading its balances and history…" },
+      page: { title: "Loading", detail: "One moment…" },
+    } as Record<string, { title: string; detail: string }>,
+  },
   /** The Transactions tab (lib/chain-txs.ts): coins in and out of the Satchel on each chain we can read. */
   txs: {
     lead: "Coins in and out of this Satchel: at its Bitcoin, Ethereum and Solana addresses, and inside it. What its contract signed is under Activity.",

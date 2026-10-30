@@ -26,7 +26,7 @@ export function ObjCol({ lgOnly = false, className, children, ...rest }: { lgOnl
 
 export function ObjMain({ className, children, ...rest }: { className?: string; children: ReactNode } & Omit<ComponentProps<"div">, "children">) {
   return (
-    <div data-obj-main className={cx("flex min-w-0 flex-col gap-8 lg:[grid-area:main]", className)} {...rest}>
+    <div data-obj-main className={cx("flex min-w-0 flex-col gap-8 lg:[grid-area:main] group-data-[pending-tab]/obj:hidden", className)} {...rest}>
       {children}
     </div>
   );

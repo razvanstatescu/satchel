@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { ArrowDown, Check, ClipboardPaste, Hourglass, Info, LoaderCircle, Lock, RefreshCw, Snowflake, TriangleAlert, Undo2, Wallet, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ClipboardPaste, Hourglass, Info, LoaderCircle, Lock, RefreshCw, Snowflake, TriangleAlert, Undo2, Wallet, X, type LucideIcon } from "lucide-react";
 import { checkDelegatedSign } from "@satchel/core/policy";
 import { ChainCharm } from "@/components/brand/ChainCharm";
 import { ConnectButton } from "@/components/client/ConnectButton";
@@ -31,6 +31,7 @@ import { validateBtc, validateEvm, validateSol, type Validation } from "@/lib/va
 import { SOL_REFRESH_MS, solBlockhashFresh } from "@/lib/signing/sol-timing";
 import { balanceBase, chainName } from "@/lib/view";
 import { EvmSendOptions } from "@/components/client/EvmSendOptions";
+import { hasCoins, holdings } from "@/lib/holdings";
 import { anyEvmFunds, evmBalanceOf, evmNetworkName, SEPOLIA, usdcAddress, USDC_DECIMALS, type EvmChainId } from "@/lib/evm-networks";
 import type { PreparedSend } from "@/lib/chains/send";
 
@@ -143,6 +144,8 @@ export function SendFlow({
   }, [prepared]);
   // C3: nonces are per network, so only an unsent send on this same network blocks
   const blocker = blockingIntent(intents, snap.token_id, chain, chain === "evm" ? evmChainId : undefined);
+  // the coins held at its other addresses (the zero guard offers them instead of a dead end)
+  const heldElsewhere = holdings(live).filter((h) => hasCoins(h) && h.place === "chain" && h.chain !== chain && SEND_CHAINS.includes(h.chain!));
 
   // validate recipient on change (debounced lightly)
   useEffect(() => {
@@ -395,9 +398,30 @@ export function SendFlow({
     guard = {
       node: (
         <Guard art={<ChainCharm chain={chain} size={40} />} title={copy.send.guard.zeroTitle} body={`${copy.send.guard.zero(ticker)} ${copy.send.guard.zeroHelp(chainName(chain))}`}>
-          <Button variant="primary" size="lg" icon={ArrowDown} href={`/s/${snap.token_id}/receive?chain=${chain}`}>
-            {copy.send.guard.addCoins}
-          </Button>
+          <div className="flex flex-col items-stretch gap-2.5">
+            {/* the coins it does hold, one tap away (the column's Send opens on a held coin; a link may not) */}
+            {heldElsewhere.slice(0, 3).map((h) => (
+              <Button
+                key={h.key}
+                variant={h === heldElsewhere[0] ? "primary" : "secondary"}
+                size="lg"
+                icon={ArrowUp}
+                data-testid="send-switch"
+                onClick={() => {
+                  setChain(h.chain!);
+                  if (h.chain === "evm") {
+                    setEvmChainId(h.chainId as EvmChainId);
+                    setAsset(h.coin === "USDC" ? "usdc" : "eth");
+                  }
+                }}
+              >
+                {copy.send.guard.sendInstead(h.ticker, h.networkName)}
+              </Button>
+            ))}
+            <Button variant={heldElsewhere.length ? "link" : "primary"} size="lg" icon={ArrowDown} href={`/s/${snap.token_id}/receive?chain=${chain}`}>
+              {copy.send.guard.addCoins}
+            </Button>
+          </div>
         </Guard>
       ),
     };

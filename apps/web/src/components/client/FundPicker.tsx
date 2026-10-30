@@ -89,7 +89,7 @@ export function FundPicker({
         <h2 id="fund-coin" className="m-0 font-display text-heading text-ink">
           {f.step(1, f.coin)}
         </h2>
-        <nav aria-label={f.coin}>
+        <nav aria-label={f.coin} data-local-nav="">
           <ul className="m-0 grid list-none grid-cols-2 gap-2.5 p-0 sm:grid-cols-3">
             {c.coins.map((coin) => (
               <li key={coin}>
@@ -121,7 +121,7 @@ export function FundPicker({
             </h2>
             {!c.place ? <p className="m-0 font-sans text-body-sm text-ink-muted">{`${f.pickNetwork(c.coin)} ${f.pickNetworkBody}`}</p> : null}
           </div>
-          <nav aria-label={f.network}>
+          <nav aria-label={f.network} data-local-nav="">
             <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2">
               {c.places.map((h) => (
                 <li key={h.key}>

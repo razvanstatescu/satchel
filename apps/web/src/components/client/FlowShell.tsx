@@ -73,6 +73,48 @@ function play(panel: HTMLElement, scrim: HTMLElement | null, phase: Phase): Prom
   );
 }
 
+/**
+ * The background lock, shared by every open shell. Next keeps a closed flow's route alive (hidden, in `<Activity>`)
+ * and effects of two shells can run out of order (one flow opening another), so a shell never "restores what it saw":
+ * each locked element is counted, and only the last shell out unlocks it (and the body's scroll).
+ */
+const marks = new Map<Element, { n: number; hidden: string | null; inert: boolean }>();
+let scrollLocks = 0;
+let scrollBefore = "";
+
+function lockSibling(el: Element) {
+  const m = marks.get(el);
+  if (m) {
+    m.n++;
+    return;
+  }
+  const h = el as HTMLElement;
+  marks.set(el, { n: 1, hidden: el.getAttribute("aria-hidden"), inert: h.inert });
+  h.inert = true;
+  el.setAttribute("aria-hidden", "true");
+}
+
+function unlockSibling(el: Element) {
+  const m = marks.get(el);
+  if (!m) return;
+  if (--m.n > 0) return;
+  marks.delete(el);
+  (el as HTMLElement).inert = m.inert;
+  if (m.hidden === null) el.removeAttribute("aria-hidden");
+  else el.setAttribute("aria-hidden", m.hidden);
+}
+
+function lockScroll() {
+  if (scrollLocks++ === 0) {
+    scrollBefore = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  }
+}
+
+function unlockScroll() {
+  if (scrollLocks > 0 && --scrollLocks === 0) document.body.style.overflow = scrollBefore;
+}
+
 export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
   const { closeHref, minimize = false, action } = head;
   const router = useRouter();
@@ -110,28 +152,42 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
     void play(panelRef.current, scrimRef.current, "in");
   }, [enterAnimated]);
 
+  // Shown again after being hidden (Next reuses a closed flow's route): start fresh, not mid-exit. A kept exit
+  // animation would leave an invisible panel over the scrim, and a kept `closing` flag would make Close do nothing.
+  useLayoutEffect(() => {
+    closingRef.current = false;
+    for (const el of [panelRef.current, scrimRef.current]) el?.getAnimations?.().forEach((a) => a.cancel());
+  }, []);
+
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    // inert background: every sibling along the path from the shell to <body>
-    const touched: { el: Element; inert: boolean; hidden: string | null }[] = [];
+    // inert background: every sibling along the path from the shell to <body> (counted; see `marks`)
+    const touched: Element[] = [];
     let node: Element | null = root;
     while (node && node !== document.body) {
       const parent: Element | null = node.parentElement;
       if (parent) {
         for (const sib of Array.from(parent.children)) {
           if (sib === node || sib.tagName === "SCRIPT" || sib.hasAttribute("data-flow-keep")) continue;
-          const h = sib as HTMLElement;
-          touched.push({ el: sib, inert: h.inert, hidden: sib.getAttribute("aria-hidden") });
-          h.inert = true;
-          sib.setAttribute("aria-hidden", "true");
+          touched.push(sib);
+          lockSibling(sib);
         }
       }
       node = parent;
     }
+    // this shell's own path must never stay locked by another shell's earlier pass
+    for (let n: Element | null = root; n && n !== document.body; n = n.parentElement) {
+      const m = marks.get(n);
+      if (m) {
+        marks.delete(n);
+        (n as HTMLElement).inert = m.inert;
+        if (m.hidden === null) n.removeAttribute("aria-hidden");
+        else n.setAttribute("aria-hidden", m.hidden);
+      }
+    }
     titleRef.current?.focus();
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    lockScroll();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
@@ -154,12 +210,8 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-      for (const t of touched) {
-        (t.el as HTMLElement).inert = t.inert;
-        if (t.hidden === null) t.el.removeAttribute("aria-hidden");
-        else t.el.setAttribute("aria-hidden", t.hidden);
-      }
+      unlockScroll();
+      for (const el of touched) unlockSibling(el);
     };
   }, [close]);
 
@@ -188,7 +240,7 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
 
   return (
     <div ref={ref} data-flow-shell data-testid={testId}>
-      <Link ref={scrimRef} href={closeHref} replace onClick={onCloseClick} className="fixed inset-0 z-60 bg-scrim" aria-hidden="true" tabIndex={-1} />
+      <Link ref={scrimRef} href={closeHref} replace onClick={onCloseClick} data-local-nav="" className="fixed inset-0 z-60 bg-scrim" aria-hidden="true" tabIndex={-1} />
       <FlowPanel {...head} scrolled={scrolled} onCloseClick={onCloseClick} panelRef={panelRef} titleRef={titleRef} bodyRef={bodyRef} footRef={footRef} />
     </div>
   );

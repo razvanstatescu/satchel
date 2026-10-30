@@ -1057,6 +1057,7 @@ export function FlowPanel({
           replace
           aria-label={minimize ? copy.sign.minimize : copy.sign.close}
           onClick={onCloseClick}
+          data-local-nav=""
           className="inline-grid size-11 flex-none place-items-center rounded-pill text-ink transition-[scale,background-color] duration-120 hover:bg-surface-sunken active:scale-[.96] active:bg-surface-sunken"
           data-testid="flow-close"
         >

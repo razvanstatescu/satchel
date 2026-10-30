@@ -12,8 +12,8 @@ const EVM_TO = "0x53f9a1c2b3d4e5f60718293a4b5c6d7e8f901c2a";
 const SOL_TO = "8C3CxUxgsZL6AU44dEmtJXLKvKf8rroNGvcP8H9wJN1r";
 
 test.describe("empty the Satchel", () => {
-  test("drains BTC, ETH and SOL in sequence to chosen addresses", async ({ page }) => {
-    await useMockWallet(page, ALICE, { delay: 300 });
+  test("takes out every coin it holds, on every network and inside, one send at a time", async ({ page }) => {
+    await useMockWallet(page, ALICE, { delay: 200 });
     await page.goto("/s/1/empty");
     const flow = page.getByTestId("empty-flow");
     await expect(flow.getByRole("dialog")).toBeVisible();
@@ -23,20 +23,33 @@ test.describe("empty the Satchel", () => {
     await flow.getByTestId("empty-addr-sol").fill(SOL_TO);
     await expect(flow.getByTestId("empty-review")).toBeEnabled();
     await flow.getByTestId("empty-review").click();
+
+    // the plan: BTC; Sepolia USDC then ETH; Base USDC then ETH; OP ETH; SOL; NEAR inside. Arbitrum's USDC has no ETH
+    // there for the fee, so it is named instead of planned.
+    const plan = flow.getByTestId("empty-plan");
+    await expect(plan.locator("[data-empty-job]")).toHaveCount(8);
+    expect(await plan.locator("[data-empty-job]").evaluateAll((els) => els.map((e) => e.getAttribute("data-empty-job")))).toEqual([
+      "btc",
+      "evm-11155111-usdc",
+      "evm",
+      "evm-84532-usdc",
+      "evm-84532-eth",
+      "evm-11155420-eth",
+      "sol",
+      "inside-near",
+    ]);
+    await expect(flow.getByTestId("empty-stuck")).toContainText("Arbitrum Sepolia");
     await flow.getByTestId("empty-start").click();
 
-    // three chains, one sign_for each: each click's tracker runs to completion before the next chain's button appears.
-    for (let i = 0; i < 3; i++) {
-      await expect(flow.getByTestId("empty-send")).toBeEnabled({ timeout: 20_000 });
+    // one approval per coin, each tracked to completion before the next one's button appears
+    for (let i = 0; i < 8; i++) {
+      await expect(flow.getByTestId("empty-send")).toBeEnabled({ timeout: 30_000 });
       await flow.getByTestId("empty-send").click();
-      await expect(flow.getByTestId("signing-progress")).toBeVisible();
     }
 
-    await expect(page.getByText(/Everything's out|Some chains didn't go through/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/Everything's out|Some coins didn't go through/)).toBeVisible({ timeout: 30_000 });
     const results = flow.getByTestId("empty-results");
-    await expect(results.getByTestId("empty-result-btc")).toBeVisible();
-    await expect(results.getByTestId("empty-result-evm")).toBeVisible();
-    await expect(results.getByTestId("empty-result-sol")).toBeVisible();
+    for (const key of ["btc", "evm", "evm-84532-usdc", "sol", "inside-near"]) await expect(results.getByTestId(`empty-result-${key}`)).toBeVisible();
   });
 
   test("is disabled while the Satchel is listed (signing paused)", async ({ page }) => {

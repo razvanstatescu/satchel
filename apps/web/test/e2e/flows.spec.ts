@@ -176,7 +176,7 @@ test.describe("mint, transfer, sale gating", () => {
     await expect(flow).toContainText("Its own Bitcoin testnet4 address");
     await expect(flow).toContainText("0.02 NEAR");
     // the background is My Satchels, inert while the sheet is open
-    expect(await page.evaluate(() => (document.querySelector("main")?.firstElementChild?.closest("[inert]") ?? null) !== null)).toBe(true);
+    expect(await page.evaluate(() => document.querySelector("main [inert]") !== null)).toBe(true);
     await flow.getByTestId("mint-cta").click();
     await expect(flow.getByTestId("mint-done")).toHaveText("Satchel #8 is yours.", { timeout: 20_000 });
     await expect(flow.getByTestId("mint-done")).toBeFocused();

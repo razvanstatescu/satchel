@@ -69,6 +69,7 @@ export const flows = {
       /** NEW (app-screens §6): the zero guard's second sentence. */
       zeroHelp: (chain: string) => `Anyone can add coins to its ${chain} address.`,
       addCoins: "Add coins",
+      sendInstead: (ticker: string, network: string) => `Send ${ticker} on ${network}`,
       unsent: "You have an unsent signed transaction. Broadcast it or replace it.",
       /** NEW (app-screens §6): under the unsent card; EVM names the nonce, Bitcoin the coins. */
       replaceNote: (nonce?: number) =>

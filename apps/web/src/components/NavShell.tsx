@@ -8,6 +8,7 @@ import { WalletPickerHost } from "@/components/client/ConnectButton";
 import { MenuSheet, type PageAnchor } from "@/components/client/LandingMenu";
 import { SideNavItems, StickyBar } from "@/components/client/NavLinks";
 import { PendingIndicator, PendingPill } from "@/components/client/PendingIndicator";
+import { NavFeedback, PendingFrame } from "@/components/client/NavFeedback";
 import { RestoreHeadFlags } from "@/components/client/RestoreHeadFlags";
 import { ThemeControl } from "@/components/client/ThemeControl";
 import { copy } from "@/lib/copy";
@@ -269,13 +270,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className={GUTTER}>
           <div className="mx-auto w-full max-w-app">
             <main id="main" tabIndex={-1} className="pt-6 outline-none lg:pt-10">
-              {children}
+              <PendingFrame>{children}</PendingFrame>
             </main>
             <Footer surface="app" />
           </div>
         </div>
       </div>
       <PendingIndicator />
+      <NavFeedback />
       <WalletPickerHost />
       {/* a 404 thrown in a route's shell (/s/999) is rendered on the client from scratch: keep the theme */}
       <RestoreHeadFlags />

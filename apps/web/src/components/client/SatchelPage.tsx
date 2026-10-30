@@ -24,6 +24,8 @@ import {
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { checkedAgo, gateText, listedAgo } from "@/components/Clean";
 import { SatchelCard } from "@/components/SatchelCard";
+import { TabSkeleton } from "@/components/client/NavFeedback";
+import { usePendingNav } from "@/lib/nav-pending";
 import { groupDigits, utcClock, utcDay, utcShort } from "@/components/Timeline";
 import { Button, Icon, RouteTabs, SatchelThumb, StatusPill, cx, type PillKind } from "@/components/ui";
 import { SignedNotSentCard } from "@/components/client/SigningProgress";
@@ -109,14 +111,19 @@ export function useObjTab(tokenId: string, forced?: ObjTab): ObjTab {
  */
 export function ObjArticle({ snap, tab: forced, children }: { snap: SatchelSnapshot; tab?: ObjTab; children: ReactNode }) {
   const tab = useObjTab(snap.token_id, forced);
+  // another tab of this Satchel is loading (NavFeedback): its area shows what's being read, the head and tabs stay
+  const pending = usePendingNav();
+  const pendingTab = pending?.kind === "tab" && pending.tokenId === snap.token_id && pending.tab !== tab ? pending.tab! : null;
   return (
     <article
       data-obj
       data-tab={tab}
+      data-pending-tab={pendingTab ?? undefined}
       data-satchel={snap.token_id}
       className="group/obj flex min-w-0 flex-col gap-5 lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-8 lg:gap-y-6 lg:[grid-template-areas:'col_head'_'col_main'] xl:grid-cols-[minmax(320px,400px)_minmax(0,1fr)] xl:gap-x-10"
     >
       {children}
+      {pendingTab ? <TabSkeleton tab={pendingTab} /> : null}
     </article>
   );
 }

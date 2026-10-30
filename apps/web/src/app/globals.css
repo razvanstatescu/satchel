@@ -370,6 +370,16 @@
   scroll-margin-top: -72px;
 }
 
+/* Navigation feedback (NavFeedback): the top bar's sweep while an in-app link loads. */
+@keyframes nav-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
 /* Reduced motion: CSS transitions and animations end at once (motion-spec §0 rule 7; the static CSS is the end state).
    Meaning-carrying fades (overlays, toasts, the hand-off) run on WAAPI, which this doesn't touch. Unlayered on purpose:
    a component that needs a CSS fade here can still win with a layered !important. */
