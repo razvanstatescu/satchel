@@ -71,6 +71,7 @@ function HoldingAmount({ live, h, className }: { live: SatchelSnapshot; h: Holdi
     >
       {amountText(h)}
       {incoming > 0n ? <small className="block font-sans text-caption font-normal whitespace-normal text-ink-muted">{copy.wallet.incoming(formatAmount(incoming, "BTC"))}</small> : null}
+      {incoming < 0n ? <small className="block font-sans text-caption font-normal whitespace-normal text-ink-muted">{copy.wallet.outgoing(formatAmount(-incoming, "BTC"))}</small> : null}
     </span>
   );
 }

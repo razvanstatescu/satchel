@@ -80,6 +80,7 @@ export const satchel = {
     /** Announced (the one status region) when an address is copied. */
     copiedAria: (chain: string) => `${chain} address copied`,
     incoming: (amount: string) => `+${amount} incoming · unconfirmed`,
+    outgoing: (amount: string) => `−${amount} leaving · unconfirmed`,
     unavailable: "Balance unavailable",
     retry: "Retry",
     zero: (ticker: string) => `0${NBSP}${ticker}`,

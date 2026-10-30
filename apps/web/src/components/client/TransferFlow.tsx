@@ -10,6 +10,7 @@ import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
 import { SatchelCard } from "@/components/SatchelCard";
 import { Avatar, Button, ExternalLink, Icon, Morph, TextInput, Tracker, cx } from "@/components/ui";
+import { BookPicker, SaveToBook } from "@/components/client/AddressBook";
 import { copy, errorCopy } from "@/lib/copy";
 import { EXPLORERS, MPC_CONTRACT, SATCHEL_CONTRACT } from "@/lib/config";
 import { refreshSnapshot } from "@/lib/data/client";
@@ -142,6 +143,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
             { label: copy.xfer.receipt.time, value: <time dateTime={new Date(receipt.at).toISOString()}>{`${new Date(receipt.at).toISOString().slice(11, 16)} UTC`}</time> },
           ]}
         />
+        <SaveToBook kind="near" address={receipt.to} className="mt-2" />
       </Handoff>
     );
     action = (
@@ -203,6 +205,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
             aria-describedby="xfer-status"
             data-testid="xfer-to"
           />
+          <BookPicker kind="near" onPick={setText} />
           <div id="xfer-status" aria-live="polite" className="flex flex-col gap-2 font-sans text-body-sm">
             {!text.trim() ? (
               <p className="text-ink-muted">{copy.xfer.help}</p>

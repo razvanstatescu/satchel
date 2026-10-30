@@ -72,7 +72,11 @@ function insideHolding(coin: "NEAR" | "USDC" | "wNEAR", ft: string | null, amoun
 /** Every holding, in the canonical order: Bitcoin, Ethereum (Sepolia, then the other networks; ETH before USDC),
  * Solana, then inside (NEAR, USDC, wNEAR). */
 export function holdings(s: Pick<SatchelSnapshot, "balances"> & Partial<Pick<SatchelSnapshot, "inside">>): Holding[] {
-  const out: Holding[] = [chainHolding("btc", "BTC", "bitcoin", NETWORK_LABEL.btc, "btc", null, balanceBase(s, "btc"), true, null)];
+  // BTC: confirmed, minus what's already leaving (a send in the mempool): the balance drops the moment it's broadcast
+  const btcConfirmed = balanceBase(s, "btc");
+  const btcPending = s.balances.btc ? BigInt(s.balances.btc.unconfirmed_sats) : 0n;
+  const btc = btcConfirmed === null ? null : btcConfirmed + (btcPending < 0n ? btcPending : 0n);
+  const out: Holding[] = [chainHolding("btc", "BTC", "bitcoin", NETWORK_LABEL.btc, "btc", null, btc !== null && btc < 0n ? 0n : btc, true, null)];
   for (const r of evmBalances(s)) {
     const network = NETWORK_OF_EVM[r.chain_id] ?? "sepolia";
     const name = evmNetworkName(r.chain_id);

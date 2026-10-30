@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ComponentProps } from "react";
-import { FileCode, Sparkles, Store, Wallet, type LucideIcon } from "lucide-react";
+import { BookUser, FileCode, Sparkles, Store, Wallet, type LucideIcon } from "lucide-react";
 import { copy } from "@/lib/copy";
 import { SATCHEL_CONTRACT } from "@/lib/config";
 import { dataSource } from "@/lib/data/source";
@@ -17,7 +17,7 @@ import { Icon, cx } from "@/components/ui";
  * viewer owns that Satchel (an `nft_token` read, once per path).
  */
 
-export type NavKey = "satchels" | "market" | "mint" | "contract";
+export type NavKey = "satchels" | "market" | "mint" | "book" | "contract";
 
 export interface NavItem {
   key: NavKey;
@@ -30,6 +30,7 @@ export const APP_NAV: readonly NavItem[] = [
   { key: "satchels", href: "/satchels", label: copy.nav.mySatchels, icon: Wallet },
   { key: "market", href: "/market", label: copy.nav.market, icon: Store },
   { key: "mint", href: "/mint", label: copy.nav.mint, icon: Sparkles },
+  { key: "book", href: "/address-book", label: copy.nav.book, icon: BookUser },
   { key: "contract", href: "/contract", label: copy.nav.contract, icon: FileCode },
 ];
 

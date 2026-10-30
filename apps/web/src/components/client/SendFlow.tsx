@@ -32,6 +32,8 @@ import { SOL_REFRESH_MS, solBlockhashFresh } from "@/lib/signing/sol-timing";
 import { balanceBase, chainName } from "@/lib/view";
 import { EvmSendOptions } from "@/components/client/EvmSendOptions";
 import { hasCoins, holdings } from "@/lib/holdings";
+import { BookPicker, SaveToBook, useBookName } from "@/components/client/AddressBook";
+import { kindOfChain } from "@/lib/address-book";
 import { anyEvmFunds, evmBalanceOf, evmNetworkName, SEPOLIA, usdcAddress, USDC_DECIMALS, type EvmChainId } from "@/lib/evm-networks";
 import type { PreparedSend } from "@/lib/chains/send";
 
@@ -453,7 +455,14 @@ export function SendFlow({
   let action: ReactNode = null;
   let stepNo: { index: number; count: number } | undefined;
   if (tracking && intent) {
-    body = <SigningProgress intent={intent} />;
+    // once it's out, the recipient can be saved for next time (unless it already is)
+    const done = intent.stage === "sent" || intent.stage === "confirmed";
+    body = (
+      <>
+        <SigningProgress intent={intent} />
+        {done && intent.display?.to ? <SaveToBook kind={kindOfChain(intent.chain)} address={intent.display.to} className="mt-1" /> : null}
+      </>
+    );
     action = <SigningActions intent={intent} closeHref={closeHref} />;
   } else if (step === "tracker" && !hydrated) {
     // server HTML / hydration of a tracker link: the store is client-only, so hold the place quietly
@@ -733,6 +742,7 @@ function FormStep(p: {
   const maxText = bal === null ? "—" : formatAmount(bal, ticker);
   const inputRef = useRef<HTMLInputElement>(null);
   const resolved = p.val && p.val.tier !== "error" ? p.val : null;
+  const savedName = useBookName(kindOfChain(p.chain), resolved?.normalized);
   const toError = p.val?.tier === "error" ? p.val.message : null;
   return (
     <>
@@ -790,6 +800,11 @@ function FormStep(p: {
             >
               <ChainCharm chain={p.chain} size={32} />
               <span className="flex min-w-0 flex-col gap-1">
+                {savedName ? (
+                  <span className="font-sans text-label text-ink" data-testid="recipient-name">
+                    {savedName}
+                  </span>
+                ) : null}
                 <AddressDisplay address={resolved.normalized} />
                 <span className="flex items-center gap-1.5 font-sans text-body-sm font-semibold text-success">
                   <Icon icon={Check} size={14} />
@@ -851,6 +866,7 @@ function FormStep(p: {
                 {copy.send.form.paste}
               </button>
             </div>
+            <BookPicker kind={kindOfChain(p.chain)} onPick={p.setToText} />
             {toError ? (
               <p id="to-error" role="alert" className="flex items-start gap-1.5 font-sans text-body-sm text-danger" data-testid="to-error">
                 <Icon icon={TriangleAlert} size={16} className="mt-0.5" />

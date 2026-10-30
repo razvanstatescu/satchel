@@ -67,10 +67,10 @@ test("mobile app shell: the top bar and the menu sheet", async ({ page }) => {
   await expect(sheet).toBeVisible();
   expect(Math.round((await sheet.boundingBox())!.x)).toBe(0); // a bottom sheet below 768
   const rows = sheet.getByRole("navigation", { name: "Main" }).getByRole("link");
-  await expect(rows).toHaveText([copy.nav.mySatchels, copy.nav.market, copy.nav.mint, copy.nav.contract]);
+  await expect(rows).toHaveText([copy.nav.mySatchels, copy.nav.market, copy.nav.mint, copy.nav.book, copy.nav.contract]);
   // measured once the sheet has settled (it slides in over 360 ms; mid-slide the rows read short)
   for (const r of await rows.all()) await expect.poll(async () => (await r.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(56);
-  await expect(rows.nth(3)).toHaveAttribute("aria-current", "page");
+  await expect(rows.nth(4)).toHaveAttribute("aria-current", "page"); // Contract facts, after Address book
   await expect(sheet.getByRole("radio")).toHaveText([copy.theme.system, copy.theme.day, copy.theme.night]);
   for (const r of await sheet.getByRole("radio").all()) expect((await r.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await expect(sheet.getByRole("button", { name: copy.nav.connect })).toBeVisible(); // signed out: the account block
@@ -208,7 +208,7 @@ test("mobile landing header, menu sheet and width", async ({ page }) => {
   const anchors = sheet.getByRole("navigation", { name: copy.nav.onThisPage });
   await expect(anchors.getByRole("link")).toHaveText([copy.nav.anchors.how, copy.nav.anchors.clean, copy.nav.anchors.questions]);
   const app = sheet.getByRole("navigation", { name: copy.nav.app });
-  await expect(app.getByRole("link")).toHaveText([copy.nav.mySatchels, copy.nav.market, copy.nav.mint, copy.nav.contract]);
+  await expect(app.getByRole("link")).toHaveText([copy.nav.mySatchels, copy.nav.market, copy.nav.mint, copy.nav.book, copy.nav.contract]);
   for (const row of await sheet.getByRole("link").all()) expect((await row.boundingBox())!.height, await row.innerText()).toBeGreaterThanOrEqual(44);
   for (const r of await sheet.getByRole("radio").all()) expect((await r.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await expect(sheet.getByRole("radio")).toHaveText([copy.theme.system, copy.theme.day, copy.theme.night]);

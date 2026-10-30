@@ -11,11 +11,12 @@ import { copy } from "@/lib/copy";
  */
 
 describe("the app nav", () => {
-  it("is My Satchels · Market · Mint · Contract facts, with the 2.0 routes", () => {
+  it("is My Satchels · Market · Mint · Address book · Contract facts, with the 2.0 routes", () => {
     expect(APP_NAV.map((i) => [i.label, i.href])).toEqual([
       ["My Satchels", "/satchels"],
       ["Market", "/market"],
       ["Mint", "/mint"],
+      ["Address book", "/address-book"],
       ["Contract facts", "/contract"],
     ]);
   });

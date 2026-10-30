@@ -259,3 +259,12 @@ it. Phase-2 UI work builds against those specs.
     - a tab-area skeleton for Activity, Transactions and Sell;
     - a page-area skeleton for Market, My Satchels and others.
   - Web unit 481, Playwright **221/221**.
+- 2026-10-30 (Razvan):
+  - **Balances follow a send without a refresh.** `refreshSnapshot` now rebuilds the snapshot in the browser from the chains, bypassing the server cache and the CDN's stale-while-revalidate (which could lag over a minute). It re-reads at 0 s, 3 s, 8 s, 15 s, 30 s, 60 s and 120 s.
+    - A shell-mounted watcher triggers it when any send reaches "sent" or "confirmed"; NEAR actions already call it.
+    - Outgoing BTC in the mempool comes off the balance at once, shown as "−X leaving · unconfirmed".
+  - **Address book** (`/address-book`, in the nav). Entries are saved in this browser (localStorage), with an optional name; the kind (BTC, EVM, SOL, NEAR) is detected and editable when ambiguous.
+    - **Pickers, each listing only its own kind:** Send's To field (all EVM networks share one entry), each Empty address field, Give, and the allowance account field.
+    - **Save from use:** the Send receipt, the Give receipt, and a one-tap save on Transactions rows.
+    - **Names shown:** on Send's resolved recipient, and on Transactions rows.
+  - Web unit 486, Playwright 224/224, with the address book, responsive and a11y specs re-run after the nav change.

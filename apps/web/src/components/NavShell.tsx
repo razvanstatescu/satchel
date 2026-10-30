@@ -9,6 +9,7 @@ import { MenuSheet, type PageAnchor } from "@/components/client/LandingMenu";
 import { SideNavItems, StickyBar } from "@/components/client/NavLinks";
 import { PendingIndicator, PendingPill } from "@/components/client/PendingIndicator";
 import { NavFeedback, PendingFrame } from "@/components/client/NavFeedback";
+import { RefreshAfterSend } from "@/components/client/RefreshAfterSend";
 import { RestoreHeadFlags } from "@/components/client/RestoreHeadFlags";
 import { ThemeControl } from "@/components/client/ThemeControl";
 import { copy } from "@/lib/copy";
@@ -278,6 +279,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
       <PendingIndicator />
       <NavFeedback />
+      <RefreshAfterSend />
       <WalletPickerHost />
       {/* a 404 thrown in a route's shell (/s/999) is rendered on the client from scratch: keep the theme */}
       <RestoreHeadFlags />

@@ -6,6 +6,8 @@ import { CoinIcon } from "@/components/brand/CoinIcon";
 import { FeedGroup, utcClock } from "@/components/Timeline";
 import { DayLabel } from "@/components/client/ActivityInProgress";
 import { ShareFundLink } from "@/components/client/ShareFundLink";
+import { SaveToBook, useBookName } from "@/components/client/AddressBook";
+import type { BookKind } from "@/lib/address-book";
 import { Button, EmptyState, ExternalLink, Icon, Pill, Segmented, cx } from "@/components/ui";
 import { familyOf, mergeTxs, TX_FILTERS, type ChainTx, type TxFilter, type TxSourceKey } from "@/lib/chain-txs";
 import { copy, NETWORK_LABEL } from "@/lib/copy";
@@ -46,13 +48,19 @@ const list = (xs: string[]) => (xs.length <= 1 ? (xs[0] ?? "") : `${xs.slice(0, 
 
 type SourceState = { status: "loading" | "ok" | "error"; txs: ChainTx[]; as_of?: number };
 
+const BOOK_KIND: Record<Network, BookKind> = { bitcoin: "btc", sepolia: "evm", base: "evm", arbitrum: "evm", optimism: "evm", solana: "sol", near: "near" };
+
 function TxRow({ t }: { t: ChainTx }) {
   const x = copy.txs;
   const badge = HOME[t.network] === t.coin ? null : t.network;
   const sign = t.direction === "in" ? "+" : t.direction === "out" ? "−" : "";
-  const who = t.counterparty ? (t.direction === "in" ? x.from(truncateAddress(t.counterparty)) : x.to(truncateAddress(t.counterparty))) : null;
+  const kind = BOOK_KIND[t.network];
+  // a saved counterparty shows by its name (the address stays in the tooltip)
+  const name = useBookName(kind, t.counterparty);
+  const label = t.counterparty ? (name ?? truncateAddress(t.counterparty)) : null;
+  const who = label ? (t.direction === "in" ? x.from(label) : x.to(label)) : null;
   return (
-    <li className="relative">
+    <li className="relative flex items-center">
       <span aria-hidden="true" className="absolute inset-x-4 top-0 hidden h-px bg-line in-[li+li]:block" />
       <a
         href={t.url}
@@ -61,7 +69,7 @@ function TxRow({ t }: { t: ChainTx }) {
         data-tx={t.id}
         data-direction={t.direction}
         data-status={t.status}
-        className="group/tx flex min-h-16 items-center gap-3 rounded-[inherit] px-4 py-3 text-ink no-underline transition-colors duration-120 hover:bg-surface-sunken focus-visible:-outline-offset-2"
+        className="group/tx flex min-h-16 min-w-0 flex-1 items-center gap-3 rounded-[inherit] px-4 py-3 text-ink no-underline transition-colors duration-120 hover:bg-surface-sunken focus-visible:-outline-offset-2"
       >
         <CoinIcon coin={t.coin} badge={badge} size={36} className="flex-none" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -78,7 +86,7 @@ function TxRow({ t }: { t: ChainTx }) {
             ) : null}
           </span>
           {who ? (
-            <span className="truncate font-mono text-[0.8125rem] leading-5 text-ink-muted" title={t.counterparty ?? undefined}>
+            <span className={cx("truncate text-[0.8125rem] leading-5 text-ink-muted", name ? "font-sans font-semibold" : "font-mono")} title={t.counterparty ?? undefined} data-tx-who="">
               {who}
             </span>
           ) : null}
@@ -97,6 +105,7 @@ function TxRow({ t }: { t: ChainTx }) {
         <Icon icon={ArrowUpRight} size={16} className="-mr-1 flex-none text-ink-muted" />
         <span className="sr-only">{` (${x.opens})`}</span>
       </a>
+      {t.counterparty ? <SaveToBook compact kind={kind} address={t.counterparty} className="mr-1" /> : null}
     </li>
   );
 }

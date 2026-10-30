@@ -104,3 +104,4 @@
 - 2026-10-30T12:38Z [orchestrator] Transactions tab (BTC, Sepolia, Base, OP, SOL, inside; Arbitrum linked out); unit 477, e2e 210/210
 - 2026-10-30T12:52Z [orchestrator] Transactions streams per source from the browser (skeleton, reading line, retry); /fund picks instant (client state + replaceState, QRs pre-drawn); unit 477, e2e 213/213
 - 2026-10-30T13:30Z [orchestrator] real-wallet fixes: Send defaults/switches, Empty covers all holdings, popup lock fix, no cached 404, nav feedback skeletons; unit 481, e2e 221/221
+- 2026-10-30T13:50Z [orchestrator] balances refresh after sends (fresh browser reads, BTC outgoing pending) + address book (page, pickers by chain, save from receipts/transactions); unit 486, e2e green

@@ -77,6 +77,6 @@ export function classify(path: string, search: string, from: string, now: number
     return { path, search, kind: "page", name: "satchel", tokenId: id, startedAt: now };
   }
   const top = path.split("/")[1] ?? "";
-  const name = top === "market" ? "market" : top === "satchels" ? "satchels" : top === "contract" ? "contract" : top === "mint" ? "mint" : top === "fund" ? "fund" : top === "claim" ? "claim" : "page";
+  const name = top === "market" ? "market" : top === "satchels" ? "satchels" : top === "contract" ? "contract" : top === "mint" ? "mint" : top === "fund" ? "fund" : top === "claim" ? "claim" : top === "address-book" ? "book" : "page";
   return { path, search, kind: "page", name, tokenId: path.match(/^\/fund\/(\d+)/)?.[1] ?? null, startedAt: now };
 }

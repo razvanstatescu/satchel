@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, CircleX, Info, LoaderCircle, Lock, PackageOpen, Snowflake, TriangleAlert, Wallet } from "lucide-react";
 import { ChainCharm } from "@/components/brand/ChainCharm";
 import { CoinIcon } from "@/components/brand/CoinIcon";
+import { BookPicker } from "@/components/client/AddressBook";
+import { kindOfChain } from "@/lib/address-book";
 import { ConnectButton } from "@/components/client/ConnectButton";
 import { FlowShell } from "@/components/client/FlowShell";
 import { SigningActions, SigningProgress } from "@/components/client/SigningProgress";
@@ -340,6 +342,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
                 invalid={!!err}
                 data-testid={`empty-addr-${c}`}
               />
+              <BookPicker kind={kindOfChain(c)} onPick={(a) => setAddr((p) => ({ ...p, [c]: a }))} />
               {c === "evm" && coins.length > 1 ? <p className="m-0 font-sans text-caption text-ink-muted">{copy.empty.evmAll(coins.map((j) => j.label).join(", "))}</p> : null}
               {err ? (
                 <p role="alert" className="flex items-start gap-1.5 font-sans text-body-sm text-danger">

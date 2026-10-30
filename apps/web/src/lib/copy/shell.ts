@@ -24,6 +24,7 @@ export const shell = {
     mySatchels: "My Satchels",
     market: "Market",
     mint: "Mint",
+    book: "Address book",
     contract: "Contract facts",
     menu: "Menu",
     openMenu: "Open menu",
