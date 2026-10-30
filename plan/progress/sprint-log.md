@@ -79,3 +79,4 @@
 - 2026-10-29T20:35Z [orchestrator] merged M-01 fix (32f9467) and C2/C3/C7 UI (aeba7f3); web unit 422, e2e 183/183; only C4/C6 UI left
 - 2026-10-29T20:42Z [orchestrator] ALL sprint features merged; final main: sandbox 119/119, e2e 194/194, wasm 423,977 B 10c6a8e9…
 - 2026-10-29T21:00Z [orchestrator] dev2 live (10c6a8e9…), #1 funded; spawned tools-live + web-gaps; prod env switch to dev2 needs Razvan (Vercel)
+- 2026-10-30T08:09Z [orchestrator] prod env -> dev2 pushed (0e8bd03); resumed tools-live + web-gaps after restart
