@@ -272,4 +272,12 @@ the contract as unowned buffer instead of being re-credited, unlike `withdraw_ne
 
 ## 6. Test counts (this audit)
 
-TODO: filled in after the final full run.
+Measured on 2026-10-30 in this worktree (wasm built with `cargo near build non-reproducible-wasm`; INV-22 check OK).
+
+| Suite | Before | After |
+|---|---|---|
+| Unit, `cargo test -p satchel` | 177 passed, 0 ignored | **189 passed, 2 ignored** (AUDIT-01, AUDIT-04) |
+| Sandbox, `cargo test -p satchel-tests` | 119 passed in 16 files, 0 ignored | **122 passed, 3 ignored** (AUDIT-01, -02, -04) in 17 files (`audit.rs` new) |
+
+Run the known-bug tests with `cargo test -p satchel -- --ignored` and `cargo test -p satchel-tests --test audit --
+--ignored`: all five fail today, which is the point. Each should pass (and lose its `#[ignore]`) once its fix lands.
