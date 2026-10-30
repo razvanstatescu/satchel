@@ -92,3 +92,7 @@
 - 2026-10-30T08:36Z [ui-gaps] fix: axe label-content-name-mismatch on /market unlisted cards (dropped SatchelCard href+linkLabel for the listed-grid's split card+stretched-Link pattern); full e2e suite rerunning
 - 2026-10-30T08:39Z [ui-gaps] done: full Playwright suite green (205/205), unit (455 web + 467 core), typecheck, lint all clean on feat/ui-gaps @ 0069c38
 - 2026-10-30T08:45Z [orchestrator] ui-gaps merged; e2e 205/205; sprint scope complete
+- 2026-10-30T09:55Z [C5-caps] WIP: extraCapOptions() + Add sheet 'Other networks' disclosure (ETH Base/Arbitrum/OP, USDC x4), 8-cap limit disables checkboxes; typecheck/lint/unit all green
+- 2026-10-30T09:59Z [C5-caps] WIP: unit tests for extraCapOptions, 8-cap limit, delegate USDC/other-EVM sign_for; 463 unit tests green, typecheck/lint clean
+- 2026-10-30T10:06Z [C5-caps] WIP: Playwright tests for USDC/Base-ETH caps in Add sheet (facts display, delegate send within/over cap), axe covers Other-networks disclosure; allowance.spec.ts 10/10 green
+- 2026-10-30T10:09Z [C5-caps] done: full suite green — 463 unit tests, 207 Playwright e2e tests, typecheck/lint clean on feat/allowance-caps (commits 93f33cf, b9b1b4f, 0133d47, c3f1f26)
