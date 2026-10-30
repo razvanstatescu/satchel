@@ -10,8 +10,10 @@ import {
   memoryVerdictCache,
   solRpcSource,
   type CleanHistoryReport,
+  type EvmSource,
   type NearViews,
 } from '@satchel/core/clean-history'
+import { EVM_CHAIN_ID_LIST, evmNetwork } from '@satchel/core/chains/evm'
 import type { ToolConfig } from '../lib/config'
 import { NearRpc, RpcError } from '../lib/near-rpc'
 
@@ -49,11 +51,23 @@ export async function runCleanHistory(cfg: ToolConfig, tokenId: string, contract
     },
     {
       evm: cfg.sepoliaRpcs.slice(0, 2).map((u) => jsonRpcEvmSource(u)),
+      evmByChain: evmByChainSources(cfg),
       btc: cfg.btcApis.slice(0, 2).map((u) => esploraBtcSource(u)),
       sol: cfg.solRpcs.slice(0, 1).map((u) => solRpcSource(u)),
       cache: memoryVerdictCache(),
     },
   )
+}
+
+/** C3: two independent providers per EVM chain the contract supports, so the checker's per-chain rule (§7.1) can
+ * actually judge Base Sepolia, Arbitrum Sepolia and OP Sepolia records, not just Sepolia's. */
+export function evmByChainSources(cfg: ToolConfig): Partial<Record<number, EvmSource[]>> {
+  const out: Partial<Record<number, EvmSource[]>> = {}
+  for (const chainId of EVM_CHAIN_ID_LIST) {
+    const rpcs = chainId === 11155111 ? cfg.sepoliaRpcs : evmNetwork(chainId).rpcs
+    out[chainId] = rpcs.slice(0, 2).map((u) => jsonRpcEvmSource(u))
+  }
+  return out
 }
 
 export function summarizeReport(r: CleanHistoryReport): string[] {

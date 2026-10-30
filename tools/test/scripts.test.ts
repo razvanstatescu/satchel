@@ -27,6 +27,9 @@ describe('e2e scripts: offline dry runs print the plan and sign nothing', () => 
     ['e2e/sale-near.ts', []],
     ['e2e/sale-usdc.ts', ['--refund-only']],
     ['e2e/clean-history.ts', ['--role', 'rc']],
+    ['e2e/message.ts', ['--chain', 'evm']],
+    ['e2e/message.ts', ['--chain', 'sol']],
+    ['e2e/allowance.ts', ['--action', 'set', '--token', '1', '--delegate', 'bob', '--asset', 'btc', '--limit', '50000']],
   ]
   for (const [script, extra] of runs) {
     it(`${script} ${extra.join(' ')}`, () => {
@@ -52,6 +55,24 @@ describe('e2e scripts: offline dry runs print the plan and sign nothing', () => 
     expect(r.status).toBe(1)
     expect(r.stderr).toMatch(/no key for alice\.satchelhq\.testnet/)
   })
+})
+
+describe('e2e scripts that always read live state (market, allowance view/sign, history): --offline prints a note, signs nothing', () => {
+  const runs: [string, string[]][] = [
+    ['e2e/market.ts', ['--action', 'totals']],
+    ['e2e/market.ts', ['--action', 'inside', '--token', '1']],
+    ['e2e/allowance.ts', ['--action', 'view', '--token', '1']],
+    ['e2e/history.ts', ['--token', '1']],
+  ]
+  for (const [script, extra] of runs) {
+    it(`${script} ${extra.join(' ')}`, () => {
+      const r = tsx([script, '--offline', ...extra])
+      expect(r.status, r.stderr).toBe(0)
+      expect(r.stdout).toContain('DRY RUN')
+      expect(r.stdout).toContain('note')
+      expect(r.stdout).not.toMatch(/tx hash|sent  |SEND MODE/)
+    })
+  }
 })
 
 describe('keyless-birth tool', () => {
