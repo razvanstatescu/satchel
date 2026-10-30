@@ -1488,3 +1488,143 @@ fn delegates_cannot_withdraw_or_accept_and_accept_clears_allowances() {
     c.nft_transfer(alice(), id.clone(), None, None);
     assert!(c.allowances_of(id.clone()).is_empty());
 }
+
+// ── test audit 2026-10-30 (docs/testing/contract.md) ─────────────────────────────────────────────
+
+/// `withdraw_storage_credit` emits its event with the exact amount, and pays with a bare transfer: there is NO
+/// callback, so if that transfer ever failed the credit would not be restored (observation AUDIT-03; only possible if
+/// the caller's account is deleted between the call and the transfer receipt).
+#[test]
+fn audit_withdraw_storage_credit_event_and_bare_transfer() {
+    let mut c = setup();
+    Ctx::new(bob()).dep(10 * MILLI).set();
+    let credit = c.prepay_storage(None).0;
+    Ctx::new(bob()).dep(1).set();
+    c.withdraw_storage_credit();
+    assert_eq!(events("storage_credit_withdrawn"), vec![json!({"account_id":"bob.testnet","amount":credit.to_string()})]);
+    assert_eq!(transfers(), vec![(bob(), credit)]);
+    assert!(calls().is_empty(), "no on_* callback follows the transfer");
+}
+
+/// The offer expiry boundary is half-open: acceptable while `now < expires_at_ms`, so 1 ms before it works and at
+/// it fails (ERR_OFFER_EXPIRED), and from that same instant anyone may cancel it.
+#[test]
+fn audit_offer_expiry_boundary_is_half_open() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let oid = near_offer(&mut c, bob(), &id, ONE_NEAR); // expires at T0 + DAY
+    Ctx::new(carol()).dep(1).ms(T0 + DAY - 1).set();
+    expect_err(ERR_NOT_OFFERER, || c.cancel_offer(oid));
+    Ctx::new(alice()).dep(1).ms(T0 + DAY).set();
+    expect_err(ERR_OFFER_EXPIRED, || c.accept_offer(oid));
+    Ctx::new(alice()).dep(1).ms(T0 + DAY - 1).set();
+    c.accept_offer(oid);
+    assert_eq!(c.owner_of(&id), bob());
+    assert_eq!(transfers(), vec![(alice(), ONE_NEAR)]);
+}
+
+/// Offers bind to the token's state `(sig_count, inside_epoch)`, not to its owner: after a gift (no new signature, no
+/// withdrawal) the NEW owner may accept an offer made to the old one, and gets paid. Documented as question Q-02.
+#[test]
+fn audit_offer_survives_a_gift_and_the_new_owner_accepts() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let oid = near_offer(&mut c, bob(), &id, ONE_NEAR);
+    Ctx::new(alice()).dep(1).set();
+    c.nft_transfer(carol(), id.clone(), None, None);
+    Ctx::new(carol()).dep(1).set();
+    c.accept_offer(oid);
+    assert_eq!(c.owner_of(&id), bob());
+    assert_eq!(transfers(), vec![(carol(), ONE_NEAR)], "the current owner is paid, not the owner at offer time");
+    assert_eq!(events("offer_accepted")[0]["seller_id"], "carol.testnet");
+}
+
+/// A sale through `buy` changes neither `sig_count` nor `inside_epoch`, so an offer made while the token was listed
+/// stays acceptable by the buyer right away (sig_count 0 → no quiet period).
+#[test]
+fn audit_offer_made_while_listed_survives_the_sale() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(3 * ONE_NEAR), Currency::Near);
+    let oid = near_offer(&mut c, bob(), &id, ONE_NEAR);
+    Ctx::new(carol()).dep(3 * ONE_NEAR).set();
+    c.buy(id.clone(), lid, 0);
+    Ctx::new(carol()).dep(1).set();
+    c.accept_offer(oid);
+    assert_eq!(c.owner_of(&id), bob());
+}
+
+/// Deposits are allowed while listed (they only add value for the buyer); withdrawals are not (ERR_LISTED).
+/// `withdraw_near` refuses only the contract itself as receiver: the MPC and the USDC contract are accepted (they
+/// would just receive the NEAR; question Q-03).
+#[test]
+fn audit_deposits_while_listed_and_withdraw_receivers() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    c.list(id.clone(), U128(5), Currency::Near);
+    Ctx::new(carol()).dep(ONE_NEAR).set();
+    let credited = c.deposit_near(id.clone()).0;
+    Ctx::new(bob()).dep(10 * MILLI).set();
+    c.prepay_storage(None);
+    ft_call(&mut c, usdc(), bob(), 7, deposit_msg(&id));
+    assert_eq!(inside(&c, &id)["fts"], json!([{"token":"usdc.testnet","amount":"7"}]));
+    Ctx::new(alice()).dep(1).set();
+    expect_err(ERR_LISTED, || c.withdraw_near(id.clone(), U128(1), None));
+    c.delist(id.clone());
+    for r in [mpc(), usdc()] {
+        Ctx::new(alice()).dep(1).set();
+        c.withdraw_near(id.clone(), U128(1), Some(r.clone()));
+        assert_eq!(transfers(), vec![(r, 1)]);
+    }
+    Ctx::new(alice()).dep(1).set();
+    expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(me())));
+    assert_eq!(inside(&c, &id)["near"], (credited - 2).to_string());
+}
+
+/// Offer pages: limit 0, offsets past the end and u32::MAX limits are empty or capped, never a panic.
+#[test]
+fn audit_offer_pages_edges() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    for who in [bob(), carol(), bob()] {
+        near_offer(&mut c, who, &id, ONE_NEAR);
+    }
+    assert!(c.offers_for(id.clone(), 0, 0).is_empty());
+    assert!(c.offers_for(id.clone(), 3, 50).is_empty());
+    assert!(c.offers_for(id.clone(), u64::MAX, u32::MAX).is_empty());
+    assert_eq!(c.offers_for(id.clone(), 2, u32::MAX).iter().map(|o| o.id).collect::<Vec<_>>(), vec![3]);
+    assert_eq!(c.offers_by(bob(), 0, u32::MAX).iter().map(|o| o.id).collect::<Vec<_>>(), vec![1, 3]);
+}
+
+/// `ft_on_transfer` msg parsing (serde defaults): unknown extra fields inside a known shape are IGNORED (accepted),
+/// two top-level keys, a numeric token id or a wrong case are refused. Pinned so a parser change is visible.
+#[test]
+fn audit_ft_msg_lenient_and_strict_cases() {
+    let ok = [
+        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4,"price":"1"}}"#,
+        r#"{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1,"x":null}}"#,
+    ];
+    for m in ok {
+        assert!(serde_json::from_str::<FtMsg>(m).is_ok(), "{m}");
+    }
+    let bad = [
+        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4},"deposit":"3"}"#,
+        r#"{"deposit":3}"#,
+        r#"{"Deposit":"3"}"#,
+        r#"{"buy":{"token_id":"3","listing_id":-1,"expected_sig_count":4}}"#,
+        r#"{"buy":{"token_id":"3","listing_id":7}}"#,
+        r#""deposit""#,
+        r#"{}"#,
+        "",
+    ];
+    for m in bad {
+        assert!(serde_json::from_str::<FtMsg>(m).is_err(), "{m}");
+    }
+    // and through the entry point: a refused msg panics ERR_BAD_MSG (the FT refunds 100 %)
+    let mut c = setup();
+    mint_to(&mut c, alice());
+    Ctx::new(usdc()).set();
+    expect_err(ERR_BAD_MSG, || c.ft_on_transfer(bob(), U128(1), bad[0].into()));
+}
