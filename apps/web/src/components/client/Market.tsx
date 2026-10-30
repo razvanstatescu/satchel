@@ -171,24 +171,24 @@ export function InsideNearActions({ snap }: { snap: SatchelSnapshot }) {
 
 /* ── storage credit (pays storage inside `ft_on_transfer`, docs/specs/C4-C6.md §1, §2.3) ────────── */
 
-/** Polls `storage_credit_of(accountId)`; `refresh()` re-reads it right after a prepay or a withdraw. */
+/** Polls `storage_credit_of(accountId)`; `refresh()` re-reads it right after a prepay or a withdraw. `for` names
+ * whose credit `value` belongs to (the `useMyOffers`/`useMySatchels` pattern), so a signed-out viewer reads null
+ * without the effect ever calling setState synchronously for that case. */
 function useStorageCredit(accountId: string | null) {
-  const [credit, setCredit] = useState<bigint | null>(null);
+  const [state, setState] = useState<{ for: string | null; value: bigint }>({ for: null, value: 0n });
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    if (!accountId) {
-      setCredit(null);
-      return;
-    }
+    if (!accountId) return;
     let alive = true;
     void contractViews(dataSource().view, SATCHEL_CONTRACT)
       .storageCreditOf(accountId)
-      .then((v) => alive && setCredit(BigInt(v)))
-      .catch(() => alive && setCredit(0n));
+      .then((v) => alive && setState({ for: accountId, value: BigInt(v) }))
+      .catch(() => alive && setState({ for: accountId, value: 0n }));
     return () => {
       alive = false;
     };
   }, [accountId, attempt]);
+  const credit = accountId && state.for === accountId ? state.value : null;
   return { credit, refresh: () => setAttempt((n) => n + 1) };
 }
 
