@@ -319,3 +319,33 @@ Property runs for the fix (release): `PROPTEST_CASES=50000 cargo test -p satchel
 (34 tests, 134 s), `PROPTEST_CASES=1000 … market_tests::prop` (4 properties, 73 s),
 `PROPTEST_CASES=20000 FUZZ_STATS_CASES=20000 … parse::fuzz_tests` (26 tests incl. the seed-corpus differential), and
 `FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test.ts test/fuzz` (78 tests): all pass.
+
+## 7. Round two (2026-10-30, branch `test/contract2`, from `main` 3272e4c)
+
+Second test audit, on the post-fix code (AUDIT-01, -02 and -04 fixed). No contract source is changed; a real bug gets a
+failing test marked `#[ignore = "BUG: …"]` and a write-up here. Wasm under test: `cargo near build
+non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3` (= dev2), INV-22 OK.
+
+### 7.1 Plan
+
+1. Baselines: unit and default sandbox (2.13.4) on 3272e4c.
+2. The sandbox suite on nearcore 2.14 (`SANDBOX_VERSION=2.14.0-rc.5`); record every difference from 2.13.4.
+3. The deep Rust-vs-TS differential corpus (≥ 100k per kind, two seeds), results and timings.
+4. Adversarial tests on the post-fix code:
+   - the one-input delegate rule with edge shapes: 0 inputs, one outpoint twice, one input of a multi-input tx sent
+     alone, an owner request "mislabeled" with extra JSON fields, a delegate request after the owner changes (incl. an
+     in-flight one);
+   - the moved emits (AUDIT-04): every success path logs each event exactly once, in the order the spec and the app's
+     parsers (`apps/web/src/lib/near/history.ts`, `lib/data/server.ts`, `lib/data/sale.ts`) expect.
+5. Q-03 (withdraw to the MPC / USDC as receiver) and Q-04 (`ft_on_transfer` extra fields): tests that pin the current
+   behaviour, plus the risk spelled out for the human to decide. No behaviour change.
+6. Gas: re-measure the heaviest paths (`gas.rs` and the other measuring tests) after the fixes and compare with the
+   pre-fix wasm (the parent of `c1d97d1`) on the same machine.
+7. Update the coverage matrix and the counts (§6, §7.6).
+
+### 7.2 Results (filled in as each run finishes)
+
+| Run | Result |
+|---|---|
+| Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
+| Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
