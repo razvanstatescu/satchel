@@ -35,6 +35,7 @@ export type AllowanceError =
   | 'ERR_ALLOWANCE_ASSET'
   | 'ERR_ALLOWANCE_EXCEEDED'
   | 'ERR_ALLOWANCE_RATE'
+  | 'ERR_ALLOWANCE_BTC_ONE_INPUT'
 
 /** JSON form of the contract's `Asset`: `"btc"` | `"sol"` | `{evm:{chain_id}}` | `{erc20:{chain_id, token}}`. */
 export type Asset = 'btc' | 'sol' | { evm: { chain_id: number } } | { erc20: { chain_id: number; token: string } }
@@ -108,7 +109,10 @@ export function evmDebits(tx: Uint8Array): Debit[] {
   throw kind()
 }
 
-/** BTC: Σ outputs not paying `0014‖pkh` + max(0, Σ inputs − Σ outputs) (the contract's `btc_debit`). */
+/**
+ * BTC: Σ outputs not paying `0014‖pkh` + max(0, Σ inputs − Σ outputs) (the contract's `btc_debit`). Pure math: a
+ * delegate's request must also have exactly one input (`allowanceDebits`, AUDIT-01).
+ */
 export function btcDebit(fields: Pick<BtcFields, 'inputs' | 'outputs' | 'pkh'>): bigint {
   const own = `0014${toHex(fields.pkh)}`
   const inputs = fields.inputs.reduce((a, i) => a + i.amountSats, 0n)
@@ -131,7 +135,11 @@ export function allowanceDebits(req: SignRequest): DebitsResult {
     }
     if ('btc' in req) {
       const r = classifyBtc(req.btc.preimages, req.btc.outputs)
-      return r.ok ? { ok: true, debits: [{ asset: 'btc', amount: btcDebit(r.fields) }] } : { ok: false, error: r.error }
+      if (!r.ok) return { ok: false, error: r.error }
+      // AUDIT-01: BIP143 commits each input's amount only in that input's own sighash, so a delegate could understate
+      // the other inputs across several requests for one tx. With exactly one input the stated fee is the real fee.
+      if (r.fields.inputs.length !== 1) return { ok: false, error: 'ERR_ALLOWANCE_BTC_ONE_INPUT' }
+      return { ok: true, debits: [{ asset: 'btc', amount: btcDebit(r.fields) }] }
     }
     if ('evm_message' in req || 'sol_message' in req) {
       // C7: a message moves no coins, so no cap can measure it: delegates may never sign one (owner only)
