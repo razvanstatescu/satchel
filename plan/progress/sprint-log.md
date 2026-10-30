@@ -119,3 +119,4 @@
 - 2026-10-30T16:21Z [AUDIT-01] WIP: fix/audit one-input rule for delegate BTC in contract, TS mirror, vectors, copy and tests committed; running suites
 - 2026-10-30T16:30Z [AUDIT-01,AUDIT-02,AUDIT-04] DONE: fix/audit fixes committed; unit 194/0 ignored, sandbox 127/0 ignored, core 472, deep proptests pass, INV-22 OK, wasm 9dd65286 (non-reproducible); not pushed, not deployed
 - 2026-10-30T16:52Z [orchestrator] AUDIT-01/02/04 merged + app one-coin delegate BTC; dev2 redeployed (9dd65286…), state kept; .env.production hash updated; contract unit 194, sandbox 127, core 472, web unit 535, e2e 265, 0 ignored
+- 2026-10-30T17:23Z [orchestrator] test audit round two started: core2 (clean-history merge, validators, retry, live API smoke), ui2 (balance after send, keyboard-only send, reject paths, delegate one-coin, dust, dropdown a11y), contract2 (sandbox on nearcore 2.14, deep differential fuzz, post-fix edges, Q-03/Q-04 pinned, gas)
