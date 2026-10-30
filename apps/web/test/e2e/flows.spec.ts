@@ -150,11 +150,12 @@ test.describe("add coins (receive): anyone, no wallet needed", () => {
     await expect(page.getByRole("heading", { level: 1, name: "This NFT is a wallet." })).toBeVisible();
   });
 
-  test("the Wallet tab's Inside rows: full grouped addresses with Copy, QR (→ Add coins) and the explorer", async ({ page }) => {
+  test("the Wallet tab: one holdings list, then the full grouped addresses with Copy, QR (→ Add coins) and the explorer", async ({ page }) => {
     await page.goto("/s/1");
+    // one holdings list for every coin; the addresses in their own section under it
+    await expect(page.locator('[data-holding="btc"] [data-balance="btc"]')).toHaveText("0.00189718 BTC");
     const row = page.locator('[data-chain-row="btc"]');
     await expect(row.locator('[data-full-address="btc"]')).toHaveText("tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5");
-    await expect(row.locator('[data-balance="btc"]')).toHaveText("0.00189718 BTC");
     await expect(row.getByRole("link", { name: /mempool\.space/ })).toHaveAttribute("href", /mempool\.space\/testnet4\/address\//);
     await row.getByRole("link", { name: "Show QR code for Bitcoin address" }).click();
     await expect(page).toHaveURL(/\/s\/1\/receive\?chain=btc$/);

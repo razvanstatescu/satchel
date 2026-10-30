@@ -678,12 +678,13 @@ export function AmountInput({
           aria-invalid={invalid || undefined}
           className={cx(
             "min-h-11 border-0 bg-transparent p-0 font-display text-balance-hero-sm text-ink t-num placeholder:text-ink-muted focus-visible:outline-none",
-            center ? "max-w-full min-w-[1ch] flex-none text-right field-sizing-content" : "min-w-0 flex-1",
+            // w-0: an <input>'s intrinsic width (~20ch) would otherwise push the ticker out of a narrow box
+            center ? "max-w-full min-w-[1ch] flex-none text-right field-sizing-content" : "w-0 min-w-0 flex-1",
           )}
           {...rest}
         />
         {/* proto .amount--hero: the hero's ticker is Funnel 800 22/26, right after the number */}
-        <span className={cx("text-ink-muted", center ? "font-display text-[1.375rem] leading-[1.625rem] font-extrabold tracking-[-0.02em]" : "font-sans text-label")}>{ticker}</span>
+        <span className={cx("flex-none text-ink-muted", center ? "font-display text-[1.375rem] leading-[1.625rem] font-extrabold tracking-[-0.02em]" : "font-sans text-label")}>{ticker}</span>
         {maxButton}
       </div>
       {available ? <span className="pointer-events-none relative font-sans text-body-sm text-ink-muted t-num [&_a]:pointer-events-auto [&_button]:pointer-events-auto">{available}</span> : null}

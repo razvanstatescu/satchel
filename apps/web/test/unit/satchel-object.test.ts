@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AddressDisplay, addressGroups } from "@/components/AddressDisplay";
-import { networkShort } from "@/components/ChainRow";
+import { networkShort } from "@/components/Addresses";
 import { hashGroups } from "@/components/Facts";
 import { dayGroups, dayKey, groupDigits, pageRows, Timeline, utcClock, utcDay, utcLong, utcShort } from "@/components/Timeline";
 import { incomingLines } from "@/components/client/Incoming";

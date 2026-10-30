@@ -9,7 +9,7 @@ import { FlowShell } from "@/components/client/FlowShell";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
-import { AmountInput, Button, Icon, Morph, Segmented, buttonClass } from "@/components/ui";
+import { AmountInput, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
 import { IS_FIXTURE, SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { copy, errorCopy } from "@/lib/copy";
 import { buyEnabled } from "@/lib/data/clean";
@@ -21,13 +21,13 @@ import { ATTACH_MARKET, contractViews, FT_STORAGE, marketCalls, offerAcceptBlock
 import type { Currency, OfferView } from "@/lib/near/types";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
-import { ftTicker, INSIDE_FTS } from "@/lib/view";
+import { ftTicker } from "@/lib/view";
 
 /**
- * C6 inside assets + C4 offers (docs/specs/C4-C6.md): the Wallet tab's "NEAR inside" row (add/withdraw) and the
- * offer flow (make / accept / cancel). The server already renders the amounts and the offer list as text
- * (snap.inside, the `offers` prop); these are the live leaves and the mutations, the same house pattern as the
- * chain rows (ChainRow/RowAmount/RowTools) and the Sell flow (SaleTab.tsx).
+ * C6 inside assets + C4 offers (docs/specs/C4-C6.md): the inside coins' amounts and add/take-out controls (shown in
+ * the coin sheet, Holdings.tsx) and the offer flow (make / accept / cancel). The server already renders the amounts
+ * and the offer list as text (snap.inside, the `offers` prop); these are the live leaves and the mutations, the same
+ * house pattern as the holdings list (Holdings.tsx) and the Sell flow (SaleTab.tsx).
  */
 
 type Note = { kind: "error" | "cancelled"; text: string };
@@ -72,11 +72,11 @@ const phaseLabels = (idle: string, doing: string) => ({
 /* ── C6: NEAR inside ─────────────────────────────────────────────────────────────────────────── */
 
 /** The "NEAR inside" row's live amount (snap.inside follows the shared poll, same as the chain balances). */
-export function InsideNearAmount({ snap }: { snap: SatchelSnapshot }) {
+export function InsideNearAmount({ snap, className = "font-sans text-[1rem]/[1.375rem] font-bold" }: { snap: SatchelSnapshot; className?: string }) {
   const live = useLiveSnapshot(snap);
   const b = BigInt(live.inside.near);
   return (
-    <span data-testid="inside-near-amount" className="font-sans text-[1rem]/[1.375rem] font-bold t-num text-ink">
+    <span data-testid="inside-near-amount" className={cx("t-num", b === 0n ? "text-ink-muted" : "text-ink", className)}>
       {b === 0n ? copy.inside.zero : formatAmount(b, "NEAR")}
     </span>
   );
@@ -133,7 +133,7 @@ export function InsideNearActions({ snap }: { snap: SatchelSnapshot }) {
           placeholder="0"
           aria-label={copy.inside.amount}
           onChange={(e) => setText(e.target.value.replace(",", "."))}
-          className="min-w-32 flex-1 py-2"
+          className="min-w-0 flex-1 basis-48 py-2"
         />
         <button
           type="button"
@@ -281,11 +281,11 @@ export function StorageCreditRow({ accountId }: { accountId: string }) {
 /* ── C6: FT assets inside a Satchel (USDC, wNEAR) ────────────────────────────────────────────────── */
 
 /** One allowlisted FT's live inside balance (snap.inside.fts follows the shared poll, same as InsideNearAmount). */
-export function InsideFtAmount({ snap, ft }: { snap: SatchelSnapshot; ft: string }) {
+export function InsideFtAmount({ snap, ft, className = "font-sans text-[1rem]/[1.375rem] font-bold" }: { snap: SatchelSnapshot; ft: string; className?: string }) {
   const live = useLiveSnapshot(snap);
   const b = BigInt(live.inside.fts.find((f) => f.token === ft)?.amount ?? "0");
   return (
-    <span data-testid={`inside-ft-amount-${ft === WNEAR_TESTNET ? "wnear" : "usdc"}`} className="font-sans text-[1rem]/[1.375rem] font-bold t-num text-ink">
+    <span data-testid={`inside-ft-amount-${ft === WNEAR_TESTNET ? "wnear" : "usdc"}`} className={cx("t-num", b === 0n ? "text-ink-muted" : "text-ink", className)}>
       {b === 0n ? copy.inside.zero : formatAmount(b, ftTicker(ft))}
     </span>
   );
@@ -350,7 +350,7 @@ export function InsideFtActions({ snap, ft }: { snap: SatchelSnapshot; ft: strin
           placeholder="0"
           aria-label={copy.inside.amount}
           onChange={(e) => setText(e.target.value.replace(",", "."))}
-          className="min-w-32 flex-1 py-2"
+          className="min-w-0 flex-1 basis-48 py-2"
         />
         <button
           type="button"
@@ -384,24 +384,6 @@ export function InsideFtActions({ snap, ft }: { snap: SatchelSnapshot; ft: strin
       ) : null}
       {note ? <NoteLine note={note} /> : null}
     </div>
-  );
-}
-
-/** Both allowlisted FT rows (INSIDE_FTS, view.ts) for the Wallet tab's Inside section, same shape as the NEAR row. */
-export function InsideFtRows({ snap }: { snap: SatchelSnapshot }) {
-  return (
-    <>
-      {INSIDE_FTS.map((f) => (
-        <li key={f.contract} data-chain-row={f.ticker === "wNEAR" ? "wnear" : "usdc"} className="relative flex flex-col gap-2.5 p-4">
-          <span aria-hidden="true" className="absolute inset-x-4 top-0 h-px bg-line" />
-          <div className="flex min-w-0 items-center justify-between gap-3">
-            <h3 className="m-0 font-sans text-label text-ink">{copy.inside.row(f.ticker)}</h3>
-            <InsideFtAmount snap={snap} ft={f.contract} />
-          </div>
-          <InsideFtActions snap={snap} ft={f.contract} />
-        </li>
-      ))}
-    </>
   );
 }
 
@@ -641,17 +623,6 @@ export function IncomingOffers({ snap, offers: initial }: { snap: SatchelSnapsho
         ))}
       </ul>
     </section>
-  );
-}
-
-/** A "Make an offer" entry point, shown to visitors on the Wallet tab (listed or not) and on `/market`. */
-export function MakeOfferEntry({ snap }: { snap: SatchelSnapshot }) {
-  const { isOwner } = useViewer(snap);
-  if (isOwner) return null;
-  return (
-    <Button href={`/s/${snap.token_id}/offer`} variant="secondary" data-testid="make-offer-entry">
-      {copy.offers.make}
-    </Button>
   );
 }
 

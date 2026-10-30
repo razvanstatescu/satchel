@@ -14,6 +14,11 @@ export const ART = {
   btc: "#F7931A",
   evm: "#A3ABE0",
   sol: "#C08CFF",
+  // the coins and network stickers beyond the three chain charms (CoinIcon): never the real logos' colours exactly
+  sky: "#8FD3FF",
+  mint: "#7FE3B8",
+  base: "#6E9BFF",
+  arbitrum: "#9ED8F2",
 } as const;
 
 /** The S stroke (logo/satchel-mark.svg), drawn three times: the drop (+10 y), the ink outline, the face. */

@@ -295,7 +295,7 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
     test(`C4/C6 the Wallet tab with inside balances and incoming offers, in ${label}`, async ({ browser }) => {
       const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
       await useMockWallet(page, BOB);
-      await page.goto("/s/6");
+      await page.goto("/s/6/coin/inside-near");
       await page.getByTestId("add-near-amount").fill("1");
       await page.getByTestId("add-near-cta").click();
       await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
@@ -324,10 +324,10 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
       await ctx.close();
     });
 
-    test(`C6 the Wallet tab's USDC/wNEAR inside rows, with a deposit prepay step and the owner's withdraw controls, in ${label}`, async ({ browser }) => {
+    test(`C6 the USDC/wNEAR coin sheets, with a deposit prepay step and the owner's withdraw controls, in ${label}`, async ({ browser }) => {
       const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
       await useMockWallet(page, ALICE);
-      await page.goto("/s/6");
+      await page.goto("/s/6/coin/inside-usdc");
       await page.getByTestId("add-usdc-amount").fill("5");
       await expect(page.getByTestId("storage-prepay")).toBeVisible();
       await page.getByTestId("prepay-storage-cta").click();
@@ -336,8 +336,10 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
       await expect(page.getByTestId("inside-ft-amount-usdc")).toHaveText("5.00 USDC", { timeout: 20_000 });
       // the owner's withdraw controls are visible for both FT rows, one of them enabled
       await expect(page.getByTestId("withdraw-usdc")).toBeEnabled();
+      expect(await axe(page, "[data-flow-shell]", ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])).toEqual([]);
+      await page.goto("/s/6/coin/inside-wnear");
       await expect(page.getByTestId("withdraw-wnear")).toBeVisible();
-      expect(await axe(page)).toEqual([]);
+      expect(await axe(page, "[data-flow-shell]", ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])).toEqual([]);
       await ctx.close();
     });
 

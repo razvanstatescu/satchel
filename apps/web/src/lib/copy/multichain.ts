@@ -7,6 +7,32 @@
 import { plural as n } from "@/lib/format";
 
 export const multichain = {
+  /** The Wallet tab's column for a visitor while it isn't for sale (C4 + Add coins). */
+  visitorPanel: {
+    title: "Want this Satchel?",
+    body: "It isn't for sale, but you can still make its owner an offer. Anyone can add coins to it.",
+    offerShort: "Offer",
+  },
+  /** The one holdings list (Wallet tab, card, "You get"): every coin, on every network, inside or at an address. */
+  coins: {
+    listLabel: "Coins in this Satchel",
+    more: (count: number) => `${n(count, "more place", "more places")} to hold coins`,
+    moreSummary: "Nothing there yet",
+    open: (coin: string, network: string, amount: string) => `${coin} on ${network}: ${amount}`,
+    cardMore: (count: number) => `+${count} more`,
+    cardMoreAria: (count: number) => `and ${n(count, "more coin", "more coins")}`,
+    sheetTitle: (ticker: string, network: string) => `${ticker} on ${network}`,
+    on: (network: string) => `on ${network}`,
+    insideNote: "Held for this Satchel by its contract on NEAR testnet. It goes with the Satchel when it's given or sold.",
+    chainNote: (network: string) => `At this Satchel's own address on ${network}. Only its owner can send it.`,
+    address: "Address",
+    addresses: "Addresses",
+    addressesNote: "Coins sent to these addresses belong to this Satchel. Whoever owns it controls them.",
+    sameAddress: "Also on Base Sepolia, Arbitrum Sepolia and OP Sepolia: the same address.",
+    send: "Send",
+    add: "Add coins",
+    explorer: (name: string) => name,
+  },
   nets: {
     /** The Ethereum row's disclosure: Base Sepolia, Arbitrum Sepolia and OP Sepolia. */
     other: "Other networks",

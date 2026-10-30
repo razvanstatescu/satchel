@@ -1,6 +1,6 @@
-import { copy } from "@/lib/copy";
+import { copy, TICKER } from "@/lib/copy";
 import type { SatchelSnapshot } from "@/lib/data/types";
-import { cardChips } from "@/lib/view";
+import { balanceText, UI_CHAINS } from "@/lib/view";
 
 /**
  * The social card's data (A1; /s/[id]/opengraph-image, /s/[id]/twitter-image), pure and unit-tested so the JSX
@@ -40,7 +40,8 @@ export function ogSigLine(sigCount: number): string {
 export type OgSnapshotInput = Pick<SatchelSnapshot, "token_id" | "status" | "listing" | "sig_count" | "balances">;
 
 export function buildOgCardProps(snap: OgSnapshotInput): OgCardProps {
-  const chains: OgChainAmount[] = cardChips(snap).map((c) => ({ ticker: c.ticker, amount: c.amount ?? "0" }));
+  // the share image keeps the three home coins (its ledger has no room for networks): BTC, ETH on Sepolia, SOL
+  const chains: OgChainAmount[] = UI_CHAINS.map((c) => ({ ticker: TICKER[c], amount: balanceText(snap, c, false) ?? "0" }));
   return {
     id: snap.token_id,
     status: ogStatusWord(snap),

@@ -5,6 +5,7 @@ import type { CardChip } from "@/components/SatchelCard";
 import { EXPLORERS, SOL_UI_ENABLED, USDC_CONTRACT } from "@/lib/config";
 import { WNEAR_TESTNET } from "@/lib/near/contract";
 import { anyEvmFunds } from "@/lib/evm-networks";
+import { cardRows, hasCoins, holdingText, holdings, type Holding } from "@/lib/holdings";
 
 /** View helpers shared by server and client components. */
 
@@ -23,8 +24,23 @@ export function balanceText(s: Pick<SatchelSnapshot, "balances">, chain: UiChain
   return formatAmount(b, TICKER[chain], { withTicker });
 }
 
-export function cardChips(s: Pick<SatchelSnapshot, "balances">): CardChip[] {
-  return UI_CHAINS.map((c) => ({ chain: c, ticker: TICKER[c], amount: balanceText(s, c, false) }));
+const chipOf = (h: Holding, overflow: boolean): CardChip => ({
+  key: h.key,
+  chain: h.core && h.chain ? h.chain : undefined,
+  coin: h.coin,
+  badge: h.badge,
+  ticker: h.ticker,
+  amount: holdingText(h, false),
+  overflow: overflow || undefined,
+});
+
+/** The card's ledger: its top three holdings as rows (`cardRows`), then every other holding with coins (`overflow`),
+ * which the card draws as its "+N more" stack. */
+export function cardChips(s: Pick<SatchelSnapshot, "balances"> & Partial<Pick<SatchelSnapshot, "inside">>): CardChip[] {
+  const list = holdings(s);
+  const { rows } = cardRows(list);
+  const rest = list.filter((h) => hasCoins(h) && !rows.includes(h));
+  return [...rows.map((h) => chipOf(h, false)), ...rest.map((h) => chipOf(h, true))];
 }
 
 /** C6: the allowlisted FTs a Satchel can hold inside it (docs/specs/C4-C6.md §2.3, `market_config().inside_fts`),

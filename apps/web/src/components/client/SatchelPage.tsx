@@ -13,8 +13,6 @@ import {
   Info,
   LoaderCircle,
   MessageSquareText,
-  QrCode,
-  RefreshCw,
   ShieldAlert,
   ShieldCheck,
   ShieldX,
@@ -26,17 +24,15 @@ import { useEffect, useRef, useState, type ReactNode, type RefObject } from "rea
 import { checkedAgo, gateText, listedAgo } from "@/components/Clean";
 import { SatchelCard } from "@/components/SatchelCard";
 import { groupDigits, utcClock, utcDay, utcShort } from "@/components/Timeline";
-import { Button, ExternalLink, Icon, RouteTabs, SatchelThumb, StatusPill, cx, type PillKind } from "@/components/ui";
-import { CopyButton } from "@/components/client/CopyButton";
+import { Button, Icon, RouteTabs, SatchelThumb, StatusPill, cx, type PillKind } from "@/components/ui";
 import { SignedNotSentCard } from "@/components/client/SigningProgress";
 import { toast, usePinnedBar } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
 import { useMySale } from "@/components/client/useSale";
 import { useNow } from "@/lib/clock";
-import { CHAIN_NAME, copy, errorCopy, EXPLORER_NAME, TICKER } from "@/lib/copy";
+import { copy, errorCopy } from "@/lib/copy";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
 import type { CleanReport, SatchelSnapshot } from "@/lib/data/types";
-import { formatAmount } from "@/lib/format";
 import { readMotionMode } from "@/lib/motion-flag";
 import { EASE, play, type Track } from "@/lib/motion/play";
 import { calls } from "@/lib/near/contract";
@@ -44,7 +40,8 @@ import { DEFAULT_BLOCK_MS } from "@/lib/near/constants";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
 import { useIntents } from "@/lib/signing/client";
-import { allZero, balanceBase, cardChips, explorerFor, priceText, UI_CHAINS, type UiChain } from "@/lib/view";
+import { holdings } from "@/lib/holdings";
+import { allZero, cardChips, priceText } from "@/lib/view";
 
 /**
  * The viewer-aware pieces of the Satchel object page `/s/[id]` (app-screens §1–§3; proto app-satchel.html). The server
@@ -177,20 +174,18 @@ function hopTracks(el: Element): Track<Element>[] {
   ];
 }
 
-/** When a chain's balance grows while the card is on screen, its charm re-sticks (never on load; static when reduced). */
+/** When a holding grows while the card is on screen, its coin re-sticks (never on load; static when reduced). */
 function useCoinHop(ref: RefObject<HTMLElement | null>, live: SatchelSnapshot) {
-  const prev = useRef<Partial<Record<UiChain, bigint | null>> | null>(null);
+  const prev = useRef<Map<string, bigint | null> | null>(null);
   useEffect(() => {
-    const now: Partial<Record<UiChain, bigint | null>> = {};
-    for (const c of UI_CHAINS) now[c] = balanceBase(live, c);
+    const now = new Map(holdings(live).map((h) => [h.key, h.amount] as const));
     const before = prev.current;
     prev.current = now;
     if (!before || readMotionMode() === "reduce") return;
-    for (const c of UI_CHAINS) {
-      const a = before[c];
-      const b = now[c];
+    for (const [key, b] of now) {
+      const a = before.get(key);
       if (a == null || b == null || b <= a) continue;
-      const coin = ref.current?.querySelector(`[data-chain="${c}"] svg`);
+      const coin = ref.current?.querySelector(`[data-holding="${key}"] svg`);
       if (coin) play(hopTracks(coin), 320);
     }
   }, [live, ref]);
@@ -238,7 +233,7 @@ export function WalletColumn({ snap }: { snap: SatchelSnapshot }) {
       <SignedNotSentSlot snap={snap} />
       <ViewerCard snap={snap} />
       {v.sale ? <SoldNote tokenId={snap.token_id} buyer={v.sale.buyer} /> : null}
-      {v.live.listing ? v.isOwner ? <ForSalePanel snap={snap} /> : <OfferOverview snap={snap} /> : !v.isOwner && !v.sale ? <AddCoinsPanel tokenId={snap.token_id} /> : null}
+      {v.live.listing ? v.isOwner ? <ForSalePanel snap={snap} /> : <OfferOverview snap={snap} /> : !v.isOwner && !v.sale ? <VisitorPanel tokenId={snap.token_id} /> : null}
       <OwnerActions snap={snap} />
     </>
   );
@@ -258,22 +253,30 @@ function SoldNote({ tokenId, buyer }: { tokenId: string; buyer: string }) {
   );
 }
 
-/** Visitors from 1024: what anyone can do here (it fills the column under the card). */
-function AddCoinsPanel({ tokenId }: { tokenId: string }) {
+/**
+ * What a visitor can do with a Satchel that isn't for sale (Mobbin: OpenSea's offer beside the buy block): make its
+ * owner an offer (C4, the primary) or add coins to it, then mint their own. Under the card at every width.
+ */
+function VisitorPanel({ tokenId }: { tokenId: string }) {
   return (
-    <section aria-labelledby="add-coins-title" className="flex flex-col gap-3 rounded-md border border-line bg-surface p-5 max-lg:hidden md:p-6">
-      <h2 id="add-coins-title" className="m-0 font-display text-heading text-ink">
-        {copy.wallet.fundcard.title}
-      </h2>
-      <p className="m-0 font-sans text-body text-ink-muted">{copy.wallet.fundcard.body}</p>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <Button href={`/s/${tokenId}/receive`} icon={ArrowDown}>
+    <section aria-labelledby="visitor-title" data-testid="visitor-panel" className="flex flex-col gap-3 rounded-md border border-line bg-surface p-5">
+      <div className="flex flex-col gap-1">
+        <h2 id="visitor-title" className="m-0 font-display text-heading text-ink">
+          {copy.visitorPanel.title}
+        </h2>
+        <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.visitorPanel.body}</p>
+      </div>
+      <div className="grid grid-cols-2 gap-2.5">
+        <Button href={`/s/${tokenId}/offer`} variant="primary" size="lg" block icon={Handshake} data-testid="make-offer-entry">
+          {copy.offers.make}
+        </Button>
+        <Button href={`/s/${tokenId}/receive`} size="lg" block icon={ArrowDown}>
           {copy.page.actions.fund}
         </Button>
-        <Button variant="link" href={`/mint?from=/s/${tokenId}`}>
-          {copy.page.mintOwn}
-        </Button>
       </div>
+      <Button variant="link" href={`/mint?from=/s/${tokenId}`} className="-my-1 self-start">
+        {copy.page.mintOwn}
+      </Button>
     </section>
   );
 }
@@ -388,9 +391,16 @@ function OfferOverview({ snap }: { snap: SatchelSnapshot }) {
             <b className="font-display text-[1.375rem]/[1.625rem] font-extrabold tracking-[-0.02em] whitespace-nowrap text-ink t-num">{price}</b>
             <span className="font-sans text-caption whitespace-nowrap text-ink-muted">{copy.page.offerListing(listing.id)}</span>
           </p>
-          <Button variant="primary" size="lg" href={`/s/${snap.token_id}/sale`} iconEnd={ArrowRight} className="max-lg:ml-auto">
-            {copy.page.tabs.buy}
-          </Button>
+          {/* Buy, then Make an offer under it from 1024; side by side in the pinned bar below (Offer, Buy) */}
+          <div className="flex gap-2 max-lg:ml-auto max-lg:flex-row-reverse lg:w-full lg:flex-col">
+            <Button variant="primary" size="lg" href={`/s/${snap.token_id}/sale`} iconEnd={ArrowRight} block className="max-lg:w-auto">
+              {copy.page.tabs.buy}
+            </Button>
+            <Button href={`/s/${snap.token_id}/offer`} size="lg" block icon={Handshake} aria-label={copy.offers.make} data-testid="make-offer-entry" className="max-lg:w-auto">
+              <span className="lg:hidden">{copy.visitorPanel.offerShort}</span>
+              <span className="max-lg:hidden">{copy.offers.make}</span>
+            </Button>
+          </div>
         </div>
         <p className="m-0 flex items-center gap-1.5 font-sans text-caption text-ink-muted">
           <Icon icon={ShieldCheck} size={14} />
@@ -490,73 +500,7 @@ export function OwnerActions({ snap }: { snap: SatchelSnapshot }) {
   );
 }
 
-/* ── The Wallet tab's main block: live leaves inside the server-rendered Inside rows and Facts ──────────────────── */
-
-/** Anyone can add coins: visitors get the button in Inside's header below 1024 (the owner has it in the actions). */
-export function InsideAddCoins({ snap }: { snap: SatchelSnapshot }) {
-  const { isOwner } = useViewer(snap);
-  if (isOwner) return null;
-  return (
-    <Button href={`/s/${snap.token_id}/receive`} icon={ArrowDown} className="lg:hidden">
-      {copy.page.actions.fund}
-    </Button>
-  );
-}
-
-/** An Inside row's amount: "0.00189718 BTC"; "0 BTC" muted; "Balance unavailable" muted; unconfirmed BTC under it. */
-export function RowAmount({ snap, chain }: { snap: SatchelSnapshot; chain: UiChain }) {
-  const live = useLiveSnapshot(snap);
-  const b = balanceBase(live, chain);
-  const incoming = chain === "btc" && live.balances.btc ? BigInt(live.balances.btc.unconfirmed_sats) : 0n;
-  const muted = b === null || b === 0n;
-  return (
-    <p data-balance={chain} data-zero={muted ? "" : undefined} className={cx("m-0 flex-none text-right font-sans text-[1rem]/[1.375rem] font-bold whitespace-nowrap t-num", muted ? "text-ink-muted" : "text-ink")}>
-      {b === null ? copy.wallet.unavailable : b === 0n ? copy.wallet.zero(TICKER[chain]) : formatAmount(b, TICKER[chain])}
-      {incoming > 0n ? <small className="block font-sans text-caption font-normal whitespace-normal text-ink-muted">{copy.wallet.incoming(formatAmount(incoming, "BTC"))}</small> : null}
-    </p>
-  );
-}
-
-const TOOL =
-  "inline-flex min-h-11 flex-none items-center gap-1.5 rounded-pill bg-surface-sunken px-3.5 font-sans text-[0.875rem]/5 font-semibold whitespace-nowrap text-ink no-underline transition-colors duration-120 hover:bg-line";
-
-/**
- * An Inside row's tools (proto `.tools`): Copy, QR (→ Add coins) and the named explorer. An empty row leads with Add coins
- * (the QR lives on that page anyway); an unavailable one ends with Retry.
- */
-export function RowTools({ snap, chain }: { snap: SatchelSnapshot; chain: UiChain }) {
-  const live = useLiveSnapshot(snap);
-  const b = balanceBase(live, chain);
-  const name = CHAIN_NAME[chain];
-  const address = snap.addresses[chain];
-  const receive = `/s/${snap.token_id}/receive?chain=${chain}`;
-  return (
-    <div className="flex flex-wrap items-center gap-2 md:pl-11">
-      {b === 0n ? (
-        <Link href={receive} className={TOOL}>
-          <Icon icon={ArrowDown} size={16} />
-          {copy.wallet.fund}
-        </Link>
-      ) : null}
-      <CopyButton value={address} label={copy.wallet.copyAria(name)} toastText={copy.wallet.copiedAria(name)} />
-      {b !== 0n ? (
-        <Link href={receive} aria-label={copy.wallet.qrAria(name)} className={TOOL}>
-          <Icon icon={QrCode} size={16} />
-          {copy.wallet.qr}
-        </Link>
-      ) : null}
-      <ExternalLink href={explorerFor(chain, address)} className="min-h-11 px-1.5 font-sans text-[0.875rem]/5 font-semibold">
-        {EXPLORER_NAME[chain]}
-      </ExternalLink>
-      {b === null ? (
-        <button type="button" className={TOOL} onClick={() => refreshSnapshot(snap.token_id)}>
-          <Icon icon={RefreshCw} size={16} />
-          {copy.wallet.retry}
-        </button>
-      ) : null}
-    </div>
-  );
-}
+/* ── The Wallet tab's main block: live leaves inside the server-rendered Facts ─────────────────────────────────── */
 
 /** "Read from NEAR testnet and each chain 12 s ago." (one freshness line; a UTC time in the server HTML). */
 export function Freshness({ snap }: { snap: SatchelSnapshot }) {

@@ -21,7 +21,6 @@ import {
   type ReportMode,
   type VerdictModel,
 } from "@/components/Clean";
-import { ChainCharm } from "@/components/brand/ChainCharm";
 import { useConnect } from "@/components/client/ConnectButton";
 import { FlowShell } from "@/components/client/FlowShell";
 import { Handoff, Receipt } from "@/components/client/Handoff";
@@ -48,6 +47,8 @@ import { runCall } from "@/lib/near/run-call";
 import type { Currency, Listing } from "@/lib/near/types";
 import { useWallet } from "@/lib/near/wallet";
 import { cardChips, holdingsSentence, priceText } from "@/lib/view";
+import { holdingText, holdings, splitHoldings } from "@/lib/holdings";
+import { CoinIcon } from "@/components/brand/CoinIcon";
 
 /**
  * The Sale tab of `/s/[id]` (app-screens §5; proto app-sale.html), inside S's object page: each view brings its column
@@ -628,18 +629,22 @@ function YouGet({ live, encumbered, headingId }: { live: SatchelSnapshot; encumb
           {copy.buy.youGet}
         </h2>
       </div>
+      {/* every coin it holds, on every network and inside (lib/holdings.ts), then the home coins still at zero */}
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-        {cardChips(live).map((c) => {
-          const zero = c.amount !== null && /^0(\.0+)?$/.test(c.amount.trim());
+        {splitHoldings(holdings(live)).shown.map((h) => {
+          const zero = h.amount === 0n;
           return (
-            <li key={c.chain} data-chain={c.chain} className="flex items-center gap-3">
-              <ChainCharm chain={c.chain} size={30} className="flex-none" />
-              <span className={cx("font-display text-[1.375rem] leading-6.5 font-extrabold tracking-[-0.02em] t-num", c.amount === null || zero ? "text-ink-muted" : "text-ink")}>
-                {c.amount === null ? "—" : zero ? "0" : c.amount}
+            <li key={h.key} data-chain={h.core ? (h.chain ?? undefined) : undefined} data-holding={h.key} className="flex items-center gap-3">
+              <CoinIcon coin={h.coin} badge={h.badge} size={30} className="flex-none" />
+              <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
+                <span className={cx("font-display text-[1.375rem] leading-6.5 font-extrabold tracking-[-0.02em] t-num", h.amount === null || zero ? "text-ink-muted" : "text-ink")}>
+                  {h.amount === null ? "—" : (holdingText(h, false) ?? "—")}
+                </span>
+                {/* the no-break space keeps "0.0005 BTC" one phrase in the text layer, out of the flow (as the card's ledger) */}
+                <span className="sr-only">{NBSP}</span>
+                <span className="font-sans text-[0.875rem] leading-5 font-semibold text-ink-muted">{h.ticker}</span>
+                <span className="w-full font-sans text-caption text-ink-muted">{h.networkName}</span>
               </span>
-              {/* the no-break space keeps "0.0005 BTC" one phrase in the text layer, out of the flow (as the card's ledger) */}
-              <span className="sr-only">{NBSP}</span>
-              <span className="font-sans text-[0.875rem] leading-5 font-semibold text-ink-muted">{c.ticker}</span>
             </li>
           );
         })}

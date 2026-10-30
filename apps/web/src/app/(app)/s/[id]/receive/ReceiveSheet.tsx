@@ -144,7 +144,7 @@ export async function ReceiveSheet({
         </h3>
         {/* A GET form: submitting navigates to ?chain=&amount=, so the server renders the payment URI and its QR —
             works with JavaScript off, and a shared link lands on exactly the same markup. */}
-        <form method="get" action={`/s/${id}/receive`} className="flex items-end gap-2.5">
+        <form method="get" action={`/s/${id}/receive`} className="flex flex-col gap-2.5 sm:flex-row sm:items-end">
           <input type="hidden" name="chain" value={chain} />
           {evm ? (
             <>
@@ -152,10 +152,10 @@ export async function ReceiveSheet({
               <input type="hidden" name="asset" value={asset} />
             </>
           ) : null}
-          <Field id="request-amount" label={copy.fund.request.label} error={requestError ? copy.fund.request.invalid : undefined} className="flex-1">
+          <Field id="request-amount" label={copy.fund.request.label} error={requestError ? copy.fund.request.invalid : undefined} className="min-w-0 sm:flex-1">
             <AmountInput id="request-amount" name="amount" ticker={ticker} defaultValue={amount ?? ""} invalid={requestError} inputMode="decimal" placeholder="0.00" />
           </Field>
-          <Button type="submit" size="lg">
+          <Button type="submit" size="lg" className="max-sm:w-full">
             {request ? copy.fund.request.update : copy.fund.request.create}
           </Button>
         </form>

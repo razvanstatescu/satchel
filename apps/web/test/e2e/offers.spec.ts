@@ -14,9 +14,13 @@ async function connectAs(page: Page, account: string) {
 }
 
 test.describe("C6: NEAR inside a Satchel", () => {
-  test("anyone can add NEAR; it shows up in Inside right away", async ({ page }) => {
+  test("anyone can add NEAR from its coin sheet; it shows up in Inside right away", async ({ page }) => {
     await useMockWallet(page, BOB);
     await page.goto("/s/6");
+    // the holdings list lists NEAR inside (folded away while empty); its row opens the coin sheet with the inputs
+    await page.locator("[data-holdings-empty] summary").click();
+    await page.locator('[data-holding="inside-near"] a').click();
+    await expect(page).toHaveURL(/\/s\/6\/coin\/inside-near$/);
     await expect(page.getByTestId("inside-near-amount")).toHaveText("Nothing inside yet");
     await page.getByTestId("add-near-amount").fill("1");
     await page.getByTestId("add-near-cta").click();
@@ -26,7 +30,7 @@ test.describe("C6: NEAR inside a Satchel", () => {
 
   test("only the owner can take it out", async ({ page }) => {
     await useMockWallet(page, BOB);
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-near");
     await page.getByTestId("add-near-amount").fill("1");
     await page.getByTestId("add-near-cta").click();
     await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
@@ -43,7 +47,7 @@ test.describe("C6: NEAR inside a Satchel", () => {
 
   test("withdraw is blocked while listed, with the reason shown, and works again once delisted", async ({ page }) => {
     await useMockWallet(page, ALICE);
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-near");
     await page.getByTestId("add-near-amount").fill("1");
     await page.getByTestId("add-near-cta").click();
     await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
@@ -53,10 +57,14 @@ test.describe("C6: NEAR inside a Satchel", () => {
     await page.getByTestId("list-cta").click();
     await expect(page).toHaveURL(/\/s\/6$/, { timeout: 20_000 });
 
+    await page.goto("/s/6/coin/inside-near");
     await expect(page.getByTestId("withdraw-near")).toBeDisabled();
     await expect(page.getByTestId("withdraw-near-why")).toHaveText("You can't take anything out while it's for sale. Stop selling first.");
 
+    await page.goto("/s/6");
     await page.getByTestId("action-row").getByTestId("delist").click();
+    await expect(page.getByTestId("action-row").getByTestId("delist")).toHaveCount(0, { timeout: 20_000 });
+    await page.goto("/s/6/coin/inside-near");
     await expect(page.getByTestId("withdraw-near")).toBeEnabled({ timeout: 20_000 });
   });
 });
@@ -79,7 +87,7 @@ test.describe("C4: offers", () => {
   test("the owner accepts: ownership moves and inside balances follow", async ({ page }) => {
     await useMockWallet(page, ALICE);
     // the token holds 1 NEAR before the offer, so acceptance must carry it over untouched
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-near");
     await page.getByTestId("add-near-amount").fill("1");
     await page.getByTestId("add-near-cta").click();
     await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
@@ -103,8 +111,8 @@ test.describe("C4: offers", () => {
     const owner = await page.evaluate(() => JSON.parse(sessionStorage.getItem("satchel:sim:v1") ?? "{}").owners["6"]);
     expect(owner).toBe(BOB);
     // inside balances are keyed by token id, so they followed the token
-    await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR");
     await expect(page.getByTestId("incoming-offers")).toHaveCount(0);
+    await expect(page.locator('[data-holding="inside-near"] [data-inside="near"]')).toHaveText("0.9991 NEAR");
   });
 
   test("cancel and refund: the offerer cancels, the offer disappears from My offers", async ({ page }) => {
@@ -135,14 +143,14 @@ test.describe("C4: offers", () => {
     // the owner withdraws nothing-ish from Inside: bumping inside_epoch is enough to make the offer stale, even
     // though nothing was signed on any chain.
     await connectAs(page, ALICE);
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-near");
     await page.getByTestId("add-near-amount").fill("1");
     await page.getByTestId("add-near-cta").click();
     await expect(page.getByTestId("inside-near-amount")).toHaveText("0.9991 NEAR", { timeout: 20_000 });
     await page.getByTestId("withdraw-near").click();
     await expect(page.getByTestId("toast").filter({ hasText: "taken out" })).toBeVisible({ timeout: 20_000 });
 
-    await page.reload();
+    await page.goto("/s/6");
     const offers = page.getByTestId("incoming-offers");
     await expect(offers).toBeVisible();
     await expect(offers.getByTestId("accept-offer")).toBeDisabled();
@@ -182,7 +190,7 @@ test.describe("C4: offers", () => {
 test.describe("C6: USDC and wNEAR inside a Satchel (FT deposits + withdrawals)", () => {
   test("a first USDC deposit needs a storage-credit prepay; once prepaid, it shows up, and only the owner can withdraw it", async ({ page }) => {
     await useMockWallet(page, BOB);
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-usdc");
     await expect(page.getByTestId("inside-ft-amount-usdc")).toHaveText("Nothing inside yet");
     await page.getByTestId("add-usdc-amount").fill("5");
     await expect(page.getByTestId("storage-prepay")).toBeVisible();
@@ -206,7 +214,7 @@ test.describe("C6: USDC and wNEAR inside a Satchel (FT deposits + withdrawals)",
 
   test("a wNEAR deposit is blocked while listed, with the reason shown, and works again once delisted", async ({ page }) => {
     await useMockWallet(page, ALICE);
-    await page.goto("/s/6");
+    await page.goto("/s/6/coin/inside-wnear");
     await page.getByTestId("add-wnear-amount").fill("2");
     await page.getByTestId("prepay-storage-cta").click();
     await expect(page.getByTestId("storage-prepay")).toHaveCount(0, { timeout: 20_000 });
@@ -218,8 +226,12 @@ test.describe("C6: USDC and wNEAR inside a Satchel (FT deposits + withdrawals)",
     await page.getByTestId("list-cta").click();
     await expect(page).toHaveURL(/\/s\/6$/, { timeout: 20_000 });
 
+    await page.goto("/s/6/coin/inside-wnear");
     await expect(page.getByTestId("withdraw-wnear")).toBeDisabled();
+    await page.goto("/s/6");
     await page.getByTestId("action-row").getByTestId("delist").click();
+    await expect(page.getByTestId("action-row").getByTestId("delist")).toHaveCount(0, { timeout: 20_000 });
+    await page.goto("/s/6/coin/inside-wnear");
     await expect(page.getByTestId("withdraw-wnear")).toBeEnabled({ timeout: 20_000 });
   });
 

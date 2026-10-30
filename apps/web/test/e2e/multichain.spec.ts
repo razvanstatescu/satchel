@@ -21,7 +21,8 @@ async function openEvmSend(page: Page, network: string, asset?: "usdc") {
 test.describe("C3: the Ethereum row and the server HTML", () => {
   test("/s/1's server HTML carries every network's balance (no JS needed)", async ({ request }) => {
     const html = await (await request.get("/s/1")).text();
-    expect(html).toContain("Other networks");
+    // one holdings list: each coin on each network is its own row (Base Sepolia ETH and USDC, Sepolia USDC)
+    expect(html).toContain("Base Sepolia");
     expect(html).toMatch(/data-evm-balance="84532" data-asset="eth"[^>]*>0\.0200.ETH/);
     expect(html).toMatch(/data-evm-balance="84532" data-asset="usdc"[^>]*>10\.00.USDC/);
     expect(html).toMatch(/data-evm-balance="11155111" data-asset="usdc"[^>]*>25\.00.USDC/);
