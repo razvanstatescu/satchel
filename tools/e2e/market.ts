@@ -48,6 +48,21 @@ export function toPlan(title: string, signerId: string, mc: MarketCall): TxPlan 
   return { title, signerId, receiverId: mc.receiverId, actions: [functionCall(mc.params.methodName, mc.params.args, BigInt(mc.params.gas), BigInt(mc.params.deposit))] }
 }
 
+/**
+ * Re-read `view()` until `ok` is satisfied, retrying a few times with a short sleep. `waitForFinalViews` already
+ * waits for the final head to pass the optimistic head seen right after the tx, but a multi-RPC fallback pool
+ * (FastNEAR / dRPC) can still answer a `final` view from a node that individually lags a little further behind
+ * (seen live on dev2, 2026-10-30): retry here rather than trust a single read.
+ */
+async function readUntil<T>(read: () => Promise<T>, ok: (v: T) => boolean, tries = 5, delayMs = 2_000): Promise<T> {
+  let last: T = await read()
+  for (let i = 0; i < tries && !ok(last); i++) {
+    await new Promise((r) => setTimeout(r, delayMs))
+    last = await read()
+  }
+  return last
+}
+
 export async function marketTotals(ctx: Ctx): Promise<MarketTotalsView> {
   return ctx.rpc.view<MarketTotalsView>(ctx.cfg.contract, 'market_totals', {})
 }
@@ -105,7 +120,10 @@ async function main(): Promise<void> {
     const sent = await executePlan(ctx, toPlan(`deposit_near #${token} ${formatNear(amount)}`, owner, depositNearCall(contract, token, amount)))
     if (!sent) return
     expect(ctx, sent.ok, 'deposit_near succeeded')
-    const after = await ctx.rpc.view<InsideView | null>(contract, 'inside_of', { token_id: token })
+    const after = await readUntil(
+      () => ctx.rpc.view<InsideView | null>(contract, 'inside_of', { token_id: token }),
+      (a) => a !== null && BigInt(a.near) > BigInt(before?.near ?? '0'),
+    )
     ctx.log(`    after     inside_of #${token} = ${JSON.stringify(after)}`)
     expect(ctx, BigInt(after!.near) > BigInt(before?.near ?? '0'), 'inside NEAR increased')
     return
@@ -120,8 +138,10 @@ async function main(): Promise<void> {
     const sent = await executePlan(ctx, toPlan(`withdraw_near #${token} ${formatNear(amount)}`, owner, withdrawNearCall(contract, token, amount)))
     if (!sent) return
     expect(ctx, sent.ok, 'withdraw_near succeeded')
-    await new Promise((r) => setTimeout(r, 2_000))
-    const after = await ctx.rpc.view<InsideView | null>(contract, 'inside_of', { token_id: token })
+    const after = await readUntil(
+      () => ctx.rpc.view<InsideView | null>(contract, 'inside_of', { token_id: token }),
+      (a) => (a?.inside_epoch ?? 0) > (before?.inside_epoch ?? -1),
+    )
     ctx.log(`    after     inside_of #${token} = ${JSON.stringify(after)} (inside_epoch bumped: ${after?.inside_epoch} > ${before?.inside_epoch})`)
     expect(ctx, (after?.inside_epoch ?? 0) > (before?.inside_epoch ?? -1), 'inside_epoch bumped (I-M4)')
     return
@@ -140,7 +160,10 @@ async function main(): Promise<void> {
     const sent = await executePlan(ctx, toPlan(`make_offer #${token} ${formatNear(amount)} by ${offerer}`, offerer, call))
     if (!sent) return
     expect(ctx, sent.ok, 'make_offer succeeded')
-    const offers = await ctx.rpc.view<OfferView[]>(contract, 'offers_for', { token_id: token, from_index: 0, limit: 50 })
+    const offers = await readUntil(
+      () => ctx.rpc.view<OfferView[]>(contract, 'offers_for', { token_id: token, from_index: 0, limit: 50 }),
+      (os) => os.some((o) => o.offerer_id === offerer),
+    )
     const mine = offers.filter((o) => o.offerer_id === offerer)
     ctx.log(`    offers    ${JSON.stringify(mine)}`)
     expect(ctx, mine.length > 0, `offerer ${offerer} now has an open offer on #${token}`)
@@ -160,7 +183,7 @@ async function main(): Promise<void> {
     const sent = await executePlan(ctx, toPlan(`accept_offer ${offerId} (#${offer.token_id})`, owner, acceptOfferCall(contract, offerId)))
     if (!sent) return
     expect(ctx, sent.ok, 'accept_offer succeeded')
-    const after = await readSatchel(ctx, offer.token_id)
+    const after = await readUntil(() => readSatchel(ctx, offer.token_id), (s) => s?.owner_id === offer.offerer_id)
     expect(ctx, after?.owner_id === offer.offerer_id, `owner of #${offer.token_id} is now ${offer.offerer_id}`)
     const insideAfter = await ctx.rpc.view<InsideView | null>(contract, 'inside_of', { token_id: offer.token_id })
     expect(ctx, insideAfter?.near === inside?.near, 'inside NEAR intact across the sale (I-M8)')
@@ -174,7 +197,7 @@ async function main(): Promise<void> {
     const sent = await executePlan(ctx, toPlan(`cancel_offer ${offerId}`, offer.offerer_id, cancelOfferCall(contract, offerId)))
     if (!sent) return
     expect(ctx, sent.ok, 'cancel_offer succeeded')
-    const gone = await ctx.rpc.view<OfferView | null>(contract, 'offer', { offer_id: offerId })
+    const gone = await readUntil(() => ctx.rpc.view<OfferView | null>(contract, 'offer', { offer_id: offerId }), (o) => o === null)
     expect(ctx, gone === null, 'the offer no longer exists (refunded)')
     return
   }

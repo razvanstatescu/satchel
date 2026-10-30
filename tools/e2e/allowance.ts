@@ -40,6 +40,8 @@ export function toPlan(title: string, signerId: string, receiverId: string, meth
   return { title, signerId, receiverId, actions: [functionCall(methodName, args, gas, deposit)] }
 }
 
+const jsonBigint = (x: unknown): string => JSON.stringify(x, (_k, v) => (typeof v === 'bigint' ? v.toString() : v))
+
 async function main(): Promise<void> {
   const v = parseCli(process.argv.slice(2), OPTIONS)
   if (bool(v, 'help')) return void console.log(HELP)
@@ -96,7 +98,7 @@ async function main(): Promise<void> {
     if (!view) throw new Error(`no allowance for ${delegate} on #${token}; run --action set first`)
     const request = await buildAssetRequest(ctx, token, assetName, BigInt(str(v, 'amount')!))
     const pre = checkDelegatedSign(view, request, { nowMs: Date.now() })
-    ctx.log(`    precheck  ${JSON.stringify(pre)}`)
+    ctx.log(`    precheck  ${jsonBigint(pre)}`)
     describeSignRequest(token, request).forEach((l) => ctx.log(l))
     if (!pre.ok) {
       ctx.log(`    EXPECTED  the local mirror refuses: ${pre.error}${'detail' in pre ? ` (${pre.detail})` : ''}`)
@@ -125,9 +127,11 @@ async function buildAssetRequest(ctx: Ctx, token: string, asset: 'btc' | 'sol', 
     const built = buildSolTransfer({ from: a.sol, to: addressesOf(ctx.cfg, String(Number(token) + 1)).sol, lamports: amount, recentBlockhash: '11111111111111111111111111111111', lastValidBlockHeight: 0 })
     return solSignRequest(built.message)
   }
-  // BTC: a single synthetic input big enough to cover `amount` + fee, swept to the Satchel's own address (offline-safe).
+  // BTC: a single synthetic input big enough to cover `amount` + fee, sent to the NEXT token's address (not back to
+  // self: a same-address "change" output doesn't debit the allowance at all, §3, since it isn't external spend).
+  const to = addressesOf(ctx.cfg, String(Number(token) + 1)).btc
   const utxos: Utxo[] = [{ txid: 'a'.repeat(64), vout: 0, value: amount + 10_000n, confirmed: true }]
-  const built = buildBtcSend({ from: { address: a.btc, pubkey: a.btcPubkey }, to: a.btc, amount, utxos, feeRate: 2 })
+  const built = buildBtcSend({ from: { address: a.btc, pubkey: a.btcPubkey }, to, amount, utxos, feeRate: 2 })
   return built.signRequest
 }
 
