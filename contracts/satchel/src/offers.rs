@@ -144,8 +144,10 @@ impl Contract {
         ensure(self.market.by_account.len(offerer.as_str()) < MAX_OFFERS_PER_ACCOUNT, ERR_TOO_MANY_OFFERS);
     }
 
-    /// Writes the offer, its index entries and the offerer's refund slot. The caller measures and charges storage.
-    fn insert_offer(&mut self, offerer: AccountId, m: OfferMsg, amount: u128, currency: Currency) -> u64 {
+    /// Writes the offer, its index entries and the offerer's refund slot. The caller measures and charges storage,
+    /// then emits the returned `offer_made` event (after the charge, which can refuse: AUDIT-04).
+    #[must_use]
+    fn insert_offer(&mut self, offerer: AccountId, m: OfferMsg, amount: u128, currency: Currency) -> (u64, SatchelEvent) {
         let id = self.market.next_offer_id;
         self.market.next_offer_id += 1;
         let tpos = self.market.by_token.push(&m.token_id, id);
@@ -170,7 +172,7 @@ impl Contract {
         self.reserve_proceeds_slot(&offerer, currency);
         self.market.flush();
         self.proceeds.flush();
-        SatchelEvent::OfferMade {
+        let made = SatchelEvent::OfferMade {
             offer_id: id,
             token_id: m.token_id,
             offerer_id: offerer,
@@ -179,9 +181,8 @@ impl Contract {
             expected_sig_count: m.expected_sig_count,
             expected_inside_epoch: m.expected_inside_epoch,
             expires_at_ms: m.expires_at_ms,
-        }
-        .emit();
-        id
+        };
+        (id, made)
     }
 
     pub(crate) fn reserve_proceeds_slot(&mut self, account: &AccountId, currency: Currency) {
@@ -213,8 +214,9 @@ impl Contract {
     pub(crate) fn ft_offer(&mut self, offerer: AccountId, m: OfferMsg, amount: u128) {
         self.check_offer(&offerer, &m, amount);
         let s0 = env::storage_usage();
-        self.insert_offer(offerer.clone(), m, amount, Currency::Usdc);
+        let (_, made) = self.insert_offer(offerer.clone(), m, amount, Currency::Usdc);
         self.charge_credit(&offerer, s0);
+        made.emit(); // after the charge that can refuse (AUDIT-04)
     }
 }
 
@@ -236,8 +238,9 @@ impl Contract {
         self.check_offer(&offerer, &m, amount.0);
         ensure(env::attached_deposit().as_yoctonear() > amount.0, ERR_DEPOSIT);
         let s0 = env::storage_usage();
-        let id = self.insert_offer(offerer, m, amount.0, Currency::Near);
+        let (id, made) = self.insert_offer(offerer, m, amount.0, Currency::Near);
         charge_storage(s0, amount.0, 0);
+        made.emit(); // after the charge that can refuse (AUDIT-04)
         id
     }
 
@@ -286,29 +289,38 @@ impl Contract {
         // ── all checks passed; one receipt from here ──
         let s0 = env::storage_usage();
         let token_id = o.token_id.clone();
+        let mut delisted = None;
         if let Some(listing) = st.listing.take() {
             self.state.insert(token_id.clone(), st);
             self.listings.remove(&token_id);
-            SatchelEvent::Delisted { token_id: token_id.clone(), listing_id: listing.id, seller_id: listing.seller }.emit();
+            delisted = Some(SatchelEvent::Delisted { token_id: token_id.clone(), listing_id: listing.id, seller_id: listing.seller });
         }
         let o = self.take_offer(offer_id);
-        self.tokens.internal_transfer(&owner, &o.offerer, &token_id, None, Some("offer".to_string()));
-        self.on_owner_change(&token_id, "sale"); // C5 reset rule: an accepted offer is a sale
+        self.move_token(&owner, &o.offerer, &token_id); // = internal_transfer(…, memo "offer"), event deferred
+        let cleared = self.on_owner_change(&token_id, "sale"); // C5 reset rule: an accepted offer is a sale
         // The freed offer record pays for this slot, so the payout's re-credit never needs contract-paid storage.
         self.reserve_proceeds_slot(&owner, o.currency);
-        SatchelEvent::OfferAccepted {
+        let accepted = SatchelEvent::OfferAccepted {
             offer_id,
-            token_id,
+            token_id: token_id.clone(),
             seller_id: owner.clone(),
-            buyer_id: o.offerer,
+            buyer_id: o.offerer.clone(),
             amount: U128(o.amount),
             currency: o.currency,
-        }
-        .emit();
-        self.payout(owner, o.currency, o.amount); // detached: never the returned promise
+        };
+        self.payout(owner.clone(), o.currency, o.amount); // detached: never the returned promise
         // M-01: last, after the NEAR payout is deducted. The freed offer record usually outweighs the new holder's
         // entries (measured −194 B), so this only bites if an accept ever grows storage the buffer can't pay.
         self.ensure_solvent(s0);
+        // events only after the last check that can refuse, in the order they used to be logged (AUDIT-04)
+        if let Some(e) = delisted {
+            e.emit();
+        }
+        crate::emit_nft_transfer(&owner, &o.offerer, &token_id, Some("offer"));
+        if let Some(e) = cleared {
+            e.emit();
+        }
+        accepted.emit();
     }
 
     pub fn offer(&self, offer_id: u64) -> Option<OfferView> {

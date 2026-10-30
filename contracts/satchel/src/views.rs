@@ -110,11 +110,15 @@ impl Contract {
         out
     }
 
-    /// Active listings (at most `limit`, capped at 50), in index order.
+    /// Active listings (at most `limit`, capped at 50), in index order. An offset past the end (including one that
+    /// does not fit a wasm32 `usize`) is an empty page, never a wrap to the start (AUDIT-02).
     pub fn listings(&self, from_index: u64, limit: u32) -> Vec<ListingView> {
+        let Ok(skip) = usize::try_from(from_index) else {
+            return vec![];
+        };
         self.listings
             .iter()
-            .skip(from_index as usize)
+            .skip(skip)
             .take(limit.min(MAX_PAGE) as usize)
             .filter_map(|id| {
                 self.state.get(id).and_then(|s| s.listing.clone()).map(|listing| ListingView { token_id: id.clone(), listing })

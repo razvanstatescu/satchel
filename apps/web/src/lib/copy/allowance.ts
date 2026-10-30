@@ -90,6 +90,8 @@ export const allowanceCopy = {
       ERR_ALLOWANCE_ASSET: "This access has no cap for that coin.",
       ERR_ALLOWANCE_EXCEEDED: "That's over today's remaining amount.",
       ERR_ALLOWANCE_RATE: "This access has hit today's limit on the number of sends. Try again tomorrow.",
+      ERR_ALLOWANCE_BTC_ONE_INPUT:
+        "With this access, a bitcoin send can spend only one of this Satchel's bitcoin deposits at a time. Send less, so a single deposit covers the amount and the fee.",
     },
   },
 } as const;

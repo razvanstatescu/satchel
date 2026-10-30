@@ -3,7 +3,7 @@
 
 use near_contract_standards::non_fungible_token::core::NonFungibleTokenCore;
 use near_contract_standards::non_fungible_token::enumeration::NonFungibleTokenEnumeration;
-use near_contract_standards::non_fungible_token::events::NftMint;
+use near_contract_standards::non_fungible_token::events::{NftMint, NftTransfer};
 use near_contract_standards::non_fungible_token::metadata::{
     NFTContractMetadata, NonFungibleTokenMetadataProvider, TokenMetadata, NFT_METADATA_SPEC,
 };
@@ -181,8 +181,22 @@ impl Contract {
     /// (reason "transfer"), `execute_sale` (`buy`, USDC `ft_on_transfer` buy; "sale") and `accept_offer` ("sale").
     /// C5 reset rule: every allowance of the token is cleared. Inside balances (C6) are keyed by token and offers (C4)
     /// are bound to token state, so neither needs anything here.
-    pub(crate) fn on_owner_change(&mut self, token_id: &TokenId, reason: &str) {
-        self.clear_allowances(token_id, reason);
+    /// Returns the `allowances_cleared` event, which the caller emits after its last check (AUDIT-04).
+    #[must_use]
+    pub(crate) fn on_owner_change(&mut self, token_id: &TokenId, reason: &str) -> Option<allowance::AllowanceEvent> {
+        self.clear_allowances(token_id, reason)
+    }
+
+    /// The writes of near-contract-standards' `internal_transfer` for an owner-initiated transfer (approvals are
+    /// disabled), with the same checks and panic messages, but WITHOUT its NEP-171 `nft_transfer` event: the caller
+    /// emits that with `emit_nft_transfer` after its last check that can refuse (AUDIT-04, events.rs, spec §5.8 step 7).
+    pub(crate) fn move_token(&mut self, from: &AccountId, to: &AccountId, token_id: &TokenId) {
+        let owner = self.tokens.owner_by_id.get(token_id).unwrap_or_else(|| env::panic_str("Token not found"));
+        if owner != *from {
+            env::panic_str("Approval extension is disabled");
+        }
+        near_sdk::require!(owner != *to, "Current and next owner must differ");
+        self.tokens.internal_transfer_unguarded(token_id, from, to);
     }
 
     pub(crate) fn ensure_receiver(&self, receiver_id: &AccountId) {
@@ -191,6 +205,12 @@ impl Contract {
             ERR_BAD_RECEIVER,
         );
     }
+}
+
+/// The NEP-171 `nft_transfer` event `internal_transfer` would have logged for an owner-initiated transfer (no
+/// `authorized_id`). Emitted by the caller of `Contract::move_token` after its last check (AUDIT-04).
+pub(crate) fn emit_nft_transfer(from: &AccountId, to: &AccountId, token_id: &str, memo: Option<&str>) {
+    NftTransfer { old_owner_id: from, new_owner_id: to, token_ids: &[token_id], authorized_id: None, memo }.emit();
 }
 
 /// NEP-181 page size: `limit` defaults to and is capped at `MAX_PAGE`, like the Satchel views (S-05).
@@ -253,9 +273,18 @@ impl NonFungibleTokenCore for Contract {
         ensure(self.token_state(&token_id).listing.is_none(), ERR_LISTED);
         self.ensure_receiver(&receiver_id);
         let s0 = env::storage_usage();
-        self.tokens.nft_transfer(receiver_id, token_id.clone(), approval_id, memo);
-        self.on_owner_change(&token_id, "transfer");
+        // = `self.tokens.nft_transfer(…)` (1 yocto, then `internal_transfer`), its event deferred (AUDIT-04);
+        // `approval_id` is ignored there too when the sender is the owner
+        let _ = approval_id;
+        near_sdk::assert_one_yocto();
+        self.move_token(&owner, &receiver_id, &token_id);
+        let cleared = self.on_owner_change(&token_id, "transfer");
         self.ensure_solvent(s0);
+        // events only after the last check that can refuse (AUDIT-04)
+        emit_nft_transfer(&owner, &receiver_id, &token_id, memo.as_deref());
+        if let Some(e) = cleared {
+            e.emit();
+        }
     }
 
     /// Disabled in v1 (D-07). Present so NEP-171 tooling gets a clear error instead of MethodNotFound.

@@ -1,6 +1,6 @@
 //! Test audit 2026-10-30 (docs/testing/contract.md): gaps found by the coverage audit, end to end on the sandbox.
-//! - AUDIT-01 (BUG, ignored): the BIP143 split-amount requests bypass a delegate's BTC cap on the real wasm.
-//! - AUDIT-02 (BUG, Info, ignored): `listings(from_index ≥ 2^32)` wraps to the first page on wasm32.
+//! - AUDIT-01 (Medium, fixed): a delegate may sign BTC only with one input, so the BIP143 split-amount requests are refused.
+//! - AUDIT-02 (Info, fixed): `listings(from_index ≥ 2^32)` is an empty page on wasm32, not the first page.
 //! - wNEAR (`wrap.testnet`, allowlisted for inside deposits only): deposit, withdraw, refused buy/offer, re-credit.
 //! - Event fields of the sale path (`listed`, `delisted`, `sold`, `payout`) on the real wasm.
 
@@ -32,13 +32,12 @@ async fn set_allowance(env: &Env, delegate: &Account, caps: Value) -> Result<Exe
         .await?)
 }
 
-/// AUDIT-01 on the real wasm. Two delegate requests for ONE 2-input tx (each input really holds 1,000,000 sats; the
-/// single output returns 1,000,000 sats to the Satchel's own P2WPKH, so the real fee is 1,000,000 sats). Request 1
-/// states input A's real amount and 1 sat for B; request 2 the reverse. Each is debited 1 sat, yet the record of A from
-/// request 1 and of B from request 2 are the sighashes of the REAL tx, i.e. both signatures are spendable together.
-/// Expected: the second request is refused ERR_ALLOWANCE_EXCEEDED under a 1,000-sat cap.
+/// AUDIT-01 (Medium, FIXED) on the real wasm. Two delegate requests for ONE 2-input tx (each input really holds
+/// 1,000,000 sats; the single output returns 1,000,000 sats to the Satchel's own P2WPKH, so the real fee is 1,000,000
+/// sats). Request 1 states input A's real amount and 1 sat for B; request 2 the reverse. Each used to be debited 1 sat
+/// while together they yield spendable signatures for the real tx. Now a delegate may sign BTC only with exactly one
+/// input: both halves are refused ERR_ALLOWANCE_BTC_ONE_INPUT before any record, the owner still signs the real tx.
 #[tokio::test]
-#[ignore = "BUG AUDIT-01: BIP143 split-amount requests let a delegate burn BTC as fee far beyond its cap"]
 async fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() -> Result<()> {
     let env = setup().await?;
     const X: u64 = 1_000_000;
@@ -55,28 +54,44 @@ async fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() -> Result<(
     r2.inputs[0].amount = 1;
 
     assert_ok(&set_allowance(&env, &env.carol, json!([{ "asset": "btc", "limit": "1000" }])).await?);
-    let r = sign_and_wait(&env, &env.carol, "1", &r1.req()).await?;
-    assert_ok(&r);
-    assert_eq!(events(&r, "allowance_spent")[0]["debits"], json!([{ "asset": "btc", "amount": "1" }]));
-    let recs = sig_records(&env, "1").await?;
-    assert_eq!(recs[0]["payload"], hex(&sha256d(&real.preimage(0))), "input A: the real tx's sighash");
-
-    let r = sign_sync_fail(&env, &env.carol, "1", &r2.req(), SignOpts::default_for(2)).await?;
-    // Today this succeeds with a 1-sat debit and records input B's real sighash (seq 3):
-    if r.is_success() {
-        let recs = sig_records(&env, "1").await?;
-        assert_eq!(recs[3]["payload"], hex(&sha256d(&real.preimage(1))), "input B: the real tx's sighash");
+    for half in [&r1, &r2] {
+        let r = sign_sync_fail(&env, &env.carol, "1", &half.req(), SignOpts::default_for(2)).await?;
+        assert_fails_with(&r, "ERR_ALLOWANCE_BTC_ONE_INPUT");
+        assert!(events(&r, "sign_requested").is_empty() && events(&r, "allowance_spent").is_empty());
     }
-    assert_fails_with(&r, "ERR_ALLOWANCE_EXCEEDED");
+    assert!(sig_records(&env, "1").await?.is_empty(), "nothing was recorded");
+    // the owner signs the real 2-input tx
+    let r = sign_and_wait(&env, &env.alice, "1", &real.req()).await?;
+    assert_ok(&r);
+    let recs = sig_records(&env, "1").await?;
+    assert_eq!(recs.len(), 2);
+    assert_eq!(recs[1]["payload"], hex(&sha256d(&real.preimage(1))));
     Ok(())
 }
 
-/// AUDIT-02 (Info). `listings` does `iter().skip(from_index as usize)`; on wasm32 `usize` is 32 bits, so
-/// `from_index = 2^32` truncates to 0 and returns the FIRST page instead of an empty one. Harmless for the UI (it
-/// pages from 0), but a client that pages by offset can loop forever or double-count. Suggested fix: clamp
-/// (`usize::try_from(from_index).unwrap_or(usize::MAX)`) or compare against `listings.len()` first.
+/// AUDIT-01: a delegate's single-input BTC send within its cap still signs on the real wasm, with the delegate as
+/// the requester and the full fee debited.
 #[tokio::test]
-#[ignore = "BUG AUDIT-02: listings(from_index >= 2^32) wraps to the first page on wasm32"]
+async fn audit01_delegate_single_input_btc_within_cap_signs() -> Result<()> {
+    let env = setup().await?;
+    let tx = BtcTx::new(1, 0x5b); // 50,000 in; 40,000 out to another P2WPKH, 9,000 change: fee 1,000
+    let debit: u128 = 41_000;
+    assert_ok(&set_allowance(&env, &env.carol, json!([{ "asset": "btc", "limit": (debit + 5).to_string() }])).await?);
+    let r = sign_and_wait(&env, &env.carol, "1", &tx.req()).await?;
+    assert_ok(&r);
+    assert_eq!(events(&r, "allowance_spent")[0]["debits"], json!([{ "asset": "btc", "amount": debit.to_string() }]));
+    let recs = sig_records(&env, "1").await?;
+    assert_eq!(recs.len(), 1);
+    assert_eq!(recs[0]["requester"], env.carol.id().to_string());
+    assert_eq!(recs[0]["status"], "signed");
+    assert_eq!(recs[0]["payload"], hex(&sha256d(&tx.preimage(0))));
+    Ok(())
+}
+
+/// AUDIT-02 (Info, FIXED). `listings` did `iter().skip(from_index as usize)`; on wasm32 `usize` is 32 bits, so
+/// `from_index = 2^32` truncated to 0 and returned the FIRST page instead of an empty one. The fix converts with
+/// `usize::try_from` and treats an offset that does not fit as past the end. Only the real wasm (32-bit) can see it.
+#[tokio::test]
 async fn audit02_listings_from_index_does_not_wrap() -> Result<()> {
     let env = setup().await?;
     list_ok(&env, &env.alice, "1", ONE_NEAR, "near").await?;
@@ -236,10 +251,10 @@ async fn audit_sale_path_event_fields() -> Result<()> {
     Ok(())
 }
 
-/// AUDIT-04 on the real wasm: a `make_offer` refused for its storage (ERR_DEPOSIT) still shows an `offer_made` event in
-/// the failed receipt's logs, which RPC and indexers return alongside the failure.
+/// AUDIT-04 (Low, FIXED) on the real wasm: a `make_offer` refused for its storage (ERR_DEPOSIT) used to show an
+/// `offer_made` event in the failed receipt's logs, which RPC and indexers return alongside the failure. The event is
+/// now emitted after `charge_storage`.
 #[tokio::test]
-#[ignore = "BUG AUDIT-04: offer_made is logged before charge_storage refuses the call"]
 async fn audit04_refused_make_offer_logs_no_offer_made() -> Result<()> {
     let env = setup().await?;
     let now = env.worker.view_block().await?.timestamp() / 1_000_000;
@@ -254,5 +269,31 @@ async fn audit04_refused_make_offer_logs_no_offer_made() -> Result<()> {
     assert_fails_with(&r, "ERR_DEPOSIT");
     assert!(view(&env, "offers_for", json!({ "token_id": "1", "from_index": 0, "limit": 50 })).await?.as_array().unwrap().is_empty());
     assert!(events(&r, "offer_made").is_empty(), "a refused call logged {:?}", events(&r, "offer_made"));
+    Ok(())
+}
+
+/// AUDIT-04 (FIXED), the USDC path: an offer through `ft_transfer_call` without storage credit is refused
+/// (ERR_STORAGE_CREDIT, the FT refunds 100 %) and logs no `offer_made`; with credit, the same offer logs exactly one.
+#[tokio::test]
+async fn audit04_refused_usdc_offer_logs_no_offer_made() -> Result<()> {
+    let env = setup().await?;
+    let now = env.worker.view_block().await?.timestamp() / 1_000_000;
+    let msg = json!({ "offer": { "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": now + 3_600_000 } }).to_string();
+    let r = ft_buy(&env, &env.bob, 5_000_000, &msg).await?;
+    assert_eq!(used(&r), 0, "no credit → refunded");
+    assert!(fail_text(&r).contains("ERR_STORAGE_CREDIT"), "{}", fail_text(&r));
+    assert!(events(&r, "offer_made").is_empty(), "a refused call logged {:?}", events(&r, "offer_made"));
+    assert_ok(
+        &env.bob
+            .call(env.satchel.id(), "prepay_storage")
+            .args_json(json!({}))
+            .deposit(NearToken::from_millinear(10))
+            .gas(Gas::from_tgas(30))
+            .transact()
+            .await?,
+    );
+    let r = ft_buy(&env, &env.bob, 5_000_000, &msg).await?;
+    assert_eq!(used(&r), 5_000_000);
+    assert_eq!(events(&r, "offer_made").len(), 1);
     Ok(())
 }
