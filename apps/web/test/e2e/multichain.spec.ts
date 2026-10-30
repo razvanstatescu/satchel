@@ -143,7 +143,7 @@ test.describe("C7: sign a message", () => {
 });
 
 test.describe("C3 + C2: Add coins network picker", () => {
-  test("picks Base Sepolia; the request URI is EIP-681 with @84532, and USDC uses the token form", async ({ page }) => {
+  test("picks Base Sepolia, then USDC; the address and the note follow the picked network and coin", async ({ page }) => {
     await page.goto("/s/1/receive?chain=evm");
     const sheet = page.getByTestId("receive-flow");
     const nets = sheet.getByRole("navigation", { name: "Network" });
@@ -151,16 +151,11 @@ test.describe("C3 + C2: Add coins network picker", () => {
     await nets.getByRole("link", { name: "Base" }).click();
     await expect(page).toHaveURL(/network=84532/);
     await expect(sheet).toContainText("Base Sepolia");
-    await sheet.locator("#request-amount").fill("0.01");
-    await sheet.getByRole("button", { name: /Create QR code|Update QR code/ }).click();
-    await expect(page).toHaveURL(/network=84532.*amount=0\.01|amount=0\.01.*network=84532/);
-    await expect(sheet.getByRole("img", { name: /ethereum:0x[0-9a-fA-F]{40}@84532\?value=10000000000000000/ })).toBeVisible();
-
     await sheet.getByRole("navigation", { name: "Coin" }).getByRole("link", { name: "USDC" }).click();
-    await expect(page).toHaveURL(/asset=usdc/);
-    await sheet.locator("#request-amount").fill("2");
-    await sheet.getByRole("button", { name: /Create QR code|Update QR code/ }).click();
-    await expect(sheet.getByRole("img", { name: /ethereum:0x036CbD53842c5426634e7929541eC2318f3dCF7e@84532\/transfer\?address=0x[0-9a-fA-F]{40}&uint256=2000000/ })).toBeVisible();
+    await expect(page).toHaveURL(/network=84532.*asset=usdc/);
+    await expect(sheet.getByRole("navigation", { name: "Network" }).getByRole("link", { name: "Base" })).toHaveAttribute("aria-current", "page");
+    await expect(sheet).toContainText("USDC on Base Sepolia arrives at this same address.");
+    await expect(sheet.locator('[data-full-address="evm"]')).toHaveText(/^0x[0-9a-fA-F]{40}$/);
   });
 });
 

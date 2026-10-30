@@ -99,3 +99,4 @@
 - 2026-10-30T10:10Z [orchestrator] allowance-caps merged; every sprint item done
 - 2026-10-30T10:47Z [orchestrator] UI notes: unified holdings list + coin sheets, Make an offer in the left column, Add coins overflow fixed, card shows top holdings + '+N more'; unit 474, e2e 207/207
 - 2026-10-30T11:05Z [orchestrator] D-50 overview: labelled ≈$ estimate + value bar + top coins on card/Wallet tab/market/You get; prices 1Click→CoinGecko; unit 479, e2e 207/207
+- 2026-10-30T11:28Z [orchestrator] A4 request-an-amount removed from Add coins (Razvan); unit 461, e2e 200/200

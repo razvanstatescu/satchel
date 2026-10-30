@@ -26,12 +26,6 @@ function pickChain(raw: string | string[] | undefined): UiChain {
   return "btc";
 }
 
-/** A4: `?amount=` on a shared request link (display only; validated again, chain-side, in ReceiveSheet). */
-function pickAmount(raw: string | string[] | undefined): string | undefined {
-  const v = Array.isArray(raw) ? raw[0] : raw;
-  return v && v.trim() ? v.trim() : undefined;
-}
-
 export default async function ReceivePage(props: PageProps<"/s/[id]/receive">) {
   const { id } = await props.params;
   const sp = await props.searchParams;
@@ -40,7 +34,7 @@ export default async function ReceivePage(props: PageProps<"/s/[id]/receive">) {
   return (
     <>
       <WalletTab snap={snap} />
-      <ReceiveSheet snap={snap} chain={pickChain(sp.chain)} amount={pickAmount(sp.amount)} network={pickEvmChainId(sp.network)} asset={sp.asset === "usdc" ? "usdc" : "eth"} />
+      <ReceiveSheet snap={snap} chain={pickChain(sp.chain)} network={pickEvmChainId(sp.network)} asset={sp.asset === "usdc" ? "usdc" : "eth"} />
     </>
   );
 }
