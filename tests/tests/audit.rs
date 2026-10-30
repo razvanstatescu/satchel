@@ -1,6 +1,6 @@
 //! Test audit 2026-10-30 (docs/testing/contract.md): gaps found by the coverage audit, end to end on the sandbox.
 //! - AUDIT-01 (BUG, ignored): the BIP143 split-amount requests bypass a delegate's BTC cap on the real wasm.
-//! - AUDIT-02 (BUG, Info, ignored): `listings(from_index ≥ 2^32)` wraps to the first page on wasm32.
+//! - AUDIT-02 (Info, fixed): `listings(from_index ≥ 2^32)` is an empty page on wasm32, not the first page.
 //! - wNEAR (`wrap.testnet`, allowlisted for inside deposits only): deposit, withdraw, refused buy/offer, re-credit.
 //! - Event fields of the sale path (`listed`, `delisted`, `sold`, `payout`) on the real wasm.
 
@@ -71,12 +71,10 @@ async fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() -> Result<(
     Ok(())
 }
 
-/// AUDIT-02 (Info). `listings` does `iter().skip(from_index as usize)`; on wasm32 `usize` is 32 bits, so
-/// `from_index = 2^32` truncates to 0 and returns the FIRST page instead of an empty one. Harmless for the UI (it
-/// pages from 0), but a client that pages by offset can loop forever or double-count. Suggested fix: clamp
-/// (`usize::try_from(from_index).unwrap_or(usize::MAX)`) or compare against `listings.len()` first.
+/// AUDIT-02 (Info, FIXED). `listings` did `iter().skip(from_index as usize)`; on wasm32 `usize` is 32 bits, so
+/// `from_index = 2^32` truncated to 0 and returned the FIRST page instead of an empty one. The fix converts with
+/// `usize::try_from` and treats an offset that does not fit as past the end. Only the real wasm (32-bit) can see it.
 #[tokio::test]
-#[ignore = "BUG AUDIT-02: listings(from_index >= 2^32) wraps to the first page on wasm32"]
 async fn audit02_listings_from_index_does_not_wrap() -> Result<()> {
     let env = setup().await?;
     list_ok(&env, &env.alice, "1", ONE_NEAR, "near").await?;
