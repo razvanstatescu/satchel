@@ -235,3 +235,24 @@ async fn audit_sale_path_event_fields() -> Result<()> {
     );
     Ok(())
 }
+
+/// AUDIT-04 on the real wasm: a `make_offer` refused for its storage (ERR_DEPOSIT) still shows an `offer_made` event in
+/// the failed receipt's logs, which RPC and indexers return alongside the failure.
+#[tokio::test]
+#[ignore = "BUG AUDIT-04: offer_made is logged before charge_storage refuses the call"]
+async fn audit04_refused_make_offer_logs_no_offer_made() -> Result<()> {
+    let env = setup().await?;
+    let now = env.worker.view_block().await?.timestamp() / 1_000_000;
+    let r = env
+        .bob
+        .call(env.satchel.id(), "make_offer")
+        .args_json(json!({ "token_id": "1", "amount": ONE_NEAR.to_string(), "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": now + 3_600_000 }))
+        .deposit(NearToken::from_yoctonear(ONE_NEAR + 1))
+        .gas(Gas::from_tgas(30))
+        .transact()
+        .await?;
+    assert_fails_with(&r, "ERR_DEPOSIT");
+    assert!(view(&env, "offers_for", json!({ "token_id": "1", "from_index": 0, "limit": 50 })).await?.as_array().unwrap().is_empty());
+    assert!(events(&r, "offer_made").is_empty(), "a refused call logged {:?}", events(&r, "offer_made"));
+    Ok(())
+}
