@@ -9,7 +9,7 @@ import { FlowShell } from "@/components/client/FlowShell";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
 import { Avatar, Button, Icon, Morph, Segmented, TextInput, cx } from "@/components/ui";
-import { CHAIN_ASSET } from "@/lib/allowanceView";
+import { CHAIN_ASSET, MAX_CAPS, extraCapOptions } from "@/lib/allowanceView";
 import { copy, TICKER } from "@/lib/copy";
 import { MPC_CONTRACT, SATCHEL_CONTRACT } from "@/lib/config";
 import { refreshSnapshot } from "@/lib/data/client";
@@ -24,9 +24,11 @@ import { UI_CHAINS, type UiChain } from "@/lib/view";
 
 /**
  * The Add sheet (/s/[id]/allowance; docs/specs/C5.md §1): Who → Limits (the daily caps + an expiry) → the wallet.
- * Owner only, blocked past MAX_DELEGATES (4 live, non-expired rows). No ERC-20/USDC cap yet (the Send flow doesn't
- * support C2 sends either) and no second EVM chain (C3's web UI comes in a later phase); both already extend the
- * contract's `Asset` enum without a shape change, so this sheet only needs new rows then.
+ * Owner only, blocked past MAX_DELEGATES (4 live, non-expired rows). Limits offers the three native-chain caps up
+ * front (BTC, Sepolia ETH, SOL) and, behind an "Other networks" disclosure, ETH on Base/Arbitrum/OP and USDC on all
+ * four EVM testnets (C2 + C3) — `extraCapOptions()` (allowanceView.ts) builds that list. The contract caps one
+ * allowance at MAX_CAPS (8) rows; past that, further unchecked boxes are disabled rather than letting the owner
+ * build a request `set_allowance` would reject.
  */
 
 const MAX_DELEGATES = 4;
@@ -36,8 +38,13 @@ const EXPIRY_MS: Record<Expiry, number | null> = { "24h": 86_400_000, "7d": 7 * 
 /** The wall clock, read only from event handlers (never during render). */
 const wallClock = () => Date.now();
 
+const EXTRA_OPTIONS = extraCapOptions();
+
 const emptyCaps = (): Record<UiChain, { on: boolean; text: string }> =>
   Object.fromEntries(UI_CHAINS.map((c) => [c, { on: false, text: "" }])) as Record<UiChain, { on: boolean; text: string }>;
+
+const emptyExtra = (): Record<string, { on: boolean; text: string }> =>
+  Object.fromEntries(EXTRA_OPTIONS.map((o) => [o.key, { on: false, text: "" }]));
 
 export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
   const { live, isOwner, accountId } = useViewer(snap);
@@ -53,6 +60,7 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
   const exists = !target ? { checking: false, ok: null, owns: 0 } : lookup?.for === target ? { checking: false, ok: lookup.ok as boolean | null, owns: lookup.owns } : { checking: true, ok: null, owns: 0 };
 
   const [caps, setCaps] = useState<Record<UiChain, { on: boolean; text: string }>>(emptyCaps);
+  const [extra, setExtra] = useState<Record<string, { on: boolean; text: string }>>(emptyExtra);
   const [expiry, setExpiry] = useState<Expiry>("never");
   const [phase, setPhase] = useState<Phase>("who");
   const [note, setNote] = useState<{ kind: "cancelled" | "error"; text: string } | null>(null);
@@ -65,6 +73,7 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
     setText("");
     setLookup(null);
     setCaps(emptyCaps());
+    setExtra(emptyExtra());
     setExpiry("never");
     setPhase("who");
     setNote(null);
@@ -98,14 +107,29 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
     const invalid = row.on && row.text.trim() !== "" && amount === null;
     return { chain, ticker, decimals, row, amount, invalid };
   });
-  const anyOn = capRows.some((r) => r.row.on);
-  const capsValid = anyOn && capRows.every((r) => !r.row.on || (r.amount !== null && r.amount > 0n));
+  const extraRows = EXTRA_OPTIONS.map((opt) => {
+    const row = extra[opt.key] ?? { on: false, text: "" };
+    const amount = row.on && row.text.trim() ? parseUnits(row.text, opt.decimals) : null;
+    const invalid = row.on && row.text.trim() !== "" && amount === null;
+    return { ...opt, row, amount, invalid };
+  });
+  const enabledCount = capRows.filter((r) => r.row.on).length + extraRows.filter((r) => r.row.on).length;
+  const atCapLimit = enabledCount >= MAX_CAPS;
+  const anyOn = enabledCount > 0;
+  const capsValid =
+    anyOn &&
+    enabledCount <= MAX_CAPS &&
+    capRows.every((r) => !r.row.on || (r.amount !== null && r.amount > 0n)) &&
+    extraRows.every((r) => !r.row.on || (r.amount !== null && r.amount > 0n));
   const canAdd = capsValid && phase === "caps";
 
   const onAdd = () => {
     if (!canAdd || !wallet || !accountId || !target) return;
     setNote(null);
-    const capInputs = capRows.filter((r) => r.row.on && r.amount !== null).map((r) => ({ asset: CHAIN_ASSET[r.chain], limit: r.amount! }));
+    const capInputs = [
+      ...capRows.filter((r) => r.row.on && r.amount !== null).map((r) => ({ asset: CHAIN_ASSET[r.chain], limit: r.amount! })),
+      ...extraRows.filter((r) => r.row.on && r.amount !== null).map((r) => ({ asset: r.asset, limit: r.amount! })),
+    ];
     const expiresAtMs = EXPIRY_MS[expiry] === null ? undefined : wallClock() + EXPIRY_MS[expiry]!;
     runCall(wallet, calls.setAllowance(id, target, capInputs, expiresAtMs), accountId, (s) => setPhase(s === "wallet" ? "wallet" : "adding")).then((r) => {
       if (r.ok) {
@@ -225,6 +249,7 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
                   <input
                     type="checkbox"
                     checked={row.on}
+                    disabled={atCapLimit && !row.on}
                     onChange={(e) => setCaps((c) => ({ ...c, [chain]: { ...c[chain], on: e.target.checked } }))}
                     className="size-5 accent-sticker"
                     data-testid={`allowance-cap-${chain}`}
@@ -252,6 +277,52 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
               {copy.allowance.add.needCap}
             </p>
           ) : null}
+          {atCapLimit ? (
+            <p className="m-0 flex items-start gap-1.5 font-sans text-body-sm text-ink-muted" data-testid="allowance-cap-limit">
+              <Icon icon={Info} size={16} className="mt-0.5" />
+              {copy.allowance.add.capLimitReached}
+            </p>
+          ) : null}
+          <details className="group rounded-md border border-line bg-surface" data-testid="allowance-other-networks">
+            <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-3 px-4 font-sans text-label text-ink [&::-webkit-details-marker]:hidden">
+              {copy.nets.other}
+              <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden="true" className="text-ink-muted transition-transform duration-150 group-open:rotate-180">
+                <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </summary>
+            <div className="flex flex-col gap-3 px-4 pb-4">
+              <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.allowance.add.otherNetworksHelp}</p>
+              <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+                {extraRows.map(({ key, network, ticker, row, invalid }) => (
+                  <li key={key} className="flex flex-col gap-2 rounded-md border border-line p-3.5">
+                    <label className="flex items-center gap-2.5 font-sans text-[0.9375rem]/5 font-semibold text-ink">
+                      <input
+                        type="checkbox"
+                        checked={row.on}
+                        disabled={atCapLimit && !row.on}
+                        onChange={(e) => setExtra((c) => ({ ...c, [key]: { ...c[key], on: e.target.checked } }))}
+                        className="size-5 accent-sticker"
+                        data-testid={`allowance-cap-${key.replace(":", "-")}`}
+                      />
+                      <ChainCharm chain="evm" size={20} />
+                      {copy.allowance.add.networkTicker(ticker, network)}
+                    </label>
+                    {row.on ? (
+                      <TextInput
+                        inputMode="decimal"
+                        value={row.text}
+                        onChange={(e) => setExtra((c) => ({ ...c, [key]: { ...c[key], text: e.target.value.replace(",", ".") } }))}
+                        aria-label={copy.allowance.add.capAmountIn(`${ticker} ${network}`)}
+                        placeholder="0"
+                        invalid={invalid}
+                        data-testid={`allowance-cap-${key.replace(":", "-")}-amount`}
+                      />
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </details>
         </section>
         <section aria-labelledby="allowance-expiry-title" className="flex flex-col gap-2.5">
           <h3 id="allowance-expiry-title" className="m-0 font-sans text-label text-ink">
