@@ -1,17 +1,16 @@
 import { cacheLife } from "next/cache";
 import { IS_FIXTURE, SATCHEL_CONTRACT, SOL_RPCS, SOL_UI_ENABLED } from "@/lib/config";
-import { BLOCKSCOUT, mergeTxs, parseBlockscout, parseInside, parseMempool, parseSolana, type ChainTx, type TxPage, type TxSourceKey, type TxSourceRead } from "@/lib/chain-txs";
+import { BLOCKSCOUT, parseBlockscout, parseInside, parseMempool, parseSolana, type ChainTx, type TxSourceKey } from "@/lib/chain-txs";
 import { fixtureTxs } from "@/lib/data/fixture-txs";
-import { isTokenId } from "@/lib/data/snapshot";
 import { satchelAddresses } from "@/lib/derive";
 import { satchelEvents } from "@/lib/near/history";
 import { withTimeout } from "@/lib/near/rpc";
 import { BTC_APIS } from "@/lib/config";
 
 /**
- * The Transactions tab's server read (lib/chain-txs.ts): every keyless source at once, each bounded on its own, so one
- * slow or failing chain never hides the others (it is reported as unread instead). Cached 30 s, which also keeps the
- * Solana devnet RPC under its per-IP method limit. Server-rendered: the tab has no loading state.
+ * The Transactions tab's server reads (lib/chain-txs.ts): one keyless source per call, bounded on its own, so one slow
+ * or failing chain never holds the others (it is reported as unread instead). Cached 30 s per source, which also keeps
+ * the Solana devnet RPC under its per-IP method limit.
  */
 
 const SOURCE_MS = 4000;
@@ -50,28 +49,32 @@ async function readInside(tokenId: string): Promise<ChainTx[]> {
   return parseInside(evs);
 }
 
-export async function getTransactions(id: string): Promise<TxPage | null> {
+/** The sources this deployment reads, in the order the tab lists them. */
+export const TX_SOURCES: readonly TxSourceKey[] = ["bitcoin", "sepolia", "base", "optimism", ...(SOL_UI_ENABLED ? (["solana"] as const) : []), "near"];
+
+export const isTxSource = (v: unknown): v is TxSourceKey => typeof v === "string" && (TX_SOURCES as readonly string[]).includes(v);
+
+/**
+ * One source's rows (the tab reads every source in parallel from the browser, through /api/satchels/[id]/txs, so the
+ * fastest chain shows first and a slow one never holds the page). Cached 30 s per source; a failed read throws (and so
+ * is not cached).
+ */
+export async function getTxSource(id: string, key: TxSourceKey): Promise<{ key: TxSourceKey; txs: ChainTx[]; as_of: number }> {
   "use cache";
   cacheLife({ revalidate: 30, expire: 3600 });
-  if (!isTokenId(id)) return null;
-  if (IS_FIXTURE) return fixtureTxs(id);
+  if (IS_FIXTURE) {
+    const page = fixtureTxs(id);
+    return { key, txs: page.txs.filter((t) => t.network === key), as_of: page.as_of };
+  }
   const a = satchelAddresses(id);
-  const jobs: [TxSourceKey, () => Promise<ChainTx[]>][] = [
-    ["bitcoin", () => readBitcoin(a.btc)],
-    ["sepolia", () => readEvm(11155111, a.evm)],
-    ["base", () => readEvm(84532, a.evm)],
-    ["optimism", () => readEvm(11155420, a.evm)],
-    ...(SOL_UI_ENABLED ? ([["solana", () => readSolana(a.sol)]] as [TxSourceKey, () => Promise<ChainTx[]>][]) : []),
-    ["near", () => readInside(id)],
-  ];
-  const results = await Promise.all(
-    jobs.map(async ([key, run]): Promise<{ read: TxSourceRead; txs: ChainTx[] }> => {
-      try {
-        return { read: { key, ok: true }, txs: await withTimeout(run(), SOURCE_MS + 500, key) };
-      } catch {
-        return { read: { key, ok: false }, txs: [] };
-      }
-    }),
-  );
-  return { txs: mergeTxs(results.map((r) => r.txs)), sources: results.map((r) => r.read), as_of: Date.now() };
+  const run: Record<TxSourceKey, () => Promise<ChainTx[]>> = {
+    bitcoin: () => readBitcoin(a.btc),
+    sepolia: () => readEvm(11155111, a.evm),
+    base: () => readEvm(84532, a.evm),
+    optimism: () => readEvm(11155420, a.evm),
+    solana: () => readSolana(a.sol),
+    near: () => readInside(id),
+  };
+  // a failure throws, so it is never cached: the next read tries the source again
+  return { key, txs: await withTimeout(run[key](), SOURCE_MS + 500, key), as_of: Date.now() };
 }

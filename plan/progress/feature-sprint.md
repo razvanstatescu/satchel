@@ -235,3 +235,13 @@ it. Phase-2 UI work builds against those specs.
     - Pending first, then UTC days; each row links to its explorer.
   - **Checks:** the parsers were checked against dev2 #1's real history, and fixture history keeps the tests offline.
   - Web unit 477, Playwright **210/210**.
+- 2026-10-30 (Razvan: "server rendering doesn't create a good UX"):
+  - **Transactions.** The page renders at once. The list loads in the browser: every source in parallel through `/api/satchels/[id]/txs?source=`, cached 30 s per source, with failures never cached.
+    - Loading rows show until the first source answers, then "Reading Base Sepolia…" for the rest.
+    - A failed source says so, with Try again.
+    - The filter is instant client state, mirrored to `?filter=`.
+  - **`/fund`.** The server renders only the first view, including a pre-filled destination's QR. Coin and network picks are now instant client state: no server round trip (e2e-checked), and the URL is mirrored for sharing.
+    - All three addresses' QR codes are drawn in the background on load.
+    - A pick scrolls the destination into view on phones.
+    - The tiles stay real links, so a new tab or no JavaScript still works.
+  - Web unit 477, Playwright **213/213**.

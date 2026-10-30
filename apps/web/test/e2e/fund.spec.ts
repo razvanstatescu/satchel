@@ -54,6 +54,25 @@ test.describe("/fund/[id]: the public Add coins page", () => {
     await expect(to.getByRole("button", { name: "Connect NEAR wallet" })).toBeVisible();
   });
 
+  test("picks are instant (no server round trip) and the URL follows for sharing", async ({ page }) => {
+    await page.goto("/fund/1");
+    let navigations = 0;
+    page.on("request", (r) => {
+      // a round trip for this page itself (other links' prefetches don't count)
+      if (new URL(r.url()).pathname.startsWith("/fund/") && (r.isNavigationRequest() || r.url().includes("_rsc"))) navigations++;
+    });
+    await page.locator('[data-fund-coin="ETH"]').click();
+    await page.locator('[data-fund-network="optimism"]').click();
+    await expect(page.locator('[data-fund-destination="evm-11155420-eth"]')).toBeVisible();
+    await expect(page).toHaveURL(/\/fund\/1\?coin=eth&network=optimism$/);
+    // the QR was drawn in the browser, ahead of the pick
+    await expect(page.locator('[data-fund-destination] [role="img"][aria-label^="QR code for 0x"]')).toBeVisible();
+    expect(navigations).toBe(0);
+    // switching coin keeps no stale network: SOL has one place, so it shows straight away
+    await page.locator('[data-fund-coin="SOL"]').click();
+    await expect(page.locator('[data-fund-destination="sol"]')).toBeVisible();
+  });
+
   test("unknown pre-fills are dropped, never guessed", async ({ page }) => {
     await page.goto("/fund/1?coin=doge&network=base");
     await expect(page.locator("[data-fund-destination]")).toHaveCount(0);

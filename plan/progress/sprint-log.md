@@ -102,3 +102,4 @@
 - 2026-10-30T11:28Z [orchestrator] A4 request-an-amount removed from Add coins (Razvan); unit 461, e2e 200/200
 - 2026-10-30T11:51Z [orchestrator] UI round 3: /fund/[id] public page + Share link everywhere, offer buttons, testnet-only labels, coin-sheet alignment, ETH explorers, bar tooltip; unit 466, e2e 208/208
 - 2026-10-30T12:38Z [orchestrator] Transactions tab (BTC, Sepolia, Base, OP, SOL, inside; Arbitrum linked out); unit 477, e2e 210/210
+- 2026-10-30T12:52Z [orchestrator] Transactions streams per source from the browser (skeleton, reading line, retry); /fund picks instant (client state + replaceState, QRs pre-drawn); unit 477, e2e 213/213

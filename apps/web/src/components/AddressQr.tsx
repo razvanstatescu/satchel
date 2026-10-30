@@ -18,7 +18,8 @@ export function AddressQr({
 }: {
   tokenId: string;
   address: string;
-  svg: string;
+  /** null while the browser draws it (the public page's instant pickers): a quiet placeholder of the same size */
+  svg: string | null;
   /** "Bitcoin testnet4", "Base Sepolia"… */
   network: string;
   /** the charm or coin icon before the network */
@@ -39,13 +40,17 @@ export function AddressQr({
           {lead}
           {network}
         </p>
-        <div
-          data-scheme="day"
-          role="img"
-          aria-label={copy.fund.qr(address)}
-          className="size-55 rounded-[16px] border border-line-strong bg-surface p-2.5 text-ink *:block *:size-full"
-          dangerouslySetInnerHTML={{ __html: svg }}
-        />
+        {svg ? (
+          <div
+            data-scheme="day"
+            role="img"
+            aria-label={copy.fund.qr(address)}
+            className="size-55 rounded-[16px] border border-line-strong bg-surface p-2.5 text-ink *:block *:size-full"
+            dangerouslySetInnerHTML={{ __html: svg }}
+          />
+        ) : (
+          <div aria-hidden="true" className="size-55 rounded-[16px] border border-line-strong bg-skeleton motion-safe:animate-pulse" />
+        )}
         <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.fund.label(network)}</p>
         <p className="m-0 w-full text-center">
           <AddressDisplay address={address} fullAttr={fullAttr} size="lg" align="center" />
