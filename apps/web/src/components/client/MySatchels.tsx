@@ -5,7 +5,7 @@ import { CircleAlert, Plus, RefreshCw, Tag, TriangleAlert } from "lucide-react";
 import { SatchelCard } from "@/components/SatchelCard";
 import { Banner, Button, EmptyState, Icon, Skeleton, cx } from "@/components/ui";
 import { ConnectButton } from "@/components/client/ConnectButton";
-import { MyOfferRow } from "@/components/client/Market";
+import { MyOfferRow, StorageCreditRow } from "@/components/client/Market";
 import { useCharmSwing } from "@/components/client/MintFlow";
 import { EscrowPanel, useProceeds } from "@/components/client/SoldReceipt";
 import { copy } from "@/lib/copy";
@@ -105,14 +105,18 @@ function useMyOffers(accountId: string | null) {
   return { offers: loading ? null : state.offers, reload: () => setAttempt((n) => n + 1) };
 }
 
+/** "My offers" + the storage credit line (docs/specs/C4-C6.md §1): the account's offers made elsewhere, and any
+ * unused `prepay_storage` credit sitting idle, with a Withdraw button. Either half can be empty on its own (a
+ * credit can outlive every offer it paid storage for), so the section renders if either has something to show. */
 function MyOffers({ accountId }: { accountId: string }) {
   const { offers, reload } = useMyOffers(accountId);
-  if (!offers?.length) return null;
+  if (!offers?.length) return <StorageCreditRow accountId={accountId} />;
   return (
     <section aria-labelledby="my-offers-title" data-testid="my-offers" className="mb-6 flex flex-col gap-2.5">
       <h2 id="my-offers-title" className="m-0 font-sans text-label text-ink">
         {copy.offers.mine.title}
       </h2>
+      <StorageCreditRow accountId={accountId} />
       <ul className="m-0 list-none rounded-md border border-line bg-surface p-0">
         {offers.map((o) => (
           <MyOfferRow key={o.id} offer={o} onChanged={reload} />

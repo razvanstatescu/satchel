@@ -123,6 +123,13 @@ export interface MarketEntry {
   hint: Pick<CleanReport, "aggregate" | "checked_at" | "items"> | null;
 }
 
+/** C4: a Satchel that isn't listed, shown on `/market`'s "Unlisted Satchels" section (docs/specs/C4-C6.md §3: anyone
+ * can offer whether or not it's for sale) with just a "Make an offer" link — no listing, no clean-history hint. */
+export interface UnlistedEntry {
+  token_id: string;
+  snapshot: SatchelSnapshot;
+}
+
 export interface ActivityRow {
   kind: "sent" | "signed_not_sent" | "issued" | "message" | "transferred" | "received" | "minted" | "listed" | "delisted" | "sold" | "bought";
   tx: string;

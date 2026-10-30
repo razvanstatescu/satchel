@@ -305,5 +305,10 @@ export const commerce = {
     tryAgain: "Try again",
     /** NEW (app-screens §9): each card's meta line. */
     meta: (id: number, sigs: number) => `Listing #${id} · ${n(sigs, "signature", "signatures")}`,
+    /** C4 (docs/specs/C4-C6.md §3): Satchels nobody's selling, but anyone can still offer on. */
+    unlisted: {
+      title: "Unlisted Satchels",
+      lead: "Not for sale, but anyone can still make an offer.",
+    },
   },
 } as const;

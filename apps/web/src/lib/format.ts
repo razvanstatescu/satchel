@@ -6,11 +6,11 @@
 export const NBSP = " ";
 export const MINUS = "−";
 
-export type Ticker = "BTC" | "ETH" | "SOL" | "NEAR" | "USDC";
+export type Ticker = "BTC" | "ETH" | "SOL" | "NEAR" | "USDC" | "wNEAR";
 
-export const DECIMALS: Record<Ticker, number> = { BTC: 8, ETH: 18, SOL: 9, NEAR: 24, USDC: 6 };
-const MAX_SHOWN: Record<Ticker, number> = { BTC: 8, ETH: 6, SOL: 6, NEAR: 4, USDC: 2 };
-const MIN_SHOWN: Record<Ticker, number> = { BTC: 4, ETH: 4, SOL: 4, NEAR: 0, USDC: 2 };
+export const DECIMALS: Record<Ticker, number> = { BTC: 8, ETH: 18, SOL: 9, NEAR: 24, USDC: 6, wNEAR: 24 };
+const MAX_SHOWN: Record<Ticker, number> = { BTC: 8, ETH: 6, SOL: 6, NEAR: 4, USDC: 2, wNEAR: 4 };
+const MIN_SHOWN: Record<Ticker, number> = { BTC: 4, ETH: 4, SOL: 4, NEAR: 0, USDC: 2, wNEAR: 0 };
 
 /** Base units → decimal string, rounded down to `maxDp`, trailing zeros trimmed to `minDp`. */
 export function formatUnits(base: bigint | string | number, decimals: number, maxDp: number, minDp = 0): string {
@@ -34,7 +34,7 @@ export function formatAmount(base: bigint | string | number, ticker: Ticker, opt
   const min = MIN_SHOWN[ticker];
   const smallest = 10n ** BigInt(dec - max);
   let body: string;
-  if (b > 0n && b < smallest && (ticker === "ETH" || ticker === "NEAR" || ticker === "SOL")) {
+  if (b > 0n && b < smallest && (ticker === "ETH" || ticker === "NEAR" || ticker === "SOL" || ticker === "wNEAR")) {
     body = `< ${formatUnits(smallest, dec, max, 0)}`;
   } else {
     body = formatUnits(b, dec, max, min);
