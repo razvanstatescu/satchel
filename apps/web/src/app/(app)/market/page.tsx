@@ -104,17 +104,18 @@ export default async function MarketPage() {
           </header>
           <ul className="m-0 grid list-none grid-cols-1 gap-7 p-0 md:grid-cols-2 xl:grid-cols-3 xl:gap-8" data-testid="unlisted-grid">
             {unlisted.entries.map((e) => (
-              <li key={e.token_id} data-unlisted-item={e.token_id} className="flex w-full max-w-100 min-w-0 flex-col gap-2.5">
-                <SatchelCard
-                  id={`unlisted-card-${e.token_id}`}
-                  tokenId={e.token_id}
-                  size="lg"
-                  status={e.snapshot.status}
-                  chips={cardChips(e.snapshot)}
-                  headingLevel={2}
+              <li key={e.token_id} data-unlisted-item={e.token_id} className="group/mkt relative flex w-full max-w-100 min-w-0 flex-col gap-2.5">
+                {/* same split as the listed grid above: the card is real content, the link below it (not around it,
+                    so axe's label-content-name-mismatch stays clean) stretches over the whole item. */}
+                <SatchelCard id={`unlisted-card-${e.token_id}`} tokenId={e.token_id} size="lg" status={e.snapshot.status} chips={cardChips(e.snapshot)} headingLevel={2} />
+                <Link
                   href={`/s/${e.token_id}/offer`}
-                  linkLabel={copy.offerEntry(e.token_id)}
-                />
+                  data-press=""
+                  className="flex items-center gap-1.5 px-1 font-sans text-body-sm font-semibold text-link no-underline decoration-1 underline-offset-3 after:absolute after:inset-0 after:rounded-card after:content-[''] hover:decoration-2 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-focus"
+                >
+                  <span className="sr-only">{`${copy.card.name(e.token_id)}, `}</span>
+                  {copy.offers.make}
+                </Link>
               </li>
             ))}
           </ul>

@@ -254,7 +254,7 @@ test.describe("/market: an entry point to offer on an unlisted Satchel", () => {
     await expect(section).toBeVisible();
     const card = section.locator('[data-unlisted-item="6"]');
     await expect(card).toBeVisible();
-    await card.getByRole("link", { name: /Make an offer on Satchel #6/ }).click();
+    await card.getByRole("link", { name: /Satchel #6.*Make an offer/ }).click();
     await expect(page).toHaveURL(/\/s\/6\/offer$/);
     await expect(page.getByTestId("offer-flow")).toBeVisible();
   });
