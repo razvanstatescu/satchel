@@ -183,8 +183,9 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
   an amount yields an invalid signature" holds per input only; segwit v0 commits to each input's amount in that
   input's sighash alone, the 2020 segwit fee issue).
 - **Impact:** a delegate can burn up to about `(n − 1) × change` of the owner's BTC as miner fee while being debited
-  a few sats; with a colluding miner that fee is theft. Bitcoin Core's default `maxfeerate` refuses such a tx at
-  `sendrawtransaction`, but consensus accepts it and any node with `-maxfeerate=0` or a miner relays it. Owners are
+  a few sats; with a colluding miner that fee is theft. Consensus accepts the tx. Bitcoin Core's default
+  `maxfeerate` (0.10 BTC/kvB) only stops `sendrawtransaction` above ≈ 0.02 BTC of fee for a ≈ 200-vB 2-input tx, so
+  the repro's 0.01 BTC fee goes through a default node; larger burns need `-maxfeerate=0` or a miner. Owners are
   not affected (they are trusted); clean history is not affected (every request is recorded before the MPC call).
 - **Tests:** `contracts/satchel/src/allowance_tests.rs::audit01_btc_split_amount_requests_bypass_the_delegate_cap`
   (unit) and `tests/tests/audit.rs::audit01_btc_split_amount_requests_bypass_the_delegate_cap` (real wasm), both
