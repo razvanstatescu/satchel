@@ -532,15 +532,15 @@ impl Contract {
     }
 
     /// Reset rule (spec §4): every ownership change clears all allowances of the token. `reason`: "transfer" | "sale".
-    pub(crate) fn clear_allowances(&mut self, token_id: &TokenId, reason: &str) {
-        if let Some(set) = store().remove(token_id) {
-            AllowanceEvent::AllowancesCleared {
-                token_id: token_id.clone(),
-                delegate_ids: set.list.into_iter().map(|a| a.delegate).collect(),
-                reason: reason.to_string(),
-            }
-            .emit();
-        }
+    /// Returns the `allowances_cleared` event (if any were cleared); the caller emits it after its last check
+    /// (AUDIT-04).
+    #[must_use]
+    pub(crate) fn clear_allowances(&mut self, token_id: &TokenId, reason: &str) -> Option<AllowanceEvent> {
+        store().remove(token_id).map(|set| AllowanceEvent::AllowancesCleared {
+            token_id: token_id.clone(),
+            delegate_ids: set.list.into_iter().map(|a| a.delegate).collect(),
+            reason: reason.to_string(),
+        })
     }
 }
 

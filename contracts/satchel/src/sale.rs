@@ -37,25 +37,31 @@ impl Contract {
 
     /// The single receipt of a sale: transfer, clear the listing, `sold` event, detached payout, then the M-01
     /// solvency guard (last, so the NEAR payout is already deducted from the balance it checks).
+    /// Events (nep171 `nft_transfer`, `allowances_cleared`, `sold`, in that order) are logged only after the guard
+    /// (AUDIT-04): a refused sale logs none.
     fn execute_sale(&mut self, token_id: TokenId, listing: Listing, buyer: AccountId) {
         let s0 = env::storage_usage();
-        self.tokens.internal_transfer(&listing.seller, &buyer, &token_id, None, Some("sale".to_string()));
-        self.on_owner_change(&token_id, "sale"); // C5 reset rule (clears allowances)
+        self.move_token(&listing.seller, &buyer, &token_id); // = internal_transfer(…, memo "sale"), event deferred
+        let cleared = self.on_owner_change(&token_id, "sale"); // C5 reset rule (clears allowances)
         let mut st = self.token_state(&token_id);
         st.listing = None;
         self.state.insert(token_id.clone(), st);
         self.listings.remove(&token_id);
-        SatchelEvent::Sold {
-            token_id,
+        let sold = SatchelEvent::Sold {
+            token_id: token_id.clone(),
             listing_id: listing.id,
             seller_id: listing.seller.clone(),
-            buyer_id: buyer,
+            buyer_id: buyer.clone(),
             price: listing.price,
             currency: listing.currency,
-        }
-        .emit();
-        self.payout(listing.seller, listing.currency, listing.price.0); // detached: never the returned promise
+        };
+        self.payout(listing.seller.clone(), listing.currency, listing.price.0); // detached: never the returned promise
         self.ensure_solvent(s0);
+        crate::emit_nft_transfer(&listing.seller, &buyer, &token_id, Some("sale"));
+        if let Some(e) = cleared {
+            e.emit();
+        }
+        sold.emit();
     }
 
     /// Payout promise `.then(on_payout)`. NEAR: plain transfer; USDC: `ft_transfer` with 1 yocto, 15 Tgas.

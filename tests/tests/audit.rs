@@ -234,10 +234,10 @@ async fn audit_sale_path_event_fields() -> Result<()> {
     Ok(())
 }
 
-/// AUDIT-04 on the real wasm: a `make_offer` refused for its storage (ERR_DEPOSIT) still shows an `offer_made` event in
-/// the failed receipt's logs, which RPC and indexers return alongside the failure.
+/// AUDIT-04 (Low, FIXED) on the real wasm: a `make_offer` refused for its storage (ERR_DEPOSIT) used to show an
+/// `offer_made` event in the failed receipt's logs, which RPC and indexers return alongside the failure. The event is
+/// now emitted after `charge_storage`.
 #[tokio::test]
-#[ignore = "BUG AUDIT-04: offer_made is logged before charge_storage refuses the call"]
 async fn audit04_refused_make_offer_logs_no_offer_made() -> Result<()> {
     let env = setup().await?;
     let now = env.worker.view_block().await?.timestamp() / 1_000_000;
@@ -252,5 +252,31 @@ async fn audit04_refused_make_offer_logs_no_offer_made() -> Result<()> {
     assert_fails_with(&r, "ERR_DEPOSIT");
     assert!(view(&env, "offers_for", json!({ "token_id": "1", "from_index": 0, "limit": 50 })).await?.as_array().unwrap().is_empty());
     assert!(events(&r, "offer_made").is_empty(), "a refused call logged {:?}", events(&r, "offer_made"));
+    Ok(())
+}
+
+/// AUDIT-04 (FIXED), the USDC path: an offer through `ft_transfer_call` without storage credit is refused
+/// (ERR_STORAGE_CREDIT, the FT refunds 100 %) and logs no `offer_made`; with credit, the same offer logs exactly one.
+#[tokio::test]
+async fn audit04_refused_usdc_offer_logs_no_offer_made() -> Result<()> {
+    let env = setup().await?;
+    let now = env.worker.view_block().await?.timestamp() / 1_000_000;
+    let msg = json!({ "offer": { "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": now + 3_600_000 } }).to_string();
+    let r = ft_buy(&env, &env.bob, 5_000_000, &msg).await?;
+    assert_eq!(used(&r), 0, "no credit → refunded");
+    assert!(fail_text(&r).contains("ERR_STORAGE_CREDIT"), "{}", fail_text(&r));
+    assert!(events(&r, "offer_made").is_empty(), "a refused call logged {:?}", events(&r, "offer_made"));
+    assert_ok(
+        &env.bob
+            .call(env.satchel.id(), "prepay_storage")
+            .args_json(json!({}))
+            .deposit(NearToken::from_millinear(10))
+            .gas(Gas::from_tgas(30))
+            .transact()
+            .await?,
+    );
+    let r = ft_buy(&env, &env.bob, 5_000_000, &msg).await?;
+    assert_eq!(used(&r), 5_000_000);
+    assert_eq!(events(&r, "offer_made").len(), 1);
     Ok(())
 }
