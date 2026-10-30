@@ -106,3 +106,11 @@
 - 2026-10-30T13:30Z [orchestrator] real-wallet fixes: Send defaults/switches, Empty covers all holdings, popup lock fix, no cached 404, nav feedback skeletons; unit 481, e2e 221/221
 - 2026-10-30T13:50Z [orchestrator] balances refresh after sends (fresh browser reads, BTC outgoing pending) + address book (page, pickers by chain, save from receipts/transactions); unit 486, e2e green
 - 2026-10-30T15:25Z [orchestrator] test audit started: 3 agents (contract → test/contract, core+API → test/core-api, UI e2e → test/ui); docs in docs/testing/
+- 2026-10-30T15:30Z [test-contract] wip: coverage inventory in docs/testing/contract.md
+- 2026-10-30T15:35Z [test-contract] found bug: AUDIT-01 delegate BTC cap bypass via BIP143 split amounts (ignored failing unit test)
+- 2026-10-30T15:41Z [test-contract] wip: sandbox audit.rs (AUDIT-01 confirmed on wasm, AUDIT-02 listings u32 wrap, wNEAR e2e)
+- 2026-10-30T15:43Z [test-contract] found bug: AUDIT-04 events logged before later refusal (make_offer, execute_sale); ignored failing tests
+- 2026-10-30T15:44Z [web-ui-tests] done on test/ui @77abb7e: +13 e2e (send validation, popup edge cases, 320px/axe on new pages); fixed FlowShell focus return (WCAG 2.4.3) and Segmented 320px overflow; docs/testing/ui.md. Waiting on contract + core-api before merging
+- 2026-10-30T15:46Z [web-ui-tests] done: added send-validation/popup-edge-cases/mobile-and-night-gaps specs (13 tests); fixed FlowShell focus-return (WCAG 2.4.3) and Segmented 320px overflow bugs; wrote docs/testing/ui.md coverage matrix; full suite 237/237 passing (baseline 224, 1 pre-existing flake on responsive.spec.ts:54 did not reproduce on re-run)
+- 2026-10-30T15:47Z [test-core-api] done: audited packages/core + apps/web lib/data/API routes; added nav-pending.test.ts, prices-cache.test.ts, signing-store.test.ts, expanded address-book.test.ts, added test/e2e/api-routes.spec.ts (18 tests, first coverage of the 5 API routes); wrote docs/testing/core-api.md; no bugs found (one non-bug behavioral note documented); branch test/core-api @ 66f75be
+- 2026-10-30T15:49Z [test-contract] done: unit 177->189 (+2 ignored bugs), sandbox 119->122 (+3 ignored bugs); docs/testing/contract.md
