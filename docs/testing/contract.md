@@ -1,6 +1,7 @@
 # Satchel contract: test guide and coverage audit
 
-Status: test audit of 2026-10-30 (branch `test/contract`). Contract source was NOT changed; every finding is a test.
+Status: test audit of 2026-10-30 (branch `test/contract`), which changed no contract source; every finding was a test.
+AUDIT-01, -02 and -04 were then fixed the same day on branch `fix/audit` (§4).
 
 Scope: `contracts/satchel` (unit tests) and `tests/` (sandbox suite, near-workspaces 0.23.0 with the mock signer and
 mock FT). The source of truth for intended behaviour is `kb/90-technical-spec.md` §5–§6 and `docs/specs/*.md`.
@@ -135,7 +136,7 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 |---|---|---|
 | Cap exactly at the debit and one over; fees counted; ERC-20 + gas; rollover; sliding window; expiry boundary; rate limit 32 | covered | `allowance_tests::cap_edges_*`, `window_rollover`, `sliding_window_*`, `expiry_edge`, `rate_limit_*` |
 | Delegate after a transfer / sale / accept; a stale set from a previous owner; paused while listed | covered | `allowance_tests::transfer_clears_*`, `usdc_sale_clears_too`, `stale_set_*`, `market_tests::delegates_cannot_withdraw_or_accept_*` |
-| **Two requests for one BTC tx, each understating a different input (BIP143 split amounts)** | **bug AUDIT-01** | `allowance_tests::audit01_btc_split_amount_requests_bypass_the_delegate_cap`, `audit::audit01_*` (both ignored) |
+| **Two requests for one BTC tx, each understating a different input (BIP143 split amounts)** | **AUDIT-01, fixed** (delegates: one input only) | `allowance_tests::audit01_*` (3 tests + proptest `btc_delegate_debits_need_one_input`), `audit::audit01_*` (2 tests), `allowance::btc_debit_counts_fee_not_change` |
 | The same tx with real amounts in one request is debited in full | added | `allowance_tests::audit01_btc_real_amounts_in_one_request_debit_the_full_fee` |
 
 ### 3.3 Sale, offers, inside assets, storage (C4/C6, M-01)
@@ -155,14 +156,14 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 | `ft_on_transfer` msg: unknown extra fields accepted; two top-level keys, numeric id, wrong case, negative id, missing field, empty refused | added | `market_tests::audit_ft_msg_lenient_and_strict_cases` |
 | `withdraw_storage_credit` event fields; it pays with a bare transfer and no callback | added (observation AUDIT-03) | `market_tests::audit_withdraw_storage_credit_event_and_bare_transfer` |
 | M-01: transfer / NEAR buy / USDC buy / accept refused at exactly one yocto short; calls that free storage pass | covered | `market_tests::m01_*`, `market::m01_*`, `review::m01_*` |
-| **Events logged before a later refusal in the same receipt** | **bug AUDIT-04** | `market_tests::audit04_refused_calls_log_no_events`, `audit::audit04_refused_make_offer_logs_no_offer_made` (both ignored); `audit04_well_ordered_paths_log_nothing_when_refused` (passes) |
+| **Events logged before a later refusal in the same receipt** | **AUDIT-04, fixed** | `market_tests::audit04_refused_calls_log_no_events` (NEAR/USDC offer, NEAR/USDC buy, `nft_transfer`), `audit04_successful_calls_log_their_events_in_order`, `audit04_well_ordered_paths_log_nothing_when_refused`; `audit::audit04_refused_make_offer_logs_no_offer_made`, `audit::audit04_refused_usdc_offer_logs_no_offer_made` |
 
 ### 3.4 Views, events, NFT
 
 | Edge case | Result | Where |
 |---|---|---|
 | Unknown / empty / `"01"` token ids in every view; limit 0; limit `u32::MAX`; offsets `u64::MAX`; unsupported chain in `max_evm_nonce`; `derived_path` of a token that does not exist | added | `tests::audit_view_edge_arguments_never_panic`, `market_tests::audit_offer_pages_edges` |
-| **`listings(from_index ≥ 2^32)` on wasm32** | **bug AUDIT-02** | `audit::audit02_listings_from_index_does_not_wrap` (ignored) |
+| **`listings(from_index ≥ 2^32)` on wasm32** | **AUDIT-02, fixed** | `audit::audit02_listings_from_index_does_not_wrap` |
 | `sig_records` / `offers_*` with offsets ≥ 2^32 on wasm32; NEP-181 offset past the supply refused | added | `audit::audit02_other_paged_views_handle_huge_offsets` |
 | `history_digest` unchanged by `on_signed`, transfer, list, delist, sale; changes with a new record | added | `tests::audit_history_digest_moves_only_with_new_records` |
 | `listed` / `delisted` / `sold` / `payout` fields on the real wasm; a refused second `list` logs nothing | added | `audit::audit_sale_path_event_fields` |
@@ -171,7 +172,19 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 
 ## 4. Bugs and open questions
 
-### AUDIT-01 (Medium, C5): delegate BTC cap bypass with BIP143 split-amount requests
+### AUDIT-01 (Medium, C5): delegate BTC cap bypass with BIP143 split-amount requests — FIXED
+
+- **Status: FIXED** on `fix/audit` (contract `485c615`, TS mirror + vectors + UI copy `3a60df8`, sandbox `c5dac99`),
+  with fix option 1 (Razvan, 2026-10-30): a delegate (requester ≠ owner) may sign a BTC request only with **exactly
+  one input**; more is refused with the new code **`ERR_ALLOWANCE_BTC_ONE_INPUT`** (`allowance.rs::request_debits`,
+  after the classifier, before the caps). The owner's own BTC signing is unchanged. With one input, BIP143 commits that
+  input's amount in its only sighash, so the stated amount is the signed amount and the existing debit math is sound.
+  Mirror: `packages/core/src/policy/allowance.ts::allowanceDebits`; `vectors/allowance.json` gains 5 BTC cases (28
+  debits). UI sentence: `apps/web/src/lib/copy/allowance.ts` (`allowance.err.ERR_ALLOWANCE_BTC_ONE_INPUT`), shown by
+  the Send flow's `checkDelegatedSign` pre-check before the wallet opens. Tests: the two `audit01_*` tests below are
+  un-ignored and assert the refusal; `audit01_delegate_single_input_btc_within_cap_signs` (unit and sandbox) shows a
+  1-input delegate send within cap still signs.
+- The original finding, for the record:
 
 - **Where:** `allowance.rs::btc_debit` (and its TS mirror `allowanceDebits` in `packages/core`).
 - **Repro:** a token with 2 P2WPKH UTXOs A and B of 1,000,000 sats each; a delegate with a 1,000-sat BTC cap.
@@ -198,16 +211,30 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
   3. Or keep an outpoint → amount map per token and refuse a request whose stated amount differs from an earlier
      record of the same outpoint (more storage and code).
 
-### AUDIT-02 (Info): `listings(from_index ≥ 2^32)` returns the first page on wasm32
+### AUDIT-02 (Info): `listings(from_index ≥ 2^32)` returns the first page on wasm32 — FIXED
+
+- **Status: FIXED** on `fix/audit` (`c1d97d1`): `usize::try_from(from_index)`; an offset that doesn't fit is past the
+  end (empty page). `listings` was the only paged view casting a u64 offset to `usize` (`sig_records` and the offer
+  indexes page in u64). The sandbox test below is un-ignored and passes.
 
 - **Where:** `views.rs::listings`, `.skip(from_index as usize)`: on wasm32 `usize` is 32 bits, so `2^32` becomes 0.
 - **Repro:** one listing; `listings({"from_index": 4294967296, "limit": 50})` returns it instead of `[]`.
   Unit tests (64-bit host) cannot see it; the sandbox does.
 - **Impact:** none for the UI (it pages from 0). An offset-paging client could loop or double count.
-- **Test:** `tests/tests/audit.rs::audit02_listings_from_index_does_not_wrap` (ignored).
+- **Test:** `tests/tests/audit.rs::audit02_listings_from_index_does_not_wrap` (was ignored; passes since the fix).
 - **Fix:** `usize::try_from(from_index).unwrap_or(usize::MAX)`, or return `[]` when `from_index ≥ listings.len()`.
 
-### AUDIT-04 (Low): events logged before a later refusal in the same receipt
+### AUDIT-04 (Low): events logged before a later refusal in the same receipt — FIXED
+
+- **Status: FIXED** on `fix/audit` (`a0eed62`): every `emit()` now comes after the last check that can refuse.
+  `insert_offer` returns `offer_made` and `make_offer` / `ft_offer` emit it after `charge_storage` / `charge_credit`;
+  `execute_sale`, `accept_offer` and `nft_transfer` emit nep171 `nft_transfer`, `delisted`, `allowances_cleared`,
+  `sold` and `offer_accepted` after `ensure_solvent`, in the same order as before. To defer the NEP-171 event, these
+  paths call `Contract::move_token` (the checks, panic messages and writes of near-contract-standards'
+  `internal_transfer` for an owner-initiated transfer with approvals disabled) and `emit_nft_transfer`. No check,
+  amount or state write moved. Tests: both ignored tests are un-ignored (the unit one now also covers the USDC offer,
+  the USDC buy and `nft_transfer`), plus `audit04_successful_calls_log_their_events_in_order` and the sandbox
+  `audit04_refused_usdc_offer_logs_no_offer_made`; every existing event-field test passes.
 
 - **Where:** `offers.rs::insert_offer` emits `offer_made` before `make_offer`'s `charge_storage` and `ft_offer`'s
   `charge_credit` can refuse; `sale.rs::execute_sale` (nep171 `nft_transfer`, `allowances_cleared`, `sold`),
@@ -219,7 +246,7 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
   (FastNEAR `is_event_log` filters, explorers, the app if it ever reads events without the receipt status) is misled.
 - **Repro:** `make_offer` attaching `amount + 1` yocto → `ERR_DEPOSIT`, and the failed receipt logs `offer_made`
   (sandbox `audit04_refused_make_offer_logs_no_offer_made`); an insolvent NEAR buy logs `nft_transfer` + `sold` and
-  then panics `ERR_INSOLVENT` (unit `audit04_refused_calls_log_no_events`). Both ignored.
+  then panics `ERR_INSOLVENT` (unit `audit04_refused_calls_log_no_events`). Both were ignored; both pass since the fix.
 - **Fix:** move the `emit()` calls after `charge_storage` / `charge_credit` / `ensure_solvent` (events are plain
   logs, so this changes no state). Or, if the order is kept, state in spec §5.13 that only successful receipts' events
   count, and check every consumer.
@@ -234,8 +261,10 @@ the contract as unowned buffer instead of being re-credited, unlike `withdraw_ne
 
 ### Open questions
 
-- **Q-01 (AUDIT-01 fix):** is "delegates sign single-input BTC only" acceptable product-wise (the Send builder picks
-  largest-first, so most sends use 1–3 inputs)? If not, option 2 is the smallest safe change.
+- **Q-01 (AUDIT-01 fix): answered.** Razvan approved "delegates sign single-input BTC only" (2026-10-30). The Send
+  builder picks largest-first, so a delegate's send works whenever one coin covers amount + fee; above that the Send
+  flow shows the `ERR_ALLOWANCE_BTC_ONE_INPUT` sentence before the wallet opens. A web follow-up could cap a
+  delegate's BTC amount at the largest coin up front.
 - **Q-02 (by design, recorded):** offers survive ownership changes (C4-C6.md §3: "the new owner may accept them"), so
   the owner who receives a gift can accept an offer made to the previous owner. Pinned by
   `audit_offer_survives_a_gift_and_the_new_owner_accepts`.
@@ -270,14 +299,23 @@ the contract as unowned buffer instead of being re-credited, unlike `withdraw_ne
 - **`nearcore 2.14` (testnet's version):** the suite runs on the sandbox default 2.13.4; `SANDBOX_VERSION=2.14.0-rc.5`
   re-runs it on 2.14 but was not part of this audit run.
 
-## 6. Test counts (this audit)
+## 6. Test counts
 
-Measured on 2026-10-30 in this worktree (wasm built with `cargo near build non-reproducible-wasm`; INV-22 check OK).
+Audit run measured on 2026-10-30 in `test/contract`; fix run measured on 2026-10-30 in `fix/audit` (wasm built with
+`cargo near build non-reproducible-wasm`, sha256 `9dd65286…49d1ebd9e3`; INV-22 check OK).
 
-| Suite | Before | After |
-|---|---|---|
-| Unit, `cargo test -p satchel` | 177 passed, 0 ignored | **189 passed, 2 ignored** (AUDIT-01, AUDIT-04) |
-| Sandbox, `cargo test -p satchel-tests` | 119 passed in 16 files, 0 ignored | **122 passed, 3 ignored** (AUDIT-01, -02, -04) in 17 files (`audit.rs` new) |
+| Suite | Before the audit | After the audit | After the fixes (`fix/audit`) |
+|---|---|---|---|
+| Unit, `cargo test -p satchel` | 177 passed, 0 ignored | 189 passed, 2 ignored (AUDIT-01, AUDIT-04) | **194 passed, 0 ignored** |
+| Sandbox, `cargo test -p satchel-tests` | 119 passed in 16 files, 0 ignored | 122 passed, 3 ignored (AUDIT-01, -02, -04) in 17 files | **127 passed, 0 ignored** in 17 files |
+| Core, `pnpm --filter @satchel/core test` | 467 | 467 | **472** (+5 shared allowance vectors) |
 
-Run the known-bug tests with `cargo test -p satchel -- --ignored` and `cargo test -p satchel-tests --test audit --
---ignored`: all five fail today, which is the point. Each should pass (and lose its `#[ignore]`) once its fix lands.
+New in the fix run: unit `audit04_successful_calls_log_their_events_in_order`,
+`audit01_delegate_single_input_btc_within_cap_signs`, proptest `btc_delegate_debits_need_one_input`; sandbox
+`audit01_delegate_single_input_btc_within_cap_signs`, `audit04_refused_usdc_offer_logs_no_offer_made`. No test is
+ignored for AUDIT-01, -02 or -04 any more.
+
+Property runs for the fix (release): `PROPTEST_CASES=50000 cargo test -p satchel --lib --release allowance_tests`
+(34 tests, 134 s), `PROPTEST_CASES=1000 … market_tests::prop` (4 properties, 73 s),
+`PROPTEST_CASES=20000 FUZZ_STATS_CASES=20000 … parse::fuzz_tests` (26 tests incl. the seed-corpus differential), and
+`FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test.ts test/fuzz` (78 tests): all pass.

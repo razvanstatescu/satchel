@@ -25,7 +25,6 @@ Every command runs from the repo root. On this machine, prefix each shell with
 | Tools unit tests | `pnpm --filter @satchel/tools test:unit` | nothing |
 | Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port; **never 3100** (reserved on the dev machine) |
 | Typecheck and lint | `pnpm --filter web typecheck`, `pnpm --filter web lint` | nothing |
-| Known-bug tests | `cargo test -p satchel -- --ignored` and `cargo test -p satchel-tests --test audit -- --ignored` | they **fail on purpose** until the fix lands |
 
 The end-to-end suite builds the app (`next build && next start`) in fixture mode and takes about 5 minutes. No suite
 signs a testnet transaction. Live testnet runs are separate and documented in `research/spikes/dev2-live/RESULTS.md`.
@@ -53,9 +52,11 @@ measured 43.99994 px against a 44 px minimum. It did not reproduce on the merged
 | Closing any popup (Escape, Close, or a tap on the background) left keyboard focus on the page body instead of the button that opened it (WCAG 2.4.3) | Medium | `FlowShell` remembers the opener and gives focus back on close |
 | The Transactions chain filter made the whole page scroll sideways at 320 px | Low | the filter track scrolls on its own when it can't fit |
 
-### Open: contract bugs (failing tests, marked ignored; the contract was not changed)
+### Contract bugs (AUDIT-01, -02 and -04 fixed on `fix/audit`, 2026-10-30)
 
-Full detail, repro steps and fix options are in [contract.md §4](contract.md#4-bugs-and-open-questions).
+Full detail, repro steps and the fixes are in [contract.md §4](contract.md#4-bugs-and-open-questions). The fixed
+bugs' tests are no longer ignored; counts after the fixes are in [contract.md §6](contract.md#6-test-counts).
+The table below is the audit's original finding.
 
 | ID | What | Severity | Suggested fix |
 |---|---|---|---|
@@ -66,11 +67,11 @@ Full detail, repro steps and fix options are in [contract.md §4](contract.md#4-
 
 The contract freezes on **Nov 9**. All three fixes are small. Each needs the full routine before the rc birth: a
 unit test plus a sandbox test (both already written as the ignored tests), the TS mirror and vectors where they
-apply, a fuzz run, and a dev deploy.
+apply, a fuzz run, and a dev deploy. On `fix/audit` all of that has run except the dev deploy.
 
 ### Open questions (from the contract audit)
 
-- **Q-01**: which AUDIT-01 fix is acceptable for the product (one input only is the recommendation).
+- **Q-01**: answered. Razvan approved "delegates sign BTC with one input only"; it is implemented on `fix/audit`.
 - **Q-03**: `withdraw_near` / `withdraw_ft` accept the MPC signer or the USDC contract as receiver. Intended?
 - **Q-04**: `ft_on_transfer` messages accept unknown extra fields. Should parsing be strict?
 - **Q-05**: right after a failed payout or withdrawal is re-credited, escrow can briefly exceed the contract's free
