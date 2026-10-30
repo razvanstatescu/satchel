@@ -247,9 +247,11 @@ properties against an independent oracle instead of a byte corpus.
 | `window_accounting_matches_oracle` | 1–80 steps; each advances time by 0–5 s, ≈ 24 h ± 3 s or up to 48 h, and debits 1–2 random assets (one never capped) for 0–50, 0–1,000 or u128::MAX; 1–4 capped assets with limits 1–2,000 | a full-history oracle: a debit at `t` passes iff Σ(accepted, stamped in `(t − 24 h, t]`) + pending + amount ≤ limit, then the 32-entry rate rule. At every step: same verdict and code, `spent` and `remaining` equal to the oracle's, `spent ≤ limit` at every instant, and ≤ 32 stored entries (storage stays bounded) |
 | `evm_debit_is_worst_case` | random `value` (u128), `gas` (u64), `max_fee` (u128) and 0–80 bytes of calldata | native debit = `value + gas × max_fee` exactly when it fits u128, else `ERR_ALLOWANCE_EXCEEDED` (never wrapped); it is ≥ `value`; non-empty calldata other than a 68-byte `a9059cbb` is `ERR_ALLOWANCE_KIND` |
 | `btc_debit_bounds` | 1–3 inputs with random amounts, 1–5 outputs, each paying either our `0014‖pkh` or another script | debit = Σ external + max(0, Σ in − Σ out), and ≥ every external output |
+| `btc_delegate_debits_need_one_input` (AUDIT-01, 2026-10-30) | 1–5 inputs with random amounts (0–2 M sats), 1–3 outputs to our `0014‖pkh` or another script, through the real classifier | `request_debits` is `Ok` (and equals `btc_debit`) iff the tx has exactly one input; any other count is `ERR_ALLOWANCE_BTC_ONE_INPUT` |
 | TS `allowance.test.ts` › randomized | seeded LCG, 300 runs × 60 steps (`FUZZ_CASES`) | the same brute-force window oracle against `applyDebits` |
 
-The shared `vectors/allowance.json` (20 request → debit cases through the real classifiers, 13 raw EVM cases including
+The shared `vectors/allowance.json` (28 request → debit cases (23 before AUDIT-01) through the real classifiers, incl. the AUDIT-01
+one-input refusals, 13 raw EVM cases including
 ERC-20 calldata, 22 window cases) is replayed on both sides (`shared_allowance_vectors`, `allowance.test.ts`).
 
 ```bash
