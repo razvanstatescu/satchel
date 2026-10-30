@@ -70,6 +70,8 @@ function prepareErrorText(e: unknown, net?: string): string {
       return copy.usdc.tooMuch;
     case "usdc_no_gas":
       return copy.usdc.noGas(net ?? "this network");
+    case "btc_one_coin":
+      return copy.allowance.send.oneCoin(formatAmount((e as { largest: bigint }).largest, "BTC"));
   }
   return e instanceof Error ? e.message : String(e);
 }
@@ -211,6 +213,8 @@ export function SendFlow({
           records,
           reuse,
           ...(chain === "evm" ? { evmChainId, asset } : {}),
+          // AUDIT-01: a delegate's Bitcoin send spends one coin (the contract refuses more)
+          ...(chain === "btc" && isDelegate ? { oneInput: true } : {}),
         });
         const src = dataSource();
         const [s, h] = await Promise.all([contractViews(src.view).satchel(snap.token_id), src.blockHeight()]);
@@ -222,7 +226,7 @@ export function SendFlow({
         setSolWait(false);
       }
     },
-    [snap.token_id, chain, val, toText, amount, records, live.sig_count, evmChainId, asset],
+    [snap.token_id, chain, val, toText, amount, records, live.sig_count, evmChainId, asset, isDelegate],
   );
 
   // Retry from the tracker: same nonce / same inputs (kb/90 §8.7).

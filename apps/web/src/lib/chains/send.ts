@@ -70,6 +70,20 @@ export interface PrepareArgs {
   evmChainId?: number;
   /** C2: send USDC instead of ETH (EVM only) */
   asset?: "eth" | "usdc";
+  /**
+   * AUDIT-01 (C5): a delegate's BTC send must spend exactly ONE coin (the contract refuses more, because only then does
+   * the signature commit to the amount the cap is charged for). Picks the smallest confirmed coin that covers the
+   * amount and fee ("max": the largest coin); none can → BtcOneCoinError, naming the largest coin.
+   */
+  oneInput?: boolean;
+}
+
+/** A delegate's BTC send can't be paid from one coin (AUDIT-01); `largest` is what one coin can send at most. */
+export class BtcOneCoinError extends Error {
+  readonly problem = "btc_one_coin";
+  constructor(readonly largest: bigint) {
+    super("a spending allowance sends Bitcoin from one coin at a time");
+  }
 }
 
 const FIXTURE_FEES = { maxFeePerGas: 3_000_000_000n, maxPriorityFeePerGas: 1_500_000_000n };
@@ -111,7 +125,26 @@ export async function prepareSend(a: PrepareArgs): Promise<PreparedSend> {
   const reuse = a.reuse?.btcInputs?.length ? utxos.filter((u) => a.reuse!.btcInputs!.includes(`${u.txid}:${u.vout}`)) : undefined;
   if (a.reuse?.btcInputs?.length && reuse?.length !== a.reuse.btcInputs.length) throw new Error("the earlier coins are no longer available");
   const forbidden = new Set<string>([...referencedTxids(a.records), ...referencedTxids(a.recipientTokenRecords ?? [])]);
-  const built = buildBtcSend({ from: { address: addr.btc, pubkey: addr.btcPubkey }, to: a.to, amount: a.amount, utxos, feeRate, forbiddenTxids: forbidden, inputs: reuse });
+  const build = (inputs?: Utxo[]) => buildBtcSend({ from: { address: addr.btc, pubkey: addr.btcPubkey }, to: a.to, amount: a.amount, utxos, feeRate, forbiddenTxids: forbidden, inputs });
+  let built: ReturnType<typeof buildBtcSend>;
+  if (a.oneInput && !reuse) {
+    // one coin: the smallest that can pay (the amount and its fee), or for "max" the largest
+    const coins = utxos.filter((u) => u.confirmed && !forbidden.has(u.txid)).sort((x, y) => (x.value < y.value ? -1 : x.value > y.value ? 1 : 0));
+    const order = a.amount === "max" ? [...coins].reverse() : coins;
+    let found: ReturnType<typeof buildBtcSend> | null = null;
+    for (const c of order) {
+      try {
+        found = build([c]);
+        break;
+      } catch {
+        /* this coin can't pay it: try the next */
+      }
+    }
+    if (!found) throw new BtcOneCoinError(coins.length ? coins[coins.length - 1].value : 0n);
+    built = found;
+  } else {
+    built = build(reuse);
+  }
   const balance = utxos.reduce((s, u) => s + u.value, 0n);
   return {
     chain: "btc",

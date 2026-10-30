@@ -76,6 +76,9 @@ export const allowanceCopy = {
       chainNotAllowed: (ticker: string) => `You can't send ${ticker} with this access.`,
       remaining: (amount: string) => `You can send up to ${amount} today`,
       overCap: (remaining: string) => `That's over today's remaining amount (${remaining} left).`,
+      /** AUDIT-01: a delegate's bitcoin send spends one deposit; the largest one here holds `largest`. */
+      oneCoin: (largest: string) =>
+        `With this access, a bitcoin send can spend only one of this Satchel's bitcoin deposits at a time. The largest holds ${largest}, and the fee comes out of it too. Send less.`,
     },
 
     /** errorCopy mappings (docs/specs/C5.md §2 error table). */
