@@ -1628,3 +1628,57 @@ fn audit_ft_msg_lenient_and_strict_cases() {
     Ctx::new(usdc()).set();
     expect_err(ERR_BAD_MSG, || c.ft_on_transfer(bob(), U128(1), bad[0].into()));
 }
+
+/// Names of every satchel/nep171 event logged by the last call (including a call that then panicked: on-chain, the
+/// logs of a failed receipt stay visible in its outcome, kb/20 §Events).
+fn logged_event_names() -> Vec<String> {
+    get_logs()
+        .iter()
+        .filter_map(|l| l.strip_prefix("EVENT_JSON:"))
+        .filter_map(|j| serde_json::from_str::<Value>(j).ok())
+        .map(|v| v["event"].as_str().unwrap_or_default().to_string())
+        .collect()
+}
+
+/// AUDIT-04 (BUG, Low): some events are logged BEFORE a later refusal in the same receipt, against the rule in
+/// `events.rs` ("Emitted after every require") and spec §5.8 step 7. A refused call then leaves a misleading event in
+/// a failed receipt's logs (an indexer that follows spec §5.13, "trust events only from successful receipts", is
+/// unaffected; one that doesn't sees a sale or an offer that never happened).
+/// - `make_offer` / USDC `ft_offer`: `offer_made` is emitted in `insert_offer`, before `charge_storage` /
+///   `charge_credit` can refuse (ERR_DEPOSIT / ERR_STORAGE_CREDIT).
+/// - `buy` / USDC buy (`execute_sale`), `accept_offer`, `nft_transfer`: `sold` / `offer_accepted` / `delisted` /
+///   `allowances_cleared` / nep171 `nft_transfer` are emitted before `ensure_solvent` can refuse (ERR_INSOLVENT).
+/// Suggested fix: emit after the last check (move the `emit()` calls below `charge_*` / `ensure_solvent`).
+#[test]
+#[ignore = "BUG AUDIT-04: offer_made / sold events are logged before a later refusal in the same receipt"]
+fn audit04_refused_calls_log_no_events() {
+    // make_offer: attached covers the amount but not the storage → ERR_DEPOSIT after offer_made was logged
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(bob()).dep(ONE_NEAR + 1).set();
+    expect_err(ERR_DEPOSIT, || c.make_offer(id.clone(), U128(ONE_NEAR), 0, 0, T0 + DAY));
+    let a = logged_event_names();
+    // NEAR buy refused ERR_INSOLVENT after `sold` was logged
+    let (mut c, id) = m01_setup();
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(ONE_NEAR), Currency::Near);
+    let b = bal_for(&mut c, 0);
+    Ctx::new(long_acc('e')).dep(ONE_NEAR).bal(b).set();
+    expect_err(ERR_INSOLVENT, || c.buy(id.clone(), lid, 0));
+    let s = logged_event_names();
+    assert!(a.is_empty() && s.is_empty(), "refused calls logged events: make_offer {a:?}, buy {s:?}");
+}
+
+/// Companion of AUDIT-04 that passes: the paths that DO follow the rule log nothing when refused (sign_for over its
+/// deposit, list short of storage, an FT deposit without storage credit).
+#[test]
+fn audit04_well_ordered_paths_log_nothing_when_refused() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(1).set();
+    expect_err(ERR_DEPOSIT, || c.sign_for(id.clone(), SignRequest::Evm { unsigned_tx: evm::tests::KB31_TX.into() }, None));
+    assert!(logged_event_names().is_empty());
+    Ctx::new(usdc()).set();
+    expect_err(ERR_STORAGE_CREDIT, || c.ft_on_transfer(carol(), U128(5), deposit_msg(&id).to_string()));
+    assert!(logged_event_names().is_empty());
+}
