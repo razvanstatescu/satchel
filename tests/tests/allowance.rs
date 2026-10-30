@@ -208,24 +208,32 @@ async fn sales_clear_allowances() -> Result<()> {
     Ok(())
 }
 
-/// BTC: a 2-input send through the real fan-out debits the external output plus the fee; change to the preimages'
-/// own P2WPKH doesn't count. A cap of exactly that passes; one sat less is refused.
+/// BTC: a delegate's 1-input send debits the external output plus the fee; change to the preimages' own P2WPKH
+/// doesn't count. A cap of exactly that passes; one sat less is refused. A 2-input send is refused for the delegate
+/// whatever the cap (AUDIT-01: BIP143 commits each input's amount only in its own sighash).
 #[tokio::test]
 async fn btc_debit_counts_fee_not_change() -> Result<()> {
     let env = setup().await?;
-    let tx = BtcTx::new(2, 9); // inputs 50,000 + 51,000; outputs 40,000 (other) + 9,000 (change to pkh 0x11…)
-    let debit: u128 = 40_000 + (101_000 - 49_000);
+    let two = BtcTx::new(2, 9); // inputs 50,000 + 51,000; outputs 40,000 (other) + 9,000 (change to pkh 0x11…)
+    assert_ok(&set_allowance(&env, &env.alice, &env.carol, json!([{ "asset": "btc", "limit": "1000000000" }]), None).await?);
+    let r = sign_sync_fail(&env, &env.carol, "1", &two.req(), SignOpts::default_for(2)).await?;
+    assert_fails_with(&r, "ERR_ALLOWANCE_BTC_ONE_INPUT");
+    let tx = BtcTx::new(1, 9); // input 50,000; the same outputs
+    let debit: u128 = 40_000 + (50_000 - 49_000);
     assert_ok(&set_allowance(&env, &env.alice, &env.carol, json!([{ "asset": "btc", "limit": (debit - 1).to_string() }]), None).await?);
-    let r = sign_sync_fail(&env, &env.carol, "1", &tx.req(), SignOpts::default_for(2)).await?;
+    let r = sign_sync_fail(&env, &env.carol, "1", &tx.req(), SignOpts::default_for(1)).await?;
     assert_fails_with(&r, "ERR_ALLOWANCE_EXCEEDED");
     assert_ok(&set_allowance(&env, &env.alice, &env.carol, json!([{ "asset": "btc", "limit": debit.to_string() }]), None).await?);
     let r = sign_and_wait(&env, &env.carol, "1", &tx.req()).await?;
     assert_ok(&r);
     assert_eq!(events(&r, "allowance_spent")[0]["debits"], json!([{ "asset": "btc", "amount": debit.to_string() }]));
     let recs = sig_records(&env, "1").await?;
-    assert_eq!(recs.len(), 2);
+    assert_eq!(recs.len(), 1);
     assert!(recs.iter().all(|r| r["requester"] == env.carol.id().to_string() && r["status"] == "signed"));
     assert_eq!(allowance(&env, &env.carol).await?["caps"][0]["remaining"], "0");
+    // the owner still signs the 2-input tx
+    assert_ok(&sign_and_wait(&env, &env.alice, "1", &two.req()).await?);
+    assert_eq!(sig_records(&env, "1").await?.len(), 3);
     Ok(())
 }
 

@@ -1,5 +1,5 @@
 //! Test audit 2026-10-30 (docs/testing/contract.md): gaps found by the coverage audit, end to end on the sandbox.
-//! - AUDIT-01 (BUG, ignored): the BIP143 split-amount requests bypass a delegate's BTC cap on the real wasm.
+//! - AUDIT-01 (Medium, fixed): a delegate may sign BTC only with one input, so the BIP143 split-amount requests are refused.
 //! - AUDIT-02 (Info, fixed): `listings(from_index ≥ 2^32)` is an empty page on wasm32, not the first page.
 //! - wNEAR (`wrap.testnet`, allowlisted for inside deposits only): deposit, withdraw, refused buy/offer, re-credit.
 //! - Event fields of the sale path (`listed`, `delisted`, `sold`, `payout`) on the real wasm.
@@ -32,13 +32,12 @@ async fn set_allowance(env: &Env, delegate: &Account, caps: Value) -> Result<Exe
         .await?)
 }
 
-/// AUDIT-01 on the real wasm. Two delegate requests for ONE 2-input tx (each input really holds 1,000,000 sats; the
-/// single output returns 1,000,000 sats to the Satchel's own P2WPKH, so the real fee is 1,000,000 sats). Request 1
-/// states input A's real amount and 1 sat for B; request 2 the reverse. Each is debited 1 sat, yet the record of A from
-/// request 1 and of B from request 2 are the sighashes of the REAL tx, i.e. both signatures are spendable together.
-/// Expected: the second request is refused ERR_ALLOWANCE_EXCEEDED under a 1,000-sat cap.
+/// AUDIT-01 (Medium, FIXED) on the real wasm. Two delegate requests for ONE 2-input tx (each input really holds
+/// 1,000,000 sats; the single output returns 1,000,000 sats to the Satchel's own P2WPKH, so the real fee is 1,000,000
+/// sats). Request 1 states input A's real amount and 1 sat for B; request 2 the reverse. Each used to be debited 1 sat
+/// while together they yield spendable signatures for the real tx. Now a delegate may sign BTC only with exactly one
+/// input: both halves are refused ERR_ALLOWANCE_BTC_ONE_INPUT before any record, the owner still signs the real tx.
 #[tokio::test]
-#[ignore = "BUG AUDIT-01: BIP143 split-amount requests let a delegate burn BTC as fee far beyond its cap"]
 async fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() -> Result<()> {
     let env = setup().await?;
     const X: u64 = 1_000_000;
@@ -55,19 +54,37 @@ async fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() -> Result<(
     r2.inputs[0].amount = 1;
 
     assert_ok(&set_allowance(&env, &env.carol, json!([{ "asset": "btc", "limit": "1000" }])).await?);
-    let r = sign_and_wait(&env, &env.carol, "1", &r1.req()).await?;
-    assert_ok(&r);
-    assert_eq!(events(&r, "allowance_spent")[0]["debits"], json!([{ "asset": "btc", "amount": "1" }]));
-    let recs = sig_records(&env, "1").await?;
-    assert_eq!(recs[0]["payload"], hex(&sha256d(&real.preimage(0))), "input A: the real tx's sighash");
-
-    let r = sign_sync_fail(&env, &env.carol, "1", &r2.req(), SignOpts::default_for(2)).await?;
-    // Today this succeeds with a 1-sat debit and records input B's real sighash (seq 3):
-    if r.is_success() {
-        let recs = sig_records(&env, "1").await?;
-        assert_eq!(recs[3]["payload"], hex(&sha256d(&real.preimage(1))), "input B: the real tx's sighash");
+    for half in [&r1, &r2] {
+        let r = sign_sync_fail(&env, &env.carol, "1", &half.req(), SignOpts::default_for(2)).await?;
+        assert_fails_with(&r, "ERR_ALLOWANCE_BTC_ONE_INPUT");
+        assert!(events(&r, "sign_requested").is_empty() && events(&r, "allowance_spent").is_empty());
     }
-    assert_fails_with(&r, "ERR_ALLOWANCE_EXCEEDED");
+    assert!(sig_records(&env, "1").await?.is_empty(), "nothing was recorded");
+    // the owner signs the real 2-input tx
+    let r = sign_and_wait(&env, &env.alice, "1", &real.req()).await?;
+    assert_ok(&r);
+    let recs = sig_records(&env, "1").await?;
+    assert_eq!(recs.len(), 2);
+    assert_eq!(recs[1]["payload"], hex(&sha256d(&real.preimage(1))));
+    Ok(())
+}
+
+/// AUDIT-01: a delegate's single-input BTC send within its cap still signs on the real wasm, with the delegate as
+/// the requester and the full fee debited.
+#[tokio::test]
+async fn audit01_delegate_single_input_btc_within_cap_signs() -> Result<()> {
+    let env = setup().await?;
+    let tx = BtcTx::new(1, 0x5b); // 50,000 in; 40,000 out to another P2WPKH, 9,000 change: fee 1,000
+    let debit: u128 = 41_000;
+    assert_ok(&set_allowance(&env, &env.carol, json!([{ "asset": "btc", "limit": (debit + 5).to_string() }])).await?);
+    let r = sign_and_wait(&env, &env.carol, "1", &tx.req()).await?;
+    assert_ok(&r);
+    assert_eq!(events(&r, "allowance_spent")[0]["debits"], json!([{ "asset": "btc", "amount": debit.to_string() }]));
+    let recs = sig_records(&env, "1").await?;
+    assert_eq!(recs.len(), 1);
+    assert_eq!(recs[0]["requester"], env.carol.id().to_string());
+    assert_eq!(recs[0]["status"], "signed");
+    assert_eq!(recs[0]["payload"], hex(&sha256d(&tx.preimage(0))));
     Ok(())
 }
 
