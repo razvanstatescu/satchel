@@ -349,3 +349,10 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 |---|---|
 | Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
 | Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
+| Differential, seed 20261030 (`target/fuzz-corpus-r2`), 100,000 per kind (evm, btc, sol, msg = 400k) | **0 disagreements**, no TS throw. TS generation 12.7 s CPU; Rust replay (release) 13.9 s. Agreed: EVM 17,711 ok + 82,289 refused; BTC 25,426 + 74,574; SOL 24,904 + 75,096; msg 49,512 + 50,488. The Rust oracles agreed with the contract on every line |
+| Differential, seed 7 (`target/fuzz-corpus-r2b`), EVM 300,000 + 100,000 btc/sol/msg (600k) | **0 disagreements**, no TS throw. TS generation 17.4 s; Rust replay 18.9 s. Agreed: EVM 52,395 ok + 247,605 refused; BTC 25,387 + 74,613; SOL 25,008 + 74,992; msg 49,177 + 50,823 |
+
+Commands (from the repo root): `pnpm --filter @satchel/tools fuzz:corpus --n 100000 --seed 20261030 --out
+../target/fuzz-corpus-r2`, then `SATCHEL_FUZZ_CORPUS=target/fuzz-corpus-r2 cargo test -p satchel --lib --release
+differential -- --nocapture`. Total for round two: **1,000,000 differential cases, 0 disagreements** (round one
+skipped this run; the last deep run was 2026-10-29, 400k).
