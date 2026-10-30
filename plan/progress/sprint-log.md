@@ -96,3 +96,4 @@
 - 2026-10-30T09:59Z [C5-caps] WIP: unit tests for extraCapOptions, 8-cap limit, delegate USDC/other-EVM sign_for; 463 unit tests green, typecheck/lint clean
 - 2026-10-30T10:06Z [C5-caps] WIP: Playwright tests for USDC/Base-ETH caps in Add sheet (facts display, delegate send within/over cap), axe covers Other-networks disclosure; allowance.spec.ts 10/10 green
 - 2026-10-30T10:09Z [C5-caps] done: full suite green — 463 unit tests, 207 Playwright e2e tests, typecheck/lint clean on feat/allowance-caps (commits 93f33cf, b9b1b4f, 0133d47, c3f1f26)
+- 2026-10-30T10:10Z [orchestrator] allowance-caps merged; every sprint item done
