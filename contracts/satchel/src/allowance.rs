@@ -39,6 +39,8 @@ pub const ERR_ALLOWANCE_KIND: &str = "ERR_ALLOWANCE_KIND";
 pub const ERR_ALLOWANCE_ASSET: &str = "ERR_ALLOWANCE_ASSET";
 pub const ERR_ALLOWANCE_EXCEEDED: &str = "ERR_ALLOWANCE_EXCEEDED";
 pub const ERR_ALLOWANCE_RATE: &str = "ERR_ALLOWANCE_RATE";
+/// AUDIT-01: a delegate's BTC request must have exactly one input (see `request_debits`).
+pub const ERR_ALLOWANCE_BTC_ONE_INPUT: &str = "ERR_ALLOWANCE_BTC_ONE_INPUT";
 
 /// A refusal: a stable code plus the human detail, raised as `CODE: detail`.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -443,6 +445,14 @@ pub fn request_debits(c: &Classified) -> Result<Vec<(Asset, u128)>, Refusal> {
     match &first.detail {
         SigDetail::Evm { unsigned_tx, .. } => evm_debits(unsigned_tx),
         SigDetail::Btc { .. } => {
+            // AUDIT-01: BIP143 (segwit v0) commits each input's amount only in THAT input's sighash, so with n > 1
+            // inputs a delegate could state a low amount for the other inputs in each of n requests for one tx and
+            // be debited ≈ 0 for a real fee of up to Σ inputs − Σ outputs. With one input the only sighash commits to
+            // the only amount, so the stated fee is the real fee (a wrong amount yields an unusable signature).
+            // Owners are not debited and keep any number of inputs.
+            if c.preimages.len() != 1 {
+                return Err(Refusal::new(ERR_ALLOWANCE_BTC_ONE_INPUT, "delegates may sign BTC with exactly one input"));
+            }
             let outputs = c.btc_outputs.as_deref().ok_or_else(kind_refusal)?;
             Ok(vec![(Asset::Btc, btc_debit(&c.preimages, outputs)?)])
         }

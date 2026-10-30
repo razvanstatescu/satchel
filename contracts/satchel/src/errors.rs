@@ -1,4 +1,6 @@
 //! Stable error codes (spec §5.15). Every panic reads `ERR_X: human sentence`; the UI maps by the prefix before ":".
+//! The C5 allowance codes (`ERR_ALLOWANCE_*`, including AUDIT-01's `ERR_ALLOWANCE_BTC_ONE_INPUT`) live next to their
+//! logic in `allowance.rs` and always carry their own detail (`fail_with`), so they need no `sentence` arm here.
 
 use near_sdk::env;
 
