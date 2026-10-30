@@ -72,7 +72,8 @@ test("mobile app shell: the top bar and the menu sheet", async ({ page }) => {
   for (const r of await rows.all()) await expect.poll(async () => (await r.boundingBox())?.height ?? 0).toBeGreaterThanOrEqual(56);
   await expect(rows.nth(4)).toHaveAttribute("aria-current", "page"); // Contract facts, after Address book
   await expect(sheet.getByRole("radio")).toHaveText([copy.theme.system, copy.theme.day, copy.theme.night]);
-  for (const r of await sheet.getByRole("radio").all()) expect((await r.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  // measured once settled and to 0.01 px: the sheet slides in, and a 44 px target can read 43.99994 mid-layout
+  for (const r of await sheet.getByRole("radio").all()) await expect.poll(async () => Math.round(((await r.boundingBox())?.height ?? 0) * 100) / 100).toBeGreaterThanOrEqual(44);
   await expect(sheet.getByRole("button", { name: copy.nav.connect })).toBeVisible(); // signed out: the account block
   await expect(sheet).toContainText(copy.footer.testnet);
   // modal: the page behind is inert, focus starts on the title and stays inside
@@ -210,7 +211,8 @@ test("mobile landing header, menu sheet and width", async ({ page }) => {
   const app = sheet.getByRole("navigation", { name: copy.nav.app });
   await expect(app.getByRole("link")).toHaveText([copy.nav.mySatchels, copy.nav.market, copy.nav.mint, copy.nav.book, copy.nav.contract]);
   for (const row of await sheet.getByRole("link").all()) expect((await row.boundingBox())!.height, await row.innerText()).toBeGreaterThanOrEqual(44);
-  for (const r of await sheet.getByRole("radio").all()) expect((await r.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  // measured once settled and to 0.01 px: the sheet slides in, and a 44 px target can read 43.99994 mid-layout
+  for (const r of await sheet.getByRole("radio").all()) await expect.poll(async () => Math.round(((await r.boundingBox())?.height ?? 0) * 100) / 100).toBeGreaterThanOrEqual(44);
   await expect(sheet.getByRole("radio")).toHaveText([copy.theme.system, copy.theme.day, copy.theme.night]);
   expect(await page.evaluate(() => (document.querySelector("main")?.closest("[inert]") ?? null) !== null)).toBe(true);
   await page.keyboard.press("Escape");

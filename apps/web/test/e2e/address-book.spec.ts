@@ -59,6 +59,79 @@ test.describe("address book", () => {
     await expect(flow.getByTestId("book-panel")).toContainText("Exchange");
   });
 
+  test("the dropdown inside the field: keyboard to pick, Escape closes only the list, a click outside closes it", async ({ page }) => {
+    await useMockWallet(page, ALICE);
+    await page.addInitScript(
+      ([btc]) => {
+        if (window.localStorage.getItem("satchel:address-book:v1")) return;
+        window.localStorage.setItem(
+          "satchel:address-book:v1",
+          JSON.stringify([
+            { id: "a", kind: "btc", address: btc, alias: "Mom", addedAt: 1, usedAt: null },
+            { id: "c", kind: "btc", address: "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx", alias: "Dad", addedAt: 2, usedAt: null },
+          ]),
+        );
+      },
+      [BTC_TO],
+    );
+    await page.goto("/s/1/send?chain=btc");
+    const flow = page.getByTestId("send-flow");
+    const open = flow.getByTestId("book-open");
+    // the button sits inside the To field, beside Paste
+    const field = await flow.getByTestId("to").boundingBox();
+    const btn = await open.boundingBox();
+    expect(btn!.y).toBeGreaterThanOrEqual(field!.y);
+    expect(btn!.y + btn!.height).toBeLessThanOrEqual(field!.y + field!.height);
+    await expect(open).toHaveAttribute("aria-expanded", "false");
+    // keyboard: open, move, pick
+    await open.focus();
+    await page.keyboard.press("Enter");
+    await expect(flow.getByTestId("book-panel")).toBeVisible();
+    await expect(open).toHaveAttribute("aria-expanded", "true");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+    await expect(flow.getByTestId("book-panel")).toHaveCount(0);
+    await expect(flow.getByTestId("recipient-name")).toBeVisible();
+    // Escape closes the list, not the Send popup
+    await flow.getByRole("button", { name: "Clear address" }).click();
+    await expect(flow.getByTestId("to")).toBeVisible();
+    await flow.getByTestId("book-open").click();
+    await expect(flow.getByTestId("book-panel")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(flow.getByTestId("book-panel")).toHaveCount(0);
+    // the popup stays (not just mid-exit): the URL keeps the send route and the dialog is still there a moment later
+    await page.waitForTimeout(500);
+    await expect(page).toHaveURL(/\/s\/1\/send/);
+    await expect(flow.getByRole("dialog")).toBeVisible();
+    await expect(flow.getByTestId("book-open")).toBeFocused();
+    // a click outside closes it
+    await flow.getByTestId("book-open").click();
+    await expect(flow.getByTestId("book-panel")).toBeVisible();
+    await flow.getByRole("heading").first().click();
+    await expect(flow.getByTestId("book-panel")).toHaveCount(0);
+  });
+
+  test("Give and Take everything out have the same button in their fields", async ({ page }) => {
+    await useMockWallet(page, ALICE);
+    await page.addInitScript(() => {
+      if (window.localStorage.getItem("satchel:address-book:v1")) return;
+      window.localStorage.setItem(
+        "satchel:address-book:v1",
+        JSON.stringify([{ id: "n", kind: "near", address: "bob.satchelhq.testnet", alias: "Bob", addedAt: 1, usedAt: null }]),
+      );
+    });
+    await page.goto("/s/1/transfer");
+    const give = page.getByTestId("transfer-flow");
+    await give.getByTestId("book-open").click();
+    await give.locator('[data-book-entry="n"]').click();
+    await expect(give.getByTestId("xfer-to")).toHaveValue("bob.satchelhq.testnet");
+    await page.goto("/s/1/empty");
+    const empty = page.getByTestId("empty-flow");
+    // a BTC field offers no NEAR account: the list says so
+    await empty.getByTestId("book-open").first().click();
+    await expect(empty.getByTestId("book-panel")).toContainText("No Bitcoin addresses saved yet.");
+  });
+
   test("save a counterparty from Transactions; it then shows by its name", async ({ page }) => {
     await page.goto("/s/1/transactions");
     const list = page.locator("[data-tx-list]");

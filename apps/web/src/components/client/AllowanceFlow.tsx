@@ -1,6 +1,6 @@
 "use client";
 
-import { BookPicker } from "@/components/client/AddressBook";
+import { BookField } from "@/components/client/AddressBook";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Info, LoaderCircle, Lock, TriangleAlert, Wallet } from "lucide-react";
@@ -185,6 +185,7 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
           <label htmlFor="allowance-to" className="font-sans text-label text-ink">
             {copy.allowance.add.to}
           </label>
+          <BookField kind="near" onPick={setText}>
           <TextInput
             id="allowance-to"
             mono
@@ -197,8 +198,9 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
             invalid={!!err}
             aria-describedby="allowance-to-status"
             data-testid="allowance-to"
+            className="pr-13"
           />
-          <BookPicker kind="near" onPick={setText} />
+          </BookField>
           <div id="allowance-to-status" aria-live="polite" className="flex flex-col gap-2 font-sans text-body-sm">
             {!text.trim() ? (
               <p className="text-ink-muted">{copy.allowance.add.help}</p>

@@ -320,6 +320,10 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
       await page.getByRole("radio", { name: "USDC" }).click();
       await flow.getByTestId("offer-amount").fill("5");
       await expect(flow.getByTestId("storage-prepay")).toBeVisible();
+      // axe reads colours as rendered: wait out the currency switch's highlight transition (mid-fade it fails contrast)
+      // (finite ones only: spinners and skeleton pulses loop forever)
+      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getTiming().iterations === Infinity));
+      await page.waitForTimeout(250);
       expect(await axe(page, "[data-flow-shell]", ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])).toEqual([]);
       await ctx.close();
     });

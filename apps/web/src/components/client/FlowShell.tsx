@@ -193,6 +193,8 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
     lockScroll();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        // something inside the popup handled this Escape (the address book's dropdown closing itself): keep the popup
+        if (e.defaultPrevented) return;
         e.preventDefault();
         close();
       } else if (e.key === "Tab") {

@@ -32,7 +32,7 @@ import { SOL_REFRESH_MS, solBlockhashFresh } from "@/lib/signing/sol-timing";
 import { balanceBase, chainName } from "@/lib/view";
 import { EvmSendOptions } from "@/components/client/EvmSendOptions";
 import { hasCoins, holdings } from "@/lib/holdings";
-import { BookPicker, SaveToBook, useBookName } from "@/components/client/AddressBook";
+import { SaveToBook, useBookMenu, useBookName } from "@/components/client/AddressBook";
 import { kindOfChain } from "@/lib/address-book";
 import { anyEvmFunds, evmBalanceOf, evmNetworkName, SEPOLIA, usdcAddress, USDC_DECIMALS, type EvmChainId } from "@/lib/evm-networks";
 import type { PreparedSend } from "@/lib/chains/send";
@@ -743,6 +743,7 @@ function FormStep(p: {
   const inputRef = useRef<HTMLInputElement>(null);
   const resolved = p.val && p.val.tier !== "error" ? p.val : null;
   const savedName = useBookName(kindOfChain(p.chain), resolved?.normalized);
+  const book = useBookMenu(kindOfChain(p.chain), p.setToText);
   const toError = p.val?.tier === "error" ? p.val.message : null;
   return (
     <>
@@ -848,25 +849,29 @@ function FormStep(p: {
                 spellCheck={false}
                 invalid={!!toError}
                 aria-describedby={toError ? "to-error" : undefined}
-                className="pr-26"
+                className="pr-37"
                 data-testid="to"
               />
-              <button
-                type="button"
-                className="absolute top-1 right-1 inline-flex min-h-11 items-center gap-1.5 rounded-pill px-3.5 font-sans text-[0.875rem] leading-5 font-semibold text-ink hover:bg-line"
-                onClick={async () => {
-                  try {
-                    p.setToText(await navigator.clipboard.readText());
-                  } catch {
-                    /* clipboard blocked */
-                  }
-                }}
-              >
-                <Icon icon={ClipboardPaste} size={16} />
-                {copy.send.form.paste}
-              </button>
+              {/* the address book (saved addresses of this chain only) and Paste, inside the field */}
+              <div className="absolute top-1 right-1 flex items-center gap-0.5">
+                {book.button}
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-pill px-3.5 font-sans text-[0.875rem] leading-5 font-semibold text-ink hover:bg-line"
+                  onClick={async () => {
+                    try {
+                      p.setToText(await navigator.clipboard.readText());
+                    } catch {
+                      /* clipboard blocked */
+                    }
+                  }}
+                >
+                  <Icon icon={ClipboardPaste} size={16} />
+                  {copy.send.form.paste}
+                </button>
+              </div>
+              {book.menu}
             </div>
-            <BookPicker kind={kindOfChain(p.chain)} onPick={p.setToText} />
             {toError ? (
               <p id="to-error" role="alert" className="flex items-start gap-1.5 font-sans text-body-sm text-danger" data-testid="to-error">
                 <Icon icon={TriangleAlert} size={16} className="mt-0.5" />
