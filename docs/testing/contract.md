@@ -349,6 +349,7 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 |---|---|
 | Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
 | Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
+| Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: see the next row |
 | Differential, seed 20261030 (`target/fuzz-corpus-r2`), 100,000 per kind (evm, btc, sol, msg = 400k) | **0 disagreements**, no TS throw. TS generation 12.7 s CPU; Rust replay (release) 13.9 s. Agreed: EVM 17,711 ok + 82,289 refused; BTC 25,426 + 74,574; SOL 24,904 + 75,096; msg 49,512 + 50,488. The Rust oracles agreed with the contract on every line |
 | Differential, seed 7 (`target/fuzz-corpus-r2b`), EVM 300,000 + 100,000 btc/sol/msg (600k) | **0 disagreements**, no TS throw. TS generation 17.4 s; Rust replay 18.9 s. Agreed: EVM 52,395 ok + 247,605 refused; BTC 25,387 + 74,613; SOL 25,008 + 74,992; msg 49,177 + 50,823 |
 
