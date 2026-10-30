@@ -162,6 +162,9 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
+    // whatever had focus when this flow opened (the link or button that triggered it, on a client navigation; <body>
+    // on a full page load) gets it back once the flow closes, instead of leaving focus on <body> (WCAG 2.4.3).
+    const returnFocusTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     // inert background: every sibling along the path from the shell to <body> (counted; see `marks`)
     const touched: Element[] = [];
     let node: Element | null = root;
@@ -212,6 +215,9 @@ export function FlowShell({ testId, ...head }: FlowHead & { testId?: string }) {
       document.removeEventListener("keydown", onKey);
       unlockScroll();
       for (const el of touched) unlockSibling(el);
+      // document.body is never worth restoring to; a trigger that's still around (same page, not just-unmounted
+      // itself) gets focus back so a keyboard/screen-reader user doesn't lose their place.
+      if (returnFocusTo && returnFocusTo !== document.body && document.contains(returnFocusTo)) returnFocusTo.focus();
     };
   }, [close]);
 
