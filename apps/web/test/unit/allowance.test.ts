@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { assetChain, assetTicker, capForChain, formatCapAmount } from "@/lib/allowanceView";
+import { assetChain, assetTicker, capForChain, ethOtherCapOptions, extraCapOptions, formatCapAmount, MAX_CAPS, usdcCapOptions } from "@/lib/allowanceView";
+import { usdcAddress } from "@/lib/evm-networks";
 import { errorCopy } from "@/lib/copy";
 import { prepareSend } from "@/lib/chains/send";
 import { DANA, FIXTURE_RECORDS } from "@/lib/data/fixtures";
@@ -213,5 +214,111 @@ describe("sim.ts: a sale clears allowances too", () => {
     expect(simOverlay().allowancesOf("4")).toHaveLength(1);
     simBuy("4", CAROL);
     expect(simOverlay().allowancesOf("4")).toHaveLength(0);
+  });
+});
+
+const BASE = 84532;
+const ARBITRUM = 421614;
+const OP = 11155420;
+
+describe("allowanceView: the Add sheet's full cap list (C2 + C3: ETH on Base/Arbitrum/OP, USDC on all four)", () => {
+  it("ethOtherCapOptions covers Base, Arbitrum and OP, never Sepolia (it has its own native-chain row)", () => {
+    const opts = ethOtherCapOptions();
+    expect(opts.map((o) => o.ticker)).toEqual(["ETH", "ETH", "ETH"]);
+    expect(opts.map((o) => (o.asset as { evm: { chain_id: number } }).evm.chain_id)).toEqual([BASE, ARBITRUM, OP]);
+    expect(opts.some((o) => (o.asset as { evm: { chain_id: number } }).evm.chain_id === 11155111)).toBe(false);
+  });
+
+  it("usdcCapOptions covers all four EVM testnets, each erc20 asset carrying that chain's USDC token", () => {
+    const opts = usdcCapOptions();
+    expect(opts).toHaveLength(4);
+    expect(opts.every((o) => o.ticker === "USDC")).toBe(true);
+    expect(
+      opts
+        .map((o) => (o.asset as { erc20: { chain_id: number; token: string } }).erc20.chain_id)
+        .sort((a, b) => a - b),
+    ).toEqual([11155111, BASE, ARBITRUM, OP].sort((a, b) => a - b));
+    for (const o of opts) {
+      const a = o.asset as { erc20: { chain_id: number; token: string } };
+      expect(a.erc20.token).toBe(usdcAddress(a.erc20.chain_id).replace(/^0x/, "").toLowerCase());
+    }
+  });
+
+  it("extraCapOptions is the 3 extra ETH rows plus the 4 USDC rows, each with a unique key", () => {
+    const opts = extraCapOptions();
+    expect(opts).toHaveLength(7);
+    expect(new Set(opts.map((o) => o.key)).size).toBe(7);
+  });
+
+  it("formatCapAmount reads ETH and USDC on every one of these chains", () => {
+    expect(formatCapAmount({ evm: { chain_id: BASE } }, "20000000000000000")).toBe(`0.0200${" "}ETH`);
+    expect(formatCapAmount({ erc20: { chain_id: BASE, token: usdcAddress(BASE).slice(2) } }, "5000000")).toBe(`5.00${" "}USDC`);
+  });
+});
+
+describe("sim.ts: set_allowance respects the contract's 8-cap limit across every asset kind", () => {
+  let restore: () => void;
+  beforeEach(() => {
+    restore = installFakeWindow();
+  });
+  afterEach(() => restore());
+
+  it("accepts exactly MAX_CAPS (8) caps mixing native chains, other-network ETH and USDC", () => {
+    expect(MAX_CAPS).toBe(8);
+    const opts = extraCapOptions(); // 7 rows: 3 ETH + 4 USDC
+    const caps = [{ asset: "btc" as const, limit: 1n }, ...opts.map((o) => ({ asset: o.asset, limit: 1n }))];
+    expect(caps).toHaveLength(8);
+    expect(() => simSetAllowance("6", ALICE, BOB, caps, undefined)).not.toThrow();
+    expect(simOverlay().allowanceOf("6", BOB)!.caps).toHaveLength(8);
+  });
+
+  it("rejects a 9th cap (ERR_ALLOWANCE_CAPS), even when every asset is distinct", () => {
+    const opts = extraCapOptions();
+    const caps = [{ asset: "btc" as const, limit: 1n }, { asset: "sol" as const, limit: 1n }, ...opts.map((o) => ({ asset: o.asset, limit: 1n }))];
+    expect(caps).toHaveLength(9);
+    expect(() => simSetAllowance("6", ALICE, BOB, caps, undefined)).toThrow(/ERR_ALLOWANCE_CAPS/);
+  });
+});
+
+describe("sim.ts + mock-wallet: a delegate's USDC and other-network ETH caps (C2 + C3)", () => {
+  let restore: () => void;
+  beforeEach(() => {
+    restore = installFakeWindow();
+  });
+  afterEach(() => restore());
+
+  it("a delegate's USDC send on Base Sepolia within the cap is allowed; over it, refused", async () => {
+    // Satchel #1 (ALICE) holds 10 USDC on Base Sepolia (fixtures.ts FIXTURE_EVM_CHAINS). A USDC send also debits the
+    // native ETH gas fee (evmDebits), so the delegate needs an ETH cap on that chain too, not only the USDC one.
+    simSetAllowance(
+      "1",
+      ALICE,
+      BOB,
+      [
+        { asset: { erc20: { chain_id: BASE, token: usdcAddress(BASE).slice(2) } }, limit: 5_000_000n }, // 5 USDC
+        { asset: { evm: { chain_id: BASE } }, limit: 1_000_000_000_000_000n }, // gas headroom
+      ],
+      undefined,
+    );
+    const small = await prepareSend({ tokenId: "1", chain: "evm", to: satchelAddresses("2").evm, amount: 2_000_000n, records: FIXTURE_RECORDS["1"]!, evmChainId: BASE, asset: "usdc" });
+    const wallet = mockWallet(BOB);
+    const r = await runCall(wallet, calls.signFor("1", small.request), BOB);
+    expect(r.ok).toBe(true);
+    const cap = simOverlay().allowanceOf("1", BOB)!.caps[0]!;
+    expect(BigInt(cap.remaining)).toBe(3_000_000n);
+
+    const big = await prepareSend({ tokenId: "1", chain: "evm", to: satchelAddresses("2").evm, amount: 3_500_000n, records: FIXTURE_RECORDS["1"]!, evmChainId: BASE, asset: "usdc", reuse: { evmNonce: small.evmNonce! + 1 } });
+    const r2 = await runCall(wallet, calls.signFor("1", big.request), BOB);
+    expect(r2.ok).toBe(false);
+    if (!r2.ok && "failure" in r2) expect(r2.failure.code).toBe("ERR_ALLOWANCE_EXCEEDED");
+  });
+
+  it("a delegate's ETH send on Base Sepolia debits its own cap, separate from the native Sepolia ETH cap", async () => {
+    simSetAllowance("1", ALICE, BOB, [{ asset: { evm: { chain_id: BASE } }, limit: 10_000_000_000_000_000n }], undefined);
+    const p = await prepareSend({ tokenId: "1", chain: "evm", to: satchelAddresses("2").evm, amount: 1_000_000_000_000_000n, records: FIXTURE_RECORDS["1"]!, evmChainId: BASE });
+    const wallet = mockWallet(BOB);
+    const r = await runCall(wallet, calls.signFor("1", p.request), BOB);
+    expect(r.ok).toBe(true);
+    expect(BigInt(simOverlay().allowanceOf("1", BOB)!.caps[0]!.remaining)).toBeLessThan(10_000_000_000_000_000n);
   });
 });
