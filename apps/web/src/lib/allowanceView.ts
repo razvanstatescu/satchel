@@ -1,15 +1,52 @@
-import { assetKey, type Asset, type AllowanceView } from "@satchel/core/policy";
-import { formatAmount, type Ticker } from "@/lib/format";
+import { MAX_CAPS, assetKey, type Asset, type AllowanceView } from "@satchel/core/policy";
+import { DECIMALS, formatAmount, type Ticker } from "@/lib/format";
+import { EVM_IDS, OTHER_EVM_IDS, USDC_DECIMALS, evmPickerName, usdcAddress, type EvmChainId } from "@/lib/evm-networks";
 import type { UiChain } from "@/lib/view";
 
 /**
- * C5 (docs/specs/C5.md) view helpers: map the contract's `Asset` (and the UI's three chains) onto each other, and
- * format a cap amount the same way the rest of the app formats balances. ERC-20 caps (future C2 UI) and EVM chain
- * ids the Send flow doesn't support yet (future C3 UI) have no UI chain: they still render in the facts list with
- * their raw amount, just without a ticker.
+ * C5 (docs/specs/C5.md) view helpers: map the contract's `Asset` (and the UI's three native chains) onto each other,
+ * and format a cap amount the same way the rest of the app formats balances. The Add sheet's full asset list — the
+ * three native chains plus ETH on Base/Arbitrum/OP and USDC on all four EVM testnets (C2 + C3) — is built here too
+ * (`extraCapOptions`), so its shape is covered by unit tests without rendering the form.
  */
 
 export const ALLOWANCE_EVM_CHAIN_ID = 11155111;
+
+/** One row the Add sheet's caps form can offer beyond the three native chains: a specific EVM-chain ETH or USDC cap. */
+export interface CapOption {
+  /** Stable React/test key; also the checkbox's `data-testid` suffix. */
+  key: string;
+  asset: Asset;
+  ticker: Ticker;
+  decimals: number;
+  /** "Base", "Arbitrum", "OP" — the network picker's own short name (evm-networks.ts). */
+  network: string;
+}
+
+/** ETH caps on the EVM testnets besides Sepolia (which already has its own native-chain row). */
+export function ethOtherCapOptions(): CapOption[] {
+  return OTHER_EVM_IDS.map((chainId) => ethCapOption(chainId));
+}
+
+export function ethCapOption(chainId: EvmChainId): CapOption {
+  return { key: `eth:${chainId}`, asset: { evm: { chain_id: chainId } }, ticker: "ETH", decimals: DECIMALS.ETH, network: evmPickerName(chainId) };
+}
+
+/** USDC caps on all four EVM testnets, Sepolia included (it has no native-chain USDC row). */
+export function usdcCapOptions(): CapOption[] {
+  return EVM_IDS.map((chainId) => usdcCapOption(chainId));
+}
+
+export function usdcCapOption(chainId: EvmChainId): CapOption {
+  return { key: `usdc:${chainId}`, asset: evmAsset(chainId, usdcAddress(chainId)), ticker: "USDC", decimals: USDC_DECIMALS, network: evmPickerName(chainId) };
+}
+
+/** Every option the Add sheet can offer beyond the three native-chain rows (C2 + C3), in a stable display order. */
+export function extraCapOptions(): CapOption[] {
+  return [...ethOtherCapOptions(), ...usdcCapOptions()];
+}
+
+export { MAX_CAPS };
 
 export function assetChain(asset: Asset): UiChain | null {
   if (asset === "btc") return "btc";

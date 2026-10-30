@@ -7,14 +7,13 @@ import { utcShort } from "@/components/Timeline";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
 import { Button, Icon, Morph, cx } from "@/components/ui";
-import { assetTicker, capForChain, formatCapAmount } from "@/lib/allowanceView";
+import { assetTicker, formatCapAmount } from "@/lib/allowanceView";
 import { copy, errorCopy } from "@/lib/copy";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { calls } from "@/lib/near/contract";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
-import { UI_CHAINS } from "@/lib/view";
 
 /**
  * C5 (docs/specs/C5.md): the public facts list, the owner's management panel (list + Revoke + Add) and the banner a
@@ -149,7 +148,7 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
 export function DelegateBanner({ snap }: { snap: SatchelSnapshot }) {
   const { isOwner, isDelegate, myAllowance } = useViewer(snap);
   if (isOwner || !isDelegate || !myAllowance) return null;
-  const rows = UI_CHAINS.map((c) => ({ chain: c, cap: capForChain(myAllowance, c) })).filter((r) => r.cap);
+  // Every cap this access grants, not just the three native chains: a Base/Arbitrum/OP ETH or any USDC cap (C2 + C3) shows here too.
   return (
     <section aria-labelledby="allowance-banner-title" className="flex flex-col gap-2 rounded-card border border-line bg-surface p-5" data-testid="delegate-banner">
       <h2 id="allowance-banner-title" className="m-0 font-display text-heading text-ink">
@@ -157,8 +156,8 @@ export function DelegateBanner({ snap }: { snap: SatchelSnapshot }) {
       </h2>
       <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.allowance.banner.lede(myAllowance.owner_id)}</p>
       <ul className="m-0 flex list-none flex-col gap-1 p-0 font-sans text-body-sm text-ink">
-        {rows.map(({ chain, cap }) => (
-          <li key={chain}>{copy.allowance.send.remaining(formatCapAmount(cap!.asset, cap!.remaining))}</li>
+        {myAllowance.caps.map((cap, i) => (
+          <li key={i}>{copy.allowance.send.remaining(formatCapAmount(cap.asset, cap.remaining))}</li>
         ))}
       </ul>
       {myAllowance.status === "paused" ? (

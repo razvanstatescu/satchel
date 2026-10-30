@@ -12,6 +12,8 @@ import { ALICE, CAROL, useMockWallet } from "./helpers";
  */
 
 const BTC_RECIPIENT = "tb1qdkyxcms7phwyy2fn94tlng8f2zdsc74a8lpf3u"; // a valid testnet4 address (flows.spec.ts)
+const RECIPIENT_EVM = "0x53f9a1c2b3d4e5f60718293a4b5c6d7e8f901c2a"; // multichain.spec.ts's own recipient (warning tier: needs the ack)
+const IVY = "ivy.satchelhq.testnet";
 
 test.describe("C5: server HTML (no JS) names the existing access and its caps", () => {
   test.use({ javaScriptEnabled: false });
@@ -87,6 +89,80 @@ test.describe("C5: the owner adds, sees and revokes", () => {
   });
 });
 
+test.describe("C2 + C3: USDC and other-EVM-chain caps in the Add sheet", () => {
+  test("Alice adds a USDC cap on Sepolia and an ETH cap on Base Sepolia to Ivy; both show in the facts", async ({ page }) => {
+    await useMockWallet(page, ALICE);
+    await page.goto("/s/1");
+    const manage = page.getByTestId("allowance-manage").filter({ visible: true });
+    await manage.getByTestId("add-allowance").click();
+    const flow = page.getByTestId("allowance-flow");
+    await flow.getByTestId("allowance-to").fill(IVY);
+    await expect(flow.getByTestId("allowance-recipient-card")).toBeVisible();
+    await flow.getByTestId("allowance-review").click();
+
+    // the native Sepolia ETH row pays the USDC send's gas fee; the extra rows are behind "Other networks"
+    await flow.getByTestId("allowance-cap-evm").check();
+    await flow.getByTestId("allowance-cap-evm-amount").fill("0.001");
+    await flow.getByTestId("allowance-other-networks").locator("summary").click();
+    await flow.getByTestId("allowance-cap-usdc-11155111").check();
+    await flow.getByTestId("allowance-cap-usdc-11155111-amount").fill("5");
+    await flow.getByTestId("allowance-cap-eth-84532").check();
+    await flow.getByTestId("allowance-cap-eth-84532-amount").fill("0.05");
+    await flow.getByTestId("allowance-submit").click();
+
+    await expect(page).toHaveURL(/\/s\/1$/);
+    await expect(manage).toContainText(IVY);
+    const facts = page.getByTestId("allowance-facts").filter({ visible: true });
+    await expect(facts).toContainText(IVY);
+    await expect(facts).toContainText("5.00 USDC");
+    await expect(facts).toContainText("0.0500 ETH");
+
+    // the public facts carry it after a reload too (a judge fact, no JS needed)
+    await page.reload();
+    await expect(page.getByTestId("allowance-facts").filter({ visible: true })).toContainText(IVY);
+  });
+
+  test("Ivy's USDC send on Sepolia is allowed within the cap, then refused over it", async ({ page }) => {
+    await useMockWallet(page, ALICE);
+    await page.goto("/s/1");
+    await page.getByTestId("allowance-manage").filter({ visible: true }).getByTestId("add-allowance").click();
+    const addFlow = page.getByTestId("allowance-flow");
+    await addFlow.getByTestId("allowance-to").fill(IVY);
+    await expect(addFlow.getByTestId("allowance-recipient-card")).toBeVisible();
+    await addFlow.getByTestId("allowance-review").click();
+    await addFlow.getByTestId("allowance-cap-evm").check();
+    await addFlow.getByTestId("allowance-cap-evm-amount").fill("0.001");
+    await addFlow.getByTestId("allowance-other-networks").locator("summary").click();
+    await addFlow.getByTestId("allowance-cap-usdc-11155111").check();
+    await addFlow.getByTestId("allowance-cap-usdc-11155111-amount").fill("5");
+    await addFlow.getByTestId("allowance-submit").click();
+    await expect(page).toHaveURL(/\/s\/1$/);
+
+    // switch the mock wallet to Ivy, same tab (same tab's sessionStorage keeps the sim state Alice's set_allowance wrote)
+    await page.evaluate((who) => localStorage.setItem("satchel:mock-wallet", who), IVY);
+    await page.goto("/s/1/send?chain=evm&asset=usdc");
+    const flow = page.getByTestId("send-flow");
+    await expect(flow.getByRole("dialog")).toBeVisible();
+    await expect(flow.getByTestId("allowance-remaining")).toContainText("5.00");
+    await flow.getByTestId("amount").fill("2");
+    await flow.getByTestId("to").fill(RECIPIENT_EVM);
+    await flow.getByTestId("review").click();
+    await flow.getByLabel("I checked this address").check();
+    await expect(flow.getByTestId("review-amount")).toHaveText("2.00 USDC");
+    await flow.getByTestId("send").click();
+    await expect(flow.getByTestId("signing-progress")).toHaveAttribute("data-stage", "confirmed", { timeout: 30_000 });
+
+    // 3 USDC of the 5 USDC cap is left; a 4 USDC send (still under the original cap) is refused client-side
+    await page.goto("/s/1/send?chain=evm&asset=usdc");
+    const flow2 = page.getByTestId("send-flow");
+    await expect(flow2.getByTestId("allowance-remaining")).toContainText("3.00");
+    await flow2.getByTestId("amount").fill("4");
+    await flow2.getByTestId("to").fill(RECIPIENT_EVM);
+    await expect(flow2.getByTestId("review")).toBeDisabled();
+    await expect(flow2).toContainText(/over today's remaining amount/);
+  });
+});
+
 test.describe("C5: a delegate sends within the cap and is refused over it", () => {
   test("Dana sees her remaining caps, sends within the BTC cap, then is blocked over the remaining amount", async ({ page }) => {
     await useMockWallet(page, DANA, { delay: 800 });
@@ -150,8 +226,17 @@ test.describe("C5: accessibility (axe, WCAG 2.0-2.2 A/AA) for the Add sheet, Day
       }
       await useMockWallet(page, ALICE);
       await page.goto("/s/1/allowance");
-      await expect(page.getByTestId("allowance-flow").getByRole("dialog")).toBeVisible();
+      const flow = page.getByTestId("allowance-flow");
+      await expect(flow.getByRole("dialog")).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe(theme);
+      expect(await axe(page)).toEqual([]);
+
+      // the Limits step, with the "Other networks" disclosure (USDC + Base/Arbitrum/OP ETH caps) open
+      await flow.getByTestId("allowance-to").fill(IVY);
+      await expect(flow.getByTestId("allowance-recipient-card")).toBeVisible();
+      await flow.getByTestId("allowance-review").click();
+      await flow.getByTestId("allowance-other-networks").locator("summary").click();
+      await expect(flow.getByTestId("allowance-cap-usdc-11155111")).toBeVisible();
       expect(await axe(page)).toEqual([]);
     });
   }
