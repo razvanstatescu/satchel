@@ -448,7 +448,11 @@ export interface SegmentOption<T extends string> {
 
 const SEG_TRACK = "rounded-pill bg-surface-sunken";
 /** `block`: equal columns at full width; otherwise as wide as its options (never stretched by a flex column). */
-const segTrack = (block: boolean) => cx(SEG_TRACK, block ? "grid w-full auto-cols-fr grid-flow-col" : "inline-flex w-fit max-w-full");
+// BUG fix (found auditing /s/[id]/transactions at 320px): a non-`block` Segmented with enough options (the
+// Transactions chain filter: All/Bitcoin/Ethereum/Solana/Inside) overflowed its `max-w-full` box at the narrowest
+// supported width, which — since nothing clipped or scrolled it — widened the whole page and broke the "nothing
+// scrolls sideways" rule every other page is held to. `overflow-x-auto` only engages when content truly doesn't fit.
+const segTrack = (block: boolean) => cx(SEG_TRACK, block ? "grid w-full auto-cols-fr grid-flow-col" : "inline-flex w-fit max-w-full overflow-x-auto");
 const SEG_OPT =
   "relative isolate inline-flex min-h-11 items-center justify-center gap-1.5 rounded-pill font-sans font-semibold whitespace-nowrap transition-colors duration-120 before:absolute before:inset-1 before:-z-10 before:rounded-pill before:content-['']";
 const segSize = (size: "md" | "sm") => (size === "sm" ? "px-3 text-[0.875rem] leading-5" : "px-3.5 text-label");
