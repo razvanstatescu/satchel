@@ -758,3 +758,107 @@ fn transfer_keeps_history_and_inflight_resolution() {
     Ctx::new(alice()).dep(5 * MILLI).set();
     expect_err(ERR_NOT_OWNER, || c.sign_for(id, evm_req(), None));
 }
+
+// ── test audit 2026-10-30 (docs/testing/contract.md) ─────────────────────────────────────────────
+
+/// C1 stability: `history_digest` covers only the immutable record fields and the count, so ownership changes and
+/// listings never move it; only a new record does. A marketplace order bound to `(sig_count, digest)` therefore
+/// survives a gift or a relist, and breaks exactly when the history grows.
+#[test]
+fn audit_history_digest_moves_only_with_new_records() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let empty = c.history_digest(id.clone()).unwrap();
+    assert_eq!(empty.sig_count, 0);
+    sign(&mut c, &id, evm_req(), 100);
+    let d1 = c.history_digest(id.clone()).unwrap();
+    assert_ne!(d1, empty);
+    // the callback fills status/signature only
+    Ctx::new(me()).results(vec![PromiseResult::Successful(SECP_OK.as_bytes().to_vec())]).at(101).set();
+    c.on_signed(id.clone(), 0, 1);
+    assert_eq!(c.history_digest(id.clone()).unwrap(), d1, "on_signed must not move the digest");
+    // transfer, list, delist, relist, sale
+    Ctx::new(alice()).dep(1).at(200).set();
+    c.nft_transfer(bob(), id.clone(), None, None);
+    assert_eq!(c.history_digest(id.clone()).unwrap(), d1, "transfer");
+    Ctx::new(bob()).dep(10 * MILLI).at(400).set();
+    c.list(id.clone(), U128(ONE_NEAR), Currency::Near);
+    assert_eq!(c.history_digest(id.clone()).unwrap(), d1, "list");
+    Ctx::new(bob()).dep(1).at(401).set();
+    c.delist(id.clone());
+    Ctx::new(bob()).dep(10 * MILLI).at(402).set();
+    let lid = c.list(id.clone(), U128(ONE_NEAR), Currency::Near);
+    Ctx::new(carol()).dep(ONE_NEAR).at(403).set();
+    c.buy(id.clone(), lid, 1);
+    assert_eq!(c.history_digest(id.clone()).unwrap(), d1, "sale");
+    // a new record (by the new owner) moves it
+    Ctx::new(carol()).dep(5 * MILLI).at(404).set();
+    c.sign_for(id.clone(), sol_req(), None);
+    let d2 = c.history_digest(id.clone()).unwrap();
+    assert_eq!(d2.sig_count, 2);
+    assert_ne!(d2.digest_hex, d1.digest_hex);
+}
+
+/// View edge arguments: unknown ids, empty strings, zero and huge limits, huge offsets. None of them panics, and every
+/// page stays ≤ MAX_PAGE. (Unit tests run on a 64-bit host; the wasm32 truncation of `listings` is AUDIT-02, sandbox.)
+#[test]
+fn audit_view_edge_arguments_never_panic() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    for k in 0..3u64 {
+        sign(&mut c, &id, sol_req(), 100 + k);
+    }
+    for unknown in ["0", "", "999", "1 ", "01"] {
+        assert!(c.satchel(unknown.into()).is_none(), "{unknown:?}");
+        assert!(c.history_digest(unknown.into()).is_none(), "{unknown:?}");
+        assert!(c.inside_of(unknown.into()).is_none(), "{unknown:?}");
+        assert!(c.sig_records(unknown.into(), 0, 50).is_empty(), "{unknown:?}");
+        assert!(c.allowances_of(unknown.into()).is_empty(), "{unknown:?}");
+        assert!(c.offers_for(unknown.into(), 0, 50).is_empty(), "{unknown:?}");
+    }
+    assert!(c.sig_records(id.clone(), 0, 0).is_empty(), "limit 0");
+    assert_eq!(c.sig_records(id.clone(), 0, u32::MAX).len(), 3, "a huge limit is capped, not an error");
+    assert!(c.sig_records(id.clone(), u64::MAX, u32::MAX).is_empty(), "offset past the end");
+    assert_eq!(c.sig_records(id.clone(), 2, 50).iter().map(|r| r.seq).collect::<Vec<_>>(), vec![2]);
+    assert!(c.listings(0, 0).is_empty());
+    assert!(c.listings(u64::MAX, 50).is_empty());
+    assert!(c.offers_by(bob(), u64::MAX, u32::MAX).is_empty());
+    assert!(c.proceeds_of(carol()).is_empty());
+    // max_evm_nonce: no record yet → None on every supported chain; an unsupported chain → None
+    for chain in [11_155_111u64, 84_532, 421_614, 11_155_420, 1, 0, u64::MAX] {
+        assert_eq!(c.max_evm_nonce(id.clone(), chain), None, "chain {chain}");
+    }
+    // derived_path does not check that the token exists (it is a pure function of the id)
+    assert_eq!(c.derived_path("999".into(), Chain::Btc), "satchel/999/btc");
+    // NEP-181 on an account that holds nothing
+    assert!(c.nft_tokens_for_owner(carol(), None, None).is_empty());
+    assert_eq!(c.nft_supply_for_owner(carol()), U128(0));
+}
+
+/// `on_signed` is called with the exact `(first_seq, n)` sign_for scheduled; the defensive paths still hold if it is
+/// replayed or sees fewer results than `n`: a resolved record is never overwritten, a missing one is skipped, and it
+/// never panics (INV-12). Also: an Ed25519 reply for an EVM record is "unparsed" (scheme must match the chain).
+#[test]
+fn audit_on_signed_defensive_paths() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    sign(&mut c, &id, evm_req(), 100);
+    let ed = json!({"scheme":"Ed25519","signature": (0..64).collect::<Vec<u8>>()}).to_string();
+    Ctx::new(me()).results(vec![PromiseResult::Successful(ed.into_bytes())]).at(101).set();
+    let out = c.on_signed(id.clone(), 0, 1);
+    assert!(out[0].is_some(), "raw JSON is returned even when unparsed");
+    assert_eq!(c.sig_records(id.clone(), 0, 1)[0].status, SigStatus::Unparsed);
+    // a replay with a valid signature cannot upgrade a resolved record
+    Ctx::new(me()).results(vec![PromiseResult::Successful(SECP_OK.as_bytes().to_vec())]).at(102).set();
+    c.on_signed(id.clone(), 0, 1);
+    let r = &c.sig_records(id.clone(), 0, 1)[0];
+    assert_eq!((r.status, r.signature.clone()), (SigStatus::Unparsed, None));
+    // n larger than the results, and seqs that do not exist: no panic, nothing written
+    Ctx::new(me()).results(vec![PromiseResult::Failed]).at(103).set();
+    let out = c.on_signed(id.clone(), 5, 10);
+    assert_eq!(out, vec![None]);
+    assert_eq!(c.satchel(id.clone()).unwrap().sig_count, 1);
+    // zero results
+    Ctx::new(me()).at(104).set();
+    assert!(c.on_signed("nope".into(), u64::MAX, u32::MAX).is_empty(), "first_seq + i saturates, never overflows");
+}

@@ -945,3 +945,69 @@ fn c7_messages_are_refused_for_delegates() {
     c.sign_for("1".into(), SignRequest::EvmMessage { message: hex::encode(b"hello") }, None);
     assert_eq!(sig_count(&c), 1);
 }
+
+// ── test audit 2026-10-30 (docs/testing/contract.md) ─────────────────────────────────────────────
+
+/// A BTC request whose preimages carry the real input amounts (what a usable signature needs), for one tx.
+fn btc_req_of(tx: &btc::tests::Tx) -> SignRequest {
+    let pre = btc::tests::preimages(tx);
+    SignRequest::Btc { preimages: pre.iter().map(hex::encode).collect(), outputs: hex::encode(&tx.outputs) }
+}
+
+/// AUDIT-01 (BUG, C5): the BIP143 "split amount" attack bypasses a delegate's BTC cap.
+///
+/// BIP143 (segwit v0) commits each input's amount only in THAT input's sighash. A delegate asks for the same tx twice:
+/// request 1 states input A's real amount and understates B; request 2 states B's real amount and understates A. Each
+/// request's debit uses the stated (low) amounts, so its computed fee is ≈ 0, but the signature for A (from request 1)
+/// and for B (from request 2) are both valid for the real tx, whose real fee is huge. Here 2 inputs of 1,000,000 sats
+/// each, one 1,000,000-sat output back to the Satchel's own P2WPKH (change, never debited): the real fee burns
+/// 1,000,000 sats while the two requests debit 1 sat each against a 1,000-sat cap.
+///
+/// Expected (spec C5 §3: "every debit is the worst case the signature can take out of the Satchel, fees included"):
+/// the second request is refused ERR_ALLOWANCE_EXCEEDED (or delegates may not sign multi-input BTC at all).
+#[test]
+#[ignore = "BUG AUDIT-01: BIP143 split-amount requests let a delegate burn BTC as fee far beyond its cap"]
+fn audit01_btc_split_amount_requests_bypass_the_delegate_cap() {
+    const X: u64 = 1_000_000;
+    let mut real = btc::tests::sample_tx(2);
+    for i in real.inputs.iter_mut() {
+        i.amount = X;
+    }
+    let own: Vec<u8> = [&[0x00, 0x14][..], &real.pkh[..]].concat();
+    real.outputs = btc::tests::output(X, &own); // all value "returns" as change; the rest (X sats) is fee
+    let real_pre = btc::tests::preimages(&real);
+    // request 1: A real, B understated to 1 sat; request 2: the reverse
+    let mut r1 = real.clone();
+    r1.inputs[1].amount = 1;
+    let mut r2 = real.clone();
+    r2.inputs[0].amount = 1;
+    assert_eq!(btc_debit(&btc::tests::preimages(&r1), &r1.outputs).unwrap(), 1, "stated fee of request 1");
+    assert_eq!(btc_debit(&btc::tests::preimages(&r2), &r2.outputs).unwrap(), 1, "stated fee of request 2");
+    assert_eq!(btc_debit(&real_pre, &real.outputs).unwrap(), X as u128, "the real tx burns X sats as fee");
+
+    let mut c = setup();
+    set(&mut c, bot(), vec![cap(Asset::Btc, 1_000)], None, T0);
+    sign_as(&mut c, bot(), btc_req_of(&r1), T0);
+    let recs = c.sig_records("1".into(), 0, 50);
+    // the record of input A (seq 0) is the sighash of the REAL tx's input A: a valid signature for the real tx
+    assert_eq!(recs[0].payload, hex::encode(btc::sha256d(&real_pre[0])));
+    // the second half of the same tx must not be signable within a 1,000-sat cap
+    expect_err(ERR_ALLOWANCE_EXCEEDED, || sign_as(&mut c, bot(), btc_req_of(&r2), T0 + 1_000));
+}
+
+/// Companion of AUDIT-01 that passes today: with the real amounts in ONE request the fee is debited in full, so the
+/// owner's cap holds for a single honest request (the bypass needs the split across two requests).
+#[test]
+fn audit01_btc_real_amounts_in_one_request_debit_the_full_fee() {
+    const X: u64 = 1_000_000;
+    let mut real = btc::tests::sample_tx(2);
+    for i in real.inputs.iter_mut() {
+        i.amount = X;
+    }
+    let own: Vec<u8> = [&[0x00, 0x14][..], &real.pkh[..]].concat();
+    real.outputs = btc::tests::output(X, &own);
+    let mut c = setup();
+    set(&mut c, bot(), vec![cap(Asset::Btc, 1_000)], None, T0);
+    expect_err(ERR_ALLOWANCE_EXCEEDED, || sign_as(&mut c, bot(), btc_req_of(&real), T0));
+    assert_eq!(sig_count(&c), 0);
+}
