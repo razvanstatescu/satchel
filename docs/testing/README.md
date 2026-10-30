@@ -29,19 +29,27 @@ Every command runs from the repo root. On this machine, prefix each shell with
 The end-to-end suite builds the app (`next build && next start`) in fixture mode and takes about 5 minutes. No suite
 signs a testnet transaction. Live testnet runs are separate and documented in `research/spikes/dev2-live/RESULTS.md`.
 
-## Counts on `main` after the audit
+## Counts on `main`
 
-| Suite | Before the audit | After | Change |
+Measured on `main` after the audit and the contract fixes (2026-10-30).
+
+| Suite | Before the audit | After the audit | After the fixes |
 |---|---|---|---|
-| Contract unit | 177 passed | **189 passed, 2 ignored** | +12 tests; 2 ignored known bugs |
-| Contract sandbox | 119 passed (16 files) | **122 passed, 3 ignored** (17 files) | +3 tests, +1 file (`audit.rs`); 3 ignored known bugs |
-| Core | 467 | **467** | unchanged (judged well covered; see [core-api.md](core-api.md)) |
-| Web unit | 486 | **531** | +45 (navigation classifier, price cache, signing intent store, address book) |
-| Tools unit | 92 | **92** | unchanged |
-| Web end to end | 224 | **263** | +39 (API routes, Send validation, popup edge cases, the new pages at 320 px and in Night with axe) |
+| Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | **194 passed, 0 ignored** |
+| Contract sandbox | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | **127 passed, 0 ignored** |
+| Core | 467 | 467 | **472** (+5 allowance vectors) |
+| Web unit | 486 | 531 | **535** (+4: a delegate's bitcoin send from one coin) |
+| Tools unit | 92 | 92 | **92** |
+| Web end to end | 224 | 263 | **265** (+2: the address-book dropdown) |
 
-The typecheck and lint are clean. One end-to-end test showed a sub-pixel flake during the audit: a theme toggle
-measured 43.99994 px against a 44 px minimum. It did not reproduce on the merged run.
+The typecheck, lint and wasm import check (INV-22) are clean. Two tests were intermittent: a theme toggle measured at
+43.99994 px, and an axe contrast reading taken mid-animation. Both are now deterministic: the measurement waits for the
+sheet to settle and rounds to 0.01 px, and axe waits for finite animations to end.
+
+**dev2 runs the fixed contract.** `dev2.satchelhq.testnet` was redeployed on 2026-10-30 with wasm sha256
+`9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3`. This is a non-reproducible dev build; the reproducible
+build is for the rc. The state was kept (4 Satchels, #1 with 8 signatures). `listings(from_index = 2^32)` answers `[]` live.
+`apps/web/.env.production` expects that hash.
 
 ## What the audit found
 
@@ -52,7 +60,7 @@ measured 43.99994 px against a 44 px minimum. It did not reproduce on the merged
 | Closing any popup (Escape, Close, or a tap on the background) left keyboard focus on the page body instead of the button that opened it (WCAG 2.4.3) | Medium | `FlowShell` remembers the opener and gives focus back on close |
 | The Transactions chain filter made the whole page scroll sideways at 320 px | Low | the filter track scrolls on its own when it can't fit |
 
-### Contract bugs (AUDIT-01, -02 and -04 fixed on `fix/audit`, 2026-10-30)
+### Contract bugs (AUDIT-01, -02 and -04 fixed and merged, 2026-10-30)
 
 Full detail, repro steps and the fixes are in [contract.md §4](contract.md#4-bugs-and-open-questions). The fixed
 bugs' tests are no longer ignored; counts after the fixes are in [contract.md §6](contract.md#6-test-counts).
@@ -65,13 +73,14 @@ The table below is the audit's original finding.
 | AUDIT-02 | `listings(from_index ≥ 2^32)` returns the first page instead of an empty one: `from_index as usize` truncates on wasm32 | Info | `usize::try_from(from_index)` with a clamp |
 | AUDIT-03 | `withdraw_storage_credit` pays with a plain transfer and no callback, so a failed transfer is not re-credited. That needs the caller to delete their own account in that window | Info | none proposed; documented |
 
-The contract freezes on **Nov 9**. All three fixes are small. Each needs the full routine before the rc birth: a
-unit test plus a sandbox test (both already written as the ignored tests), the TS mirror and vectors where they
-apply, a fuzz run, and a dev deploy. On `fix/audit` all of that has run except the dev deploy.
+All three are fixed and merged into `main`, with the full routine: unit and sandbox tests (the formerly ignored tests now
+pass), the TS mirror and vectors, the fuzz and property runs, and the dev deploy to dev2. The app side of AUDIT-01 is
+done too: a delegate's bitcoin send is built from one coin, and when no single coin can pay, the app says so before the
+wallet opens.
 
 ### Open questions (from the contract audit)
 
-- **Q-01**: answered. Razvan approved "delegates sign BTC with one input only"; it is implemented on `fix/audit`.
+- **Q-01**: answered. Razvan approved "delegates sign BTC with one input only"; it is implemented and deployed to dev2.
 - **Q-03**: `withdraw_near` / `withdraw_ft` accept the MPC signer or the USDC contract as receiver. Intended?
 - **Q-04**: `ft_on_transfer` messages accept unknown extra fields. Should parsing be strict?
 - **Q-05**: right after a failed payout or withdrawal is re-credited, escrow can briefly exceed the contract's free

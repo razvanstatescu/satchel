@@ -118,3 +118,4 @@
 - 2026-10-30T16:18Z [AUDIT-02,AUDIT-04] WIP: fix/audit AUDIT-02 (listings try_from) and AUDIT-04 (emit after last check) committed, unit tests un-ignored; sandbox pending
 - 2026-10-30T16:21Z [AUDIT-01] WIP: fix/audit one-input rule for delegate BTC in contract, TS mirror, vectors, copy and tests committed; running suites
 - 2026-10-30T16:30Z [AUDIT-01,AUDIT-02,AUDIT-04] DONE: fix/audit fixes committed; unit 194/0 ignored, sandbox 127/0 ignored, core 472, deep proptests pass, INV-22 OK, wasm 9dd65286 (non-reproducible); not pushed, not deployed
+- 2026-10-30T16:52Z [orchestrator] AUDIT-01/02/04 merged + app one-coin delegate BTC; dev2 redeployed (9dd65286…), state kept; .env.production hash updated; contract unit 194, sandbox 127, core 472, web unit 535, e2e 265, 0 ignored
