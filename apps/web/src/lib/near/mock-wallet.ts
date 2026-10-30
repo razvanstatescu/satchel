@@ -166,7 +166,7 @@ function applyTx(tx: WalletTx, accountId: string): unknown {
         if ("buy" in msg) {
           simBuy(msg.buy.token_id, accountId, hash, height);
         } else if ("deposit" in msg) {
-          simDepositFt(msg.deposit, ft, BigInt(String(args.amount)));
+          simDepositFt(msg.deposit, ft, BigInt(String(args.amount)), accountId);
         } else if ("offer" in msg) {
           // ft_on_transfer's "offer" message is accepted only from the USDC contract (spec §1.2 rule 3).
           if (ft !== USDC_CONTRACT) throw new Error("ERR_WRONG_TOKEN: offers only accept USDC");

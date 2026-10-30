@@ -3,7 +3,7 @@ import { ChainRow } from "@/components/ChainRow";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
 import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
 import { Freshness, InsideAddCoins, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
-import { IncomingOffers, InsideNearActions, InsideNearAmount, MakeOfferEntry } from "@/components/client/Market";
+import { IncomingOffers, InsideFtRows, InsideNearActions, InsideNearAmount, MakeOfferEntry } from "@/components/client/Market";
 import { cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
 import type { SatchelSnapshot } from "@/lib/data/types";
@@ -63,6 +63,7 @@ export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers
               </div>
               <InsideNearActions snap={snap} />
             </li>
+            <InsideFtRows snap={snap} />
           </ul>
           <Freshness snap={snap} />
         </section>

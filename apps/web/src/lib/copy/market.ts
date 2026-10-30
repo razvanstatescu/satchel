@@ -31,6 +31,7 @@ export const market = {
       prepaying: "Prepaying…",
       balance: (amount: string) => `Storage credit: ${amount}`,
       withdraw: "Withdraw storage credit",
+      withdrawn: (amount: string) => `${amount} withdrawn`,
     },
   },
   offers: {

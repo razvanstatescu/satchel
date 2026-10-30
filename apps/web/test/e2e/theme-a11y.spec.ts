@@ -310,5 +310,53 @@ test.describe("accessibility (axe, WCAG 2.0–2.2 A/AA) in Day (the default) and
       expect(await axe(page)).toEqual([]);
       await ctx.close();
     });
+
+    test(`C4 the USDC offer's storage-credit prepay step, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, BOB);
+      await page.goto("/s/6/offer");
+      const flow = page.getByTestId("offer-flow");
+      await expect(flow.getByTestId("offer-gate")).toHaveAttribute("data-gate", "empty", { timeout: 20_000 });
+      await page.getByRole("radio", { name: "USDC" }).click();
+      await flow.getByTestId("offer-amount").fill("5");
+      await expect(flow.getByTestId("storage-prepay")).toBeVisible();
+      expect(await axe(page, "[data-flow-shell]", ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`C6 the Wallet tab's USDC/wNEAR inside rows, with a deposit prepay step and the owner's withdraw controls, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, ALICE);
+      await page.goto("/s/6");
+      await page.getByTestId("add-usdc-amount").fill("5");
+      await expect(page.getByTestId("storage-prepay")).toBeVisible();
+      await page.getByTestId("prepay-storage-cta").click();
+      await expect(page.getByTestId("storage-prepay")).toHaveCount(0, { timeout: 20_000 });
+      await page.getByTestId("add-usdc-cta").click();
+      await expect(page.getByTestId("inside-ft-amount-usdc")).toHaveText("5.00 USDC", { timeout: 20_000 });
+      // the owner's withdraw controls are visible for both FT rows, one of them enabled
+      await expect(page.getByTestId("withdraw-usdc")).toBeEnabled();
+      await expect(page.getByTestId("withdraw-wnear")).toBeVisible();
+      expect(await axe(page)).toEqual([]);
+      await ctx.close();
+    });
+
+    test(`C4/C6 /satchels with the storage-credit row visible, in ${label}`, async ({ browser }) => {
+      const { ctx, page } = await themedPage(browser, { stored: theme === "day" ? null : "night", os: "light" });
+      await useMockWallet(page, BOB);
+      await page.goto("/s/6/offer");
+      const flow = page.getByTestId("offer-flow");
+      await expect(flow.getByTestId("offer-gate")).toHaveAttribute("data-gate", "empty", { timeout: 20_000 });
+      await page.getByRole("radio", { name: "USDC" }).click();
+      await flow.getByTestId("offer-amount").fill("5");
+      await flow.getByTestId("prepay-storage-cta").click();
+      await expect(flow.getByTestId("offer-cta")).toBeEnabled({ timeout: 20_000 });
+      await flow.getByTestId("offer-cta").click();
+      await expect(page.getByTestId("toast").filter({ hasText: "sent" })).toBeVisible({ timeout: 20_000 });
+      await page.goto("/satchels");
+      await expect(page.getByTestId("storage-credit")).toBeVisible({ timeout: 20_000 });
+      expect(await axe(page)).toEqual([]);
+      await ctx.close();
+    });
   }
 });

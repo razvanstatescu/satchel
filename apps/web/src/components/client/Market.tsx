@@ -17,10 +17,11 @@ import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
 import { dataSource } from "@/lib/data/source";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { formatAmount, parseUnits } from "@/lib/format";
-import { contractViews, marketCalls, offerAcceptBlock, type OfferBlock } from "@/lib/near/contract";
+import { ATTACH_MARKET, contractViews, FT_STORAGE, marketCalls, offerAcceptBlock, WNEAR_TESTNET, type OfferBlock } from "@/lib/near/contract";
 import type { Currency, OfferView } from "@/lib/near/types";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
+import { ftTicker, INSIDE_FTS } from "@/lib/view";
 
 /**
  * C6 inside assets + C4 offers (docs/specs/C4-C6.md): the Wallet tab's "NEAR inside" row (add/withdraw) and the
@@ -168,6 +169,242 @@ export function InsideNearActions({ snap }: { snap: SatchelSnapshot }) {
   );
 }
 
+/* ── storage credit (pays storage inside `ft_on_transfer`, docs/specs/C4-C6.md §1, §2.3) ────────── */
+
+/** Polls `storage_credit_of(accountId)`; `refresh()` re-reads it right after a prepay or a withdraw. `for` names
+ * whose credit `value` belongs to (the `useMyOffers`/`useMySatchels` pattern), so a signed-out viewer reads null
+ * without the effect ever calling setState synchronously for that case. */
+function useStorageCredit(accountId: string | null) {
+  const [state, setState] = useState<{ for: string | null; value: bigint }>({ for: null, value: 0n });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    if (!accountId) return;
+    let alive = true;
+    void contractViews(dataSource().view, SATCHEL_CONTRACT)
+      .storageCreditOf(accountId)
+      .then((v) => alive && setState({ for: accountId, value: BigInt(v) }))
+      .catch(() => alive && setState({ for: accountId, value: 0n }));
+    return () => {
+      alive = false;
+    };
+  }, [accountId, attempt]);
+  const credit = accountId && state.for === accountId ? state.value : null;
+  return { credit, refresh: () => setAttempt((n) => n + 1) };
+}
+
+/**
+ * The prepay step a USDC offer or an FT deposit needs when the account's storage credit is short (docs/specs/C4-C6.md
+ * §1.2, §3: "a plain sentence" before the real call). Renders nothing once the credit covers `needed`.
+ */
+function StoragePrepay({ accountId, needed, credit, onPrepaid }: { accountId: string; needed: bigint; credit: bigint | null; onPrepaid: () => void }) {
+  const { wallet } = useWallet();
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [note, setNote] = useState<Note | null>(null);
+  if (credit === null || credit >= needed) return null;
+
+  const prepay = () => {
+    if (!wallet || phase !== "idle") return;
+    setNote(null);
+    runCall(wallet, marketCalls.prepayStorage(ATTACH_MARKET.prepayStorage.deposit, accountId), accountId, (s) => setPhase(s === "wallet" ? "wallet" : "doing")).then((r) => {
+      setPhase("idle");
+      if (r.ok) {
+        onPrepaid();
+      } else if ("cancelled" in r) setNote({ kind: "cancelled", text: copy.sell.cancelled });
+      else setNote({ kind: "error", text: errorCopy(r.failure.code, { id: accountId }) });
+    });
+  };
+
+  return (
+    <div data-testid="storage-prepay" className="flex flex-col gap-2">
+      <FootNote icon={Info}>{copy.inside.storage.need(formatAmount(needed, "NEAR"))}</FootNote>
+      <button
+        type="button"
+        data-testid="prepay-storage-cta"
+        disabled={!wallet || phase !== "idle"}
+        onClick={prepay}
+        className={buttonClass({ variant: "secondary", size: "md", disabled: !wallet, loading: phase !== "idle" })}
+      >
+        <Morph value={phase} labels={phaseLabels(copy.inside.storage.prepay, copy.inside.storage.prepaying)} />
+      </button>
+      {note ? <NoteLine note={note} /> : null}
+    </div>
+  );
+}
+
+/** "My offers" (MySatchels.tsx) and anywhere else that needs it: the account's unused storage credit, with a
+ * withdraw button (docs/specs/C4-C6.md §1), visible only while there's something to take out. */
+export function StorageCreditRow({ accountId }: { accountId: string }) {
+  const { wallet } = useWallet();
+  const { credit, refresh } = useStorageCredit(accountId);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [note, setNote] = useState<Note | null>(null);
+  if (!credit || credit <= 0n) return null;
+
+  const withdraw = () => {
+    if (!wallet || phase !== "idle" || !credit) return;
+    setNote(null);
+    const amount = credit;
+    runCall(wallet, marketCalls.withdrawStorageCredit(), accountId, (s) => setPhase(s === "wallet" ? "wallet" : "doing")).then((r) => {
+      setPhase("idle");
+      if (r.ok) {
+        toast(copy.inside.storage.withdrawn(formatAmount(amount, "NEAR")));
+        refresh();
+      } else if ("cancelled" in r) setNote({ kind: "cancelled", text: copy.sell.cancelled });
+      else setNote({ kind: "error", text: errorCopy(r.failure.code, { id: accountId }) });
+    });
+  };
+
+  return (
+    <section aria-labelledby="storage-credit-title" data-testid="storage-credit" className="mb-6 flex items-center justify-between gap-3 rounded-md border border-line bg-surface p-4">
+      <div className="flex flex-col gap-0.5">
+        <h2 id="storage-credit-title" className="m-0 font-sans text-label text-ink">
+          {copy.inside.storage.title}
+        </h2>
+        <span data-testid="storage-credit-amount" className="font-sans text-body-sm t-num text-ink-muted">
+          {copy.inside.storage.balance(formatAmount(credit, "NEAR"))}
+        </span>
+      </div>
+      <button
+        type="button"
+        data-testid="withdraw-storage-credit"
+        disabled={!wallet || phase !== "idle"}
+        onClick={withdraw}
+        className={buttonClass({ variant: "secondary", size: "md", disabled: !wallet, loading: phase !== "idle" })}
+      >
+        <Morph value={phase} labels={phaseLabels(copy.inside.storage.withdraw, copy.inside.withdrawing)} />
+      </button>
+      {note ? <NoteLine note={note} /> : null}
+    </section>
+  );
+}
+
+/* ── C6: FT assets inside a Satchel (USDC, wNEAR) ────────────────────────────────────────────────── */
+
+/** One allowlisted FT's live inside balance (snap.inside.fts follows the shared poll, same as InsideNearAmount). */
+export function InsideFtAmount({ snap, ft }: { snap: SatchelSnapshot; ft: string }) {
+  const live = useLiveSnapshot(snap);
+  const b = BigInt(live.inside.fts.find((f) => f.token === ft)?.amount ?? "0");
+  return (
+    <span data-testid={`inside-ft-amount-${ft === WNEAR_TESTNET ? "wnear" : "usdc"}`} className="font-sans text-[1rem]/[1.375rem] font-bold t-num text-ink">
+      {b === 0n ? copy.inside.zero : formatAmount(b, ftTicker(ft))}
+    </span>
+  );
+}
+
+/** Anyone can deposit an allowlisted FT (`ft_transfer_call`); only the owner can take it out, never while listed
+ * (docs/specs/C4-C6.md §2.2). A deposit that would create the token's first slot of this FT needs storage credit
+ * first (§1.2); the UI treats "nothing inside yet" as that case, which is conservative but never wrong to over-prepay. */
+export function InsideFtActions({ snap, ft }: { snap: SatchelSnapshot; ft: string }) {
+  const live = useLiveSnapshot(snap);
+  const { isOwner, accountId } = useViewer(snap);
+  const { wallet } = useWallet();
+  const [text, setText] = useState("");
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [note, setNote] = useState<Note | null>(null);
+  const id = snap.token_id;
+  const ticker = ftTicker(ft);
+  const decimals = ticker === "USDC" ? 6 : 24;
+  const balance = BigInt(live.inside.fts.find((f) => f.token === ft)?.amount ?? "0");
+  const listed = !!live.listing;
+  const isNewSlot = balance === 0n;
+  const needed = isNewSlot ? FT_STORAGE.depositFirstSlot : 0n;
+  const { credit, refresh: refreshCredit } = useStorageCredit(accountId);
+  const short = needed > 0n && (credit === null || credit < needed);
+
+  const add = () => {
+    const base = parseUnits(text, decimals);
+    if (!wallet || !accountId || base === null || base <= 0n || phase !== "idle" || short) return;
+    setNote(null);
+    runCall(wallet, marketCalls.ftDeposit(ft, id, base), accountId, (s) => setPhase(s === "wallet" ? "wallet" : "doing")).then((r) => {
+      setPhase("idle");
+      if (r.ok) {
+        toast(copy.inside.added(formatAmount(base, ticker)));
+        setText("");
+        refreshSnapshot(id);
+      } else if ("cancelled" in r) setNote({ kind: "cancelled", text: copy.sell.cancelled });
+      else setNote({ kind: "error", text: errorCopy(r.failure.code, { id }) });
+    });
+  };
+
+  const withdraw = () => {
+    if (!wallet || !accountId || balance <= 0n || phase !== "idle") return;
+    setNote(null);
+    runCall(wallet, marketCalls.withdrawFt(id, ft, balance), accountId, (s) => setPhase(s === "wallet" ? "wallet" : "doing")).then((r) => {
+      setPhase("idle");
+      if (r.ok) {
+        toast(copy.inside.withdrawn(formatAmount(balance, ticker)));
+        refreshSnapshot(id);
+      } else if ("cancelled" in r) setNote({ kind: "cancelled", text: copy.sell.cancelled });
+      else setNote({ kind: "error", text: errorCopy(r.failure.code, { id }) });
+    });
+  };
+
+  return (
+    <div data-testid={`inside-ft-actions-${ticker === "wNEAR" ? "wnear" : "usdc"}`} className="flex flex-col gap-2.5">
+      <div className="flex flex-wrap items-center gap-2">
+        <AmountInput
+          id={`add-${ticker}`}
+          data-testid={`add-${ticker === "wNEAR" ? "wnear" : "usdc"}-amount`}
+          ticker={ticker}
+          value={text}
+          placeholder="0"
+          aria-label={copy.inside.amount}
+          onChange={(e) => setText(e.target.value.replace(",", "."))}
+          className="min-w-32 flex-1 py-2"
+        />
+        <button
+          type="button"
+          data-testid={`add-${ticker === "wNEAR" ? "wnear" : "usdc"}-cta`}
+          disabled={!wallet || !text.trim() || phase !== "idle" || short}
+          onClick={add}
+          className={buttonClass({ variant: "secondary", size: "md", disabled: !wallet || !text.trim() || short, loading: phase !== "idle" })}
+        >
+          <Morph value={phase} labels={phaseLabels(copy.inside.addFt(ticker), copy.inside.adding)} />
+        </button>
+      </div>
+      {accountId && text.trim() ? <StoragePrepay accountId={accountId} needed={needed} credit={credit} onPrepaid={refreshCredit} /> : null}
+      {isOwner ? (
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            data-testid={`withdraw-${ticker === "wNEAR" ? "wnear" : "usdc"}`}
+            disabled={!wallet || balance <= 0n || listed || phase !== "idle"}
+            aria-describedby={listed ? "inside-near-why" : undefined}
+            onClick={withdraw}
+            className={buttonClass({ variant: "link", size: "md", disabled: !wallet || balance <= 0n || listed, loading: phase !== "idle" })}
+          >
+            <Morph value={phase} labels={phaseLabels(copy.inside.withdraw, copy.inside.withdrawing)} />
+          </button>
+          {listed ? (
+            <span data-testid="withdraw-ft-why" className="font-sans text-body-sm text-ink-muted">
+              {copy.inside.blockedListed}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+      {note ? <NoteLine note={note} /> : null}
+    </div>
+  );
+}
+
+/** Both allowlisted FT rows (INSIDE_FTS, view.ts) for the Wallet tab's Inside section, same shape as the NEAR row. */
+export function InsideFtRows({ snap }: { snap: SatchelSnapshot }) {
+  return (
+    <>
+      {INSIDE_FTS.map((f) => (
+        <li key={f.contract} data-chain-row={f.ticker === "wNEAR" ? "wnear" : "usdc"} className="relative flex flex-col gap-2.5 p-4">
+          <span aria-hidden="true" className="absolute inset-x-4 top-0 h-px bg-line" />
+          <div className="flex min-w-0 items-center justify-between gap-3">
+            <h3 className="m-0 font-sans text-label text-ink">{copy.inside.row(f.ticker)}</h3>
+            <InsideFtAmount snap={snap} ft={f.contract} />
+          </div>
+          <InsideFtActions snap={snap} ft={f.contract} />
+        </li>
+      ))}
+    </>
+  );
+}
+
 /* ── C4: make an offer ───────────────────────────────────────────────────────────────────────── */
 
 const EXPIRY_OPTIONS = [
@@ -195,7 +432,12 @@ export function MakeOfferFlow({ snap }: { snap: SatchelSnapshot }) {
   const decimals = currency === "usdc" ? 6 : 24;
   const amount = text.trim() ? parseUnits(text, decimals) : null;
   const amountOk = amount !== null && amount > 0n;
-  const canOffer = !isOwner && clean && amountOk && phase === "idle";
+  // USDC offers always charge the offerer's storage credit (docs/specs/C4-C6.md §1.2, §3.1.8); a NEAR offer pays its
+  // own storage from the attached deposit, so it never needs a prepay step.
+  const { credit, refresh: refreshCredit } = useStorageCredit(accountId);
+  const creditNeeded = currency === "usdc" ? FT_STORAGE.offer : 0n;
+  const creditShort = creditNeeded > 0n && (credit === null || credit < creditNeeded);
+  const canOffer = !isOwner && clean && amountOk && !creditShort && phase === "idle";
   const gate = gateModel(mode, check.report, "");
 
   const offer = async () => {
@@ -279,6 +521,7 @@ export function MakeOfferFlow({ snap }: { snap: SatchelSnapshot }) {
           ]}
         />
         <AmountInput id="offer-amount" data-testid="offer-amount" ticker={currency === "usdc" ? "USDC" : "NEAR"} value={text} placeholder="0" onChange={(e) => setText(e.target.value.replace(",", "."))} />
+        {!isOwner && accountId && creditShort ? <StoragePrepay accountId={accountId} needed={creditNeeded} credit={credit} onPrepaid={refreshCredit} /> : null}
       </section>
       <section aria-labelledby="offer-expiry-title" className="flex flex-col gap-2.5">
         <h3 id="offer-expiry-title" className="font-sans text-label text-ink">

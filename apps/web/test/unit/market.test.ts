@@ -1,8 +1,24 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { marketCalls, offerAcceptBlock } from "@/lib/near/contract";
-import { simAcceptOffer, simCancelOffer, simDelist, simDepositNear, simList, simMakeOffer, simOverlay, simReset, simWithdrawNear } from "@/lib/data/sim";
+import { USDC_CONTRACT } from "@/lib/config";
+import { FT_STORAGE, marketCalls, offerAcceptBlock, WNEAR_TESTNET } from "@/lib/near/contract";
+import {
+  simAcceptOffer,
+  simCancelOffer,
+  simDelist,
+  simDepositFt,
+  simDepositNear,
+  simList,
+  simMakeOffer,
+  simOverlay,
+  simPrepayStorage,
+  simReset,
+  simWithdrawFt,
+  simWithdrawNear,
+  simWithdrawStorageCredit,
+} from "@/lib/data/sim";
 import { mockWallet } from "@/lib/near/mock-wallet";
 import { runCall } from "@/lib/near/run-call";
+import { ftTicker, INSIDE_FTS } from "@/lib/view";
 import { installFakeWindow } from "./fake-window";
 
 /**
@@ -212,5 +228,136 @@ describe("C4: offers (fixture sim + offerAcceptBlock gating)", () => {
       ALICE,
     );
     expect(r).toMatchObject({ ok: false, failure: { code: "ERR_SELF_BUY" } });
+  });
+});
+
+describe("C6: FT deposits + withdrawals inside a Satchel (fixture sim)", () => {
+  let restore: () => void;
+  beforeEach(() => {
+    restore = installFakeWindow();
+    simReset();
+  });
+  afterEach(() => restore());
+
+  it("a first USDC deposit without storage credit is refused (ERR_STORAGE_CREDIT), the whole call refunded (nothing credited)", () => {
+    expect(() => simDepositFt("6", USDC_CONTRACT, 5_000_000n, BOB)).toThrow(/ERR_STORAGE_CREDIT/);
+    expect(simOverlay().insideOf("6").fts).toEqual([]);
+  });
+
+  it("prepaying storage credit, then depositing USDC, credits the token's fts and debits the sender's credit", () => {
+    simPrepayStorage(BOB, 10_000_000_000_000_000_000_000n); // 0.01 NEAR, per ATTACH_MARKET.prepayStorage
+    simDepositFt("6", USDC_CONTRACT, 5_000_000n, BOB);
+    expect(simOverlay().insideOf("6").fts).toEqual([{ token: USDC_CONTRACT, amount: "5000000" }]);
+    expect(BigInt(simOverlay().storageCreditOf(BOB))).toBeLessThan(10_000_000_000_000_000_000_000n); // the slot's storage was charged
+  });
+
+  it("a second USDC deposit on the same (token, ft) slot needs no more storage credit", () => {
+    simPrepayStorage(BOB, 10_000_000_000_000_000_000_000n);
+    simDepositFt("6", USDC_CONTRACT, 5_000_000n, BOB);
+    const creditAfterFirst = simOverlay().storageCreditOf(BOB);
+    simDepositFt("6", USDC_CONTRACT, 2_000_000n, BOB); // tops up; no storage credit needed this time
+    expect(simOverlay().storageCreditOf(BOB)).toBe(creditAfterFirst);
+    expect(simOverlay().insideOf("6").fts).toEqual([{ token: USDC_CONTRACT, amount: "7000000" }]);
+  });
+
+  it("wNEAR deposits use the same allowlisted-FT path, independent of the USDC slot", () => {
+    simPrepayStorage(BOB, FT_STORAGE.depositFirstSlot * 3n); // the first prepay also keeps a slice for its own slot
+    simDepositFt("6", USDC_CONTRACT, 1_000_000n, BOB);
+    simDepositFt("6", WNEAR_TESTNET, 3_000_000_000_000_000_000_000n, BOB);
+    const fts = simOverlay().insideOf("6").fts;
+    expect(fts).toContainEqual({ token: USDC_CONTRACT, amount: "1000000" });
+    expect(fts).toContainEqual({ token: WNEAR_TESTNET, amount: "3000000000000000000000" });
+  });
+
+  it("withdraw_ft: owner only, blocked while listed, debits exactly the amount and bumps inside_epoch", () => {
+    simPrepayStorage(BOB, 10_000_000_000_000_000_000_000n);
+    simDepositFt("1", USDC_CONTRACT, 5_000_000n, BOB);
+    const before = simOverlay().insideOf("1");
+    expect(() => simWithdrawFt("1", BOB, USDC_CONTRACT, 1n)).toThrow(/ERR_NOT_OWNER/); // ALICE owns token "1"
+    simList("1", ALICE, "1000000000000000000000000", "near", 1);
+    expect(() => simWithdrawFt("1", ALICE, USDC_CONTRACT, 1n)).toThrow(/ERR_LISTED/);
+    simDelist("1");
+    simWithdrawFt("1", ALICE, USDC_CONTRACT, 2_000_000n);
+    const after = simOverlay().insideOf("1");
+    expect(BigInt(after.fts.find((f) => f.token === USDC_CONTRACT)!.amount)).toBe(BigInt(before.fts.find((f) => f.token === USDC_CONTRACT)!.amount) - 2_000_000n);
+    expect(after.inside_epoch).toBe(before.inside_epoch + 1);
+  });
+
+  it("the mock wallet maps ft_transfer_call's deposit msg through ftDeposit, charging the sender's credit", async () => {
+    simPrepayStorage(BOB, 10_000_000_000_000_000_000_000n);
+    const wallet = mockWallet(BOB);
+    const r = await runCall(wallet, marketCalls.ftDeposit(USDC_CONTRACT, "6", 5_000_000n), BOB);
+    expect(r.ok).toBe(true);
+    expect(simOverlay().insideOf("6").fts).toEqual([{ token: USDC_CONTRACT, amount: "5000000" }]);
+  });
+});
+
+describe("storage credit: prepay_storage / withdraw_storage_credit (fixture sim)", () => {
+  let restore: () => void;
+  beforeEach(() => {
+    restore = installFakeWindow();
+    simReset();
+  });
+  afterEach(() => restore());
+
+  it("the first prepay keeps a slice for the credit slot's own storage; later ones don't", () => {
+    const first = simPrepayStorage(CAROL, 10_000_000_000_000_000_000_000n);
+    expect(BigInt(first)).toBeLessThan(10_000_000_000_000_000_000_000n);
+    const second = simPrepayStorage(CAROL, 10_000_000_000_000_000_000_000n);
+    expect(BigInt(second) - BigInt(first)).toBe(10_000_000_000_000_000_000_000n);
+  });
+
+  it("withdraw_storage_credit pays out the whole balance and resets it to 0; ERR_NOTHING_OWED when already 0", () => {
+    simPrepayStorage(CAROL, 10_000_000_000_000_000_000_000n);
+    const owed = simWithdrawStorageCredit(CAROL);
+    expect(BigInt(owed)).toBeGreaterThan(0n);
+    expect(simOverlay().storageCreditOf(CAROL)).toBe("0");
+    expect(() => simWithdrawStorageCredit(CAROL)).toThrow(/ERR_NOTHING_OWED/);
+  });
+
+  it("a USDC offer always charges the offerer's storage credit (ERR_STORAGE_CREDIT without a prepay)", () => {
+    const sat = simOverlay().satchel("1")!;
+    const insideEpoch = simOverlay().insideOf("1").inside_epoch;
+    expect(() => simMakeOffer("1", BOB, 5_000_000n, "usdc", { expectedSigCount: sat.sig_count, expectedInsideEpoch: insideEpoch, expiresAtMs: Date.now() + 86_400_000 })).toThrow(
+      /ERR_STORAGE_CREDIT/,
+    );
+    simPrepayStorage(BOB, FT_STORAGE.offer * 2n);
+    const id = simMakeOffer("1", BOB, 5_000_000n, "usdc", { expectedSigCount: sat.sig_count, expectedInsideEpoch: insideEpoch, expiresAtMs: Date.now() + 86_400_000 });
+    expect(simOverlay().offer(id)?.currency).toBe("usdc");
+    expect(BigInt(simOverlay().storageCreditOf(BOB))).toBeLessThan(FT_STORAGE.offer * 2n);
+  });
+
+  it("a NEAR offer never touches storage credit (it pays its own storage from the attached deposit)", () => {
+    const sat = simOverlay().satchel("1")!;
+    const insideEpoch = simOverlay().insideOf("1").inside_epoch;
+    expect(() => simMakeOffer("1", BOB, 5_000_000n, "near", { expectedSigCount: sat.sig_count, expectedInsideEpoch: insideEpoch, expiresAtMs: Date.now() + 86_400_000 })).not.toThrow();
+    expect(simOverlay().storageCreditOf(BOB)).toBe("0");
+  });
+
+  it("the mock wallet maps the USDC offer ft_on_transfer message through make_offer, gated the same way", async () => {
+    const sat = simOverlay().satchel("1")!;
+    const insideEpoch = simOverlay().insideOf("1").inside_epoch;
+    const wallet = mockWallet(BOB);
+    const refused = await runCall(
+      wallet,
+      marketCalls.makeOfferUsdc(5_000_000n, { tokenId: "1", expectedSigCount: sat.sig_count, expectedInsideEpoch: insideEpoch, expiresAtMs: Date.now() + 86_400_000 }),
+      BOB,
+    );
+    expect(refused).toMatchObject({ ok: false, failure: { code: "ERR_STORAGE_CREDIT" } });
+    simPrepayStorage(BOB, FT_STORAGE.offer * 2n);
+    const made = await runCall(
+      wallet,
+      marketCalls.makeOfferUsdc(5_000_000n, { tokenId: "1", expectedSigCount: sat.sig_count, expectedInsideEpoch: insideEpoch, expiresAtMs: Date.now() + 86_400_000 }),
+      BOB,
+    );
+    expect(made.ok).toBe(true);
+  });
+});
+
+describe("ftTicker / INSIDE_FTS (view.ts)", () => {
+  it("names the two allowlisted FTs USDC and wNEAR", () => {
+    expect(INSIDE_FTS.map((f) => f.ticker).sort()).toEqual(["USDC", "wNEAR"]);
+    expect(ftTicker(USDC_CONTRACT)).toBe("USDC");
+    expect(ftTicker(WNEAR_TESTNET)).toBe("wNEAR");
   });
 });

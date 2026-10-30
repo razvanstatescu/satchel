@@ -1,4 +1,4 @@
-import { MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, offerAcceptBlock, offerExpiryValid } from "@satchel/core/near";
+import { FT_STORAGE, MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, offerAcceptBlock, offerExpiryValid } from "@satchel/core/near";
 import {
   allowanceDebits,
   applyDebits,
@@ -451,10 +451,25 @@ export function simDepositNear(tokenId: string, attached: bigint): string {
   return credited.toString();
 }
 
-/** `deposit` ft_on_transfer message: same storage rule, per (token, ft) slot. */
-export function simDepositFt(tokenId: string, ft: string, amount: bigint): void {
+/** Deducts `needed` from `accountId`'s storage credit, or throws `ERR_STORAGE_CREDIT` naming the shortfall (spec
+ * §1.2: "a full refund" — the caller never applies its effect when this throws, exactly like the real `ft_on_transfer`,
+ * which panics and the FT refunds 100%). */
+function chargeCredit(s: SimState, accountId: string, needed: bigint): void {
+  if (needed <= 0n) return;
+  const have = BigInt(s.storageCredit[accountId] ?? "0");
+  if (have < needed) throw new Error(`ERR_STORAGE_CREDIT: prepay_storage ≥ ${(needed - have).toString()} yocto`);
+  s.storageCredit[accountId] = (have - needed).toString();
+}
+
+/** `deposit` ft_on_transfer message: same storage rule, per (token, ft) slot. Storage credit is charged only when
+ * this creates a slot (the token's first deposit of this FT, and the token's inside record if it had none, spec §1.2). */
+export function simDepositFt(tokenId: string, ft: string, amount: bigint, senderId: string): void {
   const s = read();
   const cur = insideOfRaw(s, tokenId);
+  // A slot "exists" once it has ever been created, even emptied by a withdrawal (spec §2.1: kept forever). Fixture
+  // tokens never start with an FT slot (FIXTURE_INSIDE only seeds NEAR), so this is exactly `s.inside`'s own delta.
+  const isNewSlot = !(ft in (s.inside[tokenId]?.fts ?? {}));
+  if (isNewSlot) chargeCredit(s, senderId, FT_STORAGE.depositFirstSlot);
   const fts = { ...cur.fts, [ft]: (BigInt(cur.fts[ft] ?? "0") + amount).toString() };
   s.inside[tokenId] = { near: cur.near, fts, epoch: cur.epoch };
   write(s);
@@ -532,6 +547,9 @@ export function simMakeOffer(tokenId: string, offererId: string, amount: bigint,
   if (!offerExpiryValid(t.expiresAtMs, now) || t.expiresAtMs - now > MAX_OFFER_TTL_MS) throw new Error("ERR_OFFER_EXPIRY: expiry must be in the future and at most 90 days away");
   const open = Object.values(s.offers).filter((o) => o.offererId === offererId).length;
   if (open >= MAX_OFFERS_PER_ACCOUNT) throw new Error("ERR_TOO_MANY_OFFERS: you already have 20 open offers");
+  // USDC offers always charge the offerer's storage credit (spec §1.2); a NEAR offer pays its own storage from the
+  // attached deposit instead (make_offer's `amount + storageExtra`), so nothing is charged here for that path.
+  if (currency === "usdc") chargeCredit(s, offererId, FT_STORAGE.offer);
   const id = s.nextOfferId++;
   s.offers[id] = { id, tokenId, offererId, amount: amount.toString(), currency, expectedSigCount: t.expectedSigCount, expectedInsideEpoch: t.expectedInsideEpoch, expiresAtMs: t.expiresAtMs, createdAtMs: now };
   write(s);

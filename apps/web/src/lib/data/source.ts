@@ -86,6 +86,10 @@ function fixtureView(): ViewFn {
         return (sim.token(id) ?? fixtureToken(id)) as T | null;
       case "nft_total_supply":
         return String(Object.keys(FIXTURE_TOKENS).length + sim.minted.length) as T;
+      case "nft_tokens": {
+        const ids = [...Object.keys(FIXTURE_TOKENS), ...sim.minted.map((m) => m.id)];
+        return ids.map((i) => sim.token(i) ?? fixtureToken(i)).filter((t): t is NftToken => !!t) as T;
+      }
       case "nft_tokens_for_owner": {
         const acct = String(args.account_id);
         const ids = [...Object.keys(FIXTURE_TOKENS), ...sim.minted.map((m) => m.id)];

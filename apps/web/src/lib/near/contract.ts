@@ -1,5 +1,6 @@
 import {
   ATTACH_MARKET,
+  FT_STORAGE,
   MAX_OFFER_TTL_MS,
   MAX_OFFERS_PER_ACCOUNT,
   WNEAR_TESTNET,
@@ -44,7 +45,7 @@ import type {
   TokenId,
 } from "@/lib/near/types";
 
-export { ATTACH_MARKET, MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, WNEAR_TESTNET, ftOfferMsg, offerAcceptBlock, offerExpiryValid, type OfferBlock, type OfferTerms };
+export { ATTACH_MARKET, FT_STORAGE, MAX_OFFER_TTL_MS, MAX_OFFERS_PER_ACCOUNT, WNEAR_TESTNET, ftOfferMsg, offerAcceptBlock, offerExpiryValid, type OfferBlock, type OfferTerms };
 
 /**
  * Typed views and call builders for the Satchel contract (kb/90 §5.6, §5.14).
@@ -80,6 +81,10 @@ export function contractViews(view: ViewFn, contractId: string = SATCHEL_CONTRAC
     derivedPath: (token_id: TokenId, chain: Chain) => view<string>(contractId, "derived_path", { token_id, chain }),
     nftToken: (token_id: TokenId) => view<NftToken>(contractId, "nft_token", { token_id }),
     nftTotalSupply: async () => Number((await view<string>(contractId, "nft_total_supply", {})) ?? "0"),
+    /** NEP-181 enumeration (all tokens). Used by `/market`'s unlisted section (docs/specs/C4-C6.md: anyone may offer
+     * on a token whether or not it's listed), so visitors can reach every Satchel's offer sheet from one page. */
+    nftTokens: async (from_index = "0", limit = 50) =>
+      (await view<NftToken[]>(contractId, "nft_tokens", { from_index, limit })) ?? [],
     nftTokensForOwner: async (account_id: string, from_index = "0", limit = 50) =>
       (await view<NftToken[]>(contractId, "nft_tokens_for_owner", { account_id, from_index, limit })) ?? [],
     nftSupplyForOwner: async (account_id: string) =>

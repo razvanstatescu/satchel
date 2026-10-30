@@ -3,7 +3,7 @@ import { CONTRACT_ROLE, DATA_MODE, IS_FIXTURE, SATCHEL_CONTRACT } from "@/lib/co
 import { fixtureCleanReport, unavailableReport } from "@/lib/data/clean";
 import { fixtureEvents, fixtureInside, FIXTURE_MARKET_CONFIG } from "@/lib/data/fixtures";
 import { dataSource, type LockRead } from "@/lib/data/source";
-import type { ActivityRow, CleanReport, ContractFacts, MarketEntry, SatchelSnapshot } from "@/lib/data/types";
+import type { ActivityRow, CleanReport, ContractFacts, MarketEntry, SatchelSnapshot, UnlistedEntry } from "@/lib/data/types";
 import { buildSnapshot, isTokenId, UPSTREAM_MS } from "@/lib/data/snapshot";
 import { contractViews } from "@/lib/near/contract";
 import { satchelEvents } from "@/lib/near/history";
@@ -182,6 +182,36 @@ export async function getOffersBy(accountId: string): Promise<OfferView[]> {
     return await withTimeout(contractViews(dataSource().view).offersBy(accountId, 0, 50), UPSTREAM_MS, "offers_by");
   } catch {
     return [];
+  }
+}
+
+/**
+ * C4: Satchels that aren't listed, with a "Make an offer" link (docs/specs/C4-C6.md §3: anyone can offer whether or
+ * not it's for sale). `nft_tokens` enumerates everything ever minted; the listed ones are dropped. Capped at the
+ * contract's enumeration page (50): fine for a hackathon-scale mint count, and a judge page must still bound its
+ * own upstream calls (kb/90 §9).
+ */
+export async function getUnlistedMarket(): Promise<{ entries: UnlistedEntry[]; error: string | null }> {
+  "use cache";
+  cacheLife({ revalidate: 15, expire: 3600 });
+  try {
+    const [tokens, listings] = await Promise.all([
+      withTimeout(contractViews(dataSource().view).nftTokens("0", 50), UPSTREAM_MS, "nft_tokens"),
+      withTimeout(contractViews(dataSource().view).listings(0, 50), UPSTREAM_MS, "listings"),
+    ]);
+    const listed = new Set(listings.map((l) => l.token_id));
+    const unlisted = tokens.filter((t) => !listed.has(t.token_id)).sort((a, b) => Number(a.token_id) - Number(b.token_id));
+    const entries = (
+      await Promise.all(
+        unlisted.map(async (t) => {
+          const snapshot = await getSatchelSnapshot(t.token_id);
+          return snapshot ? ({ token_id: t.token_id, snapshot } satisfies UnlistedEntry) : null;
+        }),
+      )
+    ).filter((x): x is UnlistedEntry => !!x);
+    return { entries, error: null };
+  } catch (e) {
+    return { entries: [], error: e instanceof Error ? e.message : String(e) };
   }
 }
 

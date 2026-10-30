@@ -1,8 +1,9 @@
 import { CHAIN_NAME, NETWORK_LABEL, TICKER } from "@/lib/copy";
-import { formatAmount } from "@/lib/format";
+import { formatAmount, type Ticker } from "@/lib/format";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import type { CardChip } from "@/components/SatchelCard";
-import { EXPLORERS, SOL_UI_ENABLED } from "@/lib/config";
+import { EXPLORERS, SOL_UI_ENABLED, USDC_CONTRACT } from "@/lib/config";
+import { WNEAR_TESTNET } from "@/lib/near/contract";
 import { anyEvmFunds } from "@/lib/evm-networks";
 
 /** View helpers shared by server and client components. */
@@ -24,6 +25,17 @@ export function balanceText(s: Pick<SatchelSnapshot, "balances">, chain: UiChain
 
 export function cardChips(s: Pick<SatchelSnapshot, "balances">): CardChip[] {
   return UI_CHAINS.map((c) => ({ chain: c, ticker: TICKER[c], amount: balanceText(s, c, false) }));
+}
+
+/** C6: the allowlisted FTs a Satchel can hold inside it (docs/specs/C4-C6.md §2.3, `market_config().inside_fts`),
+ * fixed at two on this contract. The UI shows a row for each regardless of balance, so "Add" is always reachable. */
+export const INSIDE_FTS: { contract: string; ticker: Ticker; decimals: number }[] = [
+  { contract: USDC_CONTRACT, ticker: "USDC", decimals: 6 },
+  { contract: WNEAR_TESTNET, ticker: "wNEAR", decimals: 24 },
+];
+
+export function ftTicker(contract: string): Ticker {
+  return INSIDE_FTS.find((f) => f.contract === contract)?.ticker ?? ("USDC" as Ticker);
 }
 
 /** "0.0123 BTC and 0.0500 ETH" — for transfer/buy sentences. */
