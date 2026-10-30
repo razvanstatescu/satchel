@@ -27,6 +27,38 @@ describe("detectKinds", () => {
     expect(detectKinds("hello")).toEqual([]);
     expect(detectKinds("0x1234")).toEqual([]);
   });
+
+  it("is genuinely ambiguous for a legacy base58 BTC-testnet-shaped address that is ALSO a valid-shaped SOL address (both listed; the add form resolves it, not this function)", async () => {
+    const { detectKinds } = await load();
+    // starts with 'n' (btc legacy testnet prefix) and is 33 base58 chars: fits both regexes.
+    const ambiguous = "n4BJRYfnu29GPWdksz7EMUbiqx5CKSZgo";
+    expect(detectKinds(ambiguous)).toEqual(["btc", "sol"]);
+  });
+
+  it("recognises a MAINNET-shaped bech32 BTC address as 'btc' too: this function is a label guesser, not a network gate — validateBtc (lib/validate.ts) is the one that actually rejects mainnet prefixes at send time", async () => {
+    const { detectKinds } = await load();
+    expect(detectKinds("bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh")).toEqual(["btc"]);
+  });
+
+  it("recognises a bare 64-hex NEAR implicit account", async () => {
+    const { detectKinds } = await load();
+    const implicit = "a".repeat(64);
+    expect(detectKinds(implicit)).toEqual(["near"]);
+  });
+
+  it("trims surrounding whitespace before testing, and rejects an empty/whitespace-only string", async () => {
+    const { detectKinds } = await load();
+    expect(detectKinds(`  ${BTC}  `)).toEqual(["btc"]);
+    expect(detectKinds("   ")).toEqual([]);
+    expect(detectKinds("")).toEqual([]);
+  });
+
+  it("rejects a NEAR account that starts or ends with a separator, or is a single character", async () => {
+    const { detectKinds } = await load();
+    expect(detectKinds("-bob.testnet")).toEqual([]);
+    expect(detectKinds("bob-.testnet")).toEqual([]);
+    expect(detectKinds("a")).toEqual([]);
+  });
 });
 
 describe("the book", () => {
