@@ -94,6 +94,9 @@ The tool prints commands 1–4 with the hash filled in:
   (skip if `--no-usdc`):
   `near contract call-function as-transaction 3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af storage_deposit json-args '{"account_id":"<child>","registration_only":true}' prepaid-gas '30 Tgas' attached-deposit '0.00125 NEAR' sign-as satchelhq.testnet network-config testnet-fastnear sign-with-legacy-keychain send`.
   `e2e:sale-usdc --register` prints and sends the same call.
+- [ ] wNEAR `storage_deposit` on `wrap.testnet`, the same call with `wrap.testnet` as the receiver. **Without it, wNEAR
+  deposits into a Satchel (C6) fail**, even though the app and contract are fine (`docs/specs/C4-C6.md` §2.3).
+  dev2 was registered on 2026-10-29.
 - [ ] Final: switch the app (`NEXT_PUBLIC_SATCHEL_CONTRACT`, `NEXT_PUBLIC_CONTRACT_ROLE=final`,
   `NEXT_PUBLIC_EXPECTED_CODE_HASH=<H>`), then start demo staging (SAT-091/092).
 

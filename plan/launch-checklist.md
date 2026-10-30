@@ -85,7 +85,7 @@
 | # | Owner | Task | Done when |
 |---|---|---|---|
 | E-01 | **You** | **Explicit "yes"** to the final birth (H-15), after reviewing the printed batch: 11 actions, **no AddKey**, Transfer 20 NEAR, wasm = H, `base_uri` = `https://usesatchel.xyz/api/card/`, 7 mints to alice | typed "yes" |
-| E-02 | **Claude** | Send the birth for `satchel.satchelhq.testnet`; record the birth tx + block **A**; register at USDC from `satchelhq.testnet`; tag `contract-v1.0.0` | `view-account-summary`: 0 keys, code = H |
+| E-02 | **Claude** | Send the birth for `satchel.satchelhq.testnet`; record the birth tx + block **A**; register at USDC **and at wrap.testnet** from `satchelhq.testnet` (C6 wNEAR deposits need the wrap.testnet registration); tag `contract-v1.0.0` | `view-account-summary`: 0 keys, code = H |
 | E-03 | **Claude** | Switch production: `NEXT_PUBLIC_SATCHEL_CONTRACT=satchel.satchelhq.testnet`, `NEXT_PUBLIC_CONTRACT_ROLE=final`, `NEXT_PUBLIC_EXPECTED_CODE_HASH=H`, `NEXT_PUBLIC_DATA_MODE=live`; production deploy | `usesatchel.xyz/s/1` shows the live final |
 | E-04 | **Claude** | **Stage the demo states** for tokens #1–#7 (D-32): #1 flagship funded; #2 gift (alice → bob, bob sends BTC); #3 sale (EVM-only history, bought by carol); #4 blocked (a nonce + 1 record, unbroadcastable); #5 for sale (BTC spent row); #6 and #7 retakes. Run testnet4 actions early (slow blocks; cut-off rule: Nov 12 06:00 UTC). Budget about 2 min and one retry for each MPC sign (testnet timeouts, Oct 27). #4's unbroadcast record can use `evm.ts --sign-only` | every state visible on the live site |
 | E-05 | **Claude** | Capture evidence: FastNEAR `/v0/transactions` JSON for every proof tx → `docs/evidence/*.json`; CLI outputs | files committed |
