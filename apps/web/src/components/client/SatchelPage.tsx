@@ -85,7 +85,7 @@ export function useViewer(snap: SatchelSnapshot) {
 /** The card's state word: the seller sees Sold after a sale; everyone else the live status. */
 const cardStatus = (v: ReturnType<typeof useViewer>): PillKind => (v.sale ? "sold" : v.status);
 
-export type ObjTab = "wallet" | "activity" | "sale";
+export type ObjTab = "wallet" | "activity" | "transactions" | "sale";
 
 /** Which tab of the object page is showing (`forced` wins: previews). The flows (send, receive, transfer) sit over the
  * Wallet tab. */
@@ -94,6 +94,7 @@ export function useObjTab(tokenId: string, forced?: ObjTab): ObjTab {
   if (forced) return forced;
   const base = `/s/${tokenId}`;
   if (p.startsWith(`${base}/activity`)) return "activity";
+  if (p.startsWith(`${base}/transactions`)) return "transactions";
   if (p.startsWith(`${base}/sale`)) return "sale";
   return "wallet";
 }
@@ -136,6 +137,7 @@ export function ObjHead({ snap, tab: forced }: { snap: SatchelSnapshot; tab?: Ob
   const tabs = [
     { href: base, label: t.wallet, current: tab === "wallet" },
     { href: `${base}/activity`, label: t.activity, current: tab === "activity" },
+    { href: `${base}/transactions`, label: t.transactions, current: tab === "transactions" },
     ...(third ? [{ href: `${base}/sale`, label: third, current: tab === "sale" }] : []),
   ];
   return (

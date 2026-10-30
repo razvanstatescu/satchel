@@ -7,6 +7,30 @@
 import { plural as n } from "@/lib/format";
 
 export const multichain = {
+  /** The Transactions tab (lib/chain-txs.ts): coins in and out of the Satchel on each chain we can read. */
+  txs: {
+    lead: "Coins in and out of this Satchel: at its Bitcoin, Ethereum and Solana addresses, and inside it. What its contract signed is under Activity.",
+    in: "Received",
+    out: "Sent",
+    self: "Moved between its own outputs",
+    pending: "Pending",
+    failed: "Failed",
+    from: (who: string) => `from ${who}`,
+    to: (who: string) => `to ${who}`,
+    fee: (fee: string) => `fee ${fee}`,
+    filterLabel: "Show",
+    filters: { all: "All", bitcoin: "Bitcoin", ethereum: "Ethereum", solana: "Solana", inside: "Inside" },
+    listLabel: "Transactions",
+    empty: "No transactions yet",
+    emptyBody: "Coins sent to this Satchel, and anything it sends, show up here.",
+    emptyFilter: "Nothing here yet on this chain.",
+    readFrom: (networks: string, at: string) => `Read from ${networks} at ${at}.`,
+    unread: (networks: string) => `Couldn't read ${networks} just now. Try again in a minute.`,
+    latest: "The latest transactions on each network. Older ones are on each network's explorer.",
+    arbitrum: "Arbitrum Sepolia isn't listed here yet.",
+    arbitrumLink: "See this address on Arbiscan",
+    opens: "opens the explorer",
+  },
   /** The public Add coins page, /fund/[id] (lib/fund.ts): the link anyone can be sent to send coins to a Satchel. */
   fundPage: {
     title: (id: string) => `Send coins to Satchel #${id}`,

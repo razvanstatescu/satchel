@@ -101,3 +101,4 @@
 - 2026-10-30T11:05Z [orchestrator] D-50 overview: labelled ≈$ estimate + value bar + top coins on card/Wallet tab/market/You get; prices 1Click→CoinGecko; unit 479, e2e 207/207
 - 2026-10-30T11:28Z [orchestrator] A4 request-an-amount removed from Add coins (Razvan); unit 461, e2e 200/200
 - 2026-10-30T11:51Z [orchestrator] UI round 3: /fund/[id] public page + Share link everywhere, offer buttons, testnet-only labels, coin-sheet alignment, ETH explorers, bar tooltip; unit 466, e2e 208/208
+- 2026-10-30T12:38Z [orchestrator] Transactions tab (BTC, Sepolia, Base, OP, SOL, inside; Arbitrum linked out); unit 477, e2e 210/210

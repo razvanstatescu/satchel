@@ -30,7 +30,7 @@ export const satchel = {
     title: (id: string) => `Satchel #${id}`,
     meta: (id: string, btc: string, evm: string, sol?: string) =>
       `Satchel #${id} is an NFT on NEAR testnet. It controls Bitcoin testnet4 address ${btc}${sol ? `, Ethereum Sepolia address ${evm} and Solana devnet address ${sol}` : ` and Ethereum Sepolia address ${evm}`} through NEAR Chain Signatures. Give or sell the NFT and the new owner controls the coins.`,
-    tabs: { label: "Satchel sections", wallet: "Wallet", activity: "Activity", sell: "Sell", buy: "Buy", sold: "Sold" },
+    tabs: { label: "Satchel sections", wallet: "Wallet", activity: "Activity", transactions: "Transactions", sell: "Sell", buy: "Buy", sold: "Sold" },
     actions: {
       send: "Send",
       fund: "Add coins",

@@ -220,3 +220,18 @@ it. Phase-2 UI work builds against those specs.
     - The ETH address row shows four explorer links on one line.
     - The value bar has a hover/tap tooltip with the coin, amount, share and ≈ $ value.
   - Web unit 466, Playwright **208/208**, typecheck and lint clean.
+- 2026-10-30 (Razvan): **a Transactions tab** (`/s/[id]/transactions`), separate from Activity. Activity keeps the contract's decisions and signatures.
+  - **Content:** coins in and out on each chain with a keyless source.
+  - **Sources (each checked live today):**
+    - Bitcoin testnet4: mempool.space.
+    - Ethereum Sepolia and Base Sepolia: Blockscout, for ETH and the network's Circle USDC only (spam tokens never show).
+    - OP Sepolia: Optimism's own explorer.
+    - Solana devnet: one batched RPC request.
+    - Inside: the contract's `inside_deposit` / `inside_withdraw` events.
+  - **Arbitrum Sepolia is not listed:** its Blockscout is behind a bot check, so the tab links to Arbiscan instead.
+  - **Behaviour:**
+    - Server-rendered, with each source bounded on its own and an unread source reported; cached 30 s.
+    - Filters: All, Bitcoin, Ethereum, Solana, Inside.
+    - Pending first, then UTC days; each row links to its explorer.
+  - **Checks:** the parsers were checked against dev2 #1's real history, and fixture history keeps the tests offline.
+  - Web unit 477, Playwright **210/210**.
