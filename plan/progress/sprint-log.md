@@ -89,3 +89,5 @@
 - 2026-10-30T08:27Z [ui-gaps] wip: e2e (12/12) + axe Day/Night (6/6) green for USDC offer prepay, FT deposit/withdraw, storage credit, unlisted market
 - 2026-10-30T08:32Z [live] tools-live: dev2 live run complete. Clean-history checker verdicts: #1 blocked (2 intentional unused sign-only records; messages correctly non-blocking), #2/#3 empty/clean, Buy enabled on both. All 20 flows recorded in research/spikes/dev2-live/RESULTS.md, all within D-48 caps. tools test suite 92 passed, typecheck clean. Branch feat/tools-live at ca7b8c4, not pushed.
 - 2026-10-30T08:33Z [orchestrator] tools-live merged; dev2 live run 20/20 PASS
+- 2026-10-30T08:36Z [ui-gaps] fix: axe label-content-name-mismatch on /market unlisted cards (dropped SatchelCard href+linkLabel for the listed-grid's split card+stretched-Link pattern); full e2e suite rerunning
+- 2026-10-30T08:39Z [ui-gaps] done: full Playwright suite green (205/205), unit (455 web + 467 core), typecheck, lint all clean on feat/ui-gaps @ 0069c38
