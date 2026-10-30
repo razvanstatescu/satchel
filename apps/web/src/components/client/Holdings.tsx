@@ -19,6 +19,8 @@ import { findHolding, hasCoins, holdings, splitHoldings, type Holding } from "@/
 import { overview } from "@/lib/overview";
 import { explorerFor } from "@/lib/view";
 import { OverviewPanel } from "@/components/Overview";
+import { ShareFundLink } from "@/components/client/ShareFundLink";
+import { prefillOf } from "@/lib/fund";
 
 /**
  * The Wallet tab's one holdings list (Mobbin: Uniswap, Base and Trust Wallet's token rows): every coin a Satchel holds,
@@ -181,6 +183,7 @@ export function CoinSheet({ snap, holdingKey }: { snap: SatchelSnapshot; holding
         <div className="flex flex-col gap-2.5">
           <p className="m-0 font-sans text-body-sm text-ink">{copy.inside.addBody}</p>
           {h.coin === "NEAR" ? <InsideNearActions snap={snap} /> : <InsideFtActions snap={snap} ft={h.ft!} />}
+          <ShareFundLink tokenId={id} prefill={prefillOf(h)} className="self-start" />
         </div>
       ) : h.chain ? (
         <CoinAddress snap={snap} h={h} />
@@ -196,7 +199,8 @@ function CoinAddress({ snap, h }: { snap: SatchelSnapshot; h: Holding }) {
   const explorer = chain === "evm" ? evmExplorerName(h.chainId!) : EXPLORER_NAME[chain];
   const href = chain === "evm" ? evmAddressLink(h.chainId!, address) : explorerFor(chain, address);
   return (
-    <section aria-labelledby="coin-address-title" className="flex flex-col gap-2 rounded-md bg-surface-sunken p-3.5">
+    // a white box, so the Copy pill (surface-sunken) shows and its edge lines up with the address and the label
+    <section aria-labelledby="coin-address-title" className="flex flex-col gap-2.5 rounded-md border border-line bg-surface p-4">
       <h3 id="coin-address-title" className="m-0 font-sans text-label text-ink-muted">
         {copy.coins.address}
       </h3>
@@ -205,6 +209,7 @@ function CoinAddress({ snap, h }: { snap: SatchelSnapshot; h: Holding }) {
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <CopyButton value={address} label={copy.wallet.copyAria(name)} toastText={copy.wallet.copiedAria(name)} />
+        <ShareFundLink tokenId={snap.token_id} prefill={prefillOf(h)} />
         <ExternalLink href={href} className="min-h-11 px-1.5 font-sans text-[0.875rem]/5 font-semibold">
           {explorer}
         </ExternalLink>

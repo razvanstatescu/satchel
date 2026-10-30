@@ -1,31 +1,32 @@
 import { CoinIcon, COIN_FILL } from "@/components/brand/CoinIcon";
 import { cx } from "@/components/ui";
+import { ValueBarTips, type BarSegment } from "@/components/client/ValueBarTips";
 import { copy } from "@/lib/copy";
+import { IS_TESTNET } from "@/lib/config";
 import { NBSP } from "@/lib/format";
 import { coinTotalText, shareText, usdText, type Overview } from "@/lib/overview";
 
 /**
  * A Satchel at a glance (D-50; Mobbin: OKX's allocation bar, Crypto.com's shares, Family and Phantom's total-first
  * header): the labelled estimate, the value bar, the top coins. Server-safe and pure (it renders an `Overview`); the
- * callers pass the live one. Fiat appears here and nowhere else, always "≈" and "at mainnet prices".
+ * callers pass the live one. Fiat appears here and nowhere else, always "≈", and on testnet always "at mainnet prices".
  */
 
-/** One bar, one segment per coin, in the coins' own artwork colours, sized by value; a sticker-outlined pill. */
+/**
+ * One bar, one segment per coin, in the coins' own artwork colours, sized by value; a sticker-outlined pill. Hover or
+ * tap a segment for its coin, amount, share and estimate (ValueBarTips).
+ */
 export function ValueBar({ ov, className }: { ov: Overview; className?: string }) {
   if (ov.usd === null || ov.usd <= 0) return null;
   const label = copy.overview.barLabel(ov.coins.map((c) => `${c.ticker} ${shareText(c.share ?? 0)}`).join(", "));
-  return (
-    <div role="img" aria-label={label} data-value-bar="" className={cx("flex h-3 w-full overflow-hidden rounded-pill border-2 border-sticker bg-surface-sunken", className)}>
-      {ov.coins.map((c, i) => (
-        <span
-          key={c.coin}
-          data-share={c.coin}
-          className={cx("h-full min-w-1.5", i > 0 && "border-l-2 border-sticker")}
-          style={{ flexGrow: c.share ?? 0, flexBasis: 0, background: COIN_FILL[c.coin] }}
-        />
-      ))}
-    </div>
-  );
+  const segments: BarSegment[] = ov.coins.map((c) => ({
+    coin: c.coin,
+    fill: COIN_FILL[c.coin],
+    share: c.share ?? 0,
+    title: c.coinName,
+    lines: [`${coinTotalText(c)} · ${shareText(c.share ?? 0)}`, copy.overview.estimate(usdText(c.usd ?? 0))],
+  }));
+  return <ValueBarTips segments={segments} label={label} className={className} />;
 }
 
 /** "≈ $1,148.72" with "at mainnet prices"; "6 coins on 5 networks" without prices; "Nothing inside yet" when empty. */
@@ -46,7 +47,8 @@ export function OverviewHeadline({ ov, size = "lg", className }: { ov: Overview;
   return (
     <p data-overview-total={ov.usd.toFixed(2)} className={cx("m-0 flex flex-wrap items-baseline gap-x-2 gap-y-0.5", className)}>
       <span className={cx("font-display font-extrabold text-ink t-num", big)}>{copy.overview.estimate(usdText(ov.usd))}</span>
-      <span className="font-sans text-body-sm text-ink-muted">{copy.overview.atPrices}</span>
+      {/* testnet only: on mainnet the prices are the coins' own, so the label would be noise */}
+      {IS_TESTNET ? <span className="font-sans text-body-sm text-ink-muted">{copy.overview.atPrices}</span> : null}
     </p>
   );
 }
@@ -91,7 +93,7 @@ export function OverviewPanel({ ov, max = 5 }: { ov: Overview; max?: number }) {
         </ul>
       ) : null}
       {more > 0 ? <p className="m-0 font-sans text-body-sm font-semibold text-ink-muted">{copy.overview.more(more)}</p> : null}
-      {priced && ov.coins.length ? <p className="m-0 font-sans text-caption text-ink-muted">{copy.overview.note}</p> : null}
+      {IS_TESTNET && priced && ov.coins.length ? <p className="m-0 font-sans text-caption text-ink-muted">{copy.overview.note}</p> : null}
     </section>
   );
 }

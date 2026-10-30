@@ -3,6 +3,7 @@ import { Addresses } from "@/components/Addresses";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
 import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
 import { HoldingsList, InsideOverview } from "@/components/client/Holdings";
+import { ShareFundLink } from "@/components/client/ShareFundLink";
 import { Freshness, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
 import { IncomingOffers } from "@/components/client/Market";
 import { cx } from "@/components/ui";
@@ -48,7 +49,8 @@ export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers
       </ObjCol>
       <ObjMain data-judge-facts="">
         <section aria-labelledby="inside-title">
-          <SectionHead id="inside-title" title={copy.page.inside} />
+          {/* the public Add coins page (lib/fund.ts), for anyone: one tap from the top of the coins */}
+          <SectionHead id="inside-title" title={copy.page.inside} action={<ShareFundLink tokenId={snap.token_id} />} />
           {/* every coin, on every network and inside (C2, C3, C6), in one list; a row opens its sheet */}
           <div className="flex flex-col gap-3">
             <InsideOverview snap={snap} />

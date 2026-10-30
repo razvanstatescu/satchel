@@ -4,6 +4,7 @@ import { Charm } from "@/components/brand/Charm";
 import { CoinIcon } from "@/components/brand/CoinIcon";
 import { Badge, StatusPill, cx, type PillKind } from "@/components/ui";
 import { CHAIN_NAME, copy } from "@/lib/copy";
+import { IS_TESTNET } from "@/lib/config";
 import { NBSP } from "@/lib/format";
 import { ValueBar } from "@/components/Overview";
 import type { Coin } from "@/lib/holdings";
@@ -73,7 +74,7 @@ function Contents({ ov, status }: { ov: Overview; status: CardStatus }) {
               >
                 {priced ? copy.overview.estimate(usdText(ov.usd!)) : copy.overview.coinsOn(ov.coins.length, ov.networks)}
               </p>
-              {priced ? (
+              {priced && IS_TESTNET ? (
                 <p className="m-0 font-sans text-[0.75rem] leading-4 font-semibold text-ink-muted @min-[352px]/card:text-[0.8125rem] @max-[250px]/card:text-[0.6875rem]">
                   {copy.overview.atPrices}
                 </p>

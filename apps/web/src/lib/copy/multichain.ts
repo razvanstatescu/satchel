@@ -7,6 +7,28 @@
 import { plural as n } from "@/lib/format";
 
 export const multichain = {
+  /** The public Add coins page, /fund/[id] (lib/fund.ts): the link anyone can be sent to send coins to a Satchel. */
+  fundPage: {
+    title: (id: string) => `Send coins to Satchel #${id}`,
+    lead: "Pick the coin you're sending, then its network. You'll get the address to send it to.",
+    coin: "Coin",
+    network: "Network",
+    step: (n: number, label: string) => `${n} · ${label}`,
+    pickCoin: "Pick the coin you want to send.",
+    pickNetwork: (coin: string) => `Which network are you sending ${coin} on?`,
+    pickNetworkBody: "Each network keeps its own coins. Pick the one your wallet sends on.",
+    sendTo: (coin: string, network: string) => `Send ${coin} on ${network}`,
+    addInside: (coin: string, id: string) => `Add ${coin} inside Satchel #${id}`,
+    inside: "Inside on NEAR testnet",
+    insideBody: (coin: string) => `${coin} goes inside the Satchel through its contract on NEAR testnet. Connect a NEAR wallet to add it.`,
+    whose: (id: string) => `Satchel #${id} is an NFT on NEAR testnet with its own addresses. Coins sent here belong to it, and only its owner can send them out.`,
+    see: (id: string) => `See Satchel #${id}`,
+    share: "Share link",
+    shareAria: (id: string) => `Share link to add coins to Satchel #${id}`,
+    shareTitle: (id: string) => `Send coins to Satchel #${id}`,
+    copied: "Link copied",
+    copyFailed: "Couldn't copy the link. Copy it from the address bar.",
+  },
   /** The Wallet tab's column for a visitor while it isn't for sale (C4 + Add coins). */
   visitorPanel: {
     title: "Want this Satchel?",
@@ -45,7 +67,7 @@ export const multichain = {
     address: "Address",
     addresses: "Addresses",
     addressesNote: "Coins sent to these addresses belong to this Satchel. Whoever owns it controls them.",
-    sameAddress: "Also on Base Sepolia, Arbitrum Sepolia and OP Sepolia: the same address.",
+    sameAddress: "The same address on all four networks. View it on:",
     send: "Send",
     add: "Add coins",
     explorer: (name: string) => name,

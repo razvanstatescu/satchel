@@ -56,7 +56,9 @@ const accountId = z
   .regex(/^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/, "not a valid NEAR account id");
 
 export const PublicEnvSchema = z.object({
-  NEXT_PUBLIC_NETWORK: z.literal("testnet").default(DEFAULTS.network),
+  // the app runs on testnet only today; "mainnet" exists so testnet-only labels (D-50's "at mainnet prices") can be
+  // switched off by one variable when a mainnet deployment happens
+  NEXT_PUBLIC_NETWORK: z.enum(["testnet", "mainnet"]).default(DEFAULTS.network as "testnet"),
   NEXT_PUBLIC_SATCHEL_CONTRACT: accountId.default(DEFAULTS.contract),
   NEXT_PUBLIC_CONTRACT_ROLE: z.enum(["dev", "rc", "final"]).default(DEFAULTS.role),
   NEXT_PUBLIC_MPC_CONTRACT: accountId.default(DEFAULTS.mpc),
@@ -117,6 +119,8 @@ const env = parsePublicEnv({
 });
 
 export const NETWORK = env.NEXT_PUBLIC_NETWORK;
+/** Testnet-only wording (the "at mainnet prices" label, the testnet-value note) shows only here. */
+export const IS_TESTNET = NETWORK === "testnet";
 export const SATCHEL_CONTRACT = env.NEXT_PUBLIC_SATCHEL_CONTRACT;
 export const CONTRACT_ROLE = env.NEXT_PUBLIC_CONTRACT_ROLE;
 export const MPC_CONTRACT = env.NEXT_PUBLIC_MPC_CONTRACT;

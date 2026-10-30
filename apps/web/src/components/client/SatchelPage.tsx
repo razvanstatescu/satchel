@@ -266,7 +266,8 @@ function VisitorPanel({ tokenId }: { tokenId: string }) {
         </h2>
         <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.visitorPanel.body}</p>
       </div>
-      <div className="grid grid-cols-2 gap-2.5">
+      {/* stacked: "Make an offer" with its icon doesn't fit half of the 320 px column */}
+      <div className="flex flex-col gap-2.5">
         <Button href={`/s/${tokenId}/offer`} variant="primary" size="lg" block icon={Handshake} data-testid="make-offer-entry">
           {copy.offers.make}
         </Button>

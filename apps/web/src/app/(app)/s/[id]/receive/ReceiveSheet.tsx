@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Hourglass, Info, TriangleAlert } from "lucide-react";
-import { AddressDisplay } from "@/components/AddressDisplay";
-import { ChainCharm, Charm } from "@/components/brand";
+import { AddressQr } from "@/components/AddressQr";
+import { ChainCharm } from "@/components/brand";
 import { FlowShell } from "@/components/client/FlowShell";
 import { Incoming, ReceiveActions } from "@/components/client/Incoming";
 import { ExternalLink, Icon, SegmentedLinks } from "@/components/ui";
@@ -11,6 +11,9 @@ import type { SatchelSnapshot } from "@/lib/data/types";
 import { qrSvg } from "@/lib/qr";
 import { UI_CHAINS, type UiChain } from "@/lib/view";
 import { EVM_IDS, evmNetworkName, evmPickerName, SEPOLIA } from "@/lib/evm-networks";
+import type { Network } from "@/lib/holdings";
+
+const EVM_NETWORK: Record<number, Network> = { 11155111: "sepolia", 84532: "base", 421614: "arbitrum", 11155420: "optimism" };
 
 export { qrSvg };
 
@@ -45,7 +48,7 @@ export async function ReceiveSheet({
   const evmQuery = (n: number, a: "eth" | "usdc") => `chain=evm&network=${n}&asset=${a}`;
 
   return (
-    <FlowShell title={copy.fund.title(id)} closeHref={`/s/${id}`} testId="receive-flow" action={<ReceiveActions address={address} chain={chain} tokenId={id} />}>
+    <FlowShell title={copy.fund.title(id)} closeHref={`/s/${id}`} testId="receive-flow" action={<ReceiveActions address={address} chain={chain} tokenId={id} prefill={{ coin: usdc ? "USDC" : evm ? "ETH" : chain === "btc" ? "BTC" : "SOL", network: evm ? EVM_NETWORK[network] : chain === "btc" ? "bitcoin" : "solana" }} />}>
       <SegmentedLinks
         label={copy.fund.chain}
         block
@@ -67,31 +70,7 @@ export async function ReceiveSheet({
           />
         </div>
       ) : null}
-      <section aria-labelledby="qr-title" className="overflow-hidden rounded-card border border-line bg-surface">
-        <div className="flex h-13 items-center gap-2.5 border-b-2 border-sticker bg-brand px-4 text-on-brand">
-          <p id="qr-title" className="m-0 font-display text-[1.125rem]/6 font-extrabold tracking-[-0.01em]">
-            {copy.card.name(id)}
-          </p>
-          <Charm height={30} className="ml-auto h-7.5 w-auto flex-none" />
-        </div>
-        <div className="flex flex-col items-center gap-3 px-4 py-5">
-          <p className="m-0 inline-flex items-center gap-2 font-sans text-body-sm font-semibold text-ink-muted">
-            <ChainCharm chain={chain} size={20} />
-            {net}
-          </p>
-          <div
-            data-scheme="day"
-            role="img"
-            aria-label={copy.fund.qr(address)}
-            className="size-55 rounded-[16px] border border-line-strong bg-surface p-2.5 text-ink *:block *:size-full"
-            dangerouslySetInnerHTML={{ __html: svg }}
-          />
-          <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.fund.label(net)}</p>
-          <p className="m-0 w-full text-center">
-            <AddressDisplay address={address} fullAttr={chain} size="lg" align="center" />
-          </p>
-        </div>
-      </section>
+      <AddressQr tokenId={id} address={address} svg={svg} network={net} lead={<ChainCharm chain={chain} size={20} />} fullAttr={chain} />
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
         <li className="flex items-start gap-2.5 font-sans text-body-sm text-ink">
           <Icon icon={TriangleAlert} size={16} className="mt-0.5 text-danger" />

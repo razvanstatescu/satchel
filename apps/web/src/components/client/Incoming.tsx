@@ -1,13 +1,15 @@
 "use client";
 
-import { ArrowUpRight, CircleCheck, Hourglass, LoaderCircle, type LucideIcon } from "lucide-react";
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Button, Icon, cx } from "@/components/ui";
+import { CircleCheck, Hourglass, LoaderCircle, type LucideIcon } from "lucide-react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { Icon } from "@/components/ui";
 import { CopyButton } from "@/components/client/CopyButton";
+import { ShareFundLink } from "@/components/client/ShareFundLink";
 import { announce } from "@/components/client/Toaster";
-import { CHAIN_NAME, copy, NETWORK_LABEL, TICKER } from "@/lib/copy";
+import { CHAIN_NAME, copy, TICKER } from "@/lib/copy";
 import { useLiveSnapshot } from "@/lib/data/client";
 import type { SatchelSnapshot } from "@/lib/data/types";
+import type { FundPrefill } from "@/lib/fund";
 import { formatAmount } from "@/lib/format";
 import { readMotionMode } from "@/lib/motion-flag";
 import { EASE, play, stickOnTracks, type Track } from "@/lib/motion/play";
@@ -101,28 +103,17 @@ export function Incoming({ snap, chain }: { snap: SatchelSnapshot; chain: UiChai
   return <IncomingView state={state} chain={chain} tokenId={snap.token_id} amount={amount} total={confirmed} />;
 }
 
-const noop = () => () => {};
-
 /**
  * The sheet's pinned foot: **Copy address** (the primary; its visible label is "Copy address", and it rolls to "Copied")
- * and, where the device has a share sheet, **Share** (2 : 1).
+ * and **Share link** (3 : 2): the public Add coins page pre-filled with this coin and network, through the share sheet
+ * where there is one, else copied.
  */
-export function ReceiveActions({ address, chain, tokenId }: { address: string; chain: UiChain; tokenId: string }) {
-  const canShare = useSyncExternalStore(noop, () => typeof navigator !== "undefined" && typeof navigator.share === "function", () => false);
+export function ReceiveActions({ address, chain, tokenId, prefill }: { address: string; chain: UiChain; tokenId: string; prefill?: FundPrefill }) {
   const name = CHAIN_NAME[chain];
-  const share = () => {
-    void navigator.share({ title: copy.fund.shareTitle(tokenId, NETWORK_LABEL[chain]), text: address }).catch(() => {
-      /* dismissed */
-    });
-  };
   return (
-    <div className={cx(canShare && "grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2.5")}>
+    <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2.5">
       <CopyButton variant="primary" value={address} label={copy.fund.copy} text={copy.fund.copy} toastText={copy.wallet.copiedAria(name)} />
-      {canShare ? (
-        <Button size="lg" block icon={ArrowUpRight} onClick={share}>
-          {copy.fund.share}
-        </Button>
-      ) : null}
+      <ShareFundLink tokenId={tokenId} prefill={prefill} variant="button" />
     </div>
   );
 }

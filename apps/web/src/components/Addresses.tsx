@@ -7,19 +7,24 @@ import { CopyButton } from "@/components/client/CopyButton";
 import { ExternalLink, Icon } from "@/components/ui";
 import { CHAIN_NAME, copy, EXPLORER_NAME, NETWORK_LABEL } from "@/lib/copy";
 import type { SatchelSnapshot } from "@/lib/data/types";
-import { evmAddressLink, evmExplorerName, evmNetworkName, OTHER_EVM_IDS } from "@/lib/evm-networks";
+import { EVM_IDS, evmAddressLink, evmExplorerName, evmNetworkName, evmPickerName } from "@/lib/evm-networks";
+import { ShareFundLink } from "@/components/client/ShareFundLink";
+import type { Coin } from "@/lib/holdings";
 import { explorerFor, UI_CHAINS, type UiChain } from "@/lib/view";
 
 /** "testnet4", "Sepolia", "devnet": the network under the chain's name. */
 export const networkShort = (chain: UiChain) => NETWORK_LABEL[chain].replace(`${CHAIN_NAME[chain]} `, "");
+
+const HOME_COIN: Record<UiChain, Coin> = { btc: "BTC", evm: "ETH", sol: "SOL" };
 
 const TOOL =
   "inline-flex min-h-11 flex-none items-center gap-1.5 rounded-pill bg-surface-sunken px-3.5 font-sans text-[0.875rem]/5 font-semibold whitespace-nowrap text-ink no-underline transition-colors duration-120 hover:bg-line";
 
 /**
  * The Satchel's own addresses (app-screens §3.1), apart from the coins: one per chain, each the FULL grouped address
- * (`data-full-address`, the judge's fact: wraps only between 4-character groups) with Copy, QR (→ Add coins) and the
- * named explorer. The Ethereum address is the same on the three other EVM testnets; their explorers sit under it.
+ * (`data-full-address`, the judge's fact: wraps only between 4-character groups) with Copy, QR (→ Add coins), Share link
+ * (the public Add coins page, pre-filled with the chain's coin) and the named explorer. The Ethereum address is the same
+ * on all four EVM testnets, so its four explorers sit on one line under it.
  * Server-rendered; Copy is the one client leaf.
  */
 export function Addresses({ snap }: { snap: SatchelSnapshot }) {
@@ -58,15 +63,19 @@ function AddressRow({ snap, chain }: { snap: SatchelSnapshot; chain: UiChain }) 
           <Icon icon={QrCode} size={16} />
           {copy.wallet.qr}
         </Link>
-        <ExternalLink href={explorerFor(chain, address)} className="min-h-11 px-1.5 font-sans text-[0.875rem]/5 font-semibold">
-          {EXPLORER_NAME[chain]}
-        </ExternalLink>
+        <ShareFundLink tokenId={snap.token_id} prefill={{ coin: HOME_COIN[chain] }} />
+        {chain !== "evm" ? (
+          <ExternalLink href={explorerFor(chain, address)} className="min-h-11 px-1.5 font-sans text-[0.875rem]/5 font-semibold">
+            {EXPLORER_NAME[chain]}
+          </ExternalLink>
+        ) : null}
       </div>
       {chain === "evm" ? (
+        // one address on four networks: one explorer link each, on one line (Etherscan for Sepolia included)
         <div className="flex flex-col gap-1 md:pl-11" data-evm-networks="">
           <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.coins.sameAddress}</p>
           <p className="m-0 flex flex-wrap gap-x-4">
-            {OTHER_EVM_IDS.map((n) => (
+            {EVM_IDS.map((n) => (
               <ExternalLink
                 key={n}
                 href={evmAddressLink(n, address)}
@@ -74,7 +83,7 @@ function AddressRow({ snap, chain }: { snap: SatchelSnapshot; chain: UiChain }) 
                 className="min-h-11 font-sans text-[0.875rem]/5 font-semibold"
                 data-evm-network={n}
               >
-                {evmNetworkName(n).replace(" Sepolia", "")}
+                {evmPickerName(n)}
               </ExternalLink>
             ))}
           </p>
