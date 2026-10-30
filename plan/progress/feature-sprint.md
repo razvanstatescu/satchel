@@ -194,3 +194,14 @@ it. Phase-2 UI work builds against those specs.
   - Spawned **tools-live** (Sonnet): extends `tools/e2e` (multi-chain/USDC EVM, message, market, allowance, history) and runs it live on dev2 within caps, producing `research/spikes/dev2-live/RESULTS.md`.
   - Spawned **web-gaps** (Sonnet): USDC offers with storage prepay, FT deposits and withdrawals, storage-credit withdraw, `/market` offer entry.
 - 2026-10-30 08:10Z: session restart. Razvan allowed pushing `.env.production` updates. **Production now points at dev2** (0e8bd03: `NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet`, `NEXT_PUBLIC_EXPECTED_CODE_HASH=10c6a8e9…`). Public values only. tools-live and web-gaps had made no changes before the restart (dev2 untouched: `sig_count` 0); both were resumed from scratch. dev2 #1's BTC funding confirmed at block 158101.
+- 08:50Z: merged `feat/tools-live` into main. **Live dev2 run: 20/20 flows PASS** (`research/spikes/dev2-live/RESULTS.md`), with 8 real MPC `sign_for` calls at 5.4–6.1 s each and no timeouts:
+  - EVM Sepolia send; Base Sepolia and USDC sign-only;
+  - EVM and SOL messages with real verification;
+  - `history_digest` recompute = view;
+  - SOL and BTC sends;
+  - C6 deposit and withdraw;
+  - C4 offer, accept and cancel, with I-M1 and I-M8 holding live;
+  - C5 grant, within-cap, over-cap (`ERR_ALLOWANCE_EXCEEDED`, byte-identical to the local mirror) and revoke;
+  - the checker on #1/#2/#3 as expected.
+
+  Three tool bugs were fixed: the stale view read-back, the tools checker's per-chain EVM sources (C3), and the BTC self-sweep in the allowance demo. Tools 92 tests. Spend within caps (0.002 ETH, 5k sats, 0.001 SOL, ≈ 0.35 NEAR moved).
