@@ -126,6 +126,41 @@ Legend: ✅ covered before this audit · 🆕 added by this audit · ⚠️ gap 
 | mobile landing (390/375/360/320, hero loop, header) | ✅ `responsive.spec.ts`, `landing*.spec.ts` |
 | robots.txt / sitemap.xml / `/api/*` JSON and media routes | ✅ `judge.spec.ts` |
 
+## Round two
+
+A second audit pass (same fixture-mode methodology), targeting what round one flagged as untested. Plan (filled in
+as each item lands):
+
+1. **Balances update after a send, no reload** — assert the Wallet tab's holding + card change after a fixture send
+   confirms (`RefreshAfterSend` + `refreshSnapshot`), same tab, no `page.reload()`. New spec: `refresh-after-send.spec.ts`.
+2. **A complete keyboard-only Send** — open from the Wallet tab via Tab/Enter, pick chain, amount, address (including
+   the address-book dropdown by keyboard), Review, Send, Escape-close, focus returns to the opener. New spec:
+   `keyboard-send.spec.ts`.
+3. **Wallet rejection in flows not yet covered** — give-by-link, make offer, accept offer, allowance add + revoke,
+   inside NEAR/FT deposit + withdraw, Take everything out (a rejected step → Skip → partial results). Investigated
+   whether the "timeout" sim knob applies here first: it doesn't — `lib/near/mock-wallet.ts` (the fixture wallet
+   behind every plain NEAR call: `set_allowance`, `make_offer`, `accept_offer`, `deposit_near`, `withdraw_*`, the
+   give-link's fund+transfer) only honours the `reject` knob; `timeout`/`broadcast-fail`/`delay` are consumed
+   downstream in the chain-signing runner (BTC/EVM/SOL `sign_for`) only, already exercised by `flows.spec.ts` and
+   `allowance.spec.ts`'s BTC send. So "timeout" has no distinct state to assert for these NEAR-only flows; only
+   `reject` is new coverage here, plus Empty's reject→Skip→partial (Empty's per-coin step IS a `sign_for`, so its
+   skip path is the one place a rejected step composes with a multi-step plan). New spec: `reject-coverage.spec.ts`.
+4. **A delegate's BTC send that no single coin can pay (AUDIT-01)** — Satchel #1's two fixture coins are 139,718 and
+   50,000 sats; a delegate cap big enough to cover an amount neither coin can pay alone (e.g. 150,000 sats) must show
+   the one-coin message naming the largest coin (139,718 sats) before the wallet opens; an amount that fits one coin
+   succeeds. New spec: `delegate-btc-one-coin.spec.ts`.
+5. **Dust/rent-floor amounts** — read `@satchel/core`'s BTC coin-selection (`packages/core/src/chains/btc/select.ts`):
+   there IS a dust floor (294 sats for a p2wpkh recipient, `DUST.p2wpkh`), contrary to round one's note that none
+   exists; it surfaces as a generic `SelectionError` message through `SendFlow`'s review-step error banner (not a
+   copy-mapped `problem`, so the raw core message shows verbatim — flagged below). SOL's rent rule is reachable too
+   via "leaves the Satchel below rent" (E25); the "new recipient below rent" rule (E26-adjacent) is NOT reachable in
+   fixture mode because `lib/chains/send.ts`'s fixture `solReads().recipientExists` is hardcoded `true` — noted as a
+   fixture-mode gap, not a product bug. New spec: `dust-amounts.spec.ts`.
+6. **Address-book dropdown: Night + axe open, 320px, and search past 5 entries** — `AddressBook.tsx`'s `useBookMenu`
+   only renders a search box once an entry list exceeds 5 (`mine.length > 5`); round one's dropdown test used only 2
+   entries. New spec: `address-book-dropdown.spec.ts`.
+7. Bonus, if time allows: anything else round one's "What remains untested" flagged that's cheap to close.
+
 ## Edge cases explored during this audit
 
 | Edge case | Result |
