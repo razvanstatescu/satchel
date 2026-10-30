@@ -1,5 +1,6 @@
 "use client";
 
+import { overview } from "@/lib/overview";
 import { useEffect, useRef, useState } from "react";
 import { CircleAlert, Plus, RefreshCw, Tag, TriangleAlert } from "lucide-react";
 import { SatchelCard } from "@/components/SatchelCard";
@@ -17,7 +18,7 @@ import type { Aggregate, CleanReport, SatchelSnapshot } from "@/lib/data/types";
 import { contractViews } from "@/lib/near/contract";
 import type { OfferView } from "@/lib/near/types";
 import { useWallet } from "@/lib/near/wallet";
-import { cardChips, priceText } from "@/lib/view";
+import { priceText } from "@/lib/view";
 
 /**
  * My Satchels, the app home `/satchels` (app-screens §2; proto/app-misc.html `satchels*`). Client-only: it reads the
@@ -167,7 +168,7 @@ function CardGrid({ items, hints }: { items: SatchelSnapshot[]; hints: Record<st
     <ul className="m-0 grid list-none grid-cols-1 gap-7 p-0 md:grid-cols-2 xl:grid-cols-3 xl:gap-8">
       {items.map((s) => (
         <li key={s.token_id} className="flex min-w-0 flex-col gap-2.5">
-          <SatchelCard tokenId={s.token_id} size="lg" status={s.status} owned showYours={false} chips={cardChips(s)} href={`/s/${s.token_id}`} headingLevel={2} />
+          <SatchelCard tokenId={s.token_id} size="lg" status={s.status} owned showYours={false} contents={overview(s)} href={`/s/${s.token_id}`} headingLevel={2} />
           <UnderCard snap={s} hint={hints[s.token_id]} />
         </li>
       ))}

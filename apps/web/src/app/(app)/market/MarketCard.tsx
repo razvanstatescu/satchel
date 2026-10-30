@@ -1,6 +1,7 @@
 "use client";
 
-import { SatchelCard, type CardChip } from "@/components/SatchelCard";
+import { SatchelCard } from "@/components/SatchelCard";
+import type { Overview } from "@/lib/overview";
 import { useWallet } from "@/lib/near/wallet";
 
 /**
@@ -8,7 +9,7 @@ import { useWallet } from "@/lib/near/wallet";
  * own listings (known only once the wallet is, so the server HTML shows every card as a visitor sees it). The item's link
  * stretches over it (`group/mkt` on the item): the card lifts on hover and presses on tap with it.
  */
-export function MarketCard({ id, tokenId, owner, chips }: { id: string; tokenId: string; owner: string; chips: CardChip[] }) {
+export function MarketCard({ id, tokenId, owner, contents }: { id: string; tokenId: string; owner: string; contents: Overview }) {
   const { accountId } = useWallet();
   return (
     <SatchelCard
@@ -17,7 +18,7 @@ export function MarketCard({ id, tokenId, owner, chips }: { id: string; tokenId:
       size="lg"
       status="listed"
       owned={!!accountId && accountId === owner}
-      chips={chips}
+      contents={contents}
       headingLevel={2}
       className="group-hover/mkt:-translate-y-0.5 group-hover/mkt:shadow-sticker-lift group-active/mkt:translate-y-1 group-active/mkt:shadow-pressed group-active/mkt:duration-60 group-has-data-pressed/mkt:translate-y-1 group-has-data-pressed/mkt:shadow-pressed"
     />

@@ -98,3 +98,4 @@
 - 2026-10-30T10:09Z [C5-caps] done: full suite green — 463 unit tests, 207 Playwright e2e tests, typecheck/lint clean on feat/allowance-caps (commits 93f33cf, b9b1b4f, 0133d47, c3f1f26)
 - 2026-10-30T10:10Z [orchestrator] allowance-caps merged; every sprint item done
 - 2026-10-30T10:47Z [orchestrator] UI notes: unified holdings list + coin sheets, Make an offer in the left column, Add coins overflow fixed, card shows top holdings + '+N more'; unit 474, e2e 207/207
+- 2026-10-30T11:05Z [orchestrator] D-50 overview: labelled ≈$ estimate + value bar + top coins on card/Wallet tab/market/You get; prices 1Click→CoinGecko; unit 479, e2e 207/207

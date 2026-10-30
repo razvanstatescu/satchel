@@ -13,6 +13,23 @@ export const multichain = {
     body: "It isn't for sale, but you can still make its owner an offer. Anyone can add coins to it.",
     offerShort: "Offer",
   },
+  /** D-50: a Satchel at a glance (the card, the Wallet tab, market cards, "You get"). The only place fiat appears. */
+  overview: {
+    estimate: (usd: string) => `≈ ${usd}`,
+    atPrices: "at mainnet prices",
+    coinsOn: (coins: number, networks: number) => `${n(coins, "coin", "coins")} on ${n(networks, "network", "networks")}`,
+    empty: "Nothing inside yet",
+    emptyBody: "Anyone can add coins to its addresses.",
+    partial: "Some balances couldn't be read, so this may be low.",
+    more: (count: number) => `+${count} more`,
+    plus: (count: number) => `+${count}`,
+    moreAria: (count: number) => `and ${n(count, "more coin", "more coins")}`,
+    barLabel: (parts: string) => `Value by coin: ${parts}`,
+    listLabel: "Top coins by value",
+    listLabelNoPrices: "Coins inside",
+    seeAll: "See every coin and network",
+    note: "Dollar estimates use mainnet prices for the same coins. Testnet coins have no value.",
+  },
   /** The one holdings list (Wallet tab, card, "You get"): every coin, on every network, inside or at an address. */
   coins: {
     listLabel: "Coins in this Satchel",

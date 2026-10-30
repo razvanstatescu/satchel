@@ -66,14 +66,17 @@ test.describe("judge facts without JavaScript", () => {
     for (const a of Object.values(ADDR1)) expect(raw.toLowerCase()).toContain(`data-address="${a.toLowerCase()}"`);
   });
 
-  test("the brand card is real text (name, status, the charm ledger's native amounts)", async ({ page }) => {
+  test("the brand card is real text (name, status, the labelled estimate, every coin's native amount)", async ({ page }) => {
     await page.goto("/s/1");
     const card = page.locator("figure[data-card='1']").first();
     await expect(card).toContainText("Satchel #1");
     await expect(card).toContainText("Active");
-    // the charm ledger (CARD-HERO.md): the amount, a no-break space, the ticker; no "{n} chains", no fiat
+    // D-50: fiat only as the labelled estimate, "≈ $X" with "at mainnet prices" (fixture prices)
+    await expect(card.locator("[data-overview-total]")).toHaveText(/^≈ \$[\d,]+\.\d{2}$/);
+    await expect(card).toContainText("at mainnet prices");
+    // each coin's total stays in the text layer: the amount, a no-break space, the ticker
     await expect(card).toContainText("0.00189718\u00a0BTC");
-    await expect(card).toContainText("0.048979\u00a0ETH");
+    await expect(card).toContainText("0.073979\u00a0ETH");
     await expect(card).not.toContainText("chains");
     await expect(card).toHaveAttribute("data-owned", "false"); // visitors never see the Yours sticker
     await expect(card.locator("[data-yours]")).toHaveCount(0);

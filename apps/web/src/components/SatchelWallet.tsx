@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from "react";
 import { Addresses } from "@/components/Addresses";
 import { FactsGrid, HowItWorks, SectionHead, VerifyDisclosure } from "@/components/Facts";
 import { AllowanceFacts, AllowanceOwnerPanel, DelegateBanner } from "@/components/client/Allowance";
-import { HoldingsList } from "@/components/client/Holdings";
+import { HoldingsList, InsideOverview } from "@/components/client/Holdings";
 import { Freshness, VisitorOnly, WalletColumn } from "@/components/client/SatchelPage";
 import { IncomingOffers } from "@/components/client/Market";
 import { cx } from "@/components/ui";
@@ -50,7 +50,10 @@ export function WalletTab({ snap, offers = [] }: { snap: SatchelSnapshot; offers
         <section aria-labelledby="inside-title">
           <SectionHead id="inside-title" title={copy.page.inside} />
           {/* every coin, on every network and inside (C2, C3, C6), in one list; a row opens its sheet */}
-          <HoldingsList snap={snap} />
+          <div className="flex flex-col gap-3">
+            <InsideOverview snap={snap} />
+            <HoldingsList snap={snap} />
+          </div>
           <Freshness snap={snap} />
         </section>
         <IncomingOffers snap={snap} offers={offers} />

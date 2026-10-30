@@ -4,12 +4,12 @@ import { ART, artA11y } from "./art";
 /**
  * A coin as Satchel draws it (brand 2.0: a disc with a face and the constant ink outline, never a real logo), with a
  * small network sticker in its lower right when the coin isn't on its home chain: ETH on Base, USDC anywhere, anything
- * held inside the Satchel contract on NEAR. BTC, ETH and SOL are the chain charms' coins (`ChainCharm`); USDC is sky
- * with a "$" mouth-line, NEAR is mint, wNEAR is mint inside an ink ring (wrapped). The badge carries a letter (B, A, OP,
+ * held inside the Satchel contract on NEAR. BTC, ETH and SOL are the chain charms' coins (`ChainCharm`); USDC is sky,
+ * NEAR is mint, wNEAR is mint inside an ink ring (wrapped). The badge carries a letter (B, A, OP,
  * S, N) so it reads without colour; the coin's name beside it always carries the meaning (decorative unless `title`).
  */
 
-const COIN_FILL: Record<Coin, string> = {
+export const COIN_FILL: Record<Coin, string> = {
   BTC: ART.btc,
   ETH: ART.evm,
   SOL: ART.sol,

@@ -2,7 +2,8 @@
 
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ComponentProps, type ReactNode, type Ref } from "react";
 import { Sparkle } from "@/components/brand/Sparkle";
-import { SatchelCard, type CardChip } from "@/components/SatchelCard";
+import { SatchelCard } from "@/components/SatchelCard";
+import type { Overview } from "@/lib/overview";
 import { Avatar, StatusPill, cx, type PillKind } from "@/components/ui";
 import { announce } from "@/components/client/Toaster";
 import { copy } from "@/lib/copy";
@@ -48,8 +49,8 @@ export interface HandoffProps {
   from: string;
   /** The account it goes to (the receiver, the buyer). */
   to: string;
-  /** The card's charm ledger, as for SatchelCard (`cardChips(live)`). */
-  chips: CardChip[];
+  /** The card's charm ledger, as for SatchelCard (`overview(live)`). */
+  contents: Overview;
   /** The headline under the stage (`data-testid="handoff-sentence"`, `tabIndex=-1`): focused once the card lands. */
   sentence: ReactNode;
   /** Its element: `h3` (default, inside a flow sheet), `h2`, `h1` (a page's main heading) or `p`. */
@@ -111,7 +112,7 @@ export function Handoff({
   tokenId,
   from,
   to,
-  chips,
+  contents,
   sentence,
   sentenceAs = "h3",
   sentenceSize = "md",
@@ -252,7 +253,7 @@ export function Handoff({
           >
             <span className="h-5.5 w-1 rounded-[2px] bg-sticker" />
             <div ref={boxRef} className="relative w-full">
-              <SatchelCard tokenId={tokenId} id={`handoff-card-${tokenId}`} size="sm" status={v.toStatus} owned={owned} chips={chips} headingLevel={3} />
+              <SatchelCard tokenId={tokenId} id={`handoff-card-${tokenId}`} size="sm" status={v.toStatus} owned={owned} contents={contents} headingLevel={3} />
               {playing ? (
                 <span ref={pillFromRef} className="absolute top-0 left-0 opacity-0">
                   <StatusPill status={fromStatus ?? v.fromStatus} size="sm" />

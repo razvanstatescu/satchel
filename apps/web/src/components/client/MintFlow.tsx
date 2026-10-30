@@ -279,7 +279,7 @@ export function MintFlow({ from }: { from: string | null }) {
               <Sparkle size={16} className="absolute top-7.5 -left-6" />
             </div>
           ) : null}
-          <SatchelCard tokenId={minted.id} size="md" status="active" owned chips={chips("0")} headingLevel={3} />
+          <SatchelCard tokenId={minted.id} size="md" status="active" owned headingLevel={3} />
           <div ref={lineRef} className="flex flex-col items-center gap-1 text-center">
             <h3 ref={doneRef} tabIndex={-1} data-testid="mint-done" className="m-0 font-display text-title text-ink outline-none">
               {copy.mint.done(minted.id)}

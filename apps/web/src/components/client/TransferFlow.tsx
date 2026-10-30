@@ -1,5 +1,6 @@
 "use client";
 
+import { overview, type Overview } from "@/lib/overview";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { History, Hourglass, Info, LoaderCircle, Lock, Snowflake, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
 import { ConnectButton } from "@/components/client/ConnectButton";
@@ -22,7 +23,7 @@ import { calls, contractViews } from "@/lib/near/contract";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
 import { validateNearAccount, type Validation } from "@/lib/validate";
-import { cardChips, holdingsSentence } from "@/lib/view";
+import { holdingsSentence } from "@/lib/view";
 
 /**
  * Give (kb/80 R3 §Transfer; app-screens §7): Who gets it → Review gift → the wallet → Giving… → **the hand-off**, only
@@ -124,7 +125,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
         tokenId={snap.token_id}
         from={receipt.from}
         to={receipt.to}
-        chips={cardChips(live)}
+        contents={overview(live)}
         fromStatus={status === "signing" || status === "needs_attention" ? status : "active"}
         sentence={copy.xfer.done(receipt.to, balances)}
         live={copy.xfer.live(receipt.to, balances)}
@@ -184,7 +185,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
     const err = val?.tier === "error" ? val.message : exists.ok === false ? copy.xfer.err.missing(target) : null;
     body = (
       <>
-        <SatchelCard tokenId={snap.token_id} id={`give-card-${snap.token_id}`} size="md" status={status} owned chips={cardChips(live)} headingLevel={3} className="self-center" />
+        <SatchelCard tokenId={snap.token_id} id={`give-card-${snap.token_id}`} size="md" status={status} owned contents={overview(live)} headingLevel={3} className="self-center" />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="xfer-to" className="font-sans text-label text-ink">
             {copy.xfer.to}
@@ -251,7 +252,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
     meta = `${copy.app.step(2, 2)} · ${copy.xfer.stepReview}`;
     body = (
       <>
-        <GiftCard tokenId={snap.token_id} status={status} chips={cardChips(live)} to={target} lifted={busy} />
+        <GiftCard tokenId={snap.token_id} status={status} contents={overview(live)} to={target} lifted={busy} />
         <ul className="m-0 flex list-none flex-col gap-3.5 p-0 font-sans text-[0.9375rem] leading-5.5 text-ink">
           <li className="grid grid-cols-[32px_minmax(0,1fr)] items-start gap-3">
             <Avatar account={target} size={32} />
@@ -339,7 +340,7 @@ export function TransferFlow({ snap }: { snap: SatchelSnapshot }) {
  * While the wallet is open and the gift goes through it is picked up and held (−8 px, −2°, a 6 px drop; 220 ms), then
  * set down with a 2 px press if it doesn't go (motion-spec §2 "In flight"). Reduced motion: no pick-up.
  */
-function GiftCard({ tokenId, status, chips, to, lifted }: { tokenId: string; status: Parameters<typeof SatchelCard>[0]["status"]; chips: ReturnType<typeof cardChips>; to: string; lifted: boolean }) {
+function GiftCard({ tokenId, status, contents, to, lifted }: { tokenId: string; status: Parameters<typeof SatchelCard>[0]["status"]; contents: Overview; to: string; lifted: boolean }) {
   const hydrated = useHydrated();
   const reduce = hydrated && readMotionMode() === "reduce";
   const pressRef = useRef<HTMLDivElement>(null);
@@ -356,7 +357,7 @@ function GiftCard({ tokenId, status, chips, to, lifted }: { tokenId: string; sta
   return (
     <div className="relative flex flex-col items-center pt-1 pb-7.5">
       <div ref={pressRef} className="w-full max-w-75">
-        <SatchelCard tokenId={tokenId} id={`give-card-${tokenId}`} size="md" status={status} owned chips={chips} headingLevel={3} pose={lifted && !reduce ? "lifted" : "rest"} />
+        <SatchelCard tokenId={tokenId} id={`give-card-${tokenId}`} size="md" status={status} owned contents={contents} headingLevel={3} pose={lifted && !reduce ? "lifted" : "rest"} />
       </div>
       <span
         aria-hidden="true"

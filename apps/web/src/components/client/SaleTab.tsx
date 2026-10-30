@@ -1,5 +1,6 @@
 "use client";
 
+import { overview } from "@/lib/overview";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
@@ -46,9 +47,10 @@ import { usdcBuyUsedAmount } from "@/lib/near/outcome";
 import { runCall } from "@/lib/near/run-call";
 import type { Currency, Listing } from "@/lib/near/types";
 import { useWallet } from "@/lib/near/wallet";
-import { cardChips, holdingsSentence, priceText } from "@/lib/view";
+import { holdingsSentence, priceText } from "@/lib/view";
 import { holdingText, holdings, splitHoldings } from "@/lib/holdings";
 import { CoinIcon } from "@/components/brand/CoinIcon";
+import { OverviewHeadline, ValueBar } from "@/components/Overview";
 
 /**
  * The Sale tab of `/s/[id]` (app-screens §5; proto app-sale.html), inside S's object page: each view brings its column
@@ -70,7 +72,7 @@ export function SaleTab({ snap, hint, openList, serverNow }: { snap: SatchelSnap
   useTabTitle(view === "owner" ? `${copy.page.tabs.sell} · ${copy.card.name(id)}` : view === "sold" ? `${copy.page.tabs.sold} · ${copy.card.name(id)}` : view === "buy" ? `${copy.page.tabs.buy} · ${copy.card.name(id)}` : `Sale · ${copy.card.name(id)}`);
   if (view === "buy") return <BuyView snap={snap} hint={hint} serverNow={serverNow} onStart={() => setBuying(true)} onStop={() => setBuying(false)} />;
   if (view === "owner") return <OwnerSale snap={snap} openList={openList} />;
-  if (view === "sold" && sale && accountId) return <SoldReceipt sale={sale} accountId={accountId} chips={cardChips(live)} />;
+  if (view === "sold" && sale && accountId) return <SoldReceipt sale={sale} accountId={accountId} contents={overview(live)} />;
   return <NotForSale snap={snap} />;
 }
 
@@ -629,7 +631,12 @@ function YouGet({ live, encumbered, headingId }: { live: SatchelSnapshot; encumb
           {copy.buy.youGet}
         </h2>
       </div>
-      {/* every coin it holds, on every network and inside (lib/holdings.ts), then the home coins still at zero */}
+      {/* D-50: the labelled estimate and the value bar, then every coin it holds, on every network and inside
+          (lib/holdings.ts), then the home coins still at zero */}
+      <div className="flex flex-col gap-2">
+        <OverviewHeadline ov={overview(live)} size="md" />
+        <ValueBar ov={overview(live)} />
+      </div>
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
         {splitHoldings(holdings(live)).shown.map((h) => {
           const zero = h.amount === 0n;
@@ -702,7 +709,7 @@ function BuyDone({ snap, live, listing, buyer, hash, at }: { snap: SatchelSnapsh
         tokenId={id}
         from={listing.seller}
         to={buyer}
-        chips={cardChips(live)}
+        contents={overview(live)}
         sentence={copy.buy.done(id)}
         sentenceAs="h1"
         sentenceSize="lg"

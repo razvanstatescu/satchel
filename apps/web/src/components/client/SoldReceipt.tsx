@@ -5,7 +5,7 @@ import { Landmark, LoaderCircle, TriangleAlert } from "lucide-react";
 import { markSimUsdcRegistered, usdcRegistered } from "@/components/client/fixture-switches";
 import { Handoff, Receipt } from "@/components/client/Handoff";
 import { announce, toast } from "@/components/client/Toaster";
-import type { CardChip } from "@/components/SatchelCard";
+import type { Overview } from "@/lib/overview";
 import { Banner, Button, ExternalLink, Icon, Morph, cx } from "@/components/ui";
 import { copy, errorCopy } from "@/lib/copy";
 import { EXPLORERS, USDC_CONTRACT } from "@/lib/config";
@@ -93,7 +93,7 @@ export function useUsdcRegistration(currency: Currency, accountId: string | null
 
 type PaidState = keyof typeof copy.sell.sold.paid;
 
-export function SoldReceipt({ sale, accountId, chips }: { sale: SaleReceipt; accountId: string; chips: CardChip[] }) {
+export function SoldReceipt({ sale, accountId, contents }: { sale: SaleReceipt; accountId: string; contents: Overview }) {
   const price = priceText(sale.price, sale.currency);
   const { owed, reload } = useProceeds(accountId);
   const waiting = owed?.find((p) => p.currency === sale.currency) ?? null;
@@ -133,7 +133,7 @@ export function SoldReceipt({ sale, accountId, chips }: { sale: SaleReceipt; acc
         tokenId={sale.tokenId}
         from={accountId}
         to={sale.buyer}
-        chips={chips}
+        contents={contents}
         onceKey={onceKey}
         focus={first}
         live={first ? copy.sell.sold.live(sale.tokenId, sale.buyer, price) : undefined}

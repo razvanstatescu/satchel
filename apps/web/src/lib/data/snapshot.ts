@@ -30,6 +30,8 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
   const errors: string[] = [];
   const addr = satchelAddresses(id);
 
+  // prices (D-50) are optional: a miss shows no estimate and is not an error of this Satchel's
+  const pricesP = withTimeout(src.prices({ timeoutMs: UPSTREAM_MS }), UPSTREAM_MS + 200, "prices").catch(() => null);
   const [token, satchel, height, inside] = await Promise.all([
     bounded(views.nftToken(id), "nft_token", errors, undefined),
     bounded(views.satchel(id), "satchel", errors, undefined),
@@ -94,6 +96,7 @@ export async function buildSnapshot(id: string, src: DataSource, deps: { config:
     },
     inside: inside ?? { near: "0", fts: [], inside_epoch: 0 },
     allowances,
+    prices: await pricesP,
     errors,
   };
 }

@@ -1118,6 +1118,29 @@ is immutable). `NEXT_PUBLIC_APP_URL=https://usesatchel.xyz`.
 - add `usesatchel.xyz` to the Vercel project and point the DNS at it (none existed on 2026-10-29);
 - check that `https://usesatchel.xyz/api/contract` answers before the Day-9 rc birth.
 
+## D-50 · A labelled dollar estimate in the Satchel overview (2026-10-30, Razvan; reverses D-37 UX-1)
+
+**Decision.** Every Satchel shows a brief overview of what is inside:
+- an estimated total, **"≈ $X" always with "at mainnet prices"**;
+- a value bar (each coin's share);
+- the top five coins, grouped across networks and inside, with "+N more" for the rest.
+
+It appears on the card, at the top of the Wallet tab, on market cards and in the buyer's "You get". Fiat appears
+**only** in that overview; it never appears in Facts, sends, offers or prices. When no price source answers, the
+overview says "{n} coins on {m} networks" and shows no dollar figure, never a stale one.
+
+**Prices.** The primary source is 1Click `GET /v0/tokens` (no key, CORS `*`, 1,200 calls/min unauthenticated);
+CoinGecko `/simple/price` is the fallback. Both were checked on 2026-10-30. Prices are cached for 60 s, and each
+read is bounded to 1.5 s, as in kb/50 §Price route. They are read wherever the snapshot is built (server and
+browser). wNEAR uses the NEAR price. Fixture mode uses fixed prices, so the tests run offline.
+
+**Why.** Razvan wants to see at a glance what a Satchel holds. A total and a ranked mix need prices, because native
+amounts across chains can't be compared. D-37's concern (judges reading testnet dollars as fake numbers) is
+handled by the label: "≈" and "at mainnet prices" every time, next to the "Testnet only. Coins here have no
+value." note.
+
+**Human:** decided by Razvan.
+
 ## Decisions that need the human (Razvan / team)
 
 Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into the existing H-xx. Every row has a default and a deadline. "Default" means what happens if nobody objects by the deadline. H-02 and the payout account have no default, because an agent may never fill them in.

@@ -22,6 +22,7 @@ const lock = (over: Partial<LockFacts>): LockFacts => ({
 
 const unreadable: DataSource = {
   mode: "live",
+  prices: async () => null,
   view: async () => {
     throw new Error("RPC unreachable");
   },

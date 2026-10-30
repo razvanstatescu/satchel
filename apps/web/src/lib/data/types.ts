@@ -1,5 +1,6 @@
 import type { SatchelStatus } from "@/lib/near/contract";
 import type { AllowanceView, Chain, ConfigView, InsideView, Listing, SigRecordView } from "@/lib/near/types";
+import type { PriceView } from "@/lib/prices";
 
 /** GET /api/satchels/[id] shape (kb/90 §9) — also feeds the blocking /s/[id] render. */
 export interface SatchelSnapshot {
@@ -36,6 +37,9 @@ export interface SatchelSnapshot {
   inside: InsideView;
   /** C5 (docs/specs/C5.md §1.2): the token's live delegates, a public fact (judge-visible; never gated on the viewer). */
   allowances: AllowanceView[];
+  /** D-50: mainnet USD prices for the overview's labelled estimate only; null when no source answered (no dollars
+   * shown then). Optional so older snapshots still type-check. */
+  prices?: PriceView | null;
   errors: string[];
 }
 

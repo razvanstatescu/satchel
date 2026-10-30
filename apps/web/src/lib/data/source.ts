@@ -15,6 +15,7 @@ import {
 } from "@/lib/data/fixtures";
 import { EVM_IDS, evmRpcs, SEPOLIA, usdcAddress } from "@/lib/evm-networks";
 import { simOverlay } from "@/lib/data/sim";
+import { FIXTURE_PRICES, fetchPrices, type PriceView } from "@/lib/prices";
 import type { EvmChainBalance, LockFacts } from "@/lib/data/types";
 import type { ViewFn } from "@/lib/near/contract";
 import { historyClient, readBirthActions } from "@/lib/near/history";
@@ -55,6 +56,8 @@ export interface DataSource {
   balances(addr: { btc: string; evm: string; sol: string }, tokenId: string, opts?: { timeoutMs?: number; includeSol?: boolean }): Promise<Balances>;
   lock(opts?: { timeoutMs?: number }): Promise<LockRead>;
   accountExists(accountId: string): Promise<boolean>;
+  /** D-50: mainnet USD prices for the overview's estimate; null when unavailable. */
+  prices(opts?: { timeoutMs?: number }): Promise<PriceView | null>;
 }
 
 /* ───────────────────────────── fixture ───────────────────────────── */
@@ -138,6 +141,7 @@ function fixtureView(): ViewFn {
 
 const fixtureSource: DataSource = {
   mode: "fixture",
+  prices: async () => FIXTURE_PRICES,
   view: fixtureView(),
   blockHeight: async () => simOverlay().height(FIXTURE_HEIGHT),
   balances: async (_a, tokenId) => {
@@ -220,6 +224,7 @@ export function isNoCode(codeHashHex: string | null): boolean {
 
 const liveSource: DataSource = {
   mode: "live",
+  prices: (opts = {}) => fetchPrices(opts.timeoutMs),
   view: async <T,>(contractId: string, method: string, args: Record<string, unknown>) => nearView<T>(contractId, method, args),
   blockHeight: () => nearBlockHeight(),
   balances: async (a, _tokenId, opts = {}) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { overview } from "@/lib/overview";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -40,8 +41,7 @@ import { DEFAULT_BLOCK_MS } from "@/lib/near/constants";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
 import { useIntents } from "@/lib/signing/client";
-import { holdings } from "@/lib/holdings";
-import { allZero, cardChips, priceText } from "@/lib/view";
+import { allZero, priceText } from "@/lib/view";
 
 /**
  * The viewer-aware pieces of the Satchel object page `/s/[id]` (app-screens §1–§3; proto app-satchel.html). The server
@@ -174,19 +174,19 @@ function hopTracks(el: Element): Track<Element>[] {
   ];
 }
 
-/** When a holding grows while the card is on screen, its coin re-sticks (never on load; static when reduced). */
+/** When a coin's total grows while the card is on screen, its coin re-sticks (never on load; static when reduced). */
 function useCoinHop(ref: RefObject<HTMLElement | null>, live: SatchelSnapshot) {
-  const prev = useRef<Map<string, bigint | null> | null>(null);
+  const prev = useRef<Map<string, bigint> | null>(null);
   useEffect(() => {
-    const now = new Map(holdings(live).map((h) => [h.key, h.amount] as const));
+    const now = new Map(overview(live).coins.map((c) => [c.coin, c.amount] as const));
     const before = prev.current;
     prev.current = now;
     if (!before || readMotionMode() === "reduce") return;
-    for (const [key, b] of now) {
-      const a = before.get(key);
-      if (a == null || b == null || b <= a) continue;
-      const coin = ref.current?.querySelector(`[data-holding="${key}"] svg`);
-      if (coin) play(hopTracks(coin), 320);
+    for (const [coin, b] of now) {
+      const a = before.get(coin) ?? 0n;
+      if (b <= a) continue;
+      const el = ref.current?.querySelector(`[data-card-coin="${coin}"] svg`);
+      if (el) play(hopTracks(el), 320);
     }
   }, [live, ref]);
 }
@@ -201,7 +201,7 @@ export function ViewerCard({ snap, sub = false }: { snap: SatchelSnapshot; sub?:
   useCoinHop(ref, v.live);
   return (
     <div ref={ref} className={sub ? "max-lg:hidden" : undefined}>
-      <SatchelCard tokenId={v.live.token_id} size="lg" status={cardStatus(v)} owned={v.isOwner} chips={cardChips(v.live)} id="satchel-card" />
+      <SatchelCard tokenId={v.live.token_id} size="lg" status={cardStatus(v)} owned={v.isOwner} contents={overview(v.live)} id="satchel-card" />
     </div>
   );
 }

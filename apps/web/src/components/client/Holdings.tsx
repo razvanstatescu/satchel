@@ -16,7 +16,9 @@ import type { SatchelSnapshot } from "@/lib/data/types";
 import { evmAddressLink, evmExplorerName } from "@/lib/evm-networks";
 import { formatAmount } from "@/lib/format";
 import { findHolding, hasCoins, holdings, splitHoldings, type Holding } from "@/lib/holdings";
+import { overview } from "@/lib/overview";
 import { explorerFor } from "@/lib/view";
+import { OverviewPanel } from "@/components/Overview";
 
 /**
  * The Wallet tab's one holdings list (Mobbin: Uniswap, Base and Trust Wallet's token rows): every coin a Satchel holds,
@@ -89,6 +91,12 @@ function HoldingRow({ tokenId, live, h }: { tokenId: string; live: SatchelSnapsh
       </Link>
     </li>
   );
+}
+
+/** The Wallet tab's "at a glance" (D-50), above the holdings list: the estimate, the bar, the top five coins. */
+export function InsideOverview({ snap }: { snap: SatchelSnapshot }) {
+  const live = useLiveSnapshot(snap);
+  return <OverviewPanel ov={overview(live)} />;
 }
 
 const LIST = "m-0 list-none p-0 [&>li:first-child>a]:rounded-t-md [&>li:last-child>a]:rounded-b-md";

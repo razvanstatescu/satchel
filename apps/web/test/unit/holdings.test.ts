@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { USDC_CONTRACT } from "@/lib/config";
 import type { SatchelSnapshot } from "@/lib/data/types";
-import { cardRows, findHolding, holdings, holdingText, INSIDE_NETWORK_NAME, splitHoldings } from "@/lib/holdings";
+import { findHolding, holdings, holdingText, INSIDE_NETWORK_NAME, splitHoldings } from "@/lib/holdings";
 import { WNEAR_TESTNET } from "@/lib/near/contract";
-import { cardChips } from "@/lib/view";
 
 /** The one holdings list (lib/holdings.ts): the Wallet tab's rows, the card's ledger and the buyer's "You get". */
 
@@ -103,43 +102,5 @@ describe("splitHoldings: what the Wallet tab shows, and what folds away", () => 
   it("an unavailable place stays visible, so a failed read is never hidden", () => {
     const s: Snap = { ...EMPTY, balances: { ...EMPTY.balances, evm_chains: [...EMPTY.balances.evm_chains!.slice(0, 3), { chain_id: 11155420, wei: null, usdc: "0" }] } };
     expect(splitHoldings(holdings(s)).shown.map((h) => h.key)).toContain("evm-11155420-eth");
-  });
-});
-
-describe("the card's ledger", () => {
-  it("fills three rows with the home coins when it holds nothing", () => {
-    const { rows, more } = cardRows(holdings(EMPTY));
-    expect(rows.map((h) => h.key)).toEqual(["btc", "evm", "sol"]);
-    expect(more).toBe(0);
-  });
-
-  it("shows what it holds first, and counts what didn't fit", () => {
-    const list = holdings(snap({ btc: "1000", baseEth: "20000000000000000", sepUsdc: "25000000", near: "1", wnear: "2" }));
-    const { rows, more } = cardRows(list);
-    expect(rows.map((h) => h.key)).toEqual(["btc", "evm-11155111-usdc", "evm-84532-eth"]);
-    expect(more).toBe(2);
-  });
-
-  it("a single holding sits beside two home coins", () => {
-    expect(cardRows(holdings(snap({ usdc: "5000000" }))).rows.map((h) => h.key)).toEqual(["inside-usdc", "btc", "evm"]);
-  });
-
-  it("cardChips: three rows with coins and stickers, then the overflow for the '+N more' stack", () => {
-    const chips = cardChips(snap({ btc: "1000", baseEth: "20000000000000000", sepUsdc: "25000000", near: "1000000000000000000000000" }));
-    expect(chips.filter((c) => !c.overflow).map((c) => [c.key, c.coin, c.badge ?? null, c.chain ?? null])).toEqual([
-      ["btc", "BTC", null, "btc"],
-      ["evm-11155111-usdc", "USDC", "sepolia", null],
-      ["evm-84532-eth", "ETH", "base", null],
-    ]);
-    expect(chips.filter((c) => c.overflow).map((c) => [c.key, c.amount])).toEqual([["inside-near", "1"]]);
-  });
-
-  it("cardChips on an empty Satchel keeps the three home coins at zero (the card draws a muted 0), no overflow", () => {
-    const chips = cardChips(EMPTY);
-    expect(chips.map((c) => [c.chain, c.ticker, c.amount, c.overflow ?? false])).toEqual([
-      ["btc", "BTC", "0.0000", false],
-      ["evm", "ETH", "0.0000", false],
-      ["sol", "SOL", "0.0000", false],
-    ]);
   });
 });

@@ -1,5 +1,6 @@
 "use client";
 
+import { overview } from "@/lib/overview";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowUpRight, Check, LoaderCircle, Lock, Snowflake, TriangleAlert, Wallet } from "lucide-react";
 import { ConnectButton } from "@/components/client/ConnectButton";
@@ -15,7 +16,7 @@ import { calls, contractViews } from "@/lib/near/contract";
 import { dataSource } from "@/lib/data/source";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { useWallet } from "@/lib/near/wallet";
-import { cardChips, holdingsSentence } from "@/lib/view";
+import { holdingsSentence } from "@/lib/view";
 
 /**
  * Give by link (A2, plan/feature-ideas.md A2): Review → one wallet approval (funds the fresh implicit account, then
@@ -138,7 +139,7 @@ export function GiveLinkFlow({ snap }: { snap: SatchelSnapshot }) {
     meta = copy.giveLink.stepReview;
     body = (
       <>
-        <SatchelCard tokenId={snap.token_id} id={`give-link-card-${snap.token_id}`} size="md" status={status} owned chips={cardChips(live)} headingLevel={3} className="self-center" />
+        <SatchelCard tokenId={snap.token_id} id={`give-link-card-${snap.token_id}`} size="md" status={status} owned contents={overview(live)} headingLevel={3} className="self-center" />
         <p className="m-0 font-sans text-body text-ink-muted">{copy.giveLink.reviewBody}</p>
         <ul className="m-0 flex list-none flex-col gap-2.5 p-0 font-sans text-body text-ink">
           <li className="flex items-start gap-2.5">

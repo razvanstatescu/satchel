@@ -105,20 +105,6 @@ export function splitHoldings(list: Holding[]): { shown: Holding[]; empty: Holdi
   return { shown: [...held, ...core], empty };
 }
 
-/**
- * The card's ledger (SatchelCard): at most `max` rows, what it holds first; with fewer than `max` holdings the home
- * coins fill the rest (at zero), so every card shows three lines. `more` counts the holdings that didn't fit.
- */
-export function cardRows(list: Holding[], max = 3): { rows: Holding[]; more: number } {
-  const held = list.filter(hasCoins);
-  const rows = held.slice(0, max);
-  for (const h of list) {
-    if (rows.length >= max) break;
-    if (h.core && !rows.includes(h)) rows.push(h);
-  }
-  return { rows, more: Math.max(0, held.length - max) };
-}
-
 /** "0.0412 BTC", "0 USDC", or null when unavailable. */
 export function holdingText(h: Holding, withTicker = true): string | null {
   if (h.amount === null) return null;

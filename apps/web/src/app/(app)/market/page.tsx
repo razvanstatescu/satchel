@@ -1,3 +1,4 @@
+import { overview } from "@/lib/overview";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -7,7 +8,7 @@ import { SatchelCard } from "@/components/SatchelCard";
 import { Banner, Button, EmptyState } from "@/components/ui";
 import { copy } from "@/lib/copy";
 import { getMarket, getUnlistedMarket } from "@/lib/data/server";
-import { cardChips, priceText } from "@/lib/view";
+import { priceText } from "@/lib/view";
 import { MarketCard } from "./MarketCard";
 
 /**
@@ -73,7 +74,7 @@ export default async function MarketPage() {
               <li key={e.token_id} data-market-item={e.token_id} className="group/mkt relative flex w-full max-w-100 min-w-0 flex-col gap-3">
                 {/* the card is real content (its name heading and its ledger for assistive tech); the link below
                     stretches over the whole item, so a tap anywhere opens the listing */}
-                <MarketCard id={cardId} tokenId={e.token_id} owner={e.listing.seller} chips={cardChips(e.snapshot)} />
+                <MarketCard id={cardId} tokenId={e.token_id} owner={e.listing.seller} contents={overview(e.snapshot)} />
                 <Link
                   href={`/s/${e.token_id}/sale`}
                   data-press=""
@@ -107,7 +108,7 @@ export default async function MarketPage() {
               <li key={e.token_id} data-unlisted-item={e.token_id} className="group/mkt relative flex w-full max-w-100 min-w-0 flex-col gap-2.5">
                 {/* same split as the listed grid above: the card is real content, the link below it (not around it,
                     so axe's label-content-name-mismatch stays clean) stretches over the whole item. */}
-                <SatchelCard id={`unlisted-card-${e.token_id}`} tokenId={e.token_id} size="lg" status={e.snapshot.status} chips={cardChips(e.snapshot)} headingLevel={2} />
+                <SatchelCard id={`unlisted-card-${e.token_id}`} tokenId={e.token_id} size="lg" status={e.snapshot.status} contents={overview(e.snapshot)} headingLevel={2} />
                 <Link
                   href={`/s/${e.token_id}/offer`}
                   data-press=""

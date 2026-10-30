@@ -4,7 +4,7 @@
  *
  * Rules (voice-copy §1, enforced by test/unit/config-copy-theme.test.ts): sentence case; verb first, one verb per action
  * (Give → Giving… → Given; List for sale → Listing… → Listed, the state "Paused for sale"; Stop selling; Add coins);
- * no plumbing words, no cooldown, no fiat (D-37: native only); never "no signature exists"; icons carry the glyphs; a
+ * no plumbing words, no cooldown, no fiat outside the labelled overview estimate (D-50: "≈ $X" + "at mainnet prices"); never "no signature exists"; icons carry the glyphs; a
  * no-break space before every ticker; straight apostrophes. Strings name Bitcoin, Ethereum and Solana through
  * `copy/chains.ts` (SOL_UI_ENABLED, on by default since D-46); the landing always names all three (D-45).
  *
