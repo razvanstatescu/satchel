@@ -632,3 +632,19 @@ The only increase is the `prepay_storage` receiver check (+0.009 Tgas). The stri
 code to skip unknown fields; the wasm is 1,360 B smaller). Every path stays far inside its attached gas, and no gas
 constant (`PAYOUT_FT_GAS_TGAS` 15, `ON_PAYOUT_GAS_TGAS` 10, the app's `ATTACH`) needs to move. `gas.rs` floor and
 forwarding: 14.13 / 23.95 / 42.65 / 97.91 Tgas for n = 1 / 2 / 4 / 10, the same as §7.5.
+
+**dev2 redeployed** (2026-10-31, state kept, no migration: no borsh type changed). `near contract deploy
+dev2.satchelhq.testnet use-file target/near/satchel/satchel.wasm without-init-call network-config testnet-fastnear
+sign-with-legacy-keychain send`, tx `DTRoJfs1UtgR2EEvoDiBBDydaCWcfPjj17WvY9e9FBcd`. Live checks (FastNEAR RPC, then dRPC):
+- `code_hash` = `6EsFZzrxdi85EaqYwzNB8m2pKVDqkXBAyHJcAJRVei8q` (base58 of sha256 `4dd7cde9…aed2`); storage 429,065 →
+  427,705 B (the 1,360 B smaller code).
+- Views: `config()` unchanged (`version` 1.0.0, MPC `v1.signer-prod.testnet`, Circle USDC, 4 EVM chains);
+  `nft_total_supply` = 4; Satchel #1 still `alice`, 8 signatures. `market_totals()` all 0 before and after.
+- Q-03 live, with alice's own Satchel #3 (cost ≈ 0.001 NEAR of storage plus gas): `deposit_near` 0.002 NEAR → 0.0013
+  credited (`FWp8PgyEs4BmpagWL2ssFrND3zXi3ivcnPuQCsBYFHL6`); `withdraw_near(3, 0.0013 NEAR, receiver
+  v1.signer-prod.testnet)` → **`ERR_BAD_RECEIVER: receiver would strand the funds`**
+  (`BiAn6me7z48iUXsaJduFv3RYU5Yk8NE2Wja64wbgJxT5`), inside balance and epoch unchanged; `withdraw_near` back to alice
+  delivered `true` (`4vJ2rMJhJxtngG2d4xRSXP86DLJvj2ruN4E7ZvYQ5x8Z`), #3 now `near 0, inside_epoch 1`.
+- Note: for about a minute after the deploy, dRPC answered `MethodNotFound` to `config` / `nft_tokens` while FastNEAR
+  already served the new code; dRPC then caught up. A view right after a deploy should be read from two RPCs.
+- `apps/web/.env.production`: `NEXT_PUBLIC_EXPECTED_CODE_HASH` = `4dd7cde9…aed2`.

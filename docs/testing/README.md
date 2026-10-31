@@ -50,7 +50,9 @@ sheet to settle and rounds to 0.01 px, and axe waits for finite animations to en
 **dev2 runs the fixed contract.** `dev2.satchelhq.testnet` was redeployed on 2026-10-30 with wasm sha256
 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3`. This is a non-reproducible dev build; the reproducible
 build is for the rc. The state was kept (4 Satchels, #1 with 8 signatures). `listings(from_index = 2^32)` answers `[]` live.
-`apps/web/.env.production` expects that hash.
+`apps/web/.env.production` expects that hash. **Redeployed again on 2026-10-31** with the Q-03/Q-04 fixes: wasm sha256
+`4dd7cde9da18d6a455993f1e1484c8f0140672144d368153948cc9a10050aed2` (non-reproducible), state kept, tx
+`DTRoJfs1UtgR2EEvoDiBBDydaCWcfPjj17WvY9e9FBcd`; `.env.production` now expects that hash.
 
 ## Round two (2026-10-30/31)
 
