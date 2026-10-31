@@ -99,8 +99,11 @@ async fn gas_heavy_paths() -> Result<()> {
     Ok(())
 }
 
-/// How the contract's own balance moves around a call with no deposit kept: on nearcore 2.13.4 it grows by the
-/// function-call reward (≈ 30 % of the gas burnt by the receipt); printed, not asserted, so both versions pass.
+/// How the contract's own balance moves around a call that keeps no deposit. Measured 2026-10-31: on nearcore 2.13.4 it
+/// grows by a share of the receipt's burnt gas (a 1.49 Tgas failed call: +1.80e19 yocto, ≈ 12 % of its 1.49e20 yocto
+/// of gas); on 2.14.0-rc.5 (testnet) it does not grow at all (Δ 0; `nft_transfer` Δ = the 1 yocto it keeps). So on
+/// testnet the M-01 buffer that pays new holders' storage is never topped up by usage. Printed, not asserted, so both
+/// versions pass (docs/testing/contract.md §7.2).
 #[tokio::test]
 async fn contract_balance_after_calls() -> Result<()> {
     let env = setup().await?;

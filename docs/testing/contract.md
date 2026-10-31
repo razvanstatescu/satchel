@@ -352,6 +352,26 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 | Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: see the next row |
 | New sandbox file `round2.rs`, default 2.13.4 (from 63e2553) | **7 passed** on the first run, 21 s |
 | New unit tests `allowance_tests::r2_*` | **5 passed** |
+| Sandbox on 2.14, re-run one file at a time (2026-10-31): `storage`, `transfer`, `usdc`, `views` | **4 + 7 + 7 + 2 passed**. `storage.rs` byte deltas identical to 2.13.4 (mint 639 B, list 260 B, EVM 276/268 B, BTC×3 723 B, SOL 237 B). The earlier failures were sandbox start-up only (port binding after ≈ 8 min of back-to-back sandboxes); a first re-run of all four files together failed the same way |
+| **Sandbox on 2.14, total** | **127 / 127 of the existing suite pass** (107 first pass + 20 re-run), plus `round2.rs` 7/7 and `gas_paths.rs` 2/2 on 2.14 |
+
+**Differences between 2.13.4 and 2.14.0-rc.5** (same wasm, same tests):
+
+1. **The contract's balance no longer grows with usage on 2.14.** `gas_paths::contract_balance_after_calls`: a failed
+   1.49 Tgas call adds +1.80e19 yocto to the contract on 2.13.4 (a share of the burnt gas, ≈ 12 %) and **0** on 2.14;
+   `nft_transfer` adds +6.40e19 on 2.13.4 and exactly the 1 yocto it keeps on 2.14. The M-01 lines agree:
+   `market::m01_*` on 2.13.4 ends with more slack than it started with (455.36 → 524.72 mNEAR-scale units after the
+   refused transfer), on 2.14 the slack is unchanged (455.36 → 455.36). Consequence (testnet runs 2.14): the free NEAR
+   that pays a new holder's storage on `nft_transfer` / `buy` / `accept_offer` (M-01, `ensure_solvent`) is only the
+   birth Transfer plus plain Transfers anyone sends later; usage never refills it. Once it is spent those calls refuse
+   `ERR_INSOLVENT` (escrow stays safe; that is what M-01 guards). Not a contract bug; an operational note for the
+   keyless birth: size the birth Transfer for the expected number of new holders (≈ 0.001–0.002 NEAR each), and note
+   that a plain Transfer to the keyless account still tops it up. All tests pass on both versions because none
+   relied on the reward.
+2. Gas: identical to ±0.002 Tgas for every contract receipt (`gas_paths`, `gas.rs`, `on_payout` 1.862 Tgas, birth
+   88.8 Tgas, `history_digest` ceilings 3,000 / 2,000 records). The ±0.22 Tgas swing in tx totals happens on both
+   versions and on the same wasm (noise from the mock's yield/resume).
+3. Behaviour: none. Every assertion, every refusal code, every event and every storage delta is the same.
 | Differential, seed 20261030 (`target/fuzz-corpus-r2`), 100,000 per kind (evm, btc, sol, msg = 400k) | **0 disagreements**, no TS throw. TS generation 12.7 s CPU; Rust replay (release) 13.9 s. Agreed: EVM 17,711 ok + 82,289 refused; BTC 25,426 + 74,574; SOL 24,904 + 75,096; msg 49,512 + 50,488. The Rust oracles agreed with the contract on every line |
 | Differential, seed 7 (`target/fuzz-corpus-r2b`), EVM 300,000 + 100,000 btc/sol/msg (600k) | **0 disagreements**, no TS throw. TS generation 17.4 s; Rust replay 18.9 s. Agreed: EVM 52,395 ok + 247,605 refused; BTC 25,387 + 74,613; SOL 25,008 + 74,992; msg 49,177 + 50,823 |
 
