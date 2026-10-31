@@ -129,3 +129,9 @@
 - 2026-10-31T14:47Z [test-core2] done: round two complete — core 540 tests (18 files), web unit 601 tests (46 files), tools 92 unchanged; typecheck/lint clean; live smoke against dev2 clean (code hash matched); docs updated. Branch test/core2 @ 3ad5e73, not pushed.
 - 2026-10-31T14:50Z [ui-e2e-round2] target2: keyboard-send.spec.ts passing (1 test, full keyboard-only Send)
 - 2026-10-31T14:52Z [test/contract2 round two] done: contract test audit round two on test/contract2 (unit 199, sandbox 136 on 2.13.4 and 2.14, 1M-case differential 0 disagreements, gas unchanged by the fixes, no contract bug; R2-01 web Low, Q-03/Q-04 pinned for Razvan)
+- 2026-10-31T14:54Z [ui-e2e-round2] target3: reject-coverage.spec.ts passing (8 tests); found 'timeout' knob is a no-op for plain NEAR calls
+- 2026-10-31T14:56Z [ui-e2e-round2] target4: delegate-btc-one-coin.spec.ts passing (2 tests)
+- 2026-10-31T14:58Z [ui-e2e-round2] target5: dust-amounts.spec.ts passing (4 tests); confirmed BTC has a real 294-sat dust floor (unpolished error copy), SOL E25 reachable
+- 2026-10-31T14:59Z [ui-e2e-round2] target6: address-book-dropdown.spec.ts passing (4 tests)
+- 2026-10-31T15:04Z [ui-e2e-round2] docs: wrote round two write-up (targets 1-6, findings); typecheck/lint/unit all pass; full e2e suite running
+- 2026-10-31T15:14Z [ui-e2e-round2] done: full suite 286/286 passing (21 new tests, stale duplicate spec removed); typecheck/lint/unit all clean; no bugs found
