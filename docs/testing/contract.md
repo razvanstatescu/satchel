@@ -359,15 +359,14 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 
 1. **The contract's balance no longer grows with usage on 2.14.** `gas_paths::contract_balance_after_calls`: a failed
    1.49 Tgas call adds +1.80e19 yocto to the contract on 2.13.4 (a share of the burnt gas, ≈ 12 %) and **0** on 2.14;
-   `nft_transfer` adds +6.40e19 on 2.13.4 and exactly the 1 yocto it keeps on 2.14. The M-01 lines agree:
-   `market::m01_*` on 2.13.4 ends with more slack than it started with (455.36 → 524.72 mNEAR-scale units after the
-   refused transfer), on 2.14 the slack is unchanged (455.36 → 455.36). Consequence (testnet runs 2.14): the free NEAR
-   that pays a new holder's storage on `nft_transfer` / `buy` / `accept_offer` (M-01, `ensure_solvent`) is only the
-   birth Transfer plus plain Transfers anyone sends later; usage never refills it. Once it is spent those calls refuse
-   `ERR_INSOLVENT` (escrow stays safe; that is what M-01 guards). Not a contract bug; an operational note for the
-   keyless birth: size the birth Transfer for the expected number of new holders (≈ 0.001–0.002 NEAR each), and note
-   that a plain Transfer to the keyless account still tops it up. All tests pass on both versions because none
-   relied on the reward.
+   `nft_transfer` adds +6.40e19 yocto on 2.13.4 and exactly the 1 yocto it keeps on 2.14. The M-01 lines agree:
+   `market::m01_transfer_*` ends with more slack than it started with on 2.13.4 (0.4554 → 0.5247 mNEAR after the
+   refused transfer) and with the same slack on 2.14 (0.4554 → 0.4554 mNEAR). Impact: small. The reward was ≈ 0.000064
+   NEAR per transfer against the ≈ 0.0025 NEAR (250 B, S-02) a first-time holder costs the contract, so the S-02 /
+   M-01 sizing (fund the birth generously; anyone can top up the keyless account with a plain Transfer; `ensure_solvent`
+   refuses `ERR_INSOLVENT` before escrow is touched) is unchanged. On testnet (2.14) the free buffer only ever goes down
+   with usage, so a drain rehearsed on the 2.13 sandbox would look slightly better than testnet. No test relied on the
+   reward, so every test passes on both versions.
 2. Gas: identical to ±0.002 Tgas for every contract receipt (`gas_paths`, `gas.rs`, `on_payout` 1.862 Tgas, birth
    88.8 Tgas, `history_digest` ceilings 3,000 / 2,000 records). The ±0.22 Tgas swing in tx totals happens on both
    versions and on the same wasm (noise from the mock's yield/resume).
