@@ -530,3 +530,20 @@ Tgas (`release::keyless_birth_batch`), `history_digest` fits 3,000 EVM records (
   Razvan (§7.4).
 - Not done in round two: the C5-debit differential (§5), a web test for R2-01 (another lane), real Circle USDC and real
   MPC behaviour (no testnet transactions).
+
+### 7.7 Q-03 and Q-04 fixed (2026-10-31, branch `fix/q03-q04`, from `main` 2ed9759)
+
+Razvan approved option (b) for both (§7.4).
+
+**Audit before Q-04: no client sends an extra msg field.** Every `ft_transfer_call` msg the repo builds was read:
+
+| Builder | msg | Fields |
+|---|---|---|
+| `apps/web/src/lib/near/contract.ts` `contractCalls.buyUsdc` (line 182) | `{"buy":{token_id, listing_id, expected_sig_count}}` | exactly `FtMsg::Buy` |
+| `packages/core/src/near/market.ts` `ftBuyMsg` | `{"buy":{token_id, listing_id, expected_sig_count}}` | exactly `FtMsg::Buy` |
+| `packages/core/src/near/market.ts` `ftDepositMsg` (used by `ftDepositCall`, web `marketCalls.ftDeposit`) | `{"deposit":"<id>"}` | exactly `FtMsg::Deposit` |
+| `packages/core/src/near/market.ts` `ftOfferMsg` (used by `usdcOfferCall`, web `marketCalls.makeOfferUsdc`) | `{"offer":{token_id, expected_sig_count, expected_inside_epoch, expires_at_ms}}` | exactly `OfferMsg` |
+| `tools/e2e/plans.ts` `buyMsg` (`buyUsdcPlan`, `directFtOnTransferPlan`) | `{"buy":{token_id, listing_id, expected_sig_count}}` | exactly `FtMsg::Buy` |
+
+`apps/web/src/lib/near/mock-wallet.ts` only parses these msgs (for the simulator); it builds none. So denying unknown
+fields refuses nothing the app or the tools send today.
