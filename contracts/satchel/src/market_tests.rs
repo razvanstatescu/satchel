@@ -1447,6 +1447,67 @@ proptest! {
         }
     }
 
+    /// Q-04: inserting ANY key (unknown, or a duplicate of a real field) at any position of any of the three msg
+    /// types, with any value, at the top level or inside `buy` / `offer`, is refused with ERR_BAD_MSG and changes
+    /// nothing; the msg without the inserted key is accepted.
+    #[test]
+    fn prop_ft_msg_any_extra_key_is_refused(
+        kind in 0usize..3,
+        inner in any::<bool>(),
+        pos in 0usize..8,
+        key in prop_oneof![
+            "[a-z_]{1,14}",
+            Just("token_id".to_string()), Just("listing_id".to_string()), Just("expected_sig_count".to_string()),
+            Just("receiver_id".to_string()), Just("buy".to_string()), Just("offer".to_string()), Just("deposit".to_string()),
+        ],
+        val in prop_oneof![Just("null"), Just("1"), Just("\"x\""), Just("{}"), Just("[]"), Just("true"), Just("\"1\"")],
+    ) {
+        let mut c = setup();
+        let id = mint_to(&mut c, alice());
+        Ctx::new(alice()).dep(10 * MILLI).set();
+        let lid = c.list(id.clone(), U128(5_000_000), Currency::Usdc);
+        Ctx::new(bob()).dep(10 * MILLI).set();
+        c.prepay_storage(None);
+        let (tag, fields): (&str, Vec<String>) = match kind {
+            0 => ("buy", vec![format!("\"token_id\":\"{id}\""), format!("\"listing_id\":{lid}"), "\"expected_sig_count\":0".into()]),
+            1 => ("offer", vec![
+                format!("\"token_id\":\"{id}\""), "\"expected_sig_count\":0".into(), "\"expected_inside_epoch\":0".into(),
+                format!("\"expires_at_ms\":{}", T0 + DAY),
+            ]),
+            _ => ("deposit", vec![]),
+        };
+        let extra = format!("\"{key}\":{val}");
+        let body = |extra_inner: Option<&str>| match kind {
+            2 => format!("\"{id}\""),
+            _ => {
+                let mut f = fields.clone();
+                if let Some(e) = extra_inner {
+                    f.insert(pos % (f.len() + 1), e.to_string());
+                }
+                format!("{{{}}}", f.join(","))
+            }
+        };
+        let msg = if inner && kind != 2 {
+            format!("{{\"{tag}\":{}}}", body(Some(&extra)))
+        } else if pos % 2 == 0 {
+            format!("{{\"{tag}\":{},{extra}}}", body(None))
+        } else {
+            format!("{{{extra},\"{tag}\":{}}}", body(None))
+        };
+        let amount = if kind == 0 { 5_000_000 } else { 3_000_000 };
+        let s0 = (c.owner_of(&id), inside(&c, &id), totals(&c), c.offers_for(id.clone(), 0, 50).len(), c.storage_credit_of(bob()));
+        Ctx::new(usdc()).set();
+        let e = panic_msg(|| c.ft_on_transfer(bob(), U128(amount), msg.clone()));
+        prop_assert!(e.as_deref().is_some_and(|e| e.starts_with("ERR_BAD_MSG: ")), "{msg} → {e:?}");
+        prop_assert!(logged_event_names().is_empty() && get_created_receipts().is_empty(), "{msg}");
+        prop_assert_eq!(&(c.owner_of(&id), inside(&c, &id), totals(&c), c.offers_for(id.clone(), 0, 50).len(), c.storage_credit_of(bob())), &s0);
+        // the same msg without the inserted key is accepted
+        let exact = format!("{{\"{tag}\":{}}}", body(None));
+        Ctx::new(usdc()).set();
+        let r = c.ft_on_transfer(bob(), U128(amount), exact.clone());
+        prop_assert!(matches!(r, PromiseOrValue::Value(U128(0))), "{exact}");
+    }
+
     /// `ft_on_transfer` never panics with anything but a stable code, whatever the msg (the FT refunds on a panic).
     #[test]
     fn prop_ft_msg_garbage_is_refused_cleanly(msg in ".{0,120}", amount in 1u128..u128::MAX) {
@@ -1608,25 +1669,41 @@ fn audit_offer_pages_edges() {
     assert_eq!(c.offers_by(bob(), 0, u32::MAX).iter().map(|o| o.id).collect::<Vec<_>>(), vec![1, 3]);
 }
 
-/// `ft_on_transfer` msg parsing (serde defaults): unknown extra fields inside a known shape are IGNORED (accepted),
-/// two top-level keys, a numeric token id or a wrong case are refused. Pinned so a parser change is visible.
+/// `ft_on_transfer` msg parsing. Q-04 (FIXED): `deny_unknown_fields` on `FtMsg` and `OfferMsg`, so an unknown extra
+/// field inside a known shape is now REFUSED (it used to be ignored); two top-level keys, a numeric token id, a wrong
+/// case, a missing or a duplicate field were already refused. Pinned so a parser change is visible.
 #[test]
-fn audit_ft_msg_lenient_and_strict_cases() {
+fn audit_ft_msg_strict_cases() {
     let ok = [
-        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4,"price":"1"}}"#,
-        r#"{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1,"x":null}}"#,
+        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4}}"#,
+        r#"{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1}}"#,
+        r#"{"deposit":"3"}"#,
+        // field order and whitespace are free
+        r#" { "buy" : { "expected_sig_count" : 4 , "listing_id" : 7 , "token_id" : "3" } } "#,
     ];
     for m in ok {
         assert!(serde_json::from_str::<FtMsg>(m).is_ok(), "{m}");
     }
     let bad = [
+        // Q-04: unknown fields, now refused
+        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4,"price":"1"}}"#,
+        r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4,"receiver_id":"carol.testnet"}}"#,
+        r#"{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1,"x":null}}"#,
+        r#"{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1,"amount":"1"}}"#,
+        r#"{"buy":{"tokenId":"3","token_id":"3","listing_id":7,"expected_sig_count":4}}"#,
+        // already refused
         r#"{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4},"deposit":"3"}"#,
+        r#"{"deposit":"3","receiver_id":"carol.testnet"}"#,
+        r#"{"buy":{"token_id":"3","token_id":"2","listing_id":7,"expected_sig_count":4}}"#,
         r#"{"deposit":3}"#,
         r#"{"Deposit":"3"}"#,
         r#"{"buy":{"token_id":"3","listing_id":-1,"expected_sig_count":4}}"#,
         r#"{"buy":{"token_id":"3","listing_id":7}}"#,
         r#""deposit""#,
         r#"{}"#,
+        "null",
+        "[]",
+        r#""""#,
         "",
     ];
     for m in bad {
@@ -1636,7 +1713,60 @@ fn audit_ft_msg_lenient_and_strict_cases() {
     let mut c = setup();
     mint_to(&mut c, alice());
     Ctx::new(usdc()).set();
-    expect_err(ERR_BAD_MSG, || c.ft_on_transfer(bob(), U128(1), bad[0].into()));
+    for m in bad {
+        expect_err(ERR_BAD_MSG, || c.ft_on_transfer(bob(), U128(1), m.into()));
+    }
+}
+
+/// Q-04 (FIXED): an unknown field in each msg type `ft_on_transfer` parses (buy, offer, deposit) is refused with
+/// ERR_BAD_MSG before anything happens: the NFT does not move, nothing is escrowed or credited, no storage credit is
+/// spent, no event is logged and no promise is created. The exact msgs still work afterwards.
+#[test]
+fn q04_unknown_msg_fields_are_refused_and_change_nothing() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(5_000_000), Currency::Usdc);
+    for who in [bob(), carol()] {
+        Ctx::new(who).dep(10 * MILLI).set();
+        c.prepay_storage(None);
+    }
+    let buy = json!({"buy":{"token_id":id,"listing_id":lid,"expected_sig_count":0}});
+    let offer = offer_msg(&id, 0, 0, T0 + DAY);
+    let deposit = deposit_msg(&id);
+    let with = |m: &Value, path: &[&str], k: &str, v: Value| {
+        let mut m = m.clone();
+        let mut at = &mut m;
+        for p in path {
+            at = &mut at[*p];
+        }
+        at[k] = v;
+        m.to_string()
+    };
+    let snap = |c: &Contract| (c.owner_of(&id), inside(c, &id), totals(c), c.offers_for(id.clone(), 0, 50), c.storage_credit_of(bob()), c.storage_credit_of(carol()));
+    let s0 = snap(&c);
+    let cases = [
+        (usdc(), carol(), 5_000_000, with(&buy, &["buy"], "receiver_id", json!("bob.testnet"))),
+        (usdc(), carol(), 5_000_000, with(&buy, &["buy"], "max_price", json!("5000000"))),
+        (usdc(), carol(), 5_000_000, with(&buy, &[], "receiver_id", json!("bob.testnet"))),
+        (usdc(), bob(), 3_000_000, with(&offer, &["offer"], "amount", json!("1"))),
+        (usdc(), bob(), 3_000_000, with(&offer, &["offer"], "min_sig_count", json!(0))),
+        (usdc(), bob(), 3_000_000, with(&offer, &[], "memo", Value::Null)),
+        (usdc(), bob(), 7, with(&deposit, &[], "receiver_id", json!("carol.testnet"))),
+        (wnear(), bob(), 7, with(&deposit, &[], "x", json!(1))),
+    ];
+    for (ft, sender, amount, m) in &cases {
+        Ctx::new(ft.clone()).set();
+        expect_err(ERR_BAD_MSG, || c.ft_on_transfer(sender.clone(), U128(*amount), m.clone()));
+        assert!(logged_event_names().is_empty() && get_created_receipts().is_empty(), "{m}");
+        assert_eq!(snap(&c), s0, "{m} changed state");
+    }
+    // the exact msgs still work
+    ft_call(&mut c, wnear(), bob(), 7, deposit.clone());
+    ft_call(&mut c, usdc(), bob(), 3_000_000, offer.clone());
+    assert_eq!(events("offer_made").len(), 1);
+    ft_call(&mut c, usdc(), carol(), 5_000_000, buy.clone());
+    assert_eq!(c.owner_of(&id), carol(), "the FT sender gets the NFT");
 }
 
 /// Names of every satchel/nep171 event logged by the last call (including a call that then panicked: on-chain, the

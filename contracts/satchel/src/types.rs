@@ -127,8 +127,12 @@ pub enum Currency {
 /// `{"buy":{"token_id":"3","listing_id":7,"expected_sig_count":4}}` (USDC),
 /// `{"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1793000000000}}` (USDC),
 /// `{"deposit":"3"}` (any allowlisted FT).
+/// Strict (Q-04): an unknown field anywhere (inside `buy`, inside `offer` via `OfferMsg`'s own attribute, or a second
+/// top-level key), a duplicate field, a missing field or any other shape fails to parse, so `ft_on_transfer` refuses
+/// ERR_BAD_MSG and the FT refunds 100 %. A future binding field (`receiver_id`, `max_price`, …) can never be silently
+/// ignored by this immutable contract. The bare JSON `null`, `{}` and the empty string are refused the same way.
 #[near(serializers = [json])]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
 #[derive(Clone, Debug)]
 pub enum FtMsg {
     Buy { token_id: TokenId, listing_id: u64, expected_sig_count: u64 },

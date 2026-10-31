@@ -337,35 +337,56 @@ async fn q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered()
 
 // ── Q-04: ft_on_transfer extra fields ───────────────────────────────────────────────────
 
-/// Q-04 (current behaviour, pinned; no change): unknown fields inside a known msg shape are IGNORED.
-/// - A buy msg with `receiver_id` (another account) and a lower `price`: the sale goes through at the listing price,
-///   the NFT goes to the FT sender, the extra fields have no effect.
-/// - An offer msg with an `amount` field different from the transferred amount: the offer escrows the transferred
-///   amount.
-/// - A duplicate field inside the object is refused (serde `duplicate field`), so the FT refunds 100 % — note that a
-///   JS client's `JSON.parse` would take the last value instead.
+/// Q-04 (FIXED 2026-10-31, docs/testing/contract.md §7.7): an unknown field in any `ft_on_transfer` msg is REFUSED
+/// (`deny_unknown_fields` on `FtMsg` and `OfferMsg`); before the fix it was ignored, so a buy carrying `receiver_id`
+/// still gave the NFT to the sender. On the real wasm with the mock FT, each refusal is `ERR_BAD_MSG`, the FT refunds
+/// 100 % (`ft_transfer_call` returns "0"), the NFT does not move, nothing is escrowed or credited and the contract logs
+/// no event. A duplicate field, the bare JSON `null` and `{}` stay refused the same way. The exact msgs still work.
 #[tokio::test]
-async fn q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused() -> Result<()> {
+async fn q04_ft_msg_unknown_fields_are_refused_and_refunded() -> Result<()> {
     let env = setup().await?;
     let lid = list_ok(&env, &env.alice, "1", 5 * USDC, "usdc").await?;
-    let dup = format!(r#"{{"buy":{{"token_id":"1","token_id":"2","listing_id":{lid},"expected_sig_count":0}}}}"#);
-    let b0 = ft_balance(&env, env.bob.id()).await?;
-    let r = ft_buy(&env, &env.bob, 5 * USDC, &dup).await?;
-    assert_eq!(used(&r), 0);
-    assert!(fail_text(&r).contains("ERR_BAD_MSG"), "{}", fail_text(&r));
-    assert_eq!(ft_balance(&env, env.bob.id()).await?, b0);
-    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string());
-    let msg = json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "receiver_id": env.carol.id(), "price": "1" } });
-    let r = ft_buy(&env, &env.bob, 5 * USDC, &msg.to_string()).await?;
-    assert_eq!(used(&r), 5 * USDC);
-    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string(), "the sender gets the NFT, receiver_id is ignored");
-    assert_eq!(events(&r, "sold")[0]["price"], (5 * USDC).to_string());
-    // offer with a misleading `amount`
     prepay(&env, &env.carol, 10 * MILLI).await?;
+    prepay(&env, &env.bob, 10 * MILLI).await?;
     let exp = now_ms(&env).await? + 3_600_000;
-    let msg = json!({ "offer": { "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": exp, "amount": "1" } });
-    let r = ft_buy(&env, &env.carol, 3 * USDC, &msg.to_string()).await?;
+    let offer = |extra: Option<(&str, Value)>| {
+        let mut o = json!({ "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": exp });
+        if let Some((k, v)) = extra {
+            o[k] = v;
+        }
+        json!({ "offer": o }).to_string()
+    };
+    let refused: Vec<(&Account, u128, String)> = vec![
+        (&env.bob, 5 * USDC, format!(r#"{{"buy":{{"token_id":"1","token_id":"2","listing_id":{lid},"expected_sig_count":0}}}}"#)),
+        (&env.bob, 5 * USDC, json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "receiver_id": env.carol.id(), "price": "1" } }).to_string()),
+        (&env.bob, 5 * USDC, json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "max_price": (5 * USDC).to_string() } }).to_string()),
+        (&env.carol, 3 * USDC, offer(Some(("amount", json!("1"))))),
+        (&env.carol, 3 * USDC, offer(Some(("memo", Value::Null)))),
+        (&env.bob, 2 * USDC, json!({ "deposit": "1", "receiver_id": env.carol.id() }).to_string()),
+        (&env.bob, 2 * USDC, "null".to_string()),
+        (&env.bob, 2 * USDC, "{}".to_string()),
+    ];
+    let credit = |who: &Account| view(&env, "storage_credit_of", json!({ "account_id": who.id() }));
+    let (cb, cc) = (credit(&env.bob).await?, credit(&env.carol).await?);
+    for (who, amount, msg) in &refused {
+        let b0 = ft_balance(&env, who.id()).await?;
+        let r = ft_buy(&env, who, *amount, msg).await?;
+        assert_eq!(used(&r), 0, "{msg}");
+        assert!(fail_text(&r).contains("ERR_BAD_MSG"), "{msg}: {}", fail_text(&r));
+        assert!(all_contract_event_names(&env, &r).is_empty(), "{msg}: {:?}", all_contract_event_names(&env, &r));
+        assert_eq!(ft_balance(&env, who.id()).await?, b0, "{msg}: refunded 100 %");
+    }
+    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string());
+    assert_eq!(inside(&env, "1").await?["fts"], json!([]));
+    assert_eq!(view(&env, "offers_for", json!({ "token_id": "1", "from_index": 0, "limit": 50 })).await?, json!([]));
+    assert_eq!((credit(&env.bob).await?, credit(&env.carol).await?), (cb, cc), "no storage credit spent");
+    assert_eq!(ft_balance(&env, env.satchel.id()).await?, 0, "the contract kept no USDC");
+    // the exact msgs still work
+    let r = ft_buy(&env, &env.carol, 3 * USDC, &offer(None)).await?;
     assert_eq!(used(&r), 3 * USDC);
     assert_eq!(events(&r, "offer_made")[0]["amount"], (3 * USDC).to_string());
+    let r = ft_buy(&env, &env.bob, 5 * USDC, &buy_msg("1", lid, 0)).await?;
+    assert_eq!(used(&r), 5 * USDC);
+    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string());
     Ok(())
 }
