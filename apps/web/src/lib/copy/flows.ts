@@ -46,6 +46,9 @@ export const flows = {
       solFormat: "That isn't a valid Solana address. Check it and try again.",
       solPda: "This is a program address with no private key. Coins sent there may be stuck. Check it carefully.",
       solRent: "A new Solana account needs at least 0.00065024 SOL. Send more.",
+      btcDust: (min: string) => `Bitcoin can't send that little to this address. Send at least ${min}.`,
+      btcTooSmall: "What's left after the network fee is too little to send. Send more.",
+      btcTooManyCoins: "This needs too many coins for one transaction. Send a smaller amount.",
     },
     sol: {
       E25: "This would leave an account below Solana's minimum balance (0.00065024 SOL). Send more, or send everything.",

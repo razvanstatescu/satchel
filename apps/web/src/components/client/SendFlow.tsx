@@ -73,6 +73,14 @@ function prepareErrorText(e: unknown, net?: string): string {
     case "btc_one_coin":
       return copy.allowance.send.oneCoin(formatAmount((e as { largest: bigint }).largest, "BTC"));
   }
+  // core's coin selection (@satchel/core/chains/btc SelectionError) names a code, not a sentence for people
+  const code = e instanceof Error && "code" in e ? String((e as { code: unknown }).code) : null;
+  if (code === "below_dust") {
+    const min = e instanceof Error ? e.message.match(/minimum is (\d+) sats/)?.[1] : undefined;
+    return min ? copy.send.val.btcDust(formatAmount(BigInt(min), "BTC")) : copy.send.val.btcTooSmall;
+  }
+  if (code === "insufficient" || code === "no_utxos") return copy.send.val.amountMax;
+  if (code === "too_many_inputs") return copy.send.val.btcTooManyCoins;
   return e instanceof Error ? e.message : String(e);
 }
 

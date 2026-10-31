@@ -22,7 +22,7 @@ const BTC_TO = "tb1qdkyxcms7phwyy2fn94tlng8f2zdsc74a8lpf3u";
 const SOL_TO = "8C3CxUxgsZL6AU44dEmtJXLKvKf8rroNGvcP8H9wJN1r";
 
 test.describe("BTC: the dust floor (294 sats for a p2wpkh recipient)", () => {
-  test("below dust is refused at Review, with core's raw message (unpolished, flagged in docs)", async ({ page }) => {
+  test("below dust is refused at Review, saying the minimum in BTC", async ({ page }) => {
     await useMockWallet(page, ALICE);
     await page.goto("/s/1/send?chain=btc");
     const flow = page.getByTestId("send-flow");
@@ -31,7 +31,8 @@ test.describe("BTC: the dust floor (294 sats for a p2wpkh recipient)", () => {
     await expect(flow.getByTestId("recipient-resolved")).toBeVisible();
     await flow.getByTestId("review").click();
     const error = flow.locator('[role="alert"]');
-    await expect(error).toContainText("294 sats", { timeout: 10_000 });
+    await expect(error).toContainText("0.00000294 BTC", { timeout: 10_000 });
+    await expect(error).not.toContainText("sats");
     await expect(flow.getByTestId("send")).toBeDisabled();
   });
 
