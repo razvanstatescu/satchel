@@ -350,6 +350,8 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 | Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
 | Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
 | Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: see the next row |
+| New sandbox file `round2.rs`, default 2.13.4 (from 63e2553) | **7 passed** on the first run, 21 s |
+| New unit tests `allowance_tests::r2_*` | **5 passed** |
 | Differential, seed 20261030 (`target/fuzz-corpus-r2`), 100,000 per kind (evm, btc, sol, msg = 400k) | **0 disagreements**, no TS throw. TS generation 12.7 s CPU; Rust replay (release) 13.9 s. Agreed: EVM 17,711 ok + 82,289 refused; BTC 25,426 + 74,574; SOL 24,904 + 75,096; msg 49,512 + 50,488. The Rust oracles agreed with the contract on every line |
 | Differential, seed 7 (`target/fuzz-corpus-r2b`), EVM 300,000 + 100,000 btc/sol/msg (600k) | **0 disagreements**, no TS throw. TS generation 17.4 s; Rust replay 18.9 s. Agreed: EVM 52,395 ok + 247,605 refused; BTC 25,387 + 74,613; SOL 25,008 + 74,992; msg 49,177 + 50,823 |
 
@@ -357,3 +359,35 @@ Commands (from the repo root): `pnpm --filter @satchel/tools fuzz:corpus --n 100
 ../target/fuzz-corpus-r2`, then `SATCHEL_FUZZ_CORPUS=target/fuzz-corpus-r2 cargo test -p satchel --lib --release
 differential -- --nocapture`. Total for round two: **1,000,000 differential cases, 0 disagreements** (round one
 skipped this run; the last deep run was 2026-10-29, 400k).
+
+### 7.5 Gas after the fixes
+
+Same machine, default sandbox 2.13.4, `--test-threads 1`. Pre-fix wasm = `cargo near build non-reproducible-wasm` of
+`4e42b47` (the parent of the first fix commit `c1d97d1`), sha256 `10c6a8e9…53353614a`, 423,977 B; post-fix wasm
+`9dd65286…49d1ebd9e3`, 423,019 B (−958 B). Run with `SATCHEL_WASM=<pre-fix wasm>` for the "before" column.
+
+`gas_paths.rs::gas_heavy_paths` (new; behaviour-neutral so it runs on both wasms). Total = every receipt of the tx;
+main = the contract's own first receipt.
+
+| Path | Before: total / main (Tgas) | After: total / main (Tgas) | Δ main |
+|---|---|---|---|
+| `set_allowance` (new delegate, 2 caps) | 2.996 / 2.233 | 2.995 / 2.232 | −0.001 |
+| `sign_for` EVM by a delegate (C5 debit) | 14.539 / 3.716 | 14.537 / 3.715 | −0.001 |
+| `sign_for` BTC 1 input by a delegate (+ AUDIT-01 check) | 15.196 / 4.088 | 15.194 / 4.087 | −0.001 |
+| `sign_for` BTC 10 inputs by the owner | 98.190 / 12.144 | 98.188 / 12.143 | −0.001 |
+| `nft_transfer` clearing 4 delegates (AUDIT-04 `move_token`) | 3.475 / 3.164 | 3.473 / 3.162 | −0.002 |
+| `buy` NEAR clearing 4 delegates | 7.035 / 4.348 | 7.034 / 4.348 | 0 |
+| `ft_transfer_call` USDC buy | 12.562 / 4.339 | 12.561 / 4.339 | 0 |
+| `make_offer` NEAR | 3.885 / 3.123 | 3.884 / 3.123 | 0 |
+| `accept_offer` on a listed token clearing 4 delegates | 8.002 / 5.317 | 8.001 / 5.316 | −0.001 |
+
+`gas.rs::floor_and_forwarding_{1,2,4,10}` (total burnt, two runs each): before 14.13 / 23.95–24.18 / 42.44–42.66 /
+97.91; after 14.13–14.35 / 23.95–24.17 / 42.43–42.66 / 97.91–98.13. The 0.22 Tgas step shows up on the SAME wasm
+between runs (it comes from the mock's yield/resume timing, not the contract), so it is noise. Earlier figures in
+`docs/handoff/sandbox.md` (13.8 / 23.6 / 42.1 / 97.6) predate C4–C7.
+
+**Result: the fixes changed no gas cost measurably** (every path within ±0.002 Tgas; the wasm is 958 B smaller because
+`move_token` replaced the standard's `internal_transfer` + `nft_transfer` path). No static gas constant needs to move:
+`on_payout` still burns 1.862 Tgas of its 10 Tgas (`security::on_payout_recredit_gas_margin`), the keyless birth 88.8
+Tgas (`release::keyless_birth_batch`), `history_digest` fits 3,000 EVM records (276.2 Tgas) and 2,000 1-KB messages
+(266.4 Tgas) in one call (`review::sr05_history_digest_gas_ceiling`), unchanged on 2.14.
