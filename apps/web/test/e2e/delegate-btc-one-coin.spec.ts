@@ -16,8 +16,7 @@ import { ALICE, useMockWallet } from "./helpers";
 const NINA = "nina.satchelhq.testnet";
 const BTC_TO = "tb1qdkyxcms7phwyy2fn94tlng8f2zdsc74a8lpf3u";
 
-async function grantNinaBtcCap(page: import("@playwright/test").Page) {
-  await useMockWallet(page, ALICE);
+async function setUpNinaBtcCap(page: import("@playwright/test").Page) {
   await page.goto("/s/1/allowance");
   const flow = page.getByTestId("allowance-flow");
   await flow.getByTestId("allowance-to").fill(NINA);
@@ -33,7 +32,8 @@ async function grantNinaBtcCap(page: import("@playwright/test").Page) {
 
 test.describe("AUDIT-01: a delegate's BTC send spends one coin at a time", () => {
   test("an amount neither coin alone can pay shows the one-coin message, naming the largest coin, before the wallet opens", async ({ page }) => {
-    await grantNinaBtcCap(page);
+    await useMockWallet(page, ALICE);
+    await setUpNinaBtcCap(page);
     await page.evaluate((who) => localStorage.setItem("satchel:mock-wallet", who), NINA);
     await page.goto("/s/1/send?chain=btc");
     const flow = page.getByTestId("send-flow");
@@ -54,7 +54,8 @@ test.describe("AUDIT-01: a delegate's BTC send spends one coin at a time", () =>
   });
 
   test("an amount that fits inside the larger coin sends normally", async ({ page }) => {
-    await grantNinaBtcCap(page);
+    await useMockWallet(page, ALICE);
+    await setUpNinaBtcCap(page);
     await page.evaluate((who) => localStorage.setItem("satchel:mock-wallet", who), NINA);
     await page.goto("/s/1/send?chain=btc");
     const flow = page.getByTestId("send-flow");
