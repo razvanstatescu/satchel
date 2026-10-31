@@ -4,8 +4,9 @@ import { classifySignRequest, signContextFromRecords } from "@satchel/core/polic
 import { prepareSend, checkEvmNonceGap } from "@/lib/chains/send";
 import { aggregate, counts, fixtureCleanReport, messageItem } from "@/lib/data/clean";
 import { FIXTURE_C2, FIXTURE_RECORDS, fixtureEvmChains } from "@/lib/data/fixtures";
-import { signRow } from "@/lib/data/server";
+import { liveActivityRows, signRow } from "@/lib/data/server";
 import type { LockFacts, SatchelSnapshot } from "@/lib/data/types";
+import type { SigRecordView } from "@/lib/near/types";
 import { satchelAddresses } from "@/lib/derive";
 import { anyEvmFunds, evmBalanceOf, evmBalances, pickEvmChainId } from "@/lib/evm-networks";
 import { blockingIntent } from "@/lib/signing/retry";
@@ -137,5 +138,38 @@ describe("Activity: sign_requested events (docs/specs/C1-C2-C3-C7.md §4.3)", ()
   it("a USDC transfer names the token, the recipient, the amount and the chain", () => {
     const row = signRow(base, { chain: "evm", details: [{ seq: 1, chain_id: 84532, nonce: 0, erc20: { token: "036c", to: "61739f33adbb7f76c1b5b222e4119085257528be", amount: "1500000" } }] }, []);
     expect(row).toMatchObject({ kind: "issued", token: "USDC", amount: "1500000", to: "0x61739f33adbb7f76c1b5b222e4119085257528be", evmChainId: 84532 });
+  });
+});
+
+describe("Activity from live events (round two R2-01, R2-03)", () => {
+  const rec = (seq: number, requester: string) =>
+    ({ seq, request_id: seq, input_index: 0, chain: "evm", height: 10 + seq, timestamp_ms: 1, requester, payload: "00", status: "resolved", signature: null, detail: { evm: { chain_id: 11155111, nonce: seq, to: "0x00", value: "1" } } }) as unknown as SigRecordView;
+  const ev = (event: string, block: number, data: Record<string, unknown>) => ({ tx: `t${block}`, block, timestampMs: block, standard: "satchel", event, data });
+  const evs = [
+    ev("nft_mint", 1, { owner_id: "alice.testnet", token_ids: ["1"] }),
+    ev("sign_requested", 2, { token_id: "1", chain: "evm", first_seq: 0 }), // the owner herself
+    ev("sign_requested", 3, { token_id: "1", chain: "evm", first_seq: 1 }), // a delegate
+    ev("nft_transfer", 4, { token_ids: ["1"], old_owner_id: "alice.testnet", new_owner_id: "bob.testnet" }),
+    ev("sign_requested", 5, { token_id: "1", chain: "evm", first_seq: 2 }), // alice again, no longer the owner
+    ev("offer_accepted", 6, { offer_id: 3, token_id: "1", seller_id: "bob.testnet", buyer_id: "carol.testnet", amount: "2000000", currency: "usdc" }),
+  ];
+  const records = [rec(0, "alice.testnet"), rec(1, "dave.testnet"), rec(2, "alice.testnet")];
+  const rows = liveActivityRows(evs, records);
+
+  it("a delegate's signature names the delegate, read from the record (the event doesn't carry it)", () => {
+    expect(rows[2]).toMatchObject({ kind: "issued", requester: "dave.testnet" });
+  });
+  it("the owner's own signature names nobody", () => {
+    expect(rows[1]!.kind).toBe("issued");
+    expect(rows[1]!.requester).toBeUndefined();
+  });
+  it("the owner is the one at the time: a former owner's later signature names them", () => {
+    expect(rows[4]).toMatchObject({ kind: "issued", requester: "alice.testnet" });
+  });
+  it("an accepted offer reads as a sale with its price and buyer", () => {
+    expect(rows[5]).toMatchObject({ kind: "sold", to: "carol.testnet", price: "2000000", currency: "usdc" });
+  });
+  it("events newest first give the same rows", () => {
+    expect(liveActivityRows([...evs].reverse(), records).reverse()).toEqual(rows);
   });
 });
