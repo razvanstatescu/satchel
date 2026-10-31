@@ -127,3 +127,5 @@
 - 2026-10-31T14:43Z [test-core2] in-progress: bytes.ts unit tests added (49 tests, bytes.test.ts), committed 3111cb4
 - 2026-10-31T14:46Z [ui-e2e-round2] target1: refresh-after-send.spec.ts passing (2 tests); found fixture BTC/EVM/SOL balances are static, documented
 - 2026-10-31T14:47Z [test-core2] done: round two complete — core 540 tests (18 files), web unit 601 tests (46 files), tools 92 unchanged; typecheck/lint clean; live smoke against dev2 clean (code hash matched); docs updated. Branch test/core2 @ 3ad5e73, not pushed.
+- 2026-10-31T14:50Z [ui-e2e-round2] target2: keyboard-send.spec.ts passing (1 test, full keyboard-only Send)
+- 2026-10-31T14:52Z [test/contract2 round two] done: contract test audit round two on test/contract2 (unit 199, sandbox 136 on 2.13.4 and 2.14, 1M-case differential 0 disagreements, gas unchanged by the fixes, no contract bug; R2-01 web Low, Q-03/Q-04 pinned for Razvan)
