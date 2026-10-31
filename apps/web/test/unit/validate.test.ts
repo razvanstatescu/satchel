@@ -24,9 +24,12 @@ describe("validateEvm", () => {
     expect(validateEvm("", SELF_EVM)).toMatchObject({ tier: "error", message: copy.send.val.evmFormat });
   });
 
-  it("rejects the zero address, case-insensitively, before checking self or checksum", () => {
+  it("rejects the zero address", () => {
     expect(validateEvm("0x" + "0".repeat(40), SELF_EVM)).toMatchObject({ tier: "error", message: copy.send.val.evmZero });
-    expect(validateEvm("0X" + "0".repeat(40), SELF_EVM)).toMatchObject({ tier: "error", message: copy.send.val.evmZero });
+  });
+
+  it("an uppercase 0X prefix fails the format check before it ever reaches the zero-address check (the regex's \"0x\" is case-sensitive)", () => {
+    expect(validateEvm("0X" + "0".repeat(40), SELF_EVM)).toMatchObject({ tier: "error", message: copy.send.val.evmFormat });
   });
 
   it("rejects self-send, case-insensitively", () => {
@@ -86,7 +89,7 @@ describe("validateBtc", () => {
   });
 
   it("accepts a testnet4 bech32m (taproot, tb1p...) address", async () => {
-    const taproot = "tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0";
+    const taproot = "tb1pujs38ezwgpq3nr5qk940rdy0lc8em2agr9wy2tz2c2qkcheqnzvs8x6q37"; // real bech32m testnet taproot address
     const r = await validateBtc(taproot, SELF_BTC);
     expect(r.tier).toBe("ok");
     if (r.tier === "ok") expect(r.normalized).toBe(taproot.toLowerCase());
@@ -112,7 +115,7 @@ describe("validateBtc", () => {
 
 describe("validateSol", () => {
   const SELF_SOL = "Fp9KseRXBcArquhWCibLr4nrFPRhAx8S2kAihQ5sLWiQ"; // off-curve (used as the PDA example elsewhere)
-  const ON_CURVE = "4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T"; // a real on-curve devnet wallet address
+  const ON_CURVE = "GosiBeQgFC9SFA7T9sBR5pGMZZQan3qZpyrrD4JiEfy3"; // a freshly generated Ed25519 pubkey (on-curve by construction)
 
   it("rejects empty input", async () => {
     expect(await validateSol("", SELF_SOL)).toMatchObject({ tier: "error", message: copy.send.val.solFormat });
