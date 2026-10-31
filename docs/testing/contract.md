@@ -358,7 +358,7 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 |---|---|
 | Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
 | Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
-| Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: see the next row |
+| Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: the "re-run one file at a time" row below |
 | New sandbox file `round2.rs`, default 2.13.4 (from 63e2553) | **7 passed** on the first run, 21 s |
 | New unit tests `allowance_tests::r2_*` | **5 passed** |
 | Sandbox on 2.14, re-run one file at a time (2026-10-31): `storage`, `transfer`, `usdc`, `views` | **4 + 7 + 7 + 2 passed**. `storage.rs` byte deltas identical to 2.13.4 (mint 639 B, list 260 B, EVM 276/268 B, BTC×3 723 B, SOL 237 B). The earlier failures were sandbox start-up only (port binding after ≈ 8 min of back-to-back sandboxes); a first re-run of all four files together failed the same way |
@@ -419,8 +419,9 @@ No contract bug was found in round two: no test is ignored, and the contract sou
   `round2::r2_delegate_sign_events_and_requester`), so `requester` is always `undefined` live and
   `components/Timeline.tsx:201` never shows "Requested by". The fixture branch (`server.ts:258`, "a delegate's
   `requester` rides the event") puts `requester` on the fixture event, so fixture and e2e tests cannot see it.
-- Repro: on dev2, a delegate signs for Satchel #N; its Activity row shows no requester, while
-  `sig_records(N)[seq].requester` is the delegate. The clean-history page is correct (`clean.ts`, `clean-live.ts` read
+- Repro (derived from the code and the real-wasm events; not run on testnet, which this audit may not sign): a
+  delegate signs for Satchel #N on dev2; its live Activity row shows no requester, while `sig_records(N)[seq].requester`
+  is the delegate. The clean-history page is correct (`clean.ts`, `clean-live.ts` read
   the record's `requester`).
 - Impact: a buyer or owner reading Activity can't tell a delegate's signature from the owner's there. The
   authoritative history (clean history, `sig_records`) is right, so there is no safety impact.
