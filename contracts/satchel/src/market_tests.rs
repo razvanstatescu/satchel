@@ -294,7 +294,9 @@ fn withdraw_near_guards_change_nothing() {
     expect_err(ERR_DEPOSIT, || w(&mut c, alice(), 2, &id, 1, None));
     expect_err(ERR_AMOUNT, || w(&mut c, alice(), 1, &id, 0, None));
     expect_err(ERR_INSIDE_BALANCE, || w(&mut c, alice(), 1, &id, bal + 1, None));
-    expect_err(ERR_BAD_RECEIVER, || w(&mut c, alice(), 1, &id, 1, Some(me())));
+    for r in [me(), mpc(), usdc()] {
+        expect_err(ERR_BAD_RECEIVER, || w(&mut c, alice(), 1, &id, 1, Some(r))); // Q-03
+    }
     // the contract's own NEAR is not inside any Satchel
     let other = mint_to(&mut c, alice());
     expect_err(ERR_INSIDE_BALANCE, || w(&mut c, alice(), 1, &other, 1, None));
@@ -385,6 +387,11 @@ fn prepay_and_withdraw_storage_credit() {
     Ctx::new(carol()).dep(5).set();
     assert_eq!(c.prepay_storage(Some(bob())).0, credit + 5, "anyone may top up another account; no storage the 2nd time");
     assert_eq!(c.storage_credit_of(bob()).0, credit + 5);
+    assert_eq!(totals(&c)["storage_credit"], (credit + 5).to_string());
+    for r in [me(), mpc(), usdc()] {
+        Ctx::new(carol()).dep(10 * MILLI).set();
+        expect_err(ERR_BAD_RECEIVER, || c.prepay_storage(Some(r))); // Q-03: nobody could withdraw that credit
+    }
     assert_eq!(totals(&c)["storage_credit"], (credit + 5).to_string());
     Ctx::new(bob()).dep(0).set();
     expect_err(ERR_DEPOSIT, || c.prepay_storage(None));
@@ -515,7 +522,9 @@ fn withdraw_ft_guards_and_call_shape() {
     expect_err(ERR_AMOUNT, || w(&mut c, alice(), 1, usdc(), 0, None));
     expect_err(ERR_INSIDE_BALANCE, || w(&mut c, alice(), 1, usdc(), 5_000_001, None));
     expect_err(ERR_INSIDE_BALANCE, || w(&mut c, alice(), 1, wnear(), 1, None));
-    expect_err(ERR_BAD_RECEIVER, || w(&mut c, alice(), 1, usdc(), 1, Some(me())));
+    for r in [me(), mpc(), usdc()] {
+        expect_err(ERR_BAD_RECEIVER, || w(&mut c, alice(), 1, usdc(), 1, Some(r))); // Q-03
+    }
     Ctx::new(alice()).set();
     expect_err(ERR_TOKEN_NOT_FOUND, || c.withdraw_ft("99".into(), usdc(), U128(1), None));
     assert_eq!((inside(&c, &id), totals(&c)), snap);
@@ -1556,8 +1565,8 @@ fn audit_offer_made_while_listed_survives_the_sale() {
 }
 
 /// Deposits are allowed while listed (they only add value for the buyer); withdrawals are not (ERR_LISTED).
-/// `withdraw_near` refuses only the contract itself as receiver: the MPC and the USDC contract are accepted (they
-/// would just receive the NEAR; question Q-03).
+/// Q-03 (FIXED): `withdraw_near` refuses the contract, the MPC and the USDC contract as receiver (they used to be
+/// accepted and the NEAR was lost); any other named receiver still gets it.
 #[test]
 fn audit_deposits_while_listed_and_withdraw_receivers() {
     let mut c = setup();
@@ -1573,14 +1582,15 @@ fn audit_deposits_while_listed_and_withdraw_receivers() {
     Ctx::new(alice()).dep(1).set();
     expect_err(ERR_LISTED, || c.withdraw_near(id.clone(), U128(1), None));
     c.delist(id.clone());
-    for r in [mpc(), usdc()] {
+    for r in [mpc(), usdc(), me()] {
         Ctx::new(alice()).dep(1).set();
-        c.withdraw_near(id.clone(), U128(1), Some(r.clone()));
-        assert_eq!(transfers(), vec![(r, 1)]);
+        expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(r)));
     }
+    assert_eq!(inside(&c, &id)["near"], credited.to_string());
     Ctx::new(alice()).dep(1).set();
-    expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(me())));
-    assert_eq!(inside(&c, &id)["near"], (credited - 2).to_string());
+    c.withdraw_near(id.clone(), U128(1), Some(carol()));
+    assert_eq!(transfers(), vec![(carol(), 1)]);
+    assert_eq!(inside(&c, &id)["near"], (credited - 1).to_string());
 }
 
 /// Offer pages: limit 0, offsets past the end and u32::MAX limits are empty or capped, never a panic.
@@ -1756,4 +1766,67 @@ fn audit04_well_ordered_paths_log_nothing_when_refused() {
     Ctx::new(usdc()).set();
     expect_err(ERR_STORAGE_CREDIT, || c.ft_on_transfer(carol(), U128(5), deposit_msg(&id).to_string()));
     assert!(logged_event_names().is_empty());
+}
+
+/// Q-03 (FIXED): every method where the CALLER picks who receives value refuses the same set as `nft_transfer`
+/// (`ensure_receiver`: the contract, the MPC, the configured USDC) with ERR_BAD_RECEIVER, before any write and before
+/// any event or promise. Payouts to a receiver the contract fixes (the seller, the offerer, the caller of
+/// `withdraw_proceeds` / `withdraw_storage_credit`) have no receiver argument and are unchanged.
+#[test]
+fn q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc() {
+    let mut c = setup();
+    let id = usdc_funded(&mut c, 5_000_000);
+    Ctx::new(bob()).dep(ONE_NEAR).set();
+    c.deposit_near(id.clone());
+    ft_call(&mut c, wnear(), bob(), 5, deposit_msg(&id));
+    let snap = (inside(&c, &id), totals(&c), c.storage_credit_of(carol()));
+    let bad = [me(), mpc(), usdc()];
+    for r in &bad {
+        Ctx::new(alice()).dep(1).set();
+        expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(r.clone())));
+        assert!(get_created_receipts().is_empty() && logged_event_names().is_empty(), "withdraw_near to {r}");
+        Ctx::new(alice()).dep(1).set();
+        expect_err(ERR_BAD_RECEIVER, || c.withdraw_ft(id.clone(), usdc(), U128(1), Some(r.clone())));
+        assert!(get_created_receipts().is_empty() && logged_event_names().is_empty(), "withdraw_ft to {r}");
+        Ctx::new(alice()).dep(1).set();
+        expect_err(ERR_BAD_RECEIVER, || c.withdraw_ft(id.clone(), wnear(), U128(1), Some(r.clone())));
+        Ctx::new(carol()).dep(10 * MILLI).set();
+        expect_err(ERR_BAD_RECEIVER, || c.prepay_storage(Some(r.clone())));
+        assert!(get_created_receipts().is_empty() && logged_event_names().is_empty(), "prepay_storage for {r}");
+        // the same set nft_transfer and nft_mint refuse
+        Ctx::new(alice()).dep(1).set();
+        expect_err(ERR_BAD_RECEIVER, || c.nft_transfer(r.clone(), id.clone(), None, None));
+        Ctx::new(acc("team.testnet")).dep(20 * MILLI).set();
+        expect_err(ERR_BAD_RECEIVER, || c.nft_mint(r.clone()));
+    }
+    assert_eq!((inside(&c, &id), totals(&c), c.storage_credit_of(carol())), snap, "nothing changed");
+    assert_eq!(inside(&c, &id)["inside_epoch"], 0, "no withdrawal bumped the epoch");
+    // legitimate receivers: the owner by default, any other named account, a credit for another account
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_near(id.clone(), U128(7), None);
+    assert_eq!(transfers(), vec![(alice(), 7)]);
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_near(id.clone(), U128(8), Some(carol()));
+    assert_eq!(transfers(), vec![(carol(), 8)]);
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_ft(id.clone(), usdc(), U128(9), Some(carol()));
+    assert_eq!(calls()[0].2["receiver_id"], "carol.testnet");
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_ft(id.clone(), usdc(), U128(10), None);
+    assert_eq!(calls()[0].2["receiver_id"], "alice.testnet");
+    Ctx::new(bob()).dep(10 * MILLI).set();
+    assert!(c.prepay_storage(Some(carol())).0 > 0);
+    assert_eq!(inside(&c, &id)["inside_epoch"], 4);
+    // USDC disabled: usdc.testnet is an ordinary account, so it is an ordinary receiver; the contract and MPC are not
+    let mut c = setup_with(None);
+    let id = mint_to(&mut c, alice());
+    Ctx::new(bob()).dep(ONE_NEAR).set();
+    c.deposit_near(id.clone());
+    Ctx::new(alice()).dep(1).set();
+    c.withdraw_near(id.clone(), U128(1), Some(usdc()));
+    assert_eq!(transfers(), vec![(usdc(), 1)]);
+    for r in [me(), mpc()] {
+        Ctx::new(alice()).dep(1).set();
+        expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(r)));
+    }
 }

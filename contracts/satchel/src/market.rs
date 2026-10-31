@@ -150,10 +150,13 @@ impl Contract {
 #[near]
 impl Contract {
     /// Anyone, payable. Credits `attached − storage` to `account_id` (default: the caller); only a new credit slot costs
-    /// storage. The credit pays storage in `ft_on_transfer` (FT deposits, USDC offers). Returns the new credit.
+    /// storage. The credit pays storage in `ft_on_transfer` (FT deposits, USDC offers). `account_id` is never the
+    /// contract, the MPC or USDC (ERR_BAD_RECEIVER, Q-03: nobody could withdraw that credit). Returns the new credit.
     #[payable]
     pub fn prepay_storage(&mut self, account_id: Option<AccountId>) -> U128 {
         let account = account_id.unwrap_or_else(env::predecessor_account_id);
+        // Q-03: only `account` can ever withdraw this credit, and the contract, the MPC and USDC never call back
+        self.ensure_receiver(&account);
         let attached = env::attached_deposit().as_yoctonear();
         ensure(attached > 0, ERR_DEPOSIT);
         let s0 = env::storage_usage();
