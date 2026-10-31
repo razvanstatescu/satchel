@@ -379,6 +379,99 @@ Commands (from the repo root): `pnpm --filter @satchel/tools fuzz:corpus --n 100
 differential -- --nocapture`. Total for round two: **1,000,000 differential cases, 0 disagreements** (round one
 skipped this run; the last deep run was 2026-10-29, 400k).
 
+### 7.3 New tests (all pass; none ignored)
+
+| Test | What it pins |
+|---|---|
+| U `allowance_tests::r2_delegate_btc_one_input_rule_edge_shapes` | Delegate BTC: 0 and 11 inputs → `ERR_BTC_INPUT_COUNT`; one outpoint twice and one preimage twice → `ERR_BTC_DUPLICATE_INPUT`; **one input of a 2-input tx sent alone, either one → `ERR_BTC_PREVOUTS_INCOMPLETE`** (hashPrevouts commits to every outpoint, so the one-input rule cannot be met by splitting a multi-input tx into single-input requests); the full 2-input tx → `ERR_ALLOWANCE_BTC_ONE_INPUT`. Same codes as the owner's; nothing written, the cap untouched; owner and 1-input delegate sends still sign |
+| U `allowance_tests::r2_delegate_foreign_pkh_change_is_debited_zero_but_recorded` | A 1-input request whose scriptCode pkh is NOT the Satchel's, paying all value back to that foreign pkh: debit 0 (it looks like change), recorded with the delegate as requester, counts as a rate-limit entry. Harmless: BIP143 commits the scriptCode, so the signature cannot spend a Satchel coin |
+| U `allowance_tests::r2_delegate_mislabeled_requests_get_the_classifier_code` | EIP-191 bytes or a BTC preimage labeled `evm`, an EVM tx or a Solana off-chain message labeled `sol`, an EVM tx labeled `btc`: refused with the classifier's code before any allowance logic; delegate message kinds (valid or not) are `ERR_ALLOWANCE_KIND` |
+| U `allowance_tests::r2_delegate_across_owner_changes` | alice's delegate spends its cap → gift to bob → the delegate is a stranger → bob grants the same delegate a fresh budget (alice's spends do not follow) → bob gives the token to the delegate, who now signs as owner (no debit, messages allowed; all four records keep `requester` = it) → back to alice, nothing revives |
+| U `allowance_tests::r2_refused_transfers_keep_allowances_and_log_nothing` | Self-transfer, 2 yocto and a listed token: refused, no log at all, allowances and owner unchanged (the AUDIT-04 deferral did not move `on_owner_change` ahead of a refusal) |
+| S `round2::r2_events_once_and_in_order_on_every_ownership_change` | On the real wasm, through the app's own filter (successful contract receipts, receipt order): `nft_transfer` → `nep171:nft_transfer`, `allowances_cleared`; NEAR `buy` → `nft_transfer` (memo `sale`), `allowances_cleared`, `sold` in ONE receipt, then `payout` in the callback of the same tx (what `lib/data/sale.ts` pairs); USDC buy → `nft_transfer`, `sold`, `payout`; `make_offer` → `offer_made`; `accept_offer` on a listed token → `delisted`, `nft_transfer` (memo `offer`), `allowances_cleared`, `offer_accepted`, `payout`. Each exactly once; a log-grepping view of all contract receipts sees nothing more |
+| S `round2::r2_delegate_sign_events_and_requester` | Delegate `sign_for`: `sign_requested` (owner_id = the owner, **no `requester` field**), `allowance_spent` (same receipt, same `first_seq`), `sign_resolved`; only the record names the delegate (C5.md §1.3). Pins the contract side of R2-01 |
+| S `round2::r2_extra_sign_for_arguments_cannot_relabel_the_requester` | Extra `requester` / `owner_id` / `signer` JSON arguments are ignored: the record and `allowance_spent` name the delegate. A request object with two kinds (`evm` + `sol`) fails to deserialize, for owner and delegate, before anything is written |
+| S `round2::r2_inflight_delegate_sign_survives_a_transfer` | A delegated signature in flight when the owner gives the token away resolves `signed` with the delegate as requester; the transfer logs `allowances_cleared`; the delegate is then `ERR_NOT_OWNER`; the new owner signs |
+| S `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` | Q-03, current behaviour (§7.4) |
+| S `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` | Q-03 for USDC (§7.4) |
+| S `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` | Q-04, current behaviour (§7.4) |
+| S `gas_paths::gas_heavy_paths`, `gas_paths::contract_balance_after_calls` | Gas of nine heavy paths and the contract-balance effect of a call; printed, behaviour-neutral, so they run on the pre-fix wasm too (§7.2, §7.5) |
+
+Fuzz corpora: the committed seed corpus (`tools/fuzz/corpus`) was not regenerated, because no vector or generator
+changed. The deep corpora live in `target/` (not committed) and are reproducible from the seeds in §7.2.
+
+### 7.4 Findings and the open questions
+
+No contract bug was found in round two: no test is ignored, and the contract source is unchanged.
+
+**R2-01 (Low, web app, not the contract): a delegate's signature shows as the owner's in the live Activity feed.**
+- Where: `apps/web/src/lib/data/server.ts:295` (`getActivity`, live branch) sets `requester: e.data.requester` from the
+  `sign_requested` event. The contract's `sign_requested` has no `requester` field by design (C5.md §1.3; pinned by
+  `round2::r2_delegate_sign_events_and_requester`), so `requester` is always `undefined` live and
+  `components/Timeline.tsx:201` never shows "Requested by". The fixture branch (`server.ts:258`, "a delegate's
+  `requester` rides the event") puts `requester` on the fixture event, so fixture and e2e tests cannot see it.
+- Repro: on dev2, a delegate signs for Satchel #N; its Activity row shows no requester, while
+  `sig_records(N)[seq].requester` is the delegate. The clean-history page is correct (`clean.ts`, `clean-live.ts` read
+  the record's `requester`).
+- Impact: a buyer or owner reading Activity can't tell a delegate's signature from the owner's there. The
+  authoritative history (clean history, `sig_records`) is right, so there is no safety impact.
+- Suggested fix (web lane): in the live branch, take the requester from the record that `signRow` already looks up
+  (`rec.requester`, or the record at `first_seq`), or pair `sign_requested` with the `allowance_spent` of the same tx
+  on `first_seq`. Make the fixture events match the contract: no `requester` on `sign_requested`.
+
+**R2-02 (Info, TS mirror, error code only).** For a delegate's message request (`evm_message` / `sol_message`), the
+contract refuses `ERR_ALLOWANCE_KIND` in `authorize_signer`, before classifying, so an invalid message also gets
+`ERR_ALLOWANCE_KIND`. The TS `allowanceDebits` classifies first, so an empty message is `ERR_MSG_EMPTY` and `c0` is
+`ERR_MSG_ENCODING`; a valid message is `ERR_ALLOWANCE_KIND` on both sides. Both refuse, and the UI never offers
+message signing to a delegate. Pinned on the Rust side by `r2_delegate_mislabeled_requests_get_the_classifier_code`.
+Optional fix: in `allowanceDebits`, return `ERR_ALLOWANCE_KIND` for the message kinds before classifying, plus one
+vector (`vectors/allowance.json`).
+
+**R2-03 (Info, web app): an accepted offer shows only as "transferred" in Activity.** `getActivity` maps `sold` but
+not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) with no price. The events are right
+(`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row.
+
+**Q-03: withdraw to the MPC or the USDC contract as receiver (current behaviour pinned; Razvan to decide).**
+- What happens today (`round2::q03_*`):
+  - `withdraw_near(receiver = MPC)` and `(receiver = USDC contract)`: **delivered**, `inside_withdraw_resolved.ok =
+    true`. The NEAR is now the MPC's or Circle's; no Satchel method can bring it back. Permanent loss for the owner.
+  - `withdraw_ft(USDC, receiver = MPC or the USDC contract)`: the FT refuses an unregistered receiver, so the
+    transfer fails and the callback **re-credits** the token (no loss), at least with near-contract-standards
+    semantics (the mock). **But registration is permissionless**: after anyone pays `storage_deposit` for the MPC
+    account, the same withdrawal is delivered and the USDC is stranded there. Real Circle testnet USDC was not tested.
+  - A named receiver that does not exist: the NEAR transfer fails and is re-credited (no loss). The contract itself:
+    `ERR_BAD_RECEIVER`.
+- Risk: user error only (the owner picks the receiver), but irreversible, and the contract is immutable after Nov 10.
+  Severity Low. Nobody but the owner can trigger it, and only against their own Satchel.
+- Options: (a) keep it and catch it in the UI. The web Send-out flows (`EmptyFlow.tsx`, `Market.tsx`) currently
+  withdraw only to the connected owner, so today's UI cannot reach it. Only a hand-made call or a future "send to
+  address" field can, and that field would need to refuse the MPC id and the USDC id. (b) Before the freeze, extend
+  the receiver check to `ensure_receiver` (contract, MPC, USDC), the same set `nft_transfer` refuses. That is a
+  one-line behaviour change, plus a unit and a sandbox test, plus the mirror in core if any. Recommendation: (b) if
+  there is time before Nov 9, since it is cheap and the set already exists; otherwise (a).
+
+**Q-04: `ft_on_transfer` msgs accept unknown extra fields (current behaviour pinned; Razvan to decide).**
+- What happens today (`round2::q04_*`, `market_tests::audit_ft_msg_lenient_and_strict_cases`):
+  - A USDC buy msg with `"receiver_id": <other>` and `"price": "1"`: ignored. The sale runs at the listing price and
+    the NFT goes to the FT **sender**.
+  - An offer msg with `"amount": "1"`: ignored, and the offer escrows the transferred amount.
+  - Two top-level keys, a numeric id, a wrong case or a missing field: refused (`ERR_BAD_MSG`, the FT refunds 100 %).
+  - A **duplicate field** (`"token_id":"1","token_id":"2"`): refused (serde `duplicate field`), refunded. A JS
+    `JSON.parse` would keep the last value, but no client parses these msgs, it only writes them.
+- Risk: none today. Every binding value (token, listing id, sig count, epoch, expiry) is a required field, and the
+  amount comes from the FT transfer, not the msg. The risk is forward-looking: the contract is immutable, so a future
+  client that adds a field it expects to be enforced (`receiver_id`, `max_price`, `min_sig_count`, …) gets it
+  silently ignored rather than refused. For example, a "buy for a friend" UI would hand the NFT to the payer.
+  Severity Info.
+- Options: (a) keep it, and write in spec §5.12 / C4-C6.md that unknown msg fields are ignored and that new binding
+  fields need a new contract. (b) Add `#[serde(deny_unknown_fields)]` to `FtMsg::Buy`, `OfferMsg` (and the `Deposit`
+  form is already exact). That is a behaviour change: unknown fields would refuse and refund. It needs a unit test
+  flip (`audit_ft_msg_lenient_and_strict_cases`), `q04_*` updated, and a check that the TS builders
+  (`packages/core`) never add a field. Recommendation: (b) is cheap and fails closed. Either way, (a)'s spec sentence.
+
+**Q-05 (unchanged):** the transient I-M1 window after a failed withdrawal or payout is still not reproduced
+deterministically; round two saw no `ERR_INSOLVENT` in any run on either version.
+
 ### 7.5 Gas after the fixes
 
 Same machine, default sandbox 2.13.4, `--test-threads 1`. Pre-fix wasm = `cargo near build non-reproducible-wasm` of
