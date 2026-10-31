@@ -1066,3 +1066,184 @@ fn audit01_delegate_single_input_btc_within_cap_signs() {
     expect_err(ERR_ALLOWANCE_EXCEEDED, || sign_as(&mut c, bot(), btc_req_of(&tx), T0 + 1_000));
     assert_eq!(sig_count(&c), 1);
 }
+
+// ── test audit round two (2026-10-30, docs/testing/contract.md §7) ──────────────────────────────
+
+/// The code `sign_for` gives the owner for `req` (the stateless classifier's), so a delegate test can assert that the
+/// delegate gets exactly the same refusal, before any allowance logic runs.
+fn classifier_code(req: &SignRequest) -> &'static str {
+    match parse::classify(req) {
+        Err(code) => code,
+        Ok(_) => panic!("expected the classifier to refuse {req:?}"),
+    }
+}
+
+fn btc_raw(pre: &[Vec<u8>], outputs: &[u8]) -> SignRequest {
+    SignRequest::Btc { preimages: pre.iter().map(hex::encode).collect(), outputs: hex::encode(outputs) }
+}
+
+/// Round two, one-input rule (AUDIT-01) with edge shapes. Every shape below is refused for the delegate before any
+/// write (no record, no spend entry, no event, the cap untouched), and a valid 1-input send still signs afterwards:
+/// - 0 inputs → `ERR_BTC_INPUT_COUNT` (step 3, before the classifier); 11 inputs → the same;
+/// - the same outpoint twice (two inputs) and the same preimage twice → `ERR_BTC_DUPLICATE_INPUT` (classifier);
+/// - ONE input of a 2-input tx sent alone, either one → `ERR_BTC_PREVOUTS_INCOMPLETE`: hashPrevouts commits to every
+///   outpoint, so a delegate cannot get a multi-input tx signed one "single-input" request at a time (the bypass the
+///   fix would otherwise invite);
+/// - a 2-input tx whose preimages state the real amounts → `ERR_ALLOWANCE_BTC_ONE_INPUT` (after the classifier).
+#[test]
+fn r2_delegate_btc_one_input_rule_edge_shapes() {
+    let mut c = setup();
+    set(&mut c, bot(), vec![cap(Asset::Btc, 1_000_000_000)], None, T0);
+    let tx2 = btc::tests::sample_tx(2);
+    let pre2 = btc::tests::preimages(&tx2);
+    let mut dup = btc::tests::sample_tx(2);
+    dup.inputs[1].txid_le = dup.inputs[0].txid_le;
+    dup.inputs[1].vout = dup.inputs[0].vout;
+    let tx11 = btc::tests::sample_tx(11);
+    let cases: Vec<(&str, SignRequest)> = vec![
+        (ERR_BTC_INPUT_COUNT, btc_raw(&[], &tx2.outputs)),
+        (ERR_BTC_INPUT_COUNT, btc_raw(&btc::tests::preimages(&tx11), &tx11.outputs)),
+        (ERR_BTC_DUPLICATE_INPUT, btc_raw(&btc::tests::preimages(&dup), &dup.outputs)),
+        (ERR_BTC_DUPLICATE_INPUT, btc_raw(&[pre2[0].clone(), pre2[0].clone()], &tx2.outputs)),
+        (ERR_BTC_PREVOUTS_INCOMPLETE, btc_raw(&pre2[..1], &tx2.outputs)),
+        (ERR_BTC_PREVOUTS_INCOMPLETE, btc_raw(&pre2[1..], &tx2.outputs)),
+        (ERR_ALLOWANCE_BTC_ONE_INPUT, btc_raw(&pre2, &tx2.outputs)),
+    ];
+    for (i, (code, req)) in cases.iter().enumerate() {
+        // the owner gets the same code for every classifier refusal (the delegate path adds nothing before it)
+        if *code != ERR_ALLOWANCE_BTC_ONE_INPUT && *code != ERR_BTC_INPUT_COUNT {
+            assert_eq!(classifier_code(req), *code, "case {i}");
+        }
+        expect_err(code, || sign_as(&mut c, bot(), req.clone(), T0 + 1_000 * i as u64));
+        assert_eq!(sig_count(&c), 0, "case {i}");
+        assert!(events("sign_requested").is_empty() && events("allowance_spent").is_empty(), "case {i}");
+    }
+    assert_eq!(remaining(&c, &Asset::Btc), 1_000_000_000);
+    assert_eq!(c.allowance("1".into(), bot()).unwrap().spends_in_window, 0);
+    // the owner signs the 2-input tx; the delegate signs a complete 1-input tx
+    ctx(alice(), 10 * MILLI, T0 + 20_000);
+    c.sign_for("1".into(), btc_raw(&pre2, &tx2.outputs), None);
+    let tx1 = btc::tests::sample_tx(1);
+    sign_as(&mut c, bot(), btc_req_of(&tx1), T0 + 21_000);
+    assert_eq!(sig_count(&c), 3);
+    assert_eq!(c.sig_records("1".into(), 2, 1)[0].requester, bot());
+}
+
+/// Round two: what a 1-input request can and cannot hide. The debit uses the preimage's own scriptCode pkh to tell
+/// change from spending; a delegate that states a FOREIGN pkh and pays it is debited only the fee, but the MPC then
+/// signs a sighash over a scriptCode that is not the Satchel's (BIP143 commits the scriptCode), so the signature cannot
+/// spend any Satchel coin. Pinned: such a request is recorded (requester = the delegate, so it shows in clean history),
+/// debited 0, and still counts against the 32-per-24 h rate limit.
+#[test]
+fn r2_delegate_foreign_pkh_change_is_debited_zero_but_recorded() {
+    let mut tx = btc::tests::sample_tx(1);
+    tx.pkh = [0x99; 20]; // not the Satchel's key hash
+    let foreign: Vec<u8> = [&[0x00, 0x14][..], &tx.pkh[..]].concat();
+    tx.outputs = btc::tests::output(tx.inputs[0].amount, &foreign); // all value to "change" at the foreign pkh
+    assert_eq!(btc_debit(&btc::tests::preimages(&tx), &tx.outputs).unwrap(), 0);
+    let mut c = setup();
+    set(&mut c, bot(), vec![cap(Asset::Btc, 1)], None, T0);
+    sign_as(&mut c, bot(), btc_req_of(&tx), T0);
+    assert_eq!(events("allowance_spent")[0]["data"]["debits"], json!([{"asset":"btc","amount":"0"}]));
+    let rec = &c.sig_records("1".into(), 0, 1)[0];
+    assert_eq!(rec.requester, bot());
+    assert_eq!(c.allowance("1".into(), bot()).unwrap().spends_in_window, 1, "a zero debit is still a rate-limit entry");
+}
+
+/// Round two, "mislabeled" requests: a delegate cannot smuggle bytes past the classifier by labeling them as another
+/// kind. A message labeled as a transaction, a BTC preimage labeled EVM, an EVM tx labeled SOL, a Solana off-chain
+/// message labeled SOL: each is refused with the classifier's code (the owner's code), before the allowance logic,
+/// and nothing is written. Message kinds are refused for delegates with `ERR_ALLOWANCE_KIND` BEFORE the classifier,
+/// so an invalid message gives ERR_ALLOWANCE_KIND here (the TS mirror `allowanceDebits` classifies first and reports
+/// ERR_MSG_*: same refusal, different code; docs/testing/contract.md §7, R2-02).
+#[test]
+fn r2_delegate_mislabeled_requests_get_the_classifier_code() {
+    let mut c = setup();
+    set(&mut c, bot(), vec![evm_cap(10u128.pow(20)), cap(Asset::Sol, 10u128.pow(12)), cap(Asset::Btc, 10u128.pow(9))], None, T0);
+    let eip191 = [b"\x19Ethereum Signed Message:\n5".as_slice(), b"hello"].concat();
+    let offchain = [&[0xff][..], b"solana offchain", &[0, 0, 0], b"hello"].concat();
+    let btc_pre = btc::tests::preimages(&btc::tests::sample_tx(1)).remove(0);
+    let reqs = vec![
+        SignRequest::Evm { unsigned_tx: hex::encode(&eip191) },
+        SignRequest::Evm { unsigned_tx: hex::encode(&btc_pre) },
+        SignRequest::Sol { message: evm::tests::KB31_TX.into() },
+        SignRequest::Sol { message: hex::encode(&offchain) },
+        SignRequest::Btc { preimages: vec![evm::tests::KB31_TX.into()], outputs: "".into() },
+    ];
+    for (i, req) in reqs.iter().enumerate() {
+        let code = classifier_code(req);
+        assert!(code.starts_with("ERR_EVM") || code.starts_with("ERR_SOL") || code.starts_with("ERR_BTC"), "{code}");
+        expect_err(code, || sign_as(&mut c, bot(), req.clone(), T0 + i as u64));
+    }
+    for m in ["", "c0", "68656c6c6f"] {
+        for req in [SignRequest::EvmMessage { message: m.into() }, SignRequest::SolMessage { message: m.into() }] {
+            expect_err(ERR_ALLOWANCE_KIND, || sign_as(&mut c, bot(), req.clone(), T0 + 100));
+        }
+    }
+    assert_eq!(sig_count(&c), 0);
+    assert_eq!(c.allowance("1".into(), bot()).unwrap().spends_in_window, 0);
+}
+
+/// Round two, a delegate across owner changes:
+/// 1. alice's delegate spends its whole cap; alice gives the token to bob: the delegate is a stranger (ERR_NOT_OWNER);
+/// 2. bob grants the SAME delegate a cap: it is a fresh budget (alice's spends are gone with her set), and the records
+///    and `allowance_spent` name bob as the owner;
+/// 3. bob gives the token to the delegate itself: allowances are cleared; the delegate now signs as the OWNER (no debit,
+///    no `allowance_spent`, message signing allowed), and the earlier delegated records keep their requester;
+/// 4. it gives the token back to alice: nothing revives.
+#[test]
+fn r2_delegate_across_owner_changes() {
+    let mut c = setup();
+    set(&mut c, bot(), vec![evm_cap(KB31_DEBIT)], None, T0);
+    sign_as(&mut c, bot(), kb31(), T0 + 1_000);
+    assert_eq!(remaining(&c, &Asset::Evm { chain_id: SEPOLIA }), 0);
+    ctx(alice(), 1, T0 + 2_000);
+    c.nft_transfer(bob(), "1".into(), None, None);
+    expect_err(ERR_NOT_OWNER, || sign_as(&mut c, bot(), evm_tx(1, 0, 1, 1), T0 + 3_000));
+    // 2. bob's grant to the same delegate starts from zero
+    ctx(bob(), 10 * MILLI, T0 + 4_000);
+    c.set_allowance("1".into(), bot(), vec![evm_cap(KB31_DEBIT)], None);
+    let v = c.allowance("1".into(), bot()).unwrap();
+    assert_eq!((v.owner_id.clone(), v.caps[0].spent.0, v.spends_in_window), (bob(), 0, 0));
+    let req = evm_tx(1, 0, 21_000, 1);
+    sign_as(&mut c, bot(), req, T0 + 5_000);
+    assert_eq!(events("allowance_spent")[0]["data"]["owner_id"], "bob.testnet");
+    assert_eq!(events("sign_requested")[0]["data"]["owner_id"], "bob.testnet");
+    // 3. the delegate becomes the owner
+    ctx(bob(), 1, T0 + 6_000);
+    c.nft_transfer(bot(), "1".into(), None, None);
+    assert_eq!(events("allowances_cleared")[0]["data"]["delegate_ids"], json!(["bot.testnet"]));
+    sign_as(&mut c, bot(), evm_tx(2, 10u128.pow(18), 21_000, 10u128.pow(10)), T0 + 7_000);
+    assert!(events("allowance_spent").is_empty(), "an owner is never debited");
+    ctx(bot(), 6 * MILLI, T0 + 8_000);
+    c.sign_for("1".into(), SignRequest::EvmMessage { message: hex::encode(b"hi") }, None);
+    let recs = c.sig_records("1".into(), 0, 50);
+    assert_eq!(recs.iter().map(|r| r.requester.clone()).collect::<Vec<_>>(), vec![bot(); 4]);
+    assert_eq!(events("sign_requested")[0]["data"]["owner_id"], "bot.testnet");
+    // 4. back to alice: nothing revives, the ex-owner is a stranger again
+    ctx(bot(), 1, T0 + 9_000);
+    c.nft_transfer(alice(), "1".into(), None, None);
+    assert!(c.allowances_of("1".into()).is_empty());
+    expect_err(ERR_NOT_OWNER, || sign_as(&mut c, bot(), evm_tx(3, 0, 1, 1), T0 + 10_000));
+}
+
+/// Round two: a refused ownership change (self-transfer, listed token) leaves the allowances in place and logs nothing
+/// (the AUDIT-04 move did not make `on_owner_change` run before a refusal that is checked later).
+#[test]
+fn r2_refused_transfers_keep_allowances_and_log_nothing() {
+    let mut c = setup();
+    set(&mut c, bot(), vec![evm_cap(KB31_DEBIT)], None, T0);
+    ctx(alice(), 1, T0 + 1);
+    expect_err("Current and next owner must differ", || c.nft_transfer(alice(), "1".into(), None, None));
+    assert!(get_logs().is_empty());
+    ctx(alice(), 2, T0 + 2);
+    expect_err("Requires attached deposit of exactly 1 yoctoNEAR", || c.nft_transfer(bob(), "1".into(), None, None));
+    assert!(get_logs().is_empty());
+    ctx(alice(), 10 * MILLI, T0 + 3);
+    c.list("1".into(), U128(10), Currency::Near);
+    ctx(alice(), 1, T0 + 4);
+    expect_err(ERR_LISTED, || c.nft_transfer(bob(), "1".into(), None, None));
+    assert!(get_logs().is_empty());
+    assert_eq!(c.allowances_of("1".into()).len(), 1);
+    assert_eq!(c.tokens.owner_by_id.get(&"1".to_string()).unwrap(), alice());
+}

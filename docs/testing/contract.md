@@ -1,7 +1,8 @@
 # Satchel contract: test guide and coverage audit
 
 Status: test audit of 2026-10-30 (branch `test/contract`), which changed no contract source; every finding was a test.
-AUDIT-01, -02 and -04 were then fixed the same day on branch `fix/audit` (§4).
+AUDIT-01, -02 and -04 were then fixed the same day on branch `fix/audit` (§4). Round two (branch `test/contract2`,
+2026-10-30/31, §7) re-audited the fixed code: nearcore 2.14, the deep differential, new adversarial tests, Q-03/Q-04, gas.
 
 Scope: `contracts/satchel` (unit tests) and `tests/` (sandbox suite, near-workspaces 0.23.0 with the mock signer and
 mock FT). The source of truth for intended behaviour is `kb/90-technical-spec.md` §5–§6 and `docs/specs/*.md`.
@@ -39,25 +40,25 @@ Legend: U = unit test (`contracts/satchel/src/…`), S = sandbox test (`tests/te
 |---|---|---|
 | `new` | `tests::config_matches_constants` | `views::config_matches_constants`, `release::keyless_birth_batch` (second `new` fails) |
 | `nft_mint` | `tests::ids_sequential_no_approvals_and_mint_charges_exactly`, `security_tests::s06_*`, `fix_s06_s09_*` | `nft::ids_sequential_no_burn`, `nft::mint_rules_and_metadata`, `storage::mint_and_list_charge_exactly` |
-| `nft_transfer` | `tests::transfer_guards`, `tests::transfer_keeps_history_and_inflight_resolution`, `fix_s06_s09_*`, `m01_transfer_*` | `transfer::*`, `security::fix_s06_s09_receiver_guard`, `market::m01_transfer_to_new_holder_never_spends_escrow` |
+| `nft_transfer` | `tests::transfer_guards`, `tests::transfer_keeps_history_and_inflight_resolution`, `fix_s06_s09_*`, `m01_transfer_*`, `allowance_tests::r2_refused_transfers_keep_allowances_and_log_nothing` | `transfer::*`, `security::fix_s06_s09_receiver_guard`, `market::m01_transfer_to_new_holder_never_spends_escrow`, `round2::r2_events_once_and_in_order_on_every_ownership_change` |
 | `nft_transfer_call` | `tests::transfer_guards` | `transfer::transfer_call_disabled` |
 | `nft_token`, `nft_total_supply`, `nft_tokens`, `nft_supply_for_owner`, `nft_tokens_for_owner`, `nft_metadata` | `security_tests::s05_*`, `fix_s05_*` | `security::fix_s05_nep181_views_are_paged`, `nft::mint_rules_and_metadata` |
 | `sign_for` (EVM/BTC/SOL) | `tests::sign_for_*`, `security_tests::guard_*`, `parse::tests::*`, `parse::fuzz_tests::*` | `sign::*`, `gas::*`, `storage::sign_for_charges_exactly` |
 | `sign_for` (C7 messages) | `feature_tests::c7_*` | `features::c7_*` |
-| `sign_for` (delegate, C5) | `allowance_tests::*`, `audit01_*` | `allowance::*`, `audit::audit01_*` |
+| `sign_for` (delegate, C5) | `allowance_tests::*`, `audit01_*`, `allowance_tests::r2_*` (5, round two) | `allowance::*`, `audit::audit01_*`, `round2::r2_delegate_sign_events_and_requester`, `r2_extra_sign_for_arguments_cannot_relabel_the_requester`, `r2_inflight_delegate_sign_survives_a_transfer` |
 | `on_signed` | `tests::on_signed_fills_slots_never_panics_and_grows_no_storage`, `tests::audit_on_signed_defensive_paths` | `sign::callback_fills_slot`, `timeout_never_sticks`, `garbage_response`, `mpc_panics`, `btc_fanout_partial_failure`, `storage::callback_no_growth`, `sign::callbacks_are_private` |
 | `list` / `delist` | `tests::quiet_period_and_freeze`, `list_guards`, `list_zero_deposit_rejected`, `fix_s03_*` | `sale::quiet_period_*`, `delist_resumes_signing`, `list_guards`, `zero_deposit_rejected` |
-| `buy` | `tests::buy_*`, `security_tests::guard_buy_binding` | `sale::buy_*` |
-| `ft_on_transfer` (buy/offer/deposit) | `tests::ft_on_transfer_*`, `market_tests::ft_on_transfer_routing_guards`, `ft_msg_shapes_are_exact`, `prop_ft_msg_garbage_is_refused_cleanly` | `usdc::*`, `market::ft_deposit_storage_credit_and_refunds`, `market::offer_usdc_accept` |
+| `buy` | `tests::buy_*`, `security_tests::guard_buy_binding` | `sale::buy_*`, `round2::r2_events_once_and_in_order_on_every_ownership_change` |
+| `ft_on_transfer` (buy/offer/deposit) | `tests::ft_on_transfer_*`, `market_tests::ft_on_transfer_routing_guards`, `ft_msg_shapes_are_exact`, `prop_ft_msg_garbage_is_refused_cleanly` | `usdc::*`, `market::ft_deposit_storage_credit_and_refunds`, `market::offer_usdc_accept`, `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` |
 | `withdraw_proceeds` | `tests::payout_failure_recredit_and_withdraw`, `fix_s03_*` | `sale::payout_failure_recredit`, `security::fix_s03_exactly_one_yocto` |
 | `on_payout` | `fix_s13_on_payout_needs_exactly_one_promise_result`, `guard_payout_recredit_accounting` | `security::s01_*`, `on_payout_recredit_gas_margin`, `usdc::unregistered_seller_recredit` |
 | `set_allowance` / `revoke_allowance` | `allowance_tests::set_allowance_*`, `revoke_guards_and_effect`, … | `allowance::set_allowance_guards_and_charge` |
 | `allowances_of` / `allowance` | `allowance_tests::views_for_unknown_tokens_and_delegates` | `allowance::*` (indirect) |
-| `deposit_near` / `withdraw_near` | `market_tests::deposit_near_*`, `withdraw_near_*` | `market::deposit_and_withdraw_near`, `withdraw_blocked_while_listed` |
-| `withdraw_ft` | `market_tests::withdraw_ft_guards_and_call_shape` | `market::withdraw_failures_recredit`, `audit::audit_wnear_inside_deposit_withdraw_and_refusals` (wNEAR) |
+| `deposit_near` / `withdraw_near` | `market_tests::deposit_near_*`, `withdraw_near_*` | `market::deposit_and_withdraw_near`, `withdraw_blocked_while_listed`, `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` |
+| `withdraw_ft` | `market_tests::withdraw_ft_guards_and_call_shape` | `market::withdraw_failures_recredit`, `audit::audit_wnear_inside_deposit_withdraw_and_refusals` (wNEAR), `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` |
 | `on_inside_withdraw` | `market_tests::on_inside_withdraw_recredits_only_on_failure_and_never_panics` | `market::withdraw_failures_recredit` |
 | `prepay_storage` / `withdraw_storage_credit` / `storage_credit_of` | `market_tests::prepay_and_withdraw_storage_credit`, `audit_withdraw_storage_credit_event_and_bare_transfer` | `market::ft_deposit_storage_credit_and_refunds` |
-| `make_offer` / `cancel_offer` / `accept_offer` | `market_tests::*offer*` | `market::offer_*` |
+| `make_offer` / `cancel_offer` / `accept_offer` | `market_tests::*offer*` | `market::offer_*`, `round2::r2_events_once_and_in_order_on_every_ownership_change` |
 | `offer` / `offers_for` / `offers_by` | `market_tests::offer_indexes_survive_swap_remove`, `audit_offer_pages_edges` | `market::offer_*` (indirect) |
 | `inside_of`, `market_config`, `market_totals` | `market_tests::*`, `prop_accounting_matches_model` | `market::near_solvency_invariant`, `ft_solvency_invariant` |
 | `config`, `satchel`, `sig_records`, `listings`, `proceeds_of`, `derived_path` | `tests::views_shapes_and_paging`, `tests::audit_view_edge_arguments_never_panic` | `views::view_shapes_match_spec`, `audit::audit02_*` |
@@ -85,10 +86,10 @@ Legend: U = unit test (`contracts/satchel/src/…`), S = sandbox test (`tests/te
 | INV-16 ft_on_transfer refunds | `tests::ft_on_transfer_*` | `usdc::ft_guards`, `direct_call_attack`, `near_listing_refunds`, `ft_self_buy` |
 | INV-17 deposits | `tests::list_zero_deposit_rejected`, `fix_s03_*` | `sign::zero_deposit_rejected`, `sale::zero_deposit_rejected`, `security::fix_s03_exactly_one_yocto`, `transfer::transfer_exactly_one_yocto` |
 | INV-18 exact storage charge | `tests::sign_for_evm_records_charges_and_calls_mpc`, `feature_tests::c7_long_message_*` | `storage::sign_for_charges_exactly`, `excess_refunded`, `mint_and_list_charge_exactly` |
-| INV-19 gas floor | `tests::sign_for_guards_*` | `gas::floor_and_forwarding_{1,2,4,10}` |
+| INV-19 gas floor | `tests::sign_for_guards_*` | `gas::floor_and_forwarding_{1,2,4,10}`, `gas_paths::gas_heavy_paths` (measurement, round two) |
 | INV-21 ids sequential | `tests::ids_sequential_*` | `nft::ids_sequential_no_burn` |
 | INV-22 wasm imports | — | `harness::wasm_import_check_*` (+ `tools/check-wasm-imports.sh`) |
-| INV-23 BTC completeness | `parse::tests::btc_*`, `security_tests::guard_btc_*` | `sign::btc_records_per_input` |
+| INV-23 BTC completeness | `parse::tests::btc_*`, `security_tests::guard_btc_*`, `allowance_tests::r2_delegate_btc_one_input_rule_edge_shapes` | `sign::btc_records_per_input` |
 | INV-24 BTC fan-out partial failure | `tests::sign_for_btc_fans_out_*` | `sign::btc_fanout_partial_failure` |
 | INV-25 payout failure re-credit | `fix_s01_*`, `fix_s13_*` | `sale::payout_failure_recredit`, `usdc::unregistered_seller_recredit`, `security::s01_*` |
 | INV-26 mpc_deposit bounds | `tests::sign_for_guards_*` | `sign::mpc_deposit_bounds` |
@@ -97,8 +98,8 @@ Legend: U = unit test (`contracts/satchel/src/…`), S = sandbox test (`tests/te
 | INV-29 callback grows no storage | `tests::on_signed_fills_slots_*` | `storage::callback_no_growth` |
 | INV-30 receiver guard, NEP-181 paging | `fix_s06_s09_*`, `fix_s09_*`, `fix_s05_*` | `transfer::bad_receivers`, `security::fix_s06_s09_*`, `fix_s05_*` |
 | INV-31 keyless birth | — | `release::keyless_birth_batch`, `failed_birth_leaves_nothing` |
-| INV-34 delegate authorization | `allowance_tests::*` | `allowance::*` |
-| INV-35 ownership change clears allowances | `allowance_tests::transfer_clears_*`, `usdc_sale_clears_too`, `market_tests::delegates_cannot_withdraw_or_accept_and_accept_clears_allowances` | `allowance::transfer_clears_allowances`, `sales_clear_allowances`, `market::offer_accept_clears_allowances_*` |
+| INV-34 delegate authorization | `allowance_tests::*`, `allowance_tests::r2_*` | `allowance::*`, `round2::r2_*` (delegate path) |
+| INV-35 ownership change clears allowances | `allowance_tests::transfer_clears_*`, `usdc_sale_clears_too`, `market_tests::delegates_cannot_withdraw_or_accept_and_accept_clears_allowances`, `allowance_tests::r2_delegate_across_owner_changes` | `allowance::transfer_clears_allowances`, `sales_clear_allowances`, `market::offer_accept_clears_allowances_*`, `round2::r2_inflight_delegate_sign_survives_a_transfer` |
 | INV-36 market solvency (I-M1…I-M8) | `market_tests::m01_*`, `prop_*` | `market::*solvency*`, `m01_*`, `review::m01_*` |
 | INV-37 messages never transactions | `parse::msg::tests::signed_bytes_never_parse_as_transactions` | `features::c7_messages_mpc_shape_records_and_refusals` |
 | INV-38 per-chain nonce gap | `feature_tests::c3_nonce_gap_is_per_chain` | `features::c3_nonce_gap_is_per_chain` |
@@ -291,24 +292,32 @@ the contract as unowned buffer instead of being re-credited, unlike `withdraw_ne
   semantics) at those roles.
 - **The TS mirror's agreement with `vectors/*.json`:** the Rust side reads every vector (`parse::tests::shared_vectors`,
   `allowance_tests::shared_allowance_vectors`, `feature_tests::c1_history_shared_vectors`,
-  `parse::fuzz_tests::differential_vs_ts_reference`). The vitest side (`packages/core`) was not run: no
-  `node_modules` in this worktree, and `packages/core` belongs to another agent. No vector was changed.
+  `parse::fuzz_tests::differential_vs_ts_reference`). Round two ran the TS classifier on 1,000,000 generated requests
+  (the deep differential, §7.2, 0 disagreements). No vector was changed.
+- **A Rust-vs-TS differential of the C5 debits** (`request_debits` vs `allowanceDebits` over generated requests): not
+  built. The new corpus generator file was declined in this session. The shared `vectors/allowance.json` (28 cases)
+  and the Rust properties `btc_delegate_debits_need_one_input` / `btc_debit_bounds` remain the cross-checks; R2-02 is
+  the one known code difference.
+- **The web app's use of the events** (R2-01, R2-03): checked by reading `apps/web/src/lib/near/history.ts` and
+  `lib/data/{server,sale}.ts` against the real-wasm event order. No web test was added (another lane).
 - **The reproducible build and the rc/final keyless birth on testnet** (SAT-081, SAT-082): out of scope (no deploys).
 - **`withdraw_storage_credit` with a failing transfer** (AUDIT-03) and **Q-05's window**: both need an account
   deletion or receipt-ordering race the sandbox cannot schedule deterministically.
-- **`nearcore 2.14` (testnet's version):** the suite runs on the sandbox default 2.13.4; `SANDBOX_VERSION=2.14.0-rc.5`
-  re-runs it on 2.14 but was not part of this audit run.
+- **`nearcore 2.14` (testnet's version):** covered in round two: the whole suite passes on `2.14.0-rc.5` (§7.2). Run it
+  one `--test <file>` at a time or in two halves; back-to-back sandboxes for ≈ 8 min exhaust the host's ports.
 
 ## 6. Test counts
 
-Audit run measured on 2026-10-30 in `test/contract`; fix run measured on 2026-10-30 in `fix/audit` (wasm built with
+Audit run measured on 2026-10-30 in `test/contract`; fix run measured on 2026-10-30 in `fix/audit`; round two measured on 2026-10-30/31 in `test/contract2` (§7) (wasm built with
 `cargo near build non-reproducible-wasm`, sha256 `9dd65286…49d1ebd9e3`; INV-22 check OK).
 
-| Suite | Before the audit | After the audit | After the fixes (`fix/audit`) |
-|---|---|---|---|
-| Unit, `cargo test -p satchel` | 177 passed, 0 ignored | 189 passed, 2 ignored (AUDIT-01, AUDIT-04) | **194 passed, 0 ignored** |
-| Sandbox, `cargo test -p satchel-tests` | 119 passed in 16 files, 0 ignored | 122 passed, 3 ignored (AUDIT-01, -02, -04) in 17 files | **127 passed, 0 ignored** in 17 files |
-| Core, `pnpm --filter @satchel/core test` | 467 | 467 | **472** (+5 shared allowance vectors) |
+| Suite | Before the audit | After the audit | After the fixes (`fix/audit`) | Round two (`test/contract2`) |
+|---|---|---|---|---|
+| Unit, `cargo test -p satchel` | 177 passed, 0 ignored | 189 passed, 2 ignored (AUDIT-01, AUDIT-04) | **194 passed, 0 ignored** | **199 passed, 0 ignored** (+5 `allowance_tests::r2_*`) |
+| Sandbox, `cargo test -p satchel-tests`, default 2.13.4 | 119 passed in 16 files, 0 ignored | 122 passed, 3 ignored (AUDIT-01, -02, -04) in 17 files | **127 passed, 0 ignored** in 17 files | **136 passed, 0 ignored** in 19 files (+7 `round2.rs`, +2 `gas_paths.rs`) |
+| Sandbox on 2.14.0-rc.5 | not run | not run | not run | **136 passed, 0 ignored** (per file, §7.2) |
+| Core, `pnpm --filter @satchel/core test` | 467 | 467 | **472** (+5 shared allowance vectors) | 472 (not re-run; core unchanged) |
+| Deep Rust-vs-TS differential | 400k (2026-10-29) | not run | not run | **1,000,000 cases, 0 disagreements** (§7.2) |
 
 New in the fix run: unit `audit04_successful_calls_log_their_events_in_order`,
 `audit01_delegate_single_input_btc_within_cap_signs`, proptest `btc_delegate_debits_need_one_input`; sandbox
@@ -319,3 +328,200 @@ Property runs for the fix (release): `PROPTEST_CASES=50000 cargo test -p satchel
 (34 tests, 134 s), `PROPTEST_CASES=1000 … market_tests::prop` (4 properties, 73 s),
 `PROPTEST_CASES=20000 FUZZ_STATS_CASES=20000 … parse::fuzz_tests` (26 tests incl. the seed-corpus differential), and
 `FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test.ts test/fuzz` (78 tests): all pass.
+
+## 7. Round two (2026-10-30, branch `test/contract2`, from `main` 3272e4c)
+
+Second test audit, on the post-fix code (AUDIT-01, -02 and -04 fixed). No contract source is changed; a real bug gets a
+failing test marked `#[ignore = "BUG: …"]` and a write-up here. Wasm under test: `cargo near build
+non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3` (= dev2), INV-22 OK.
+
+### 7.1 Plan
+
+1. Baselines: unit and default sandbox (2.13.4) on 3272e4c.
+2. The sandbox suite on nearcore 2.14 (`SANDBOX_VERSION=2.14.0-rc.5`); record every difference from 2.13.4.
+3. The deep Rust-vs-TS differential corpus (≥ 100k per kind, two seeds), results and timings.
+4. Adversarial tests on the post-fix code:
+   - the one-input delegate rule with edge shapes: 0 inputs, one outpoint twice, one input of a multi-input tx sent
+     alone, an owner request "mislabeled" with extra JSON fields, a delegate request after the owner changes (incl. an
+     in-flight one);
+   - the moved emits (AUDIT-04): every success path logs each event exactly once, in the order the spec and the app's
+     parsers (`apps/web/src/lib/near/history.ts`, `lib/data/server.ts`, `lib/data/sale.ts`) expect.
+5. Q-03 (withdraw to the MPC / USDC as receiver) and Q-04 (`ft_on_transfer` extra fields): tests that pin the current
+   behaviour, plus the risk spelled out for the human to decide. No behaviour change.
+6. Gas: re-measure the heaviest paths (`gas.rs` and the other measuring tests) after the fixes and compare with the
+   pre-fix wasm (the parent of `c1d97d1`) on the same machine.
+7. Update the coverage matrix and the counts (§6, §7.6).
+
+### 7.2 Results (filled in as each run finishes)
+
+| Run | Result |
+|---|---|
+| Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
+| Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
+| Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: the "re-run one file at a time" row below |
+| New sandbox file `round2.rs`, default 2.13.4 (from 63e2553) | **7 passed** on the first run, 21 s |
+| New unit tests `allowance_tests::r2_*` | **5 passed** |
+| Sandbox on 2.14, re-run one file at a time (2026-10-31): `storage`, `transfer`, `usdc`, `views` | **4 + 7 + 7 + 2 passed**. `storage.rs` byte deltas identical to 2.13.4 (mint 639 B, list 260 B, EVM 276/268 B, BTC×3 723 B, SOL 237 B). The earlier failures were sandbox start-up only (port binding after ≈ 8 min of back-to-back sandboxes); a first re-run of all four files together failed the same way |
+| **Sandbox on 2.14, total** | **127 / 127 of the existing suite pass** (107 first pass + 20 re-run), plus `round2.rs` 7/7 and `gas_paths.rs` 2/2 on 2.14 |
+
+**Differences between 2.13.4 and 2.14.0-rc.5** (same wasm, same tests):
+
+1. **The contract's balance no longer grows with usage on 2.14.** `gas_paths::contract_balance_after_calls`: a failed
+   1.49 Tgas call adds +1.80e19 yocto to the contract on 2.13.4 (a share of the burnt gas, ≈ 12 %) and **0** on 2.14;
+   `nft_transfer` adds +6.40e19 yocto on 2.13.4 and exactly the 1 yocto it keeps on 2.14. The M-01 lines agree:
+   `market::m01_transfer_*` ends with more slack than it started with on 2.13.4 (0.4554 → 0.5247 mNEAR after the
+   refused transfer) and with the same slack on 2.14 (0.4554 → 0.4554 mNEAR). Impact: small. The reward was ≈ 0.000064
+   NEAR per transfer against the ≈ 0.0025 NEAR (250 B, S-02) a first-time holder costs the contract, so the S-02 /
+   M-01 sizing (fund the birth generously; anyone can top up the keyless account with a plain Transfer; `ensure_solvent`
+   refuses `ERR_INSOLVENT` before escrow is touched) is unchanged. On testnet (2.14) the free buffer only ever goes down
+   with usage, so a drain rehearsed on the 2.13 sandbox would look slightly better than testnet. No test relied on the
+   reward, so every test passes on both versions.
+2. Gas: identical to ±0.002 Tgas for every contract receipt (`gas_paths`, `gas.rs`, `on_payout` 1.862 Tgas, birth
+   88.8 Tgas, `history_digest` ceilings 3,000 / 2,000 records). The ±0.22 Tgas swing in tx totals happens on both
+   versions and on the same wasm (noise from the mock's yield/resume).
+3. Behaviour: none. Every assertion, every refusal code, every event and every storage delta is the same.
+| Differential, seed 20261030 (`target/fuzz-corpus-r2`), 100,000 per kind (evm, btc, sol, msg = 400k) | **0 disagreements**, no TS throw. TS generation 12.7 s CPU; Rust replay (release) 13.9 s. Agreed: EVM 17,711 ok + 82,289 refused; BTC 25,426 + 74,574; SOL 24,904 + 75,096; msg 49,512 + 50,488. The Rust oracles agreed with the contract on every line |
+| Differential, seed 7 (`target/fuzz-corpus-r2b`), EVM 300,000 + 100,000 btc/sol/msg (600k) | **0 disagreements**, no TS throw. TS generation 17.4 s; Rust replay 18.9 s. Agreed: EVM 52,395 ok + 247,605 refused; BTC 25,387 + 74,613; SOL 25,008 + 74,992; msg 49,177 + 50,823 |
+
+Commands (from the repo root): `pnpm --filter @satchel/tools fuzz:corpus --n 100000 --seed 20261030 --out
+../target/fuzz-corpus-r2`, then `SATCHEL_FUZZ_CORPUS=target/fuzz-corpus-r2 cargo test -p satchel --lib --release
+differential -- --nocapture`. Total for round two: **1,000,000 differential cases, 0 disagreements** (round one
+skipped this run; the last deep run was 2026-10-29, 400k).
+
+### 7.3 New tests (all pass; none ignored)
+
+| Test | What it pins |
+|---|---|
+| U `allowance_tests::r2_delegate_btc_one_input_rule_edge_shapes` | Delegate BTC: 0 and 11 inputs → `ERR_BTC_INPUT_COUNT`; one outpoint twice and one preimage twice → `ERR_BTC_DUPLICATE_INPUT`; **one input of a 2-input tx sent alone, either one → `ERR_BTC_PREVOUTS_INCOMPLETE`** (hashPrevouts commits to every outpoint, so the one-input rule cannot be met by splitting a multi-input tx into single-input requests); the full 2-input tx → `ERR_ALLOWANCE_BTC_ONE_INPUT`. Same codes as the owner's; nothing written, the cap untouched; owner and 1-input delegate sends still sign |
+| U `allowance_tests::r2_delegate_foreign_pkh_change_is_debited_zero_but_recorded` | A 1-input request whose scriptCode pkh is NOT the Satchel's, paying all value back to that foreign pkh: debit 0 (it looks like change), recorded with the delegate as requester, counts as a rate-limit entry. Harmless: BIP143 commits the scriptCode, so the signature cannot spend a Satchel coin |
+| U `allowance_tests::r2_delegate_mislabeled_requests_get_the_classifier_code` | EIP-191 bytes or a BTC preimage labeled `evm`, an EVM tx or a Solana off-chain message labeled `sol`, an EVM tx labeled `btc`: refused with the classifier's code before any allowance logic; delegate message kinds (valid or not) are `ERR_ALLOWANCE_KIND` |
+| U `allowance_tests::r2_delegate_across_owner_changes` | alice's delegate spends its cap → gift to bob → the delegate is a stranger → bob grants the same delegate a fresh budget (alice's spends do not follow) → bob gives the token to the delegate, who now signs as owner (no debit, messages allowed; all four records keep `requester` = it) → back to alice, nothing revives |
+| U `allowance_tests::r2_refused_transfers_keep_allowances_and_log_nothing` | Self-transfer, 2 yocto and a listed token: refused, no log at all, allowances and owner unchanged (the AUDIT-04 deferral did not move `on_owner_change` ahead of a refusal) |
+| S `round2::r2_events_once_and_in_order_on_every_ownership_change` | On the real wasm, through the app's own filter (successful contract receipts, receipt order): `nft_transfer` → `nep171:nft_transfer`, `allowances_cleared`; NEAR `buy` → `nft_transfer` (memo `sale`), `allowances_cleared`, `sold` in ONE receipt, then `payout` in the callback of the same tx (what `lib/data/sale.ts` pairs); USDC buy → `nft_transfer`, `sold`, `payout`; `make_offer` → `offer_made`; `accept_offer` on a listed token → `delisted`, `nft_transfer` (memo `offer`), `allowances_cleared`, `offer_accepted`, `payout`. Each exactly once; a log-grepping view of all contract receipts sees nothing more |
+| S `round2::r2_delegate_sign_events_and_requester` | Delegate `sign_for`: `sign_requested` (owner_id = the owner, **no `requester` field**), `allowance_spent` (same receipt, same `first_seq`), `sign_resolved`; only the record names the delegate (C5.md §1.3). Pins the contract side of R2-01 |
+| S `round2::r2_extra_sign_for_arguments_cannot_relabel_the_requester` | Extra `requester` / `owner_id` / `signer` JSON arguments are ignored: the record and `allowance_spent` name the delegate. A request object with two kinds (`evm` + `sol`) fails to deserialize, for owner and delegate, before anything is written |
+| S `round2::r2_inflight_delegate_sign_survives_a_transfer` | A delegated signature in flight when the owner gives the token away resolves `signed` with the delegate as requester; the transfer logs `allowances_cleared`; the delegate is then `ERR_NOT_OWNER`; the new owner signs |
+| S `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` | Q-03, current behaviour (§7.4) |
+| S `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` | Q-03 for USDC (§7.4) |
+| S `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` | Q-04, current behaviour (§7.4) |
+| S `gas_paths::gas_heavy_paths`, `gas_paths::contract_balance_after_calls` | Gas of nine heavy paths and the contract-balance effect of a call; printed, behaviour-neutral, so they run on the pre-fix wasm too (§7.2, §7.5) |
+
+Fuzz corpora: the committed seed corpus (`tools/fuzz/corpus`) was not regenerated, because no vector or generator
+changed. The deep corpora live in `target/` (not committed) and are reproducible from the seeds in §7.2.
+
+### 7.4 Findings and the open questions
+
+No contract bug was found in round two: no test is ignored, and the contract source is unchanged.
+
+**R2-01 (Low, web app, not the contract): a delegate's signature shows as the owner's in the live Activity feed.**
+- Where: `apps/web/src/lib/data/server.ts:295` (`getActivity`, live branch) sets `requester: e.data.requester` from the
+  `sign_requested` event. The contract's `sign_requested` has no `requester` field by design (C5.md §1.3; pinned by
+  `round2::r2_delegate_sign_events_and_requester`), so `requester` is always `undefined` live and
+  `components/Timeline.tsx:201` never shows "Requested by". The fixture branch (`server.ts:258`, "a delegate's
+  `requester` rides the event") puts `requester` on the fixture event, so fixture and e2e tests cannot see it.
+- Repro (derived from the code and the real-wasm events; not run on testnet, which this audit may not sign): a
+  delegate signs for Satchel #N on dev2; its live Activity row shows no requester, while `sig_records(N)[seq].requester`
+  is the delegate. The clean-history page is correct (`clean.ts`, `clean-live.ts` read
+  the record's `requester`).
+- Impact: a buyer or owner reading Activity can't tell a delegate's signature from the owner's there. The
+  authoritative history (clean history, `sig_records`) is right, so there is no safety impact.
+- Suggested fix (web lane): in the live branch, take the requester from the record that `signRow` already looks up
+  (`rec.requester`, or the record at `first_seq`), or pair `sign_requested` with the `allowance_spent` of the same tx
+  on `first_seq`. Make the fixture events match the contract: no `requester` on `sign_requested`.
+
+**R2-02 (Info, TS mirror, error code only).** For a delegate's message request (`evm_message` / `sol_message`), the
+contract refuses `ERR_ALLOWANCE_KIND` in `authorize_signer`, before classifying, so an invalid message also gets
+`ERR_ALLOWANCE_KIND`. The TS `allowanceDebits` classifies first, so an empty message is `ERR_MSG_EMPTY` and `c0` is
+`ERR_MSG_ENCODING`; a valid message is `ERR_ALLOWANCE_KIND` on both sides. Both refuse, and the UI never offers
+message signing to a delegate. Pinned on the Rust side by `r2_delegate_mislabeled_requests_get_the_classifier_code`.
+Optional fix: in `allowanceDebits`, return `ERR_ALLOWANCE_KIND` for the message kinds before classifying, plus one
+vector (`vectors/allowance.json`).
+
+**R2-03 (Info, web app): an accepted offer shows only as "transferred" in Activity.** `getActivity` maps `sold` but
+not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) with no price. The events are right
+(`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row.
+
+**Q-03: withdraw to the MPC or the USDC contract as receiver (current behaviour pinned; Razvan to decide).**
+- What happens today (`round2::q03_*`):
+  - `withdraw_near(receiver = MPC)` and `(receiver = USDC contract)`: **delivered**, `inside_withdraw_resolved.ok =
+    true`. The NEAR is now the MPC's or Circle's; no Satchel method can bring it back. Permanent loss for the owner.
+  - `withdraw_ft(USDC, receiver = MPC or the USDC contract)`: the FT refuses an unregistered receiver, so the
+    transfer fails and the callback **re-credits** the token (no loss), at least with near-contract-standards
+    semantics (the mock). **But registration is permissionless**: after anyone pays `storage_deposit` for the MPC
+    account, the same withdrawal is delivered and the USDC is stranded there. Real Circle testnet USDC was not tested.
+  - A named receiver that does not exist: the NEAR transfer fails and is re-credited (no loss). The contract itself:
+    `ERR_BAD_RECEIVER`.
+- Risk: user error only (the owner picks the receiver), but irreversible, and the contract is immutable after Nov 10.
+  Severity Low. Nobody but the owner can trigger it, and only against their own Satchel.
+- Options: (a) keep it and catch it in the UI. The web Send-out flows (`EmptyFlow.tsx`, `Market.tsx`) currently
+  withdraw only to the connected owner, so today's UI cannot reach it. Only a hand-made call or a future "send to
+  address" field can, and that field would need to refuse the MPC id and the USDC id. (b) Before the freeze, extend
+  the receiver check to `ensure_receiver` (contract, MPC, USDC), the same set `nft_transfer` refuses. That is a
+  one-line behaviour change, plus a unit and a sandbox test, plus the mirror in core if any. Recommendation: (b) if
+  there is time before Nov 9, since it is cheap and the set already exists; otherwise (a).
+
+**Q-04: `ft_on_transfer` msgs accept unknown extra fields (current behaviour pinned; Razvan to decide).**
+- What happens today (`round2::q04_*`, `market_tests::audit_ft_msg_lenient_and_strict_cases`):
+  - A USDC buy msg with `"receiver_id": <other>` and `"price": "1"`: ignored. The sale runs at the listing price and
+    the NFT goes to the FT **sender**.
+  - An offer msg with `"amount": "1"`: ignored, and the offer escrows the transferred amount.
+  - Two top-level keys, a numeric id, a wrong case or a missing field: refused (`ERR_BAD_MSG`, the FT refunds 100 %).
+  - A **duplicate field** (`"token_id":"1","token_id":"2"`): refused (serde `duplicate field`), refunded. A JS
+    `JSON.parse` would keep the last value, but no client parses these msgs, it only writes them.
+- Risk: none today. Every binding value (token, listing id, sig count, epoch, expiry) is a required field, and the
+  amount comes from the FT transfer, not the msg. The risk is forward-looking: the contract is immutable, so a future
+  client that adds a field it expects to be enforced (`receiver_id`, `max_price`, `min_sig_count`, …) gets it
+  silently ignored rather than refused. For example, a "buy for a friend" UI would hand the NFT to the payer.
+  Severity Info.
+- Options: (a) keep it, and write in spec §5.12 / C4-C6.md that unknown msg fields are ignored and that new binding
+  fields need a new contract. (b) Add `#[serde(deny_unknown_fields)]` to `FtMsg::Buy`, `OfferMsg` (and the `Deposit`
+  form is already exact). That is a behaviour change: unknown fields would refuse and refund. It needs a unit test
+  flip (`audit_ft_msg_lenient_and_strict_cases`), `q04_*` updated, and a check that the TS builders
+  (`packages/core`) never add a field. Recommendation: (b) is cheap and fails closed. Either way, (a)'s spec sentence.
+
+**Q-05 (unchanged):** the transient I-M1 window after a failed withdrawal or payout is still not reproduced
+deterministically; round two saw no `ERR_INSOLVENT` in any run on either version.
+
+### 7.5 Gas after the fixes
+
+Same machine, default sandbox 2.13.4, `--test-threads 1`. Pre-fix wasm = `cargo near build non-reproducible-wasm` of
+`4e42b47` (the parent of the first fix commit `c1d97d1`), sha256 `10c6a8e9…53353614a`, 423,977 B; post-fix wasm
+`9dd65286…49d1ebd9e3`, 423,019 B (−958 B). Run with `SATCHEL_WASM=<pre-fix wasm>` for the "before" column.
+
+`gas_paths.rs::gas_heavy_paths` (new; behaviour-neutral so it runs on both wasms). Total = every receipt of the tx;
+main = the contract's own first receipt.
+
+| Path | Before: total / main (Tgas) | After: total / main (Tgas) | Δ main |
+|---|---|---|---|
+| `set_allowance` (new delegate, 2 caps) | 2.996 / 2.233 | 2.995 / 2.232 | −0.001 |
+| `sign_for` EVM by a delegate (C5 debit) | 14.539 / 3.716 | 14.537 / 3.715 | −0.001 |
+| `sign_for` BTC 1 input by a delegate (+ AUDIT-01 check) | 15.196 / 4.088 | 15.194 / 4.087 | −0.001 |
+| `sign_for` BTC 10 inputs by the owner | 98.190 / 12.144 | 98.188 / 12.143 | −0.001 |
+| `nft_transfer` clearing 4 delegates (AUDIT-04 `move_token`) | 3.475 / 3.164 | 3.473 / 3.162 | −0.002 |
+| `buy` NEAR clearing 4 delegates | 7.035 / 4.348 | 7.034 / 4.348 | 0 |
+| `ft_transfer_call` USDC buy | 12.562 / 4.339 | 12.561 / 4.339 | 0 |
+| `make_offer` NEAR | 3.885 / 3.123 | 3.884 / 3.123 | 0 |
+| `accept_offer` on a listed token clearing 4 delegates | 8.002 / 5.317 | 8.001 / 5.316 | −0.001 |
+
+`gas.rs::floor_and_forwarding_{1,2,4,10}` (total burnt, two runs each): before 14.13 / 23.95–24.18 / 42.44–42.66 /
+97.91; after 14.13–14.35 / 23.95–24.17 / 42.43–42.66 / 97.91–98.13. The 0.22 Tgas step shows up on the SAME wasm
+between runs (it comes from the mock's yield/resume timing, not the contract), so it is noise. Earlier figures in
+`docs/handoff/sandbox.md` (13.8 / 23.6 / 42.1 / 97.6) predate C4–C7.
+
+**Result: the fixes changed no gas cost measurably** (every path within ±0.002 Tgas; the wasm is 958 B smaller because
+`move_token` replaced the standard's `internal_transfer` + `nft_transfer` path). No static gas constant needs to move:
+`on_payout` still burns 1.862 Tgas of its 10 Tgas (`security::on_payout_recredit_gas_margin`), the keyless birth 88.8
+Tgas (`release::keyless_birth_batch`), `history_digest` fits 3,000 EVM records (276.2 Tgas) and 2,000 1-KB messages
+(266.4 Tgas) in one call (`review::sr05_history_digest_gas_ceiling`), unchanged on 2.14.
+
+### 7.6 Counts and what round two changed
+
+- Contract source: **unchanged** (wasm `9dd65286…49d1ebd9e3` = dev2; INV-22 OK). No vector, corpus or generator changed.
+- Unit: 194 → **199** passed, 0 ignored. Sandbox default 2.13.4: 127 → **136** passed in 19 files, 0 ignored; the same
+  136 pass on 2.14.0-rc.5. Deep differential: **1,000,000** cases, 0 disagreements.
+- Findings: no contract bug. R2-01 (Low, web: a delegate's requester is missing from live Activity), R2-02 (Info, TS
+  mirror error code for a delegate's invalid message), R2-03 (Info, web: an accepted offer shows as a plain transfer);
+  one environment note (2.14 gives the contract no share of gas, §7.2). Q-03 and Q-04 are pinned with options for
+  Razvan (§7.4).
+- Not done in round two: the C5-debit differential (§5), a web test for R2-01 (another lane), real Circle USDC and real
+  MPC behaviour (no testnet transactions).
