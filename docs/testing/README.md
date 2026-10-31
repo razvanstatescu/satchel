@@ -31,17 +31,17 @@ signs a testnet transaction. Live testnet runs are separate and documented in `r
 
 ## Counts on `main`
 
-Measured on `main` after round two and its fixes (2026-10-31).
+Measured on `main` after round two, its fixes, and the Q-03/Q-04 contract change (2026-10-31).
 
-| Suite | Before the audit | After round one | After the round-one fixes | **After round two** |
-|---|---|---|---|---|
-| Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | **199 passed, 0 ignored** |
-| Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | **136 passed, 0 ignored** (19 files) |
-| Contract sandbox (2.14.0-rc.5) | not run | not run | not run | **136 passed** (run by the round-two agent, one file at a time) |
-| Core | 467 | 467 | 472 | **540** |
-| Web unit | 486 | 531 | 535 | **606** |
-| Tools unit | 92 | 92 | 92 | **92** |
-| Web end to end | 224 | 263 | 265 | **286** (+21: round two) |
+| Suite | Before the audit | After round one | After the round-one fixes | After round two | **After Q-03/Q-04** |
+|---|---|---|---|---|---|
+| Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | 199 passed, 0 ignored | **202 passed, 0 ignored** |
+| Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | 136 passed, 0 ignored (19 files) | **137 passed, 0 ignored** (20 files) |
+| Contract sandbox (2.14.0-rc.5) | not run | not run | not run | 136 passed (one file at a time) | not re-run |
+| Core | 467 | 467 | 472 | 540 | **540** |
+| Web unit | 486 | 531 | 535 | 606 | **606** |
+| Tools unit | 92 | 92 | 92 | 92 | **92** |
+| Web end to end | 224 | 263 | 265 | 286 (+21) | **286** (app unchanged) |
 
 The typecheck, lint and wasm import check (INV-22) are clean. Two tests were intermittent: a theme toggle measured at
 43.99994 px, and an axe contrast reading taken mid-animation. Both are now deterministic: the measurement waits for the
