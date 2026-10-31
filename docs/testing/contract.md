@@ -49,15 +49,15 @@ Legend: U = unit test (`contracts/satchel/src/…`), S = sandbox test (`tests/te
 | `on_signed` | `tests::on_signed_fills_slots_never_panics_and_grows_no_storage`, `tests::audit_on_signed_defensive_paths` | `sign::callback_fills_slot`, `timeout_never_sticks`, `garbage_response`, `mpc_panics`, `btc_fanout_partial_failure`, `storage::callback_no_growth`, `sign::callbacks_are_private` |
 | `list` / `delist` | `tests::quiet_period_and_freeze`, `list_guards`, `list_zero_deposit_rejected`, `fix_s03_*` | `sale::quiet_period_*`, `delist_resumes_signing`, `list_guards`, `zero_deposit_rejected` |
 | `buy` | `tests::buy_*`, `security_tests::guard_buy_binding` | `sale::buy_*`, `round2::r2_events_once_and_in_order_on_every_ownership_change` |
-| `ft_on_transfer` (buy/offer/deposit) | `tests::ft_on_transfer_*`, `market_tests::ft_on_transfer_routing_guards`, `ft_msg_shapes_are_exact`, `prop_ft_msg_garbage_is_refused_cleanly` | `usdc::*`, `market::ft_deposit_storage_credit_and_refunds`, `market::offer_usdc_accept`, `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` |
+| `ft_on_transfer` (buy/offer/deposit) | `tests::ft_on_transfer_*`, `market_tests::ft_on_transfer_routing_guards`, `ft_msg_shapes_are_exact`, `prop_ft_msg_garbage_is_refused_cleanly`, `audit_ft_msg_strict_cases`, `q04_unknown_msg_fields_are_refused_and_change_nothing`, `prop_ft_msg_any_extra_key_is_refused` | `usdc::*`, `market::ft_deposit_storage_credit_and_refunds`, `market::offer_usdc_accept`, `round2::q04_ft_msg_unknown_fields_are_refused_and_refunded` |
 | `withdraw_proceeds` | `tests::payout_failure_recredit_and_withdraw`, `fix_s03_*` | `sale::payout_failure_recredit`, `security::fix_s03_exactly_one_yocto` |
 | `on_payout` | `fix_s13_on_payout_needs_exactly_one_promise_result`, `guard_payout_recredit_accounting` | `security::s01_*`, `on_payout_recredit_gas_margin`, `usdc::unregistered_seller_recredit` |
 | `set_allowance` / `revoke_allowance` | `allowance_tests::set_allowance_*`, `revoke_guards_and_effect`, … | `allowance::set_allowance_guards_and_charge` |
 | `allowances_of` / `allowance` | `allowance_tests::views_for_unknown_tokens_and_delegates` | `allowance::*` (indirect) |
-| `deposit_near` / `withdraw_near` | `market_tests::deposit_near_*`, `withdraw_near_*` | `market::deposit_and_withdraw_near`, `withdraw_blocked_while_listed`, `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` |
-| `withdraw_ft` | `market_tests::withdraw_ft_guards_and_call_shape` | `market::withdraw_failures_recredit`, `audit::audit_wnear_inside_deposit_withdraw_and_refusals` (wNEAR), `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` |
+| `deposit_near` / `withdraw_near` | `market_tests::deposit_near_*`, `withdraw_near_*`, `q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc` | `market::deposit_and_withdraw_near`, `withdraw_blocked_while_listed`, `round2::q03_withdraw_near_to_mpc_usdc_or_self_is_refused` |
+| `withdraw_ft` | `market_tests::withdraw_ft_guards_and_call_shape` | `market::withdraw_failures_recredit`, `audit::audit_wnear_inside_deposit_withdraw_and_refusals` (wNEAR), `round2::q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered` |
 | `on_inside_withdraw` | `market_tests::on_inside_withdraw_recredits_only_on_failure_and_never_panics` | `market::withdraw_failures_recredit` |
-| `prepay_storage` / `withdraw_storage_credit` / `storage_credit_of` | `market_tests::prepay_and_withdraw_storage_credit`, `audit_withdraw_storage_credit_event_and_bare_transfer` | `market::ft_deposit_storage_credit_and_refunds` |
+| `prepay_storage` / `withdraw_storage_credit` / `storage_credit_of` | `market_tests::prepay_and_withdraw_storage_credit`, `audit_withdraw_storage_credit_event_and_bare_transfer`, `q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc` | `market::ft_deposit_storage_credit_and_refunds`, `round2::q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered` |
 | `make_offer` / `cancel_offer` / `accept_offer` | `market_tests::*offer*` | `market::offer_*`, `round2::r2_events_once_and_in_order_on_every_ownership_change` |
 | `offer` / `offers_for` / `offers_by` | `market_tests::offer_indexes_survive_swap_remove`, `audit_offer_pages_edges` | `market::offer_*` (indirect) |
 | `inside_of`, `market_config`, `market_totals` | `market_tests::*`, `prop_accounting_matches_model` | `market::near_solvency_invariant`, `ft_solvency_invariant` |
@@ -152,9 +152,9 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 | Offer stale after a signature or a withdrawal; offerer became owner (`ERR_SELF_BUY`); self-offer; MPC as offerer; 20-offer cap per account | covered | `market_tests::accept_offer_guards`, `make_offer_guards_change_nothing`, `offer_cap_is_per_offerer_not_per_token` |
 | Offer survives a gift; the new owner accepts and is paid | added (by design, C4-C6.md §3 "the new owner may accept them") | `market_tests::audit_offer_survives_a_gift_and_the_new_owner_accepts` |
 | Offer made while listed survives a `buy`; the buyer accepts it at once | added | `market_tests::audit_offer_made_while_listed_survives_the_sale` |
-| Deposits while listed (NEAR and FT) allowed; withdraw while listed `ERR_LISTED`; withdraw receiver = MPC / USDC accepted, = contract refused | added | `market_tests::audit_deposits_while_listed_and_withdraw_receivers` |
+| Deposits while listed (NEAR and FT) allowed; withdraw while listed `ERR_LISTED`; withdraw receiver = MPC / USDC / contract refused (accepted MPC / USDC until Q-03 was fixed, §7.7) | added | `market_tests::audit_deposits_while_listed_and_withdraw_receivers` |
 | wNEAR: first deposit without credit refunded; deposit with credit; `buy` and `offer` msgs from wNEAR refunded (`ERR_WRONG_TOKEN`); withdraw to owner; withdraw to an unregistered account re-credited; FT balance equals inside | added | `audit::audit_wnear_inside_deposit_withdraw_and_refusals` |
-| `ft_on_transfer` msg: unknown extra fields accepted; two top-level keys, numeric id, wrong case, negative id, missing field, empty refused | added | `market_tests::audit_ft_msg_lenient_and_strict_cases` |
+| `ft_on_transfer` msg: unknown extra fields refused (accepted until Q-04 was fixed, §7.7); two top-level keys, numeric id, wrong case, negative id, missing or duplicate field, `null`, `{}`, empty refused | added | `market_tests::audit_ft_msg_strict_cases` |
 | `withdraw_storage_credit` event fields; it pays with a bare transfer and no callback | added (observation AUDIT-03) | `market_tests::audit_withdraw_storage_credit_event_and_bare_transfer` |
 | M-01: transfer / NEAR buy / USDC buy / accept refused at exactly one yocto short; calls that free storage pass | covered | `market_tests::m01_*`, `market::m01_*`, `review::m01_*` |
 | **Events logged before a later refusal in the same receipt** | **AUDIT-04, fixed** | `market_tests::audit04_refused_calls_log_no_events` (NEAR/USDC offer, NEAR/USDC buy, `nft_transfer`), `audit04_successful_calls_log_their_events_in_order`, `audit04_well_ordered_paths_log_nothing_when_refused`; `audit::audit04_refused_make_offer_logs_no_offer_made`, `audit::audit04_refused_usdc_offer_logs_no_offer_made` |
@@ -269,10 +269,11 @@ the contract as unowned buffer instead of being re-credited, unlike `withdraw_ne
 - **Q-02 (by design, recorded):** offers survive ownership changes (C4-C6.md §3: "the new owner may accept them"), so
   the owner who receives a gift can accept an offer made to the previous owner. Pinned by
   `audit_offer_survives_a_gift_and_the_new_owner_accepts`.
-- **Q-03:** `withdraw_near` / `withdraw_ft` refuse only the contract itself as receiver (spec rule 8). Sending inside
-  NEAR to the MPC or the USDC contract is accepted and is a user error the UI should catch. Intended?
-- **Q-04:** `ft_on_transfer` msgs accept unknown extra fields (serde default). Harmless today (the amount must still
-  equal the price); should the parser be strict (`deny_unknown_fields`) to match the TS mirror's exact strings?
+- **Q-03: decided and fixed (2026-10-31, §7.7).** `withdraw_near` / `withdraw_ft` used to refuse only the contract
+  itself as receiver. Razvan chose option (b): they, and `prepay_storage(account_id)`, now refuse the contract, the MPC
+  and USDC (`ensure_receiver`, the `nft_transfer` set) with `ERR_BAD_RECEIVER`.
+- **Q-04: decided and fixed (2026-10-31, §7.7).** `ft_on_transfer` msgs used to accept unknown extra fields. Razvan
+  chose option (b): `deny_unknown_fields` on `FtMsg` and `OfferMsg`; an unknown field is `ERR_BAD_MSG`, refunded.
 - **Q-05:** transient I-M1 window: when a withdrawal or payout transfer fails, `on_inside_withdraw` / `on_payout`
   re-credits escrow while the runtime's refund of the failed transfer may land in a later receipt. Until it lands,
   `market_totals().escrow_near` can exceed `balance − stake` by that amount, and an `ensure_solvent` check in that
@@ -401,9 +402,9 @@ skipped this run; the last deep run was 2026-10-29, 400k).
 | S `round2::r2_delegate_sign_events_and_requester` | Delegate `sign_for`: `sign_requested` (owner_id = the owner, **no `requester` field**), `allowance_spent` (same receipt, same `first_seq`), `sign_resolved`; only the record names the delegate (C5.md §1.3). Pins the contract side of R2-01 |
 | S `round2::r2_extra_sign_for_arguments_cannot_relabel_the_requester` | Extra `requester` / `owner_id` / `signer` JSON arguments are ignored: the record and `allowance_spent` name the delegate. A request object with two kinds (`evm` + `sol`) fails to deserialize, for owner and delegate, before anything is written |
 | S `round2::r2_inflight_delegate_sign_survives_a_transfer` | A delegated signature in flight when the owner gives the token away resolves `signed` with the delegate as requester; the transfer logs `allowances_cleared`; the delegate is then `ERR_NOT_OWNER`; the new owner signs |
-| S `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` | Q-03, current behaviour (§7.4) |
-| S `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` | Q-03 for USDC (§7.4) |
-| S `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` | Q-04, current behaviour (§7.4) |
+| S `round2::q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost` | Q-03, behaviour as found (§7.4); flipped and renamed `q03_withdraw_near_to_mpc_usdc_or_self_is_refused` by the fix (§7.7) |
+| S `round2::q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered` | Q-03 for USDC (§7.4); now `q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered` (§7.7) |
+| S `round2::q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused` | Q-04, behaviour as found (§7.4); now `q04_ft_msg_unknown_fields_are_refused_and_refunded` (§7.7) |
 | S `gas_paths::gas_heavy_paths`, `gas_paths::contract_balance_after_calls` | Gas of nine heavy paths and the contract-balance effect of a call; printed, behaviour-neutral, so they run on the pre-fix wasm too (§7.2, §7.5) |
 
 Fuzz corpora: the committed seed corpus (`tools/fuzz/corpus`) was not regenerated, because no vector or generator
@@ -446,7 +447,7 @@ not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) w
 (`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row. **Fixed**
 (2026-10-31, commit `6eb8bb1`): `offer_accepted` becomes a `sold` row with its amount, currency and buyer.
 
-**Q-03: withdraw to the MPC or the USDC contract as receiver (current behaviour pinned; Razvan to decide).**
+**Q-03: withdraw to the MPC or the USDC contract as receiver. Decided (option b) and FIXED 2026-10-31, §7.7.** As found:
 - What happens today (`round2::q03_*`):
   - `withdraw_near(receiver = MPC)` and `(receiver = USDC contract)`: **delivered**, `inside_withdraw_resolved.ok =
     true`. The NEAR is now the MPC's or Circle's; no Satchel method can bring it back. Permanent loss for the owner.
@@ -465,7 +466,7 @@ not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) w
   one-line behaviour change, plus a unit and a sandbox test, plus the mirror in core if any. Recommendation: (b) if
   there is time before Nov 9, since it is cheap and the set already exists; otherwise (a).
 
-**Q-04: `ft_on_transfer` msgs accept unknown extra fields (current behaviour pinned; Razvan to decide).**
+**Q-04: `ft_on_transfer` msgs accept unknown extra fields. Decided (option b) and FIXED 2026-10-31, §7.7.** As found:
 - What happens today (`round2::q04_*`, `market_tests::audit_ft_msg_lenient_and_strict_cases`):
   - A USDC buy msg with `"receiver_id": <other>` and `"price": "1"`: ignored. The sale runs at the listing price and
     the NFT goes to the FT **sender**.
@@ -547,3 +548,47 @@ Razvan approved option (b) for both (§7.4).
 
 `apps/web/src/lib/near/mock-wallet.ts` only parses these msgs (for the simulator); it builds none. So denying unknown
 fields refuses nothing the app or the tools send today.
+
+**What changed (contract).**
+- **Q-03** (`8b0bca5`): `withdraw_near`, `withdraw_ft` and `prepay_storage(account_id)` call `ensure_receiver`, the one
+  existing check `nft_mint`, `nft_transfer` and offers already use: the contract itself, the MPC and the configured USDC
+  are `ERR_BAD_RECEIVER` (existing code, sentence "receiver would strand the funds"). With `usdc: None` the USDC id is
+  an ordinary receiver, as for `nft_transfer`. The check runs before any write, event or promise.
+- **Q-04** (`e785075`): `#[serde(deny_unknown_fields)]` on `FtMsg` (the `buy` struct variant and the top level) and on
+  `OfferMsg` (the `offer` body). `deposit` is a bare string, so it has no inner fields. An unknown field is
+  `ERR_BAD_MSG`; the FT refunds 100 %. The bare JSON `null`, `{}`, `""` and duplicate fields were already refused and
+  still are (no change was needed there). Field order and whitespace stay free.
+
+**Payout paths checked.** Only a receiver the caller picks needs the check:
+
+| Path | Receiver | Change |
+|---|---|---|
+| `withdraw_near`, `withdraw_ft` | caller-chosen `receiver_id` (default: the owner) | **checked** (Q-03) |
+| `prepay_storage(account_id)` | caller-chosen account credited; only that account can ever withdraw it | **checked** (Q-03): the contract, the MPC and USDC never call `withdraw_storage_credit`, so the credit was stranded |
+| `withdraw_storage_credit` | the caller (predecessor) | none: fixed by the contract |
+| `withdraw_proceeds` | the caller (predecessor) | none |
+| `cancel_offer` refund | the stored offerer, who passed `ensure_receiver` at `make_offer` / USDC offer time | none |
+| `buy`, USDC buy, `accept_offer` payouts | the stored seller / current owner | none |
+| `charge_storage` refund of excess deposit | the caller | none |
+| `nft_mint`, `nft_transfer`, offerer | already `ensure_receiver` | none |
+
+Not changed and worth knowing: `wrap.testnet` (an inside FT) is not in the set, the same as for `nft_transfer`. NEAR
+sent to it with a plain transfer is not wrapped for anyone. The UI only withdraws to the connected owner, so it cannot
+reach any of these receivers today. `apps/web/src/lib/copy.ts` maps `ERR_BAD_RECEIVER` to the transfer copy
+(`xfer.err.contract`), which is fine while no withdraw flow takes a receiver.
+
+**TS mirror and vectors.** `packages/core/src/near/market.ts` builds the calls without modelling receiver checks or msg
+parsing, and no `vectors/*.json` set covers withdrawals or `ft_on_transfer` msgs, so neither changed. The builders'
+exact msg strings are what the contract now requires.
+
+**New and flipped tests.** Unit: `market_tests::q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc` (every
+caller-chosen receiver × the three bad ids, nothing changes, no event, no promise; the owner, a named account and a
+credit for another account still work; `usdc: None` makes the USDC id ordinary); the receiver loops in
+`withdraw_near_guards_change_nothing`, `withdraw_ft_guards_and_call_shape`, `prepay_and_withdraw_storage_credit`;
+`audit_deposits_while_listed_and_withdraw_receivers` flipped; `audit_ft_msg_strict_cases` (was
+`audit_ft_msg_lenient_and_strict_cases`), `q04_unknown_msg_fields_are_refused_and_change_nothing` (buy, offer, deposit
+from USDC and wNEAR), property `prop_ft_msg_any_extra_key_is_refused` (any key, including duplicates of real fields
+and of the variant names, any position, top level or inner, any JSON value: always `ERR_BAD_MSG` with no state change,
+and the msg without that key is accepted). Sandbox (`round2.rs`): `q03_withdraw_near_to_mpc_usdc_or_self_is_refused`,
+`q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered`, `q04_ft_msg_unknown_fields_are_refused_and_refunded`
+(flipped and renamed); `gas_paths::gas_withdraw_and_ft_msg_paths` (new, behaviour-neutral).
