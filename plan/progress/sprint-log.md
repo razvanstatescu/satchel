@@ -135,3 +135,6 @@
 - 2026-10-31T14:59Z [ui-e2e-round2] target6: address-book-dropdown.spec.ts passing (4 tests)
 - 2026-10-31T15:04Z [ui-e2e-round2] docs: wrote round two write-up (targets 1-6, findings); typecheck/lint/unit all pass; full e2e suite running
 - 2026-10-31T15:14Z [ui-e2e-round2] done: full suite 286/286 passing (21 new tests, stale duplicate spec removed); typecheck/lint/unit all clean; no bugs found
+- 2026-10-31T15:30Z [Q-03,Q-04] start: withdraw receiver guard + deny_unknown_fields on ft_on_transfer msgs (branch fix/q03-q04)
+- 2026-10-31T15:48Z [Q-03,Q-04] progress: Q-03 (8b0bca5) and Q-04 (code+tests) committed on fix/q03-q04; unit 202 pass; round2 7/7; next TS mirror/specs/suites
+- 2026-10-31T16:11Z [Q-03,Q-04] done: fix/q03-q04 (11 commits, not merged); withdraw_near/withdraw_ft/prepay_storage refuse contract/MPC/USDC; ft msgs deny_unknown_fields; unit 202, sandbox 137, core 540, web 606, INV-22 OK; dev2 redeployed 4dd7cde9… (tx DTRoJfs1…), state kept, live ERR_BAD_RECEIVER verified; .env.production hash updated
