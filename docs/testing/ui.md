@@ -40,7 +40,13 @@ Notes:
     under the 44px WCAG 2.5.5 target on this particular rendering. Flag for whoever owns `ThemeControl`'s CSS; it's
     not reproduced by any change in this audit and wasn't investigated further (out of scope: UI-only layout polish
     on a component this audit didn't touch for a feature reason).
-- **After this audit**: 237 tests, 224 passed / 1 failed (same pre-existing failure above) — all 13 new tests pass.
+- **After round one**: 237 tests, 224 passed / 1 failed (same pre-existing failure above) — all 13 new tests pass.
+- **Before round two** (this branch's base, `main` at `3272e4c` — later than round one; other work landed meanwhile,
+  e.g. the AUDIT-01 contract-side fix and its app-side send change): 265 tests, all passing — the round-one
+  `responsive.spec.ts:54` sub-pixel flake did not reproduce in this environment.
+- **After round two**: 286 tests, **all 286 passing** — 21 new tests across 6 new spec files, 0 regressions. (A
+  7th, stray file — `balance-refresh.spec.ts`, left over from an earlier crashed session attempt at this same
+  target — was found and removed; see "Round two" below.)
 
 ## New specs added by this audit
 
@@ -184,6 +190,12 @@ design, or genuine, already-correct behavior that just hadn't been asserted yet)
 
 No item 7 bonus was reached this round — targets 1–6 plus the final full-suite/typecheck/lint/unit run filled the
 time budget.
+
+A note on a stray file: an earlier crashed session had committed `test/e2e/balance-refresh.spec.ts` as WIP for
+target 1, before being replaced by `refresh-after-send.spec.ts` in this pass. Nobody deleted the old one, so the
+repo carried both — and the stale one, built on the same wrong assumption (that fixture BTC balances decrease after
+a send) that `refresh-after-send.spec.ts`'s own comments disprove, was the single failure in the first full-suite
+run of this round. Removed; the second full run is clean.
 
 ### Bugs found this round
 
