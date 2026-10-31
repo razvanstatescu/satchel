@@ -4,8 +4,8 @@
 //!   receipts executed by the contract, in receipt order; `lib/data/sale.ts` pairs `sold` with the `payout` of the same tx).
 //! - The delegate path: `sign_requested` keeps the owner and carries no `requester` (the record does), extra JSON
 //!   arguments cannot relabel a request, an in-flight delegated signature survives a transfer.
-//! - Q-03 (withdraw to the MPC or the USDC contract as receiver) and Q-04 (`ft_on_transfer` extra fields): the current
-//!   behaviour, pinned. No contract behaviour is changed by this file.
+//! - Q-03 (withdraw to the MPC or the USDC contract as receiver) and Q-04 (`ft_on_transfer` extra fields): pinned
+//!   as found in round two, then flipped when both were fixed on 2026-10-31 (§7.7): they now assert the refusals.
 
 mod common;
 
@@ -94,6 +94,11 @@ async fn withdraw(env: &Env, method: &str, id: &str, amount: u128, to: &AccountI
         args["ft"] = json!(env.usdc.id());
     }
     Ok(env.alice.call(env.satchel.id(), method).args_json(args).deposit(YOCTO).gas(Gas::from_tgas(50)).transact().await?)
+}
+
+/// Receipts of a withdrawal by alice other than the refunds back to her: 1 = only the contract's own receipt ran.
+fn non_refund_receipts(env: &Env, r: &ExecutionFinalResult) -> usize {
+    r.receipt_outcomes().iter().filter(|o| &o.executor_id != env.alice.id()).count()
 }
 
 async fn prepay(env: &Env, who: &Account, amount: u128) -> Result<()> {
@@ -263,87 +268,125 @@ async fn r2_inflight_delegate_sign_survives_a_transfer() -> Result<()> {
 
 // ── Q-03: withdraw receivers ────────────────────────────────────────────────────────────
 
-/// Q-03 (current behaviour, pinned; no change): `withdraw_near` refuses only the contract itself as receiver.
-/// - To the MPC contract and to the USDC contract: DELIVERED (`inside_withdraw_resolved.ok = true`), the inside balance
-///   is debited and the NEAR sits on those accounts, which no Satchel method can get back (user error, permanent loss).
-/// - To a named account that does not exist: the transfer fails and the callback re-credits the token (no loss).
+/// Q-03 (FIXED 2026-10-31, docs/testing/contract.md §7.7): `withdraw_near` refuses the MPC, the USDC contract and the
+/// contract itself as receiver with ERR_BAD_RECEIVER (the `nft_transfer` set). Before the fix the first two were
+/// DELIVERED and the NEAR was lost. A refusal debits nothing, bumps no epoch, logs no event and sends nothing; a named
+/// receiver still gets the NEAR, and one that does not exist is still re-credited by the callback.
 #[tokio::test]
-async fn q03_withdraw_near_to_mpc_or_usdc_is_delivered_and_lost() -> Result<()> {
+async fn q03_withdraw_near_to_mpc_usdc_or_self_is_refused() -> Result<()> {
     let env = setup().await?;
     let r = env.bob.call(env.satchel.id(), "deposit_near").args_json(json!({ "token_id": "1" })).deposit(NearToken::from_near(1)).gas(Gas::from_tgas(30)).transact().await?;
     assert_ok(&r);
     let credited = num(&r.json::<Value>()?);
     let amt = 100 * MILLI;
-    for to in [env.mpc.id().clone(), env.usdc.id().clone()] {
+    let before = inside(&env, "1").await?;
+    for to in [env.mpc.id().clone(), env.usdc.id().clone(), env.satchel.id().clone()] {
         let b0 = balance(&env, &to).await?;
         let r = withdraw(&env, "withdraw_near", "1", amt, &to).await?;
-        assert_ok(&r);
-        assert_eq!(events(&r, "inside_withdraw_resolved")[0]["ok"], true, "delivered to {to}");
-        assert!(balance(&env, &to).await? >= b0 + amt - MILLI, "{to} received the NEAR");
+        assert_fails_with(&r, "ERR_BAD_RECEIVER");
+        assert!(all_contract_event_names(&env, &r).is_empty(), "no event for {to}: {:?}", all_contract_event_names(&env, &r));
+        assert_eq!(non_refund_receipts(&env, &r), 1, "no transfer or callback receipt for {to}");
+        assert!(balance(&env, &to).await? <= b0 + MILLI, "{to} received nothing");
+        assert_eq!(inside(&env, "1").await?, before, "nothing debited, epoch unchanged ({to})");
     }
-    assert_eq!(num(&inside(&env, "1").await?["near"]), credited - 2 * amt);
+    // a legitimate named receiver
+    let b0 = balance(&env, env.carol.id()).await?;
+    let r = withdraw(&env, "withdraw_near", "1", amt, env.carol.id()).await?;
+    assert_ok(&r);
+    assert_eq!(events(&r, "inside_withdraw_resolved")[0]["ok"], true);
+    assert_eq!(balance(&env, env.carol.id()).await?, b0 + amt);
+    assert_eq!(num(&inside(&env, "1").await?["near"]), credited - amt);
+    // a named account that does not exist: the transfer fails and is re-credited (unchanged by the fix)
     let ghost: AccountId = format!("ghost.{}", env.root.id()).parse()?;
     let r = withdraw(&env, "withdraw_near", "1", amt, &ghost).await?;
     assert_eq!(events(&r, "inside_withdraw_resolved")[0]["ok"], false, "{}", fail_text(&r));
-    assert_eq!(num(&inside(&env, "1").await?["near"]), credited - 2 * amt, "re-credited");
-    let r = withdraw(&env, "withdraw_near", "1", amt, env.satchel.id()).await?;
-    assert_fails_with(&r, "ERR_BAD_RECEIVER");
+    assert_eq!(num(&inside(&env, "1").await?["near"]), credited - amt, "re-credited");
     Ok(())
 }
 
-/// Q-03 for USDC (mock FT with near-contract-standards semantics): to the MPC or to the USDC contract itself, an
-/// unregistered receiver makes `ft_transfer` fail and the callback re-credits (no loss). But registration is
-/// permissionless: once anyone pays `storage_deposit` for the MPC account, the same withdrawal is delivered and the
-/// USDC is stranded there (the MPC contract has no way to send it on).
+/// Q-03 for USDC (FIXED): `withdraw_ft` refuses the same three receivers, even after someone registers the MPC
+/// account at USDC (registration is permissionless, and before the fix that made the withdrawal deliver and strand the
+/// USDC at the MPC). `prepay_storage(account_id)` refuses them too (a credit only that account could ever withdraw).
+/// A registered named receiver still gets the USDC.
 #[tokio::test]
-async fn q03_withdraw_usdc_to_mpc_or_usdc_recredits_until_registered() -> Result<()> {
+async fn q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered() -> Result<()> {
     let env = setup().await?;
     prepay(&env, &env.bob, 10 * MILLI).await?;
     assert_eq!(used(&ft_buy(&env, &env.bob, 10 * USDC, &json!({ "deposit": "1" }).to_string()).await?), 10 * USDC);
-    for to in [env.mpc.id().clone(), env.usdc.id().clone()] {
-        let r = withdraw(&env, "withdraw_ft", "1", USDC, &to).await?;
-        assert_eq!(events(&r, "inside_withdraw_resolved")[0]["ok"], false, "{to}: {}", fail_text(&r));
-        assert_eq!(inside(&env, "1").await?["fts"], json!([{ "token": env.usdc.id(), "amount": (10 * USDC).to_string() }]));
-    }
     ft_register(&env, env.mpc.id()).await?; // anyone can do this
-    let r = withdraw(&env, "withdraw_ft", "1", USDC, env.mpc.id()).await?;
+    let before = inside(&env, "1").await?;
+    for to in [env.mpc.id().clone(), env.usdc.id().clone(), env.satchel.id().clone()] {
+        let r = withdraw(&env, "withdraw_ft", "1", USDC, &to).await?;
+        assert_fails_with(&r, "ERR_BAD_RECEIVER");
+        assert!(all_contract_event_names(&env, &r).is_empty(), "no event for {to}");
+        assert_eq!(non_refund_receipts(&env, &r), 1, "no ft_transfer receipt for {to}");
+        assert_eq!(inside(&env, "1").await?, before, "nothing debited ({to})");
+        let r = env.carol.call(env.satchel.id(), "prepay_storage").args_json(json!({ "account_id": to })).deposit(NearToken::from_millinear(10)).gas(Gas::from_tgas(30)).transact().await?;
+        assert_fails_with(&r, "ERR_BAD_RECEIVER");
+        assert_eq!(num(&view(&env, "storage_credit_of", json!({ "account_id": to })).await?), 0);
+    }
+    assert_eq!(ft_balance(&env, env.mpc.id()).await?, 0, "nothing stranded at the MPC account");
+    let b0 = ft_balance(&env, env.carol.id()).await?;
+    let r = withdraw(&env, "withdraw_ft", "1", USDC, env.carol.id()).await?;
+    assert_ok(&r);
     assert_eq!(events(&r, "inside_withdraw_resolved")[0]["ok"], true);
-    assert_eq!(ft_balance(&env, env.mpc.id()).await?, USDC, "stranded at the MPC account");
+    assert_eq!(ft_balance(&env, env.carol.id()).await?, b0 + USDC);
     assert_eq!(inside(&env, "1").await?["fts"], json!([{ "token": env.usdc.id(), "amount": (9 * USDC).to_string() }]));
     Ok(())
 }
 
 // ── Q-04: ft_on_transfer extra fields ───────────────────────────────────────────────────
 
-/// Q-04 (current behaviour, pinned; no change): unknown fields inside a known msg shape are IGNORED.
-/// - A buy msg with `receiver_id` (another account) and a lower `price`: the sale goes through at the listing price,
-///   the NFT goes to the FT sender, the extra fields have no effect.
-/// - An offer msg with an `amount` field different from the transferred amount: the offer escrows the transferred
-///   amount.
-/// - A duplicate field inside the object is refused (serde `duplicate field`), so the FT refunds 100 % — note that a
-///   JS client's `JSON.parse` would take the last value instead.
+/// Q-04 (FIXED 2026-10-31, docs/testing/contract.md §7.7): an unknown field in any `ft_on_transfer` msg is REFUSED
+/// (`deny_unknown_fields` on `FtMsg` and `OfferMsg`); before the fix it was ignored, so a buy carrying `receiver_id`
+/// still gave the NFT to the sender. On the real wasm with the mock FT, each refusal is `ERR_BAD_MSG`, the FT refunds
+/// 100 % (`ft_transfer_call` returns "0"), the NFT does not move, nothing is escrowed or credited and the contract logs
+/// no event. A duplicate field, the bare JSON `null` and `{}` stay refused the same way. The exact msgs still work.
 #[tokio::test]
-async fn q04_ft_msg_extra_fields_are_ignored_and_duplicates_refused() -> Result<()> {
+async fn q04_ft_msg_unknown_fields_are_refused_and_refunded() -> Result<()> {
     let env = setup().await?;
     let lid = list_ok(&env, &env.alice, "1", 5 * USDC, "usdc").await?;
-    let dup = format!(r#"{{"buy":{{"token_id":"1","token_id":"2","listing_id":{lid},"expected_sig_count":0}}}}"#);
-    let b0 = ft_balance(&env, env.bob.id()).await?;
-    let r = ft_buy(&env, &env.bob, 5 * USDC, &dup).await?;
-    assert_eq!(used(&r), 0);
-    assert!(fail_text(&r).contains("ERR_BAD_MSG"), "{}", fail_text(&r));
-    assert_eq!(ft_balance(&env, env.bob.id()).await?, b0);
-    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string());
-    let msg = json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "receiver_id": env.carol.id(), "price": "1" } });
-    let r = ft_buy(&env, &env.bob, 5 * USDC, &msg.to_string()).await?;
-    assert_eq!(used(&r), 5 * USDC);
-    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string(), "the sender gets the NFT, receiver_id is ignored");
-    assert_eq!(events(&r, "sold")[0]["price"], (5 * USDC).to_string());
-    // offer with a misleading `amount`
     prepay(&env, &env.carol, 10 * MILLI).await?;
+    prepay(&env, &env.bob, 10 * MILLI).await?;
     let exp = now_ms(&env).await? + 3_600_000;
-    let msg = json!({ "offer": { "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": exp, "amount": "1" } });
-    let r = ft_buy(&env, &env.carol, 3 * USDC, &msg.to_string()).await?;
+    let offer = |extra: Option<(&str, Value)>| {
+        let mut o = json!({ "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": 0, "expires_at_ms": exp });
+        if let Some((k, v)) = extra {
+            o[k] = v;
+        }
+        json!({ "offer": o }).to_string()
+    };
+    let refused: Vec<(&Account, u128, String)> = vec![
+        (&env.bob, 5 * USDC, format!(r#"{{"buy":{{"token_id":"1","token_id":"2","listing_id":{lid},"expected_sig_count":0}}}}"#)),
+        (&env.bob, 5 * USDC, json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "receiver_id": env.carol.id(), "price": "1" } }).to_string()),
+        (&env.bob, 5 * USDC, json!({ "buy": { "token_id": "1", "listing_id": lid, "expected_sig_count": 0, "max_price": (5 * USDC).to_string() } }).to_string()),
+        (&env.carol, 3 * USDC, offer(Some(("amount", json!("1"))))),
+        (&env.carol, 3 * USDC, offer(Some(("memo", Value::Null)))),
+        (&env.bob, 2 * USDC, json!({ "deposit": "1", "receiver_id": env.carol.id() }).to_string()),
+        (&env.bob, 2 * USDC, "null".to_string()),
+        (&env.bob, 2 * USDC, "{}".to_string()),
+    ];
+    let credit = |who: &Account| view(&env, "storage_credit_of", json!({ "account_id": who.id() }));
+    let (cb, cc) = (credit(&env.bob).await?, credit(&env.carol).await?);
+    for (who, amount, msg) in &refused {
+        let b0 = ft_balance(&env, who.id()).await?;
+        let r = ft_buy(&env, who, *amount, msg).await?;
+        assert_eq!(used(&r), 0, "{msg}");
+        assert!(fail_text(&r).contains("ERR_BAD_MSG"), "{msg}: {}", fail_text(&r));
+        assert!(all_contract_event_names(&env, &r).is_empty(), "{msg}: {:?}", all_contract_event_names(&env, &r));
+        assert_eq!(ft_balance(&env, who.id()).await?, b0, "{msg}: refunded 100 %");
+    }
+    assert_eq!(owner_of(&env, "1").await?, env.alice.id().to_string());
+    assert_eq!(inside(&env, "1").await?["fts"], json!([]));
+    assert_eq!(view(&env, "offers_for", json!({ "token_id": "1", "from_index": 0, "limit": 50 })).await?, json!([]));
+    assert_eq!((credit(&env.bob).await?, credit(&env.carol).await?), (cb, cc), "no storage credit spent");
+    assert_eq!(ft_balance(&env, env.satchel.id()).await?, 0, "the contract kept no USDC");
+    // the exact msgs still work
+    let r = ft_buy(&env, &env.carol, 3 * USDC, &offer(None)).await?;
     assert_eq!(used(&r), 3 * USDC);
     assert_eq!(events(&r, "offer_made")[0]["amount"], (3 * USDC).to_string());
+    let r = ft_buy(&env, &env.bob, 5 * USDC, &buy_msg("1", lid, 0)).await?;
+    assert_eq!(used(&r), 5 * USDC);
+    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string());
     Ok(())
 }

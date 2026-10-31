@@ -50,7 +50,9 @@ sheet to settle and rounds to 0.01 px, and axe waits for finite animations to en
 **dev2 runs the fixed contract.** `dev2.satchelhq.testnet` was redeployed on 2026-10-30 with wasm sha256
 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3`. This is a non-reproducible dev build; the reproducible
 build is for the rc. The state was kept (4 Satchels, #1 with 8 signatures). `listings(from_index = 2^32)` answers `[]` live.
-`apps/web/.env.production` expects that hash.
+`apps/web/.env.production` expects that hash. **Redeployed again on 2026-10-31** with the Q-03/Q-04 fixes: wasm sha256
+`4dd7cde9da18d6a455993f1e1484c8f0140672144d368153948cc9a10050aed2` (non-reproducible), state kept, tx
+`DTRoJfs1UtgR2EEvoDiBBDydaCWcfPjj17WvY9e9FBcd`; `.env.production` now expects that hash.
 
 ## Round two (2026-10-30/31)
 
@@ -90,13 +92,17 @@ Details: [contract.md §7](contract.md#7-round-two-2026-10-30-branch-testcontrac
 | — | A bitcoin amount below dust was refused with core's raw text ("minimum is 294 sats for this recipient") | Cosmetic (web) | coin-selection errors read as sentences ("Send at least 0.00000294 BTC") |
 | R2-02 | For a delegate's invalid message the TS mirror returns `ERR_MSG_*` where the contract returns `ERR_ALLOWANCE_KIND`; both refuse | Info (TS mirror) | not fixed; optional |
 
-### Waiting for Razvan's decision (contract, before the Nov 9 freeze)
+### Decided by Razvan and fixed (contract, 2026-10-31, before the Nov 9 freeze)
 
-- **Q-03 (Low).** `withdraw_near` to the MPC signer or the USDC contract is delivered and lost; `withdraw_ft` of USDC
-  there fails and is re-credited only until someone registers that receiver. The UI always withdraws to the owner.
-  Recommended: refuse the receivers `nft_transfer` already refuses (the contract, the MPC, USDC).
-- **Q-04 (Info).** Buy and offer messages ignore unknown fields (a buy with a `receiver_id` still gives the NFT to the
-  sender). Recommended: `deny_unknown_fields` on those messages, while the contract can still change.
+- **Q-03 (Low), fixed.** `withdraw_near` to the MPC signer or the USDC contract used to be delivered and lost, and a
+  `withdraw_ft` of USDC there was only re-credited until someone registered that receiver. `withdraw_near`,
+  `withdraw_ft` and `prepay_storage(account_id)` now refuse the receivers `nft_transfer` already refuses (the contract,
+  the MPC, USDC) with `ERR_BAD_RECEIVER`. The UI always withdraws to the owner, so nothing in the app changes.
+- **Q-04 (Info), fixed.** Buy and offer messages used to ignore unknown fields (a buy with a `receiver_id` still gave
+  the NFT to the sender). Every `ft_on_transfer` message is now strict: an unknown field is `ERR_BAD_MSG` and the FT
+  refunds 100 %. No app or tool message carries an extra field.
+
+Details, tests and gas: `docs/testing/contract.md` §7.7.
 
 ## What the audit found (round one)
 
@@ -128,7 +134,7 @@ wallet opens.
 ### Open questions (from the contract audit)
 
 - **Q-01**: answered. Razvan approved "delegates sign BTC with one input only"; it is implemented and deployed to dev2.
-- **Q-03** and **Q-04**: behaviour pinned by tests in round two; see "Waiting for Razvan's decision" above.
+- **Q-03** and **Q-04**: decided and fixed on 2026-10-31; see "Decided by Razvan and fixed" above.
 - **Q-05**: right after a failed payout or withdrawal is re-credited, escrow can briefly exceed the contract's free
   balance, so `ERR_INSOLVENT` can fire spuriously until the refund lands. It is harmless and retryable.
 - Q-02, by design: an offer survives a gift or a sale of the Satchel (C4–C6 spec §3). It is now covered by tests.

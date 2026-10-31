@@ -199,6 +199,9 @@ impl Contract {
         self.tokens.internal_transfer_unguarded(token_id, from, to);
     }
 
+    /// ERR_BAD_RECEIVER for the accounts that would strand an NFT or funds: the contract itself, the MPC signer and
+    /// the configured USDC. The one rule for every caller-chosen receiver: `nft_mint`, `nft_transfer`, offerers, and
+    /// (Q-03) `withdraw_near`, `withdraw_ft`, `prepay_storage(account_id)`.
     pub(crate) fn ensure_receiver(&self, receiver_id: &AccountId) {
         ensure(
             *receiver_id != env::current_account_id() && *receiver_id != self.mpc && Some(receiver_id) != self.usdc.as_ref(),

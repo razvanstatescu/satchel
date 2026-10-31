@@ -43,8 +43,9 @@ pub struct OfferView {
     pub created_at_ms: u64,
 }
 
-/// `ft_on_transfer` msg body of a USDC offer.
+/// `ft_on_transfer` msg body of a USDC offer. Strict like `FtMsg` (Q-04): an unknown field refuses ERR_BAD_MSG.
 #[near(serializers = [json])]
+#[serde(deny_unknown_fields)]
 #[derive(Clone, Debug, PartialEq)]
 pub struct OfferMsg {
     pub token_id: TokenId,

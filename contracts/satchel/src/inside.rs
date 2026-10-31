@@ -1,7 +1,7 @@
 //! C6: NEAR and allowlisted NEP-141 tokens held inside a Satchel (spec docs/specs/C4-C6.md §2). Balances are keyed by
 //! token id, so they move with every ownership change. Deposits: anyone. Withdrawals: the owner, exactly 1 yocto, never
-//! while listed; each one debits first, bumps `inside_epoch`, and a failed transfer is re-credited by a panic-free
-//! callback that only overwrites existing slots.
+//! while listed, never to the contract, the MPC or USDC (Q-03, `ensure_receiver`); each one debits first, bumps
+//! `inside_epoch`, and a failed transfer is re-credited by a panic-free callback that only overwrites existing slots.
 
 use near_sdk::json_types::U128;
 use near_sdk::serde_json::json;
@@ -95,7 +95,8 @@ impl Contract {
         U128(credited)
     }
 
-    /// Owner only, exactly 1 yocto, not while listed. Debit, bump the epoch, transfer `.then(on_inside_withdraw)`.
+    /// Owner only, exactly 1 yocto, not while listed; the receiver (default: the owner) is never the contract, the MPC
+    /// or USDC (ERR_BAD_RECEIVER, Q-03). Debit, bump the epoch, transfer `.then(on_inside_withdraw)`.
     #[payable]
     pub fn withdraw_near(&mut self, token_id: TokenId, amount: U128, receiver_id: Option<AccountId>) {
         let owner = self.check_withdraw(&token_id);
@@ -103,7 +104,7 @@ impl Contract {
         let mut ins = self.market.inside.get(&token_id).copied().unwrap_or_default();
         ensure(amount.0 <= ins.near, ERR_INSIDE_BALANCE);
         let receiver = receiver_id.unwrap_or_else(|| owner.clone());
-        ensure(receiver != env::current_account_id(), ERR_BAD_RECEIVER);
+        self.ensure_receiver(&receiver); // Q-03: not the contract, the MPC or USDC (the set `nft_transfer` refuses)
         ins.near -= amount.0;
         ins.epoch += 1;
         self.market.inside.insert(token_id.clone(), ins);
@@ -123,7 +124,8 @@ impl Contract {
         env::promise_return(cb);
     }
 
-    /// Owner only, exactly 1 yocto, not while listed. `ft.ft_transfer(receiver, amount)` `.then(on_inside_withdraw)`.
+    /// Owner only, exactly 1 yocto, not while listed; the same receiver rule as `withdraw_near` (Q-03).
+    /// `ft.ft_transfer(receiver, amount)` `.then(on_inside_withdraw)`.
     #[payable]
     pub fn withdraw_ft(&mut self, token_id: TokenId, ft: AccountId, amount: U128, receiver_id: Option<AccountId>) {
         let owner = self.check_withdraw(&token_id);
@@ -133,7 +135,7 @@ impl Contract {
         let have = self.market.inside_ft.get(&key).copied().unwrap_or(0);
         ensure(amount.0 <= have, ERR_INSIDE_BALANCE);
         let receiver = receiver_id.unwrap_or_else(|| owner.clone());
-        ensure(receiver != env::current_account_id(), ERR_BAD_RECEIVER);
+        self.ensure_receiver(&receiver); // Q-03: not the contract, the MPC or USDC (the set `nft_transfer` refuses)
         // A non-zero FT slot implies the inside record exists (ft_deposit creates both), so both writes overwrite.
         let mut ins = self.market.inside.get(&token_id).copied().unwrap_or_default();
         ins.epoch += 1;
