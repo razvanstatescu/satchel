@@ -8,8 +8,8 @@ This is the overview. Each area has its own detailed document:
   and the API routes, with a module-by-module inventory.
 - [ui.md](ui.md): the web UI end to end (Playwright), with a page/flow/state coverage matrix.
 
-The audit ran on 2026-10-30, with one agent per area, and was merged into `main` the same day. Every count below was
-measured on the merged `main`, not copied from an agent's report.
+The audit ran in two rounds, with one agent per area: round one on 2026-10-30, round two on 2026-10-30/31. Both were
+merged into `main`. Every count below was measured on the merged `main`, not copied from an agent's report.
 
 ## Run everything
 
@@ -31,16 +31,17 @@ signs a testnet transaction. Live testnet runs are separate and documented in `r
 
 ## Counts on `main`
 
-Measured on `main` after the audit and the contract fixes (2026-10-30).
+Measured on `main` after round two and its fixes (2026-10-31).
 
-| Suite | Before the audit | After the audit | After the fixes |
-|---|---|---|---|
-| Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | **194 passed, 0 ignored** |
-| Contract sandbox | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | **127 passed, 0 ignored** |
-| Core | 467 | 467 | **472** (+5 allowance vectors) |
-| Web unit | 486 | 531 | **535** (+4: a delegate's bitcoin send from one coin) |
-| Tools unit | 92 | 92 | **92** |
-| Web end to end | 224 | 263 | **265** (+2: the address-book dropdown) |
+| Suite | Before the audit | After round one | After the round-one fixes | **After round two** |
+|---|---|---|---|---|
+| Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | **199 passed, 0 ignored** |
+| Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | **136 passed, 0 ignored** (19 files) |
+| Contract sandbox (2.14.0-rc.5) | not run | not run | not run | **136 passed** (run by the round-two agent, one file at a time) |
+| Core | 467 | 467 | 472 | **540** |
+| Web unit | 486 | 531 | 535 | **606** |
+| Tools unit | 92 | 92 | 92 | **92** |
+| Web end to end | 224 | 263 | 265 | **286** (+21: round two) |
 
 The typecheck, lint and wasm import check (INV-22) are clean. Two tests were intermittent: a theme toggle measured at
 43.99994 px, and an axe contrast reading taken mid-animation. Both are now deterministic: the measurement waits for the
@@ -51,7 +52,53 @@ sheet to settle and rounds to 0.01 px, and axe waits for finite animations to en
 build is for the rc. The state was kept (4 Satchels, #1 with 8 signatures). `listings(from_index = 2^32)` answers `[]` live.
 `apps/web/.env.production` expects that hash.
 
-## What the audit found
+## Round two (2026-10-30/31)
+
+Details: [contract.md §7](contract.md#7-round-two-2026-10-30-branch-testcontract2-from-main-3272e4c),
+[core-api.md "Round two"](core-api.md#round-two), [ui.md "Round two"](ui.md#round-two).
+
+- **Contract.** No contract bug; the contract source is unchanged. 1,000,000 Rust-vs-TS differential cases, 0
+  disagreements. New edge cases:
+  - a delegate can't meet the one-input rule by splitting a multi-input BTC tx (`ERR_BTC_PREVOUTS_INCOMPLETE`);
+  - allowances across owner changes, including a delegate's in-flight request during a transfer;
+  - every event is logged once, in the order the app's parsers expect.
+
+  The sandbox passes on nearcore 2.14. The one difference from 2.13.4: on 2.14 the contract gets no share of the gas
+  its calls burn (about 0.00006 NEAR per transfer, harmless). Gas is unchanged by the fixes (±0.002 Tgas).
+- **Core and data layer.** New tests:
+  - the multi-source clean-history merge, every branch, including a single disagreeing source among three still
+    blocking;
+  - the address validators, with real generated fixtures;
+  - the signing-retry planner;
+  - the byte helpers.
+
+  A read-only live smoke against dev2 matched the code hash and got the expected answer from every API route.
+- **UI.** 21 new end-to-end tests:
+  - the page after a send, without a reload;
+  - a keyboard-only Send, through the address-book dropdown;
+  - wallet rejection in give-by-link, offers, allowances, inside deposit and withdraw, and Empty's skip;
+  - the delegate one-coin message;
+  - BTC dust and SOL rent floors;
+  - the dropdown's search, 320 px, and Night with axe.
+
+### Found in round two, and fixed
+
+| ID | What | Severity | Fix |
+|---|---|---|---|
+| R2-01 | The live Activity feed never named a delegate who signed: the app read `requester` from the `sign_requested` event, which (by design) doesn't carry it. Fixtures did, so no test saw it | Low (web) | the requester now comes from the signature record, shown only when it wasn't the owner at that block (`liveActivityRows`, unit-tested) |
+| R2-03 | An accepted offer showed in Activity as a plain transfer, with no price | Info (web) | `offer_accepted` becomes a sale row with its price and buyer |
+| — | A bitcoin amount below dust was refused with core's raw text ("minimum is 294 sats for this recipient") | Cosmetic (web) | coin-selection errors read as sentences ("Send at least 0.00000294 BTC") |
+| R2-02 | For a delegate's invalid message the TS mirror returns `ERR_MSG_*` where the contract returns `ERR_ALLOWANCE_KIND`; both refuse | Info (TS mirror) | not fixed; optional |
+
+### Waiting for Razvan's decision (contract, before the Nov 9 freeze)
+
+- **Q-03 (Low).** `withdraw_near` to the MPC signer or the USDC contract is delivered and lost; `withdraw_ft` of USDC
+  there fails and is re-credited only until someone registers that receiver. The UI always withdraws to the owner.
+  Recommended: refuse the receivers `nft_transfer` already refuses (the contract, the MPC, USDC).
+- **Q-04 (Info).** Buy and offer messages ignore unknown fields (a buy with a `receiver_id` still gives the NFT to the
+  sender). Recommended: `deny_unknown_fields` on those messages, while the contract can still change.
+
+## What the audit found (round one)
 
 ### Fixed during the audit (UI, each with a regression test)
 
@@ -81,8 +128,7 @@ wallet opens.
 ### Open questions (from the contract audit)
 
 - **Q-01**: answered. Razvan approved "delegates sign BTC with one input only"; it is implemented and deployed to dev2.
-- **Q-03**: `withdraw_near` / `withdraw_ft` accept the MPC signer or the USDC contract as receiver. Intended?
-- **Q-04**: `ft_on_transfer` messages accept unknown extra fields. Should parsing be strict?
+- **Q-03** and **Q-04**: behaviour pinned by tests in round two; see "Waiting for Razvan's decision" above.
 - **Q-05**: right after a failed payout or withdrawal is re-credited, escrow can briefly exceed the contract's free
   balance, so `ERR_INSOLVENT` can fire spuriously until the refund lands. It is harmless and retryable.
 - Q-02, by design: an offer survives a gift or a sale of the Satchel (C4–C6 spec §3). It is now covered by tests.
@@ -103,8 +149,8 @@ wallet opens.
 | Live MPC behavior: latency, timeouts (≈ 1 in 4 under load on 2026-10-27), late signatures | the sandbox uses a mock signer | the `tools/e2e/{evm,btc,sol}.ts --sign-only` live scripts and the dev2 live run (20/20 on 2026-10-30) |
 | Real chain timing: testnet4 confirmations (minutes to hours), the Solana 36 s blockhash, the EVM 204,600-gas account creation | the fixture simulation is instant and deterministic | live runs during demo staging; stage BTC early |
 | The features added after the dev2 live run on real chains: Take everything out across networks, the Transactions tab sources under load, the address book with a real wallet | fixture-only so far | a short live pass on dev2 before the rc rehearsal |
-| The sandbox on nearcore 2.14 | the suite ran on the default sandbox | `SANDBOX_VERSION=2.14.0-rc.5 cargo test -p satchel-tests` before the freeze |
 | AUDIT-03 and Q-05 races | they can't be scheduled deterministically in the sandbox | reasoning plus code review (documented) |
-| `lib/validate.ts` validators in isolation; the rarer branches of the multi-source NEAR merge behind the buyer's clean-history gate; `lib/signing/retry.ts` on its own | time; they are covered indirectly | the next unit-test targets ([core-api.md](core-api.md#what-remains-untested-and-why)) |
-| UI: a dust-amount send, a keyboard-only Send from start to finish, an explicit "balance changes after a send" assertion, wallet rejection in give-by-link, offers and allowances | time | the next end-to-end targets ([ui.md](ui.md#what-remains-untested-and-why)) |
+| A chain balance going down after a send | fixture balances are static by design, so the e2e only sees the signature count change | the live pass on dev2 |
+| The delegate-debit differential (Rust vs TS on random C5 requests) | its corpus generator wasn't written | the Rust properties and the shared vectors cover it meanwhile |
+| SOL's "a new recipient needs the full rent" rule end to end | fixture mode treats every recipient as existing | a unit test on `prepareSend`, or the live pass |
 | Rate limits of the free public APIs (Solana devnet, FastNEAR without a key) with many judges at once | not load-tested | a short load test against the deployed site during the rc rehearsal |

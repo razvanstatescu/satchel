@@ -7,10 +7,9 @@ import { ALICE, useMockWallet } from "./helpers";
  * FINDING: round one's doc said "the contract/sim has no dust threshold distinct from ... amount above zero but
  * below a chain's min relay/rent". That's not quite right for BTC: `@satchel/core`'s coin selection
  * (packages/core/src/chains/btc/select.ts) DOES enforce a real dust floor — `DUST.p2wpkh = 294n` sats for a
- * bech32/p2wpkh recipient (the kind every testnet4 address in this suite is) — it just isn't mapped through a
- * `problem` the way `below_rent_new_recipient`/`usdc_insufficient`/etc. are in `SendFlow.tsx`'s `prepareErrorText`,
- * so the raw `SelectionError` message surfaces verbatim in the review-step error banner. Below-dust BTC amounts ARE
- * refused, just with an unpolished message (flagged, not fixed — see docs/testing/ui.md).
+ * bech32/p2wpkh recipient (the kind every testnet4 address in this suite is). `SendFlow.tsx`'s `prepareErrorText` maps
+ * the selection error's code to a sentence that names the minimum in BTC (fixed after round two; it used to show
+ * core's raw "minimum is 294 sats" text).
  *
  * SOL's rent rule (E25, "leaves the Satchel below rent") IS reachable in fixture mode. The OTHER rent rule
  * ("below_rent_new_recipient", a brand-new recipient needs the full rent minimum) is NOT reachable in fixture mode:

@@ -428,6 +428,10 @@ No contract bug was found in round two: no test is ignored, and the contract sou
 - Suggested fix (web lane): in the live branch, take the requester from the record that `signRow` already looks up
   (`rec.requester`, or the record at `first_seq`), or pair `sign_requested` with the `allowance_spent` of the same tx
   on `first_seq`. Make the fixture events match the contract: no `requester` on `sign_requested`.
+- **Fixed** (2026-10-31, commit `6eb8bb1`): the live mapping is now a pure `liveActivityRows` in `server.ts`. It takes
+  the requester from the record at `first_seq` and names it only when it wasn't the owner at that block (the owner is
+  replayed from the token's mint and transfer events). Unit tests in `apps/web/test/unit/multichain.test.ts`. The
+  fixture events still carry `requester`, so the e2e path doesn't exercise the live mapping; the unit tests do.
 
 **R2-02 (Info, TS mirror, error code only).** For a delegate's message request (`evm_message` / `sol_message`), the
 contract refuses `ERR_ALLOWANCE_KIND` in `authorize_signer`, before classifying, so an invalid message also gets
@@ -439,7 +443,8 @@ vector (`vectors/allowance.json`).
 
 **R2-03 (Info, web app): an accepted offer shows only as "transferred" in Activity.** `getActivity` maps `sold` but
 not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) with no price. The events are right
-(`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row.
+(`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row. **Fixed**
+(2026-10-31, commit `6eb8bb1`): `offer_accepted` becomes a `sold` row with its amount, currency and buyer.
 
 **Q-03: withdraw to the MPC or the USDC contract as receiver (current behaviour pinned; Razvan to decide).**
 - What happens today (`round2::q03_*`):

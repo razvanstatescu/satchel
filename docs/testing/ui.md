@@ -171,10 +171,10 @@ design, or genuine, already-correct behavior that just hadn't been asserted yet)
    that fits inside the larger coin sends normally end to end.
 5. **Dust/rent-floor amounts.** `dust-amounts.spec.ts` (4 tests). **Finding, correcting round one**: BTC DOES have a
    real dust floor — `packages/core/src/chains/btc/select.ts`'s `DUST.p2wpkh = 294n` sats for a bech32/p2wpkh
-   recipient (every testnet4 address used in this suite). It just isn't mapped through a `problem` the way
-   `below_rent_new_recipient`/`usdc_insufficient`/etc. are in `SendFlow.tsx`'s `prepareErrorText`, so the raw
-   `SelectionError` message ("…294 sats…") surfaces verbatim in the review-step banner — real, correct behavior,
-   unpolished copy (flagged below, not fixed: changing shared copy text is a product call, not a test fix). 300
+   recipient (every testnet4 address used in this suite). The refusal used to show core's raw `SelectionError` text
+   ("minimum is 294 sats for this recipient"); after this round `prepareErrorText` maps its codes to sentences
+   (below dust → "Send at least 0.00000294 BTC", plus "too little after the fee", "too many coins", and insufficient
+   funds), and the test asserts the BTC wording. 300
    sats (just above dust) builds a review and sends normally. SOL's E25 "leaves the Satchel below rent" rule IS
    reachable in fixture mode (0.4997 SOL out of a 0.5 SOL balance leaves ~295,000 lamports, under the 650,240
    minimum) and is refused with the right copy; a small amount that leaves plenty of rent behind sends normally.
@@ -199,10 +199,9 @@ run of this round. Removed; the second full run is clean.
 
 ### Bugs found this round
 
-None. Both "findings" above (the static fixture balance, and BTC's real-but-unpolished dust-error copy) are
-existing, intentional, or at worst cosmetically-rough behavior, not incorrect behavior — so no `test.fixme` and no
-regression fix was needed; they're documented here and in the specs' own comments so the next person doesn't
-re-discover them from scratch.
+No incorrect behaviour. The static fixture balance is deliberate fixture design. BTC's dust refusal was correct but
+showed core's raw text; that copy was fixed after the round (commit `3d770ba`, "Web: bitcoin coin-selection errors
+read as sentences"), and `dust-amounts.spec.ts` now asserts the new wording.
 
 ## Edge cases explored during this audit
 
