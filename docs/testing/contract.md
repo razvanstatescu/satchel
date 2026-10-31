@@ -592,3 +592,13 @@ and of the variant names, any position, top level or inner, any JSON value: alwa
 and the msg without that key is accepted). Sandbox (`round2.rs`): `q03_withdraw_near_to_mpc_usdc_or_self_is_refused`,
 `q03_withdraw_usdc_to_mpc_usdc_or_self_is_refused_even_when_registered`, `q04_ft_msg_unknown_fields_are_refused_and_refunded`
 (flipped and renamed); `gas_paths::gas_withdraw_and_ft_msg_paths` (new, behaviour-neutral).
+
+**Suites on the fixed code** (2026-10-31, wasm `4dd7cde9da18d6a455993f1e1484c8f0140672144d368153948cc9a10050aed2`,
+421,659 B, `cargo near build non-reproducible-wasm`, INV-22 OK):
+
+| Suite | Before (2ed9759) | After |
+|---|---|---|
+| Unit, `cargo test -p satchel --lib` | 199 passed | **202 passed**, 0 ignored (+ `q03_caller_chosen_receivers_…`, `q04_unknown_msg_fields_…`, `prop_ft_msg_any_extra_key_is_refused`; `audit_ft_msg_strict_cases` is the renamed lenient pin) |
+| Sandbox, default 2.13.4, one `--test` file at a time | 136 passed | **137 passed**, 0 ignored, in 20 files (+ `gas_paths::gas_withdraw_and_ft_msg_paths`; the three round-two pins flipped) |
+| Core, `pnpm --filter @satchel/core test` | 540 | 540 (unchanged code) |
+| Web unit, `pnpm --filter web test` | 606 | 606 (unchanged code) |
