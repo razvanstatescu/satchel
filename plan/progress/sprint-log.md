@@ -120,3 +120,5 @@
 - 2026-10-30T16:30Z [AUDIT-01,AUDIT-02,AUDIT-04] DONE: fix/audit fixes committed; unit 194/0 ignored, sandbox 127/0 ignored, core 472, deep proptests pass, INV-22 OK, wasm 9dd65286 (non-reproducible); not pushed, not deployed
 - 2026-10-30T16:52Z [orchestrator] AUDIT-01/02/04 merged + app one-coin delegate BTC; dev2 redeployed (9dd65286…), state kept; .env.production hash updated; contract unit 194, sandbox 127, core 472, web unit 535, e2e 265, 0 ignored
 - 2026-10-30T17:23Z [orchestrator] test audit round two started: core2 (clean-history merge, validators, retry, live API smoke), ui2 (balance after send, keyboard-only send, reject paths, delegate one-coin, dust, dropdown a11y), contract2 (sandbox on nearcore 2.14, deep differential fuzz, post-fix edges, Q-03/Q-04 pinned, gas)
+- 2026-10-30T18:52Z [test-core2] in-progress: mergeNearSnapshots unit tests added (19 tests, near-merge.test.ts), committed c60efcc
+- 2026-10-30T18:55Z [ui-e2e-round2] plan: wrote round two plan (targets 1-7) into docs/testing/ui.md
