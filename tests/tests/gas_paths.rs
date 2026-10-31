@@ -127,3 +127,56 @@ async fn contract_balance_after_calls() -> Result<()> {
     eprintln!("BALANCE nft_transfer (1 yocto kept): satchel Δ {} yocto; receipt burnt {:.3} Tgas", b2 as i128 - b1 as i128, burnt as f64 / 1e12);
     Ok(())
 }
+
+/// Q-03 / Q-04 (docs/testing/contract.md §7.7): the paths the receiver check and the strict msg parsing touch, all
+/// with legitimate arguments so the same test runs on the wasm before the change (`SATCHEL_WASM=<path>`). Attached gas
+/// is what the app attaches: withdrawals 50 Tgas, `ft_transfer_call` 150 Tgas, `prepay_storage` 30 Tgas.
+#[tokio::test]
+async fn gas_withdraw_and_ft_msg_paths() -> Result<()> {
+    let env = setup().await?;
+    let r = env.bob.call(env.satchel.id(), "deposit_near").args_json(json!({ "token_id": "1" })).deposit(NearToken::from_near(1)).gas(Gas::from_tgas(30)).transact().await?;
+    report(&env, "deposit_near", &r);
+    let r = env.bob.call(env.satchel.id(), "prepay_storage").args_json(json!({ "account_id": env.carol.id() })).deposit(NearToken::from_millinear(10)).gas(Gas::from_tgas(30)).transact().await?;
+    report(&env, "prepay_storage (for another account)", &r);
+    let r = env.bob.call(env.satchel.id(), "prepay_storage").args_json(json!({})).deposit(NearToken::from_millinear(10)).gas(Gas::from_tgas(30)).transact().await?;
+    assert!(r.is_success(), "{}", fail_text(&r));
+    let r = ft_buy(&env, &env.bob, 10 * USDC, &json!({ "deposit": "1" }).to_string()).await?;
+    report(&env, "ft_transfer_call deposit (USDC)", &r);
+    let withdraw = |method: &'static str, receiver: Option<&near_workspaces::AccountId>| {
+        let mut args = json!({ "token_id": "1", "amount": if method == "withdraw_ft" { USDC.to_string() } else { (100 * MILLI).to_string() } });
+        if method == "withdraw_ft" {
+            args["ft"] = json!(env.usdc.id());
+        }
+        if let Some(to) = receiver {
+            args["receiver_id"] = json!(to);
+        }
+        env.alice.call(env.satchel.id(), method).args_json(args).deposit(YOCTO).gas(Gas::from_tgas(50)).transact()
+    };
+    let r = withdraw("withdraw_near", None).await?;
+    report(&env, "withdraw_near (to the owner)", &r);
+    let r = withdraw("withdraw_near", Some(env.bob.id())).await?;
+    report(&env, "withdraw_near (to a named receiver)", &r);
+    let r = withdraw("withdraw_ft", None).await?;
+    report(&env, "withdraw_ft USDC (to the owner)", &r);
+    let r = withdraw("withdraw_ft", Some(env.bob.id())).await?;
+    report(&env, "withdraw_ft USDC (to a named receiver)", &r);
+    prepay_for(&env, &env.carol).await?;
+    let exp = env.worker.view_block().await?.timestamp() / 1_000_000 + 3_600_000;
+    let epoch = view(&env, "inside_of", json!({ "token_id": "1" })).await?["inside_epoch"].as_u64().unwrap();
+    let msg = json!({ "offer": { "token_id": "1", "expected_sig_count": 0, "expected_inside_epoch": epoch, "expires_at_ms": exp } });
+    let r = ft_buy(&env, &env.carol, 3 * USDC, &msg.to_string()).await?;
+    report(&env, "ft_transfer_call offer (USDC)", &r);
+    let lid = list_ok(&env, &env.alice, "1", 5 * USDC, "usdc").await?;
+    let r = ft_buy(&env, &env.bob, 5 * USDC, &buy_msg("1", lid, 0)).await?;
+    report(&env, "ft_transfer_call buy (USDC)", &r);
+    let lid = list_ok(&env, &env.bob, "1", ONE_NEAR, "near").await?;
+    let r = buy(&env, &env.carol, "1", lid, 0, NearToken::from_yoctonear(ONE_NEAR)).await?;
+    report(&env, "buy (NEAR)", &r);
+    Ok(())
+}
+
+async fn prepay_for(env: &Env, who: &Account) -> Result<()> {
+    let r = who.call(env.satchel.id(), "prepay_storage").args_json(json!({})).deposit(NearToken::from_millinear(10)).gas(Gas::from_tgas(30)).transact().await?;
+    assert!(r.is_success(), "{}", fail_text(&r));
+    Ok(())
+}
