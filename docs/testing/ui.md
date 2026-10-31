@@ -128,38 +128,69 @@ Legend: ✅ covered before this audit · 🆕 added by this audit · ⚠️ gap 
 
 ## Round two
 
-A second audit pass (same fixture-mode methodology), targeting what round one flagged as untested. Plan (filled in
-as each item lands):
+A second audit pass (same fixture-mode methodology), closing what round one's "What remains untested" flagged.
+Six new spec files, 21 new tests, all passing; two real findings that correct round one's own notes (below); no
+product bugs found (everything that looked surprising turned out to be fixture-mode's deliberate static-balance
+design, or genuine, already-correct behavior that just hadn't been asserted yet).
 
-1. **Balances update after a send, no reload** — assert the Wallet tab's holding + card change after a fixture send
-   confirms (`RefreshAfterSend` + `refreshSnapshot`), same tab, no `page.reload()`. New spec: `refresh-after-send.spec.ts`.
-2. **A complete keyboard-only Send** — open from the Wallet tab via Tab/Enter, pick chain, amount, address (including
-   the address-book dropdown by keyboard), Review, Send, Escape-close, focus returns to the opener. New spec:
-   `keyboard-send.spec.ts`.
-3. **Wallet rejection in flows not yet covered** — give-by-link, make offer, accept offer, allowance add + revoke,
-   inside NEAR/FT deposit + withdraw, Take everything out (a rejected step → Skip → partial results). Investigated
-   whether the "timeout" sim knob applies here first: it doesn't — `lib/near/mock-wallet.ts` (the fixture wallet
-   behind every plain NEAR call: `set_allowance`, `make_offer`, `accept_offer`, `deposit_near`, `withdraw_*`, the
-   give-link's fund+transfer) only honours the `reject` knob; `timeout`/`broadcast-fail`/`delay` are consumed
-   downstream in the chain-signing runner (BTC/EVM/SOL `sign_for`) only, already exercised by `flows.spec.ts` and
-   `allowance.spec.ts`'s BTC send. So "timeout" has no distinct state to assert for these NEAR-only flows; only
-   `reject` is new coverage here, plus Empty's reject→Skip→partial (Empty's per-coin step IS a `sign_for`, so its
-   skip path is the one place a rejected step composes with a multi-step plan). New spec: `reject-coverage.spec.ts`.
-4. **A delegate's BTC send that no single coin can pay (AUDIT-01)** — Satchel #1's two fixture coins are 139,718 and
-   50,000 sats; a delegate cap big enough to cover an amount neither coin can pay alone (e.g. 150,000 sats) must show
-   the one-coin message naming the largest coin (139,718 sats) before the wallet opens; an amount that fits one coin
-   succeeds. New spec: `delegate-btc-one-coin.spec.ts`.
-5. **Dust/rent-floor amounts** — read `@satchel/core`'s BTC coin-selection (`packages/core/src/chains/btc/select.ts`):
-   there IS a dust floor (294 sats for a p2wpkh recipient, `DUST.p2wpkh`), contrary to round one's note that none
-   exists; it surfaces as a generic `SelectionError` message through `SendFlow`'s review-step error banner (not a
-   copy-mapped `problem`, so the raw core message shows verbatim — flagged below). SOL's rent rule is reachable too
-   via "leaves the Satchel below rent" (E25); the "new recipient below rent" rule (E26-adjacent) is NOT reachable in
-   fixture mode because `lib/chains/send.ts`'s fixture `solReads().recipientExists` is hardcoded `true` — noted as a
-   fixture-mode gap, not a product bug. New spec: `dust-amounts.spec.ts`.
-6. **Address-book dropdown: Night + axe open, 320px, and search past 5 entries** — `AddressBook.tsx`'s `useBookMenu`
-   only renders a search box once an entry list exceeds 5 (`mine.length > 5`); round one's dropdown test used only 2
-   entries. New spec: `address-book-dropdown.spec.ts`.
-7. Bonus, if time allows: anything else round one's "What remains untested" flagged that's cheap to close.
+1. **Balances update after a send, no reload.** `RefreshAfterSend.tsx` does fire `refreshSnapshot` the moment an
+   intent reaches "sent"/"confirmed" — but in fixture mode this never changes the Wallet tab's BTC/EVM/SOL *chain
+   balance* number: `lib/data/source.ts`'s fixture `balances()` always returns the static `FIXTURE_BALANCES` dict,
+   and `lib/chains/send.ts` says so in its own comment on `fixtureEvmBalance` ("the static world; the sim never
+   moves EVM balances"). This is by design (fixture mode is a frozen world for native balances, not a ledger), not
+   a bug. What DOES change, same page instance, no reload — is the clean-history signature count
+   (`[data-fact-sig-count]`, a server-rendered judge fact). `refresh-after-send.spec.ts` (2 tests) asserts that, and
+   pins the static-balance behavior down as a regression guard.
+2. **A complete keyboard-only Send.** `keyboard-send.spec.ts` (1 test): Tab from the Wallet tab's own "Send" action
+   (chosen over a coin-sheet-opened Send because its `closeHref` is `/s/1` itself, so the focus-restore fix can
+   land back on it), arrow keys through the chain `radiogroup`, Tab past the "to" field to the address-book button,
+   Enter to open it (focus auto-lands on the first entry), ArrowDown + Enter to pick the second, Space to activate
+   Review, Enter to activate Send, Escape to close — focus returns to the "Send" link. No `.click()`/`.check()`
+   anywhere in the test body.
+3. **Wallet rejection in flows not yet covered.** `reject-coverage.spec.ts` (8 tests): give-by-link, make offer,
+   accept offer, allowance add, allowance revoke, inside-NEAR deposit, inside-NEAR withdraw, and Empty's
+   reject→Skip→partial path. Each asserts the right neutral note, that nothing moved, and that a plain retry (knob
+   off) succeeds. **Finding**: the "timeout" sim knob has no effect on any of these — `lib/near/mock-wallet.ts` (the
+   fixture wallet behind every plain NEAR call: `set_allowance`, `revoke_allowance`, `make_offer`, `accept_offer`,
+   `deposit_near`, `withdraw_near`, the give-link's fund+transfer) only reads the `reject` knob; `mode`/`delay` are
+   consumed downstream in the chain-signing runner (BTC/EVM/SOL `sign_for`) only, already exercised by
+   `flows.spec.ts` and `allowance.spec.ts`'s BTC send, and never touch `signAndSendTransaction` itself (it always
+   resolves in 600ms or rejects in 300ms). So there is no distinct "NEAR call timed out" UI state anywhere in these
+   flows to test — mint's reject path is already covered by `flows.spec.ts` and has the same property, so it wasn't
+   duplicated here.
+4. **AUDIT-01, a delegate's BTC send that no single coin can pay.** `delegate-btc-one-coin.spec.ts` (2 tests):
+   Satchel #1's two fixture coins are 139,718 and 50,000 sats; a delegate cap large enough to cover 150,000 sats
+   (which neither coin alone can pay) shows the one-coin message naming the largest coin (0.00139718 BTC) at the
+   Review click, before the wallet ever opens (Send stays disabled — nothing was prepared to approve); an amount
+   that fits inside the larger coin sends normally end to end.
+5. **Dust/rent-floor amounts.** `dust-amounts.spec.ts` (4 tests). **Finding, correcting round one**: BTC DOES have a
+   real dust floor — `packages/core/src/chains/btc/select.ts`'s `DUST.p2wpkh = 294n` sats for a bech32/p2wpkh
+   recipient (every testnet4 address used in this suite). It just isn't mapped through a `problem` the way
+   `below_rent_new_recipient`/`usdc_insufficient`/etc. are in `SendFlow.tsx`'s `prepareErrorText`, so the raw
+   `SelectionError` message ("…294 sats…") surfaces verbatim in the review-step banner — real, correct behavior,
+   unpolished copy (flagged below, not fixed: changing shared copy text is a product call, not a test fix). 300
+   sats (just above dust) builds a review and sends normally. SOL's E25 "leaves the Satchel below rent" rule IS
+   reachable in fixture mode (0.4997 SOL out of a 0.5 SOL balance leaves ~295,000 lamports, under the 650,240
+   minimum) and is refused with the right copy; a small amount that leaves plenty of rent behind sends normally.
+   The OTHER SOL rent rule ("new recipient needs the full rent minimum") is NOT reachable in fixture mode —
+   `lib/chains/send.ts`'s fixture `solReads().recipientExists` is hardcoded `true` — a fixture-mode test gap, not a
+   product bug.
+6. **Address-book dropdown: search past 5 entries, 320px, Night + axe.** `address-book-dropdown.spec.ts` (4 tests):
+   with 6 saved BTC entries, the search box (`AddressBook.tsx`'s `useBookMenu`, `mine.length > 5`) appears, is
+   focused on open, and narrows the list by alias or address, down to a "no match" state; with exactly 5 entries, no
+   search box renders (confirms the threshold is `> 5`, not `>= 5`); at 320px the dropdown (search box included)
+   never causes horizontal overflow and every entry is still reachable; in Night, with the dropdown and its search
+   box both open, axe reports no serious/critical violation.
+
+No item 7 bonus was reached this round — targets 1–6 plus the final full-suite/typecheck/lint/unit run filled the
+time budget.
+
+### Bugs found this round
+
+None. Both "findings" above (the static fixture balance, and BTC's real-but-unpolished dust-error copy) are
+existing, intentional, or at worst cosmetically-rough behavior, not incorrect behavior — so no `test.fixme` and no
+regression fix was needed; they're documented here and in the specs' own comments so the next person doesn't
+re-discover them from scratch.
 
 ## Edge cases explored during this audit
 
