@@ -257,3 +257,159 @@ confirm anything here).
 - **`apps/web/src/lib/signing/runner.ts` and `retry.ts`** already have a dedicated runner test
   (`signing-runner.test.ts`); `retry.ts`'s own branches weren't independently diffed against that file's coverage in
   this pass.
+
+## Round two
+
+A follow-up pass (2026-10-31, worktree `test/core2`) closing the five items the first pass flagged above. Counts
+below were measured by actually running each suite in the worktree, not estimated.
+
+| Suite | After round one | After round two |
+| --- | --- | --- |
+| `@satchel/core` (`pnpm --filter @satchel/core test`) | 467 tests, 16 files | **540 tests, 18 files** (+2 files: `near-merge.test.ts`, `bytes.test.ts`) |
+| `web` unit (`pnpm --filter web test`) | 531 tests, 43 files | **601 tests, 46 files** (+3 files: `validate.test.ts`, `retry.test.ts`, and the WIP commit's file landing as a real addition) |
+| `@satchel/tools` (`pnpm --filter @satchel/tools test:unit`) | 92 tests, 6 files | 92 tests, 6 files (unchanged; out of this pass's scope) |
+| typecheck (`pnpm --filter web typecheck`) | clean | clean |
+| lint (`pnpm --filter web lint`) | clean | clean |
+
+### Target 1: `mergeNearSnapshots` (packages/core clean-history checker)
+
+Added `packages/core/test/near-merge.test.ts` (19 tests), calling `mergeNearSnapshots` directly rather than only
+through `checkCleanHistory`, so every branch is pinned independently of the gate logic layered on top. Diffed
+against the existing coverage in `clean-history.test.ts` (which only exercised: 2-source agree, 2-source disagree,
+records_incomplete with a short count, and both-sources-down) before adding anything, to avoid duplicating what was
+already there.
+
+New branches covered:
+
+- **Zero sources** (empty array, and an array of only errors) → `near_unavailable`.
+- **3+ sources, 2 agree and 1 minority disagrees** → still `near_disagree`, never "majority wins" — this is the
+  wrong-direction case that matters most here: the merge must fail closed on *any* disagreement, not silently drop
+  the odd one out.
+- **3+ sources, all agree** → `ok`, `sources: 3` (not capped at 2 the way the old tests, which only ever used
+  exactly 2 sources, could have left implicit).
+- **3 sources, 1 errors, 2 agree** → `ok`, `sources: 2` (errored sources don't count toward the total).
+- **`records_incomplete`**, three distinct shapes beyond the one existing "too few records" test: non-contiguous
+  seqs (0 and 2, missing 1), a duplicate seq (two seq-0 records, no seq-1), and confirmation that the completeness
+  check is **order-independent** (out-of-order records that do cover every seq are accepted).
+- **`near_one_source`**: a single readable source is rejected when `allowSingleSource` is `false` (both as the only
+  array entry, and as the single survivor after the other source errors) — this branch had zero coverage before;
+  the only existing single-source test used the policy default (`allowSingleSource: true`, the "1 of 2 sources" UX),
+  so the actual rejecting behavior of the flag had never been exercised.
+- **Priority ordering**: when a pair of snapshots is both disagreeing *and* individually incomplete,
+  `near_disagree` wins (matches the function's own branch order — disagreement is checked before completeness).
+- **Fingerprint sensitivity**: confirmed `status`/`signature` are ignored (the function's documented intent — they
+  legitimately lag between RPCs) while `height`, `mpcKeys`, and `accessKeyCount` do trigger disagreement, and that a
+  code hash differing only in letter case is normalized and does **not** count as disagreement (via
+  `normalizeCodeHash`).
+
+No bug found: every branch already failed closed in the safe direction. The code was correct; it was just untested
+in isolation.
+
+### Target 2: `apps/web/src/lib/validate.ts`
+
+Added `apps/web/test/unit/validate.test.ts` (41 tests) covering `validateEvm`, `validateBtc`, `validateSol` and
+`validateNearAccount` directly — previously only reached indirectly through `sol-send.test.ts` and
+`address-book.test.ts`. Covers: EVM checksum right/wrong/absent (all-lower, all-upper, correct mixed-case, a
+single-letter-case typo relative to the real checksum), the zero address, self-send (case-insensitive), BTC mainnet
+vs. testnet prefixes across bech32/legacy/P2SH, every BTC testnet script type (bech32 `tb1q`, bech32m taproot
+`tb1p`, legacy P2PKH `m`/`n`, P2SH `2`), SOL on-curve vs. off-curve (PDA) addresses and base58-alphabet rejection,
+NEAR named vs. 64-hex implicit accounts, the three NEAR reserved-account rejections (self, the contract, the MPC
+signer) including the `self: null` (no wallet connected) case, whitespace trimming, unicode lookalikes (full-width
+digits, a Cyrillic homoglyph), and empty/boundary-length input on every validator.
+
+This file was authored, lost to a session crash, and restored as a WIP commit by the coordinator with 4 failing
+tests (40 total). Fixed before committing further — **all four were bad test fixtures/expectations, not
+`validate.ts` bugs**:
+
+- A fabricated taproot address (`tb1p0xlxv…`) that didn't actually decode as valid bech32m — replaced with a real
+  one generated from a random valid secp256k1-adjacent x-only pubkey via `bitcoinjs-lib`'s `p2tr` payment and
+  round-tripped through `bitcoin.address.toOutputScript` to confirm it decodes.
+- A Solana address labelled "a real on-curve devnet wallet address" that was actually **off-curve** (a PDA),
+  contradicting its own comment and the two assertions relying on it — replaced with a freshly generated Ed25519
+  keypair's pubkey (`@solana/web3.js`'s `Keypair.generate()`), on-curve by construction.
+- An uppercase `"0X" + "0".repeat(40)` zero-address case expected to hit the zero-address message — it actually
+  fails the format check first, since `validateEvm`'s regex literal `0x` is case-sensitive (only a lowercase `0x`
+  prefix is accepted at all; `0X...` is simply malformed input). Split into two tests: the real zero-address case
+  (lowercase `0x`) and a new test pinning the `0X` case's actual outcome (a format error), with a comment explaining
+  why.
+
+All 41 tests pass after the fix. No `validate.ts` bug was found — the bad fixtures were artifacts of the test
+authoring, not the code under test; each was checked by actually decoding/generating the real bytes rather than
+guessing a string.
+
+### Target 3: `apps/web/src/lib/signing/retry.ts`
+
+Added `apps/web/test/unit/retry.test.ts` (25 tests). `signing-runner.test.ts` already covered the headline cases
+(EVM nonce reuse + fee bump on `timed_out`, BTC input reuse, basic same-chain blocking, the fee-bump and
+input-set-comparison helpers on a couple of values) — diffed against that file first and added only what it didn't
+reach:
+
+- **`blockingIntent`**: a different `tokenId` never blocks even with everything else matching; a **message intent
+  (C7) never blocks** regardless of stage (untested before — message intents use no nonce and no coin, so this is a
+  real behavioral guarantee, not an incidental pass); every one of the seven `SPENDABLE_UNSENT` stages blocks
+  individually (the old test only tried `signed_not_sent` and `timed_out`); the non-blocking stages including SOL's
+  `expired` (which deliberately does *not* block — a dead blockhash can't be spent, so a fresh send is safe); the
+  `failed`-with-a-signature edge (`failed` alone doesn't block, but `failed` with at least one non-null signature
+  does, since a verify failure after the MPC already signed still leaves a usable signature in the wild); per-EVM
+  chain-id scoping (C3) in both directions — an intent on chain 42161 doesn't block a Sepolia send and vice versa —
+  plus the "no `evmChainId` recorded = treat as Sepolia" default and the "caller passes no `evmChainId` = match any
+  EVM intent regardless of its chain" case; a `replaces` chain only supersedes its exact target, not other
+  independently-blocking intents; first-match-wins ordering; and an empty list never blocking.
+- **`retryPlan`**: `bumpFees` checked against *every* stage, not just two (true only for `signed_not_sent`,
+  `unknown`, `timed_out`; false for everything else including `failed`); the BTC "no inputs to retry" throw (both an
+  entirely absent `btc` payload and one with an empty `inputs` array); BTC's `bumpFees` always `false` regardless of
+  stage; SOL's `solWaitForExpiry` (true unless the intent is already `expired`) and `solNotBefore` (carries the
+  prior `lastValidBlockHeight` through, or `undefined` when there was no prior SOL payload) — none of this SOL
+  branch had any coverage before.
+- **`bumpEvmFee`**: the ceiling-rounding behavior on values that don't divide evenly by 10 (`1n → 2n`, not `1n`,
+  which a naive floor would produce and under-bump below the real 110%), `0n`, and a gwei-scale value.
+- **`sameInputSet`**: two empty sets, a length mismatch with overlapping elements, and a same-length-but-not-same-set
+  case created by a duplicate in one array (pins the actual `Set`-based implementation's behavior rather than an
+  idealized multiset comparison, since the function's own doc comment only promises "order-insensitive", not
+  "multiset-exact").
+
+No bug found; every branch behaved as the code's own comments describe.
+
+### Target 4: `packages/core/src/bytes.ts`
+
+Added `packages/core/test/bytes.test.ts` (49 tests) — the file had zero dedicated coverage before, only reached
+indirectly through btc/evm/sol/near tests that happen to call `toHex`/`hexToBytesStrict`/etc. as a side effect.
+Covers every exported function: `hexToBytesStrict`'s strictness (0x/0X prefix stripped only when leading, odd
+length rejected, non-hex rejected including a `0x` appearing mid-string, whitespace rejected, the empty string and
+bare `"0x"` both decoding to zero bytes); `toHex`/`to0x`/`strip0x` round-trips; `concatBytes` with zero parts, empty
+parts, and non-mutation of its inputs; `equalBytes` (length mismatch, a differing byte, two empty arrays);
+`reverseBytes` (non-mutation, empty and single-byte inputs); `u32le`/`u64le`/`readU32le`/`readU64le` — little-endian
+byte order, range checks (negative, non-integer, over the max), offset handling, and reading past the end of the
+buffer, including a view with a non-zero `byteOffset` into a shared `ArrayBuffer` (confirms `readU32le` goes through
+`b.byteOffset` rather than assuming the view starts at 0, which the existing indirect call sites never happened to
+exercise); `bytesToBigIntBE`/`bigIntToBytesBE` round-trips across several byte-count boundaries, the minimal
+(no-leading-zero) encoding, and the negative-bigint throw; `utf8` on ASCII, a multi-byte character, and the empty
+string; and `base64ToBytes`/`bytesToBase64` round-trips plus two known vectors (`"hello"` ↔ `"aGVsbG8="`).
+
+No bug found.
+
+### Target 5: read-only live API smoke against dev2
+
+Built the app in live mode (`next build` with the committed `apps/web/.env.production`: `NEXT_PUBLIC_DATA_MODE=live`,
+`NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet`) and ran it with `next start -p 3332` in this worktree. All
+calls were plain `GET`s (FastNEAR/dRPC reads only, no `rpc.testnet.near.org`, no transactions, no wallet). Not added
+as an automated test — it depends on live testnet/FastNEAR/mempool.space/Solana-devnet availability, which the
+existing fixture-mode e2e suite exists precisely to avoid depending on.
+
+| Call | Result |
+| --- | --- |
+| `GET /api/contract` | 200. `code_hash_hex` and `expected_code_hash` both `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f56c456049d1ebd9e3`, `code_matches: true`. `account_exists: true`, `locked: false` (dev role, 1 access key — expected pre-birth), `mpc_version: "3.18.0"`, `next_token_id: 5` (4 minted Satchels, matching the "4 Satchels" note in the top-level README). |
+| `GET /api/satchels/1` | 200, full snapshot shape: `sig_count: 8`, real BTC/EVM/SOL balances and addresses, live USD prices (source `1click`), `lock.code_matches: true`. |
+| `GET /api/satchels/999` | 404, `{"error":"Satchel #999 doesn't exist","token_id":"999"}` — as documented, unlike `/txs` below. |
+| `GET /api/satchels/abc` | 400, `{"error":"token id must be a decimal integer"}`. |
+| `GET /api/satchels/1/txs` (no `?source`) | 200, `{"sources":["bitcoin","sepolia","base","optimism","solana","near"]}` — note the source key is `sepolia`/`base`/`optimism`, not `ethereum`; a request with `?source=ethereum` correctly 400s (`"unknown source"`). |
+| `GET /api/satchels/1/txs?source=bitcoin` | 200, 2 real testnet4 transactions (confirmed, with mempool.space URLs). |
+| `GET /api/satchels/1/txs?source=sepolia` | 200, real Sepolia transactions (confirmed, etherscan URLs, real fees). |
+| `GET /api/satchels/1/txs?source=solana` | 200, 2 real devnet transactions (confirmed, explorer URLs). |
+| `GET /api/satchels/1/txs?source=base`, `?source=optimism`, `?source=near` | 200, each `{"txs":[]}` — no activity recorded yet on those sources for token 1, served cleanly rather than erroring. |
+| `GET /api/satchels/999/txs?source=bitcoin` | 200, `{"txs":[]}` — confirms round one's documented finding (this route never 404s for an unminted id) degrades exactly as described in **live** mode: a derived address with no real chain history just comes back empty, not an error. |
+| `GET /api/clean-history/1` | 200. `aggregate: "blocked"` (not "clean") — dev2 has a mix of spent/unused/unknown items across chains right now, which is the real, honest state of a dev contract mid-sprint, not a bug; `one_of_two: true` reflects the policy's "1 of 2 sources" allowance; `checks` lists the dev-role lock/code skip as an explicit warning rather than hiding it. |
+| `GET /api/card/1.svg` | 200. |
+
+No upstream failures observed (no FastNEAR/dRPC/mempool.space/Solana-devnet timeouts during this pass). No bug
+found; every shape matched what round one's fixture-mode tests predicted it should.
