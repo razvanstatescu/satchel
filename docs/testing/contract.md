@@ -602,3 +602,33 @@ and the msg without that key is accepted). Sandbox (`round2.rs`): `q03_withdraw_
 | Sandbox, default 2.13.4, one `--test` file at a time | 136 passed | **137 passed**, 0 ignored, in 20 files (+ `gas_paths::gas_withdraw_and_ft_msg_paths`; the three round-two pins flipped) |
 | Core, `pnpm --filter @satchel/core test` | 540 | 540 (unchanged code) |
 | Web unit, `pnpm --filter web test` | 606 | 606 (unchanged code) |
+
+**Deep property runs (release).** `PROPTEST_CASES=1000 cargo test -p satchel --lib --release market_tests::prop`: all 5
+properties pass, 63 s (incl. `prop_accounting_matches_model` and the new `prop_ft_msg_any_extra_key_is_refused`).
+`PROPTEST_CASES=20000 … market_tests::prop_ft_msg`: `prop_ft_msg_any_extra_key_is_refused` and
+`prop_ft_msg_garbage_is_refused_cleanly` pass, 20,000 cases each, 330 s. The `parse::` fuzz targets and the Rust-vs-TS
+differential cover `sign_for` payloads, which these changes don't touch, so they were not re-run; no corpus or vector
+changed.
+
+**Gas before / after** (same machine, default sandbox 2.13.4, `gas_paths.rs`; before = `SATCHEL_WASM=` the 2ed9759
+build `9dd65286…`, the wasm dev2 ran). Main = the contract's first receipt.
+
+| Path | Before: total / main (Tgas) | After: total / main (Tgas) | Δ main | Attached by the app |
+|---|---|---|---|---|
+| `withdraw_near` to the owner | 5.377 / 2.691 | 5.374 / 2.689 | −0.002 | 50 |
+| `withdraw_near` to a named receiver | 5.379 / 2.692 | 5.377 / 2.690 | −0.002 | 50 |
+| `withdraw_ft` USDC to the owner | 7.106 / 2.979 | 7.103 / 2.978 | −0.001 | 50 |
+| `withdraw_ft` USDC to a named receiver | 7.103 / 2.981 | 7.100 / 2.979 | −0.002 | 50 |
+| `prepay_storage` for another account | 2.135 / 1.824 | 2.144 / 1.833 | +0.009 | 30 |
+| `deposit_near` | 2.298 / 1.989 | 2.297 / 1.987 | −0.002 | 30 |
+| `ft_transfer_call` deposit (USDC) | 6.577 / 2.157 | 6.576 / 2.155 | −0.002 | 150 |
+| `ft_transfer_call` offer (USDC) | 7.516 / 3.069 | 7.515 / 3.067 | −0.002 | 150 |
+| `ft_transfer_call` buy (USDC) | 12.560 / 4.338 | 12.557 / 4.336 | −0.002 | 150 |
+| `buy` (NEAR) | 6.896 / 4.210 | 6.893 / 4.209 | −0.001 | 50 |
+| `buy` (NEAR) clearing 4 delegates | 7.034 / 4.348 | 7.031 / 4.346 | −0.002 | 50 |
+| `accept_offer` (listed, 4 delegates) | 8.001 / 5.316 | 7.998 / 5.315 | −0.001 | 50 |
+
+The only increase is the `prepay_storage` receiver check (+0.009 Tgas). The strict msg parse is slightly cheaper (no
+code to skip unknown fields; the wasm is 1,360 B smaller). Every path stays far inside its attached gas, and no gas
+constant (`PAYOUT_FT_GAS_TGAS` 15, `ON_PAYOUT_GAS_TGAS` 10, the app's `ATTACH`) needs to move. `gas.rs` floor and
+forwarding: 14.13 / 23.95 / 42.65 / 97.91 Tgas for n = 1 / 2 / 4 / 10, the same as §7.5.
