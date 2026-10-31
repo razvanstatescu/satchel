@@ -122,3 +122,8 @@
 - 2026-10-30T17:23Z [orchestrator] test audit round two started: core2 (clean-history merge, validators, retry, live API smoke), ui2 (balance after send, keyboard-only send, reject paths, delegate one-coin, dust, dropdown a11y), contract2 (sandbox on nearcore 2.14, deep differential fuzz, post-fix edges, Q-03/Q-04 pinned, gas)
 - 2026-10-30T18:52Z [test-core2] in-progress: mergeNearSnapshots unit tests added (19 tests, near-merge.test.ts), committed c60efcc
 - 2026-10-30T18:55Z [ui-e2e-round2] plan: wrote round two plan (targets 1-7) into docs/testing/ui.md
+- 2026-10-31T14:41Z [test-core2] in-progress: validate.ts unit tests fixed (3 bad fixtures) and committed fbef0d7, 41 tests passing
+- 2026-10-31T14:42Z [test-core2] in-progress: retry.ts unit tests added (25 tests, retry.test.ts), committed 3ffa3e4
+- 2026-10-31T14:43Z [test-core2] in-progress: bytes.ts unit tests added (49 tests, bytes.test.ts), committed 3111cb4
+- 2026-10-31T14:46Z [ui-e2e-round2] target1: refresh-after-send.spec.ts passing (2 tests); found fixture BTC/EVM/SOL balances are static, documented
+- 2026-10-31T14:47Z [test-core2] done: round two complete — core 540 tests (18 files), web unit 601 tests (46 files), tools 92 unchanged; typecheck/lint clean; live smoke against dev2 clean (code hash matched); docs updated. Branch test/core2 @ 3ad5e73, not pushed.
