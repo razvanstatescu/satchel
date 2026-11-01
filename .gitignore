@@ -17,7 +17,6 @@ payload.json
 
 # OS
 .DS_Store
-
 /near_hackathon.md
 /*.zip
 .claude/worktrees/
