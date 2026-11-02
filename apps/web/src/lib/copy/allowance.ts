@@ -24,9 +24,9 @@ export const allowanceCopy = {
       revokedToast: (who: string) => `${who} can no longer spend from this Satchel.`,
       revokeCancelled: "Revoking was cancelled. Nothing changed.",
       limitReached: "This Satchel already lets 4 accounts spend. Revoke one before adding another.",
-      /** The history-griefing note (spec §7 "Security notes"), in calm, plain words. */
-      trustNote:
-        "Their signatures become part of this Satchel's history, same as your own, and this access ends the moment you give or sell it. Add only someone you trust that much.",
+      /** The history-griefing note (spec §7 "Security notes"), shortened (less-labels); the full explanation moved
+       * to /questions#q-allow-history, linked by the Allowance/AllowanceFlow components. */
+      trustNote: "Their signatures count as yours. Add only someone you trust.",
     },
 
     /** The Add sheet (/s/[id]/allowance). */

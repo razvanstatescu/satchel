@@ -50,7 +50,9 @@ export const commerce = {
       /** NEW: the currency control's name and List's reason before a price is typed. */
       currency: "Currency",
       priceIn: (ticker: string) => `Price in ${ticker}`,
-      priceWhy: "Enter a price to list it.",
+      // priceWhy is gone (less-labels): a disabled List button with an empty price says enough; its accessible
+      // description for empty price is `priceWhyA11y`, screen-reader only.
+      priceWhyA11y: "Enter a price to list it.",
       invalid: "Enter a price like 2 or 2.5.",
       buyerGets: (b: string) => `Buyer gets ${b}.`,
       fee: "Satchel fee",

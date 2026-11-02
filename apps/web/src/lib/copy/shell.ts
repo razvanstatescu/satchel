@@ -26,6 +26,7 @@ export const shell = {
     mint: "Mint",
     book: "Address book",
     contract: "Contract facts",
+    questions: "Questions",
     menu: "Menu",
     openMenu: "Open menu",
     closeMenu: "Close menu",

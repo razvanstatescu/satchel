@@ -91,7 +91,9 @@ export const flows = {
       feePaid: "paid by this Satchel",
       after: (id: string) => `Satchel #${id} after`,
       nearFee: "NEAR fee",
-      near: "≈ 0.004 NEAR (gas + permanent signature record) · paid by your NEAR account",
+      // Shortened (less-labels): the breakdown (gas + the permanent signature record) and who pays it moved to
+      // /questions#q-fees-near, linked next to this value by SendFlow's ReviewCard.
+      near: "≈ 0.004 NEAR",
       nearTip: "Needs ≈ 0.1–0.3 NEAR free while signing (refunded).",
       /** NEW (app-screens §6): the disclosure that holds `nearTip` (a disclosure, not a tooltip). */
       nearAbout: "About the NEAR fee",
@@ -101,15 +103,11 @@ export const flows = {
       ack: "I checked this address",
       /** NEW (app-screens §1.4): the reason under Send until the box is ticked. */
       ackFirst: "Tick I checked this address to send.",
-      final: {
-        btc: "A Bitcoin send can't be undone. Check the address above.",
-        evm: "An Ethereum send can't be undone. Check the address above.",
-        sol: "A Solana send can't be undone. Check the address above.",
-      },
+      // The "a send can't be undone" line (one per chain) is gone (less-labels): it's covered once, for every chain,
+      // at /questions#q-undo. The wallet-approval helper is gone too: the wallet names itself and the contract.
       cta: (amount: string) => `Send ${amount}`,
       ctaAria: (amount: string, to: string) => `Send ${amount} to ${to}`,
       walletHint: "Check the Meteor or Intear window.",
-      helper: (contract: string) => `Your wallet will ask you to approve a request to ${contract}.`,
       networkAddress: (network: string) => `${network} address`,
     },
   },

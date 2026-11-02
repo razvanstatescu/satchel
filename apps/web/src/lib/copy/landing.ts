@@ -287,6 +287,8 @@ export const landing = {
    */
   questions: {
     h2: "Questions",
+    /** Below the seven closed questions (less-labels): the long version, grouped, on its own page. */
+    all: "All questions",
     /** Appended to `q-keys` on the dev role only. */
     keysDev: "This build reads a development contract that still has keys, so its lock checks are skipped.",
     "q-send": {

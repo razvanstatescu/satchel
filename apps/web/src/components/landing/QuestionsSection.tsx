@@ -1,4 +1,5 @@
-import { Plus } from "lucide-react";
+import Link from "next/link";
+import { ChevronRight, Plus } from "lucide-react";
 import { CONTAINER, FLOW, H2, HEAD_CENTER } from "@/components/landing/layout";
 import { Icon } from "@/components/ui";
 import { CONTRACT_ROLE } from "@/lib/config";
@@ -46,6 +47,15 @@ export function QuestionsSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { 
               );
             })}
           </div>
+          <p className="mt-6 text-center">
+            <Link
+              href="/questions"
+              className="inline-flex min-h-11 items-center gap-1 font-sans text-label font-semibold text-link underline-offset-3 hover:underline"
+            >
+              {copy.landing.questions.all}
+              <Icon icon={ChevronRight} size={16} />
+            </Link>
+          </p>
         </div>
       </div>
     </section>

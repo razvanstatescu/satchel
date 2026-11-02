@@ -293,6 +293,7 @@ const idsFor = (id: string) => ({
   done: `buy-done-title-${id}`,
   listWhy: `list-why-${id}`,
   priceError: `price-error-${id}`,
+  priceWhyA11y: `price-why-${id}`,
 });
 
 /* ── Buy ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -962,7 +963,12 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
   const c = report ? counts(report.items) : null;
   const agg = report?.aggregate ?? null;
   const risky = agg === "blocked" || agg === "settling" || agg === "unknown" || agg === "unsafe";
-  const reason = phase !== "idle" ? null : !quietOk ? (left === null ? null : { icon: Hourglass, text: copy.sell.quiet.waitWhy(formatBlocks(left, DEFAULT_BLOCK_MS)) }) : !usdcOk ? { icon: Info, text: copy.sell.usdc.first } : !priceOk ? { icon: Info, text: copy.sell.form.priceWhy } : null;
+  // The visible reason under List: only quiet-period and USDC-registration blockers get a line (less-labels dropped
+  // "Enter a price to list it." — a disabled button with an empty price says enough on its own). `priceHint` keeps
+  // that fact as the button's accessible description only, for when price is the sole remaining blocker.
+  const reason = phase !== "idle" ? null : !quietOk ? (left === null ? null : { icon: Hourglass, text: copy.sell.quiet.waitWhy(formatBlocks(left, DEFAULT_BLOCK_MS)) }) : !usdcOk ? { icon: Info, text: copy.sell.usdc.first } : null;
+  const priceHintId = idsFor(id).priceWhyA11y;
+  const showPriceHint = phase === "idle" && quietOk && usdcOk && !priceOk;
 
   const list = () => {
     if (!canList || !wallet || !accountId || base === null) return;
@@ -1026,7 +1032,7 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             data-testid="list-cta"
             aria-disabled={!canList}
             aria-busy={phase !== "idle" || undefined}
-            aria-describedby={reason ? idsFor(id).listWhy : undefined}
+            aria-describedby={reason ? idsFor(id).listWhy : showPriceHint ? priceHintId : undefined}
             data-press={canList ? "" : undefined}
             data-latched={phase !== "idle" ? "" : undefined}
             onClick={list}
@@ -1046,6 +1052,10 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             <FootNote id={idsFor(id).listWhy} icon={reason.icon}>
               {reason.text}
             </FootNote>
+          ) : showPriceHint ? (
+            <p id={priceHintId} className="sr-only">
+              {copy.sell.form.priceWhyA11y}
+            </p>
           ) : null}
           {risky && phase === "idle" ? <FootNote icon={TriangleAlert}>{copy.sell.history.warn}</FootNote> : null}
           {note ? <NoteLine note={note} /> : null}
