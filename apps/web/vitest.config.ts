@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     include: ["test/unit/**/*.test.ts", "src/**/*.test.ts"],
     environment: "node",
+    maxWorkers: 4,
     env: { NEXT_PUBLIC_DATA_MODE: "fixture" },
   },
 });

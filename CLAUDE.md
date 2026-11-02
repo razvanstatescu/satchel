@@ -60,6 +60,11 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
 - near-sdk 5.29.1 with edition 2021 may resolve `near-sdk-env 0.1.7`, which needs rustc 1.95. Use edition 2024 or
   `cargo update near-sdk-env --precise 0.1.6`, and commit `Cargo.lock`. Don't adopt the Oct 19 5.30 RCs.
 - Build contracts only with `cargo near build`, with `crate-type = ["cdylib"]`.
+- **CPU budget.** Several agent sessions share this machine, so heavy runs must not overlap. Before starting
+  `cargo near build`, `cargo test`, Playwright or a full `pnpm test`, check `ps` for another one already running and
+  wait for it to finish. Run one package's suite rather than the whole workspace when that covers the change. Vitest is
+  capped at `maxWorkers: 4` and the root `pnpm test` runs one package at a time; don't override either. Kill any
+  `next start`/`next dev` server you started once you're done with it.
 - **Never use `rpc.testnet.near.org`** (deprecated and throttled). Use FastNEAR (API key) with the dRPC fallback
   `https://near-testnet.drpc.org`. Submit transactions async and poll by hash; wallet promises are unreliable for
   long receipts.
