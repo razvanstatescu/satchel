@@ -97,6 +97,7 @@ export const EXTRA_FAQ_IDS = [
   "q-txs-vs-activity",
   "q-wallets",
   "q-safety-message",
+  "q-feedback",
 ] as const;
 
 export interface FaqGroup {
@@ -117,7 +118,7 @@ export const FAQ_GROUPS: readonly FaqGroup[] = [
   { id: "inside", title: "Inside balances", ids: ["q-inside", "q-storage-credit", "q-withdraw-inside"] },
   { id: "fees", title: "Fees and costs", ids: ["q-cost", "q-fees-near", "q-fees-chain"] },
   { id: "txs-vs-activity", title: "Transactions vs Activity", ids: ["q-txs-vs-activity"] },
-  { id: "testnet", title: "Testnet and safety", ids: ["q-testnet", "q-wallets", "q-safety-message"] },
+  { id: "testnet", title: "Testnet and safety", ids: ["q-testnet", "q-wallets", "q-safety-message", "q-feedback"] },
 ];
 
 /** Every question on /questions, grouped, with the landing's variants applied to the seven it shares with the

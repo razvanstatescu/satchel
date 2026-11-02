@@ -22,7 +22,8 @@
     "e2e:market": "tsx e2e/market.ts",
     "e2e:allowance": "tsx e2e/allowance.ts",
     "e2e:history": "tsx e2e/history.ts",
-    "deploy:keyless-birth": "tsx deploy/keyless-birth.ts"
+    "deploy:keyless-birth": "tsx deploy/keyless-birth.ts",
+    "onboarding:report": "tsx onboarding-report.ts"
   },
   "dependencies": {
     "@satchel/core": "workspace:*",

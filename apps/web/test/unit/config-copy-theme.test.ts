@@ -5,6 +5,7 @@ import { DEFAULTS, parsePublicEnv } from "@/lib/config";
 const FORBIDDEN_RPC_HOST = ["rpc", "testnet", "near", "org"].join(".");
 import manifest from "@/app/manifest";
 import { copy, errorCopy } from "@/lib/copy";
+import { EXTRA_FAQ_IDS, FAQ_IDS } from "@/lib/faq";
 import { NBSP } from "@/lib/format";
 import { applyTheme, DARK_QUERY, GROUND, parseStoredTheme, readTheme, resolveTheme, THEME_HEAD_SCRIPT, THEME_KEY } from "@/lib/theme";
 
@@ -274,6 +275,28 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     expect(errorCopy("ERR_SELF_BUY", { id: "3" })).toBe("You can't buy your own Satchel. Stop selling it instead.");
     expect(errorCopy("ERR_EVM_DATA", { id: "1", chain: "evm" })).toBe("Satchel only signs plain Ethereum transfers. Nothing was signed.");
     expect(errorCopy("MPC_QUEUE", { id: "1" })).toContain("already being signed");
+  });
+  it("the first-time onboarding: three screens, each with a Learn-more anchor that exists on /questions", () => {
+    const O = copy.onboarding;
+    expect(O.screens).toHaveLength(3);
+    expect(O.screens.map((s) => s.title)).toEqual(["A wallet you can hand over", "Every signature is on the record", "Testnet: try everything"]);
+    const knownAnchors: readonly string[] = [...FAQ_IDS, ...EXTRA_FAQ_IDS];
+    for (const s of O.screens) {
+      expect(knownAnchors, s.learnMore.anchor).toContain(s.learnMore.anchor);
+      expect(s.body.length, s.id).toBeGreaterThan(0);
+    }
+    expect([O.mintCta, O.openCta, O.continueCta]).toEqual(["Mint your first Satchel", "Open my Satchels", "Continue"]);
+    expect(O.replayIntro).toBe("Replay intro");
+  });
+  it("the about-you survey: every option id matches the API validator's stable contract", () => {
+    const S = copy.onboarding.survey;
+    expect(Object.keys(S.goal.options)).toEqual(["explore", "gift", "trade", "multichain", "build", "other"]);
+    expect(Object.keys(S.experience.options)).toEqual(["new", "some", "regular", "builder"]);
+    expect(Object.keys(S.chains.options)).toEqual(["btc", "evm", "sol", "near", "none"]);
+    expect(Object.keys(S.source.options)).toEqual(["hackathon", "x", "friend", "search", "other"]);
+    expect(S.shareAccount.label).toBe("Include my NEAR account so you can see how I use Satchel");
+    expect(S.privacy).toMatch(/no IP address stored, no cookies\.$/);
+    expect(copy.questions["q-feedback"]).toBeDefined();
   });
 });
 
