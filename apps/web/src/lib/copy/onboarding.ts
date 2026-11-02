@@ -29,10 +29,10 @@ export const onboardingCopy = {
       learnMore: { anchor: "q-proves", label: "What the buyer's check covers" },
     },
     {
-      id: "testnet",
-      title: "Testnet: try everything",
-      body: "These coins have no value, so there's nothing to lose. Mint a Satchel (or open the one you were given), add testnet coins, then send, give or list it.",
-      learnMore: { anchor: "q-testnet", label: "Why Satchel stays on testnet" },
+      id: "one-wallet",
+      title: "No new keys to keep",
+      body: "Send Bitcoin, Ethereum and Solana with the NEAR wallet you already use. There's no seed phrase for each chain: whoever owns the Satchel controls what's inside.",
+      learnMore: { anchor: "q-keys", label: "Who holds the keys" },
     },
   ],
   mintCta: "Mint your first Satchel",
@@ -84,7 +84,7 @@ export const onboardingCopy = {
     },
     shareAccount: {
       label: "Include my NEAR account so you can see how I use Satchel",
-      hint: "With it on, we can match your answers to your Satchel activity on NEAR testnet, which is already public.",
+      hint: "With it on, we can match your answers to your Satchel activity on NEAR, which is already public.",
     },
     privacy:
       "We send your answers, the time and the app version, and your account id only if you ticked the box above. Nothing else is collected: no IP address stored, no cookies.",

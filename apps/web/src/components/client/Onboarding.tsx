@@ -45,7 +45,8 @@ const SCREEN_CHIPS: CardChip[] = (SOL_UI_ENABLED ? (["btc", "evm", "sol"] as con
 }));
 
 /** The three screens' illustrations, each built from an existing brand part: the card (a wallet you can hand over),
- * the sticker S with two "Used" pills (every signature is on the record), and the chain charms (testnet coins). */
+ * the sticker S with two "Used" pills (every signature is on the record), and the chain charms (one NEAR wallet for
+ * all three chains). */
 function ScreenArt({ screenId }: { screenId: string }) {
   return (
     <div aria-hidden="true" className="flex items-center justify-center rounded-card bg-sky px-6 py-7">
