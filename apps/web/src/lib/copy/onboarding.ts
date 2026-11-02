@@ -12,6 +12,7 @@ export const onboardingCopy = {
   back: "Back",
   close: "Close intro",
   replayIntro: "Replay intro",
+  learnMore: "Learn more",
   screens: [
     {
       id: "hand-over",

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowUpRight, ChevronUp, Copy, LogOut, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, ChevronUp, Copy, LogOut, Sparkles, type LucideIcon } from "lucide-react";
 import { copy, NETWORK_LABEL } from "@/lib/copy";
 import { EXPLORERS } from "@/lib/config";
 import { readMotionMode } from "@/lib/motion-flag";
@@ -12,6 +12,7 @@ import { useWallet } from "@/lib/near/wallet";
 import { Avatar, Button, Icon, IconButton, cx } from "@/components/ui";
 import { ConnectButton } from "@/components/client/ConnectButton";
 import { ModalSheet } from "@/components/client/LandingMenu";
+import { useOnboardingReplay } from "@/components/client/Onboarding";
 import { toast } from "@/components/client/Toaster";
 
 /**
@@ -63,6 +64,7 @@ function MenuAction({ icon, children, onClick }: { icon: LucideIcon; children: R
 /** Copy account ID · View on NearBlocks · Disconnect (the popover's and the sheet's rows). */
 function AccountActions({ accountId, done }: { accountId: string; done: () => void }) {
   const { signOut } = useWallet();
+  const replayOnboarding = useOnboardingReplay();
   return (
     <div className="flex flex-col gap-1">
       <MenuAction
@@ -79,6 +81,15 @@ function AccountActions({ accountId, done }: { accountId: string; done: () => vo
         {copy.nav.viewNearBlocks}
         <span className="sr-only">{` ${copy.a11y.newTab}`}</span>
       </a>
+      <MenuAction
+        icon={Sparkles}
+        onClick={() => {
+          done();
+          replayOnboarding();
+        }}
+      >
+        {copy.onboarding.replayIntro}
+      </MenuAction>
       <MenuAction icon={LogOut} onClick={() => void signOut().then(done)}>
         {copy.nav.disconnect}
       </MenuAction>
