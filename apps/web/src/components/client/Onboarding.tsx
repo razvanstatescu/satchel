@@ -135,8 +135,10 @@ function Screens({
       <div className="flex flex-col gap-2">
         <h2 className="m-0 font-display text-heading text-ink">{screen.title}</h2>
         <p className="m-0 font-sans text-body text-ink-muted">{screen.body}</p>
-        <a href={`/questions#${screen.learnMore.anchor}`} aria-label={screen.learnMore.label} className="text-link self-start font-sans text-body-sm underline decoration-1 underline-offset-3 hover:decoration-2">
+        {/* a new tab, so the intro stays where it was; the visible words start the accessible name (WCAG 2.5.3) */}
+        <a href={`/questions#${screen.learnMore.anchor}`} target="_blank" rel="noopener" className="text-link self-start font-sans text-body-sm underline decoration-1 underline-offset-3 hover:decoration-2">
           {O.learnMore}
+          <span className="sr-only">: {screen.learnMore.label}{O.newTab}</span>
         </a>
       </div>
       <Dots step={step} total={total} />
@@ -291,8 +293,9 @@ function Survey({ accountId, onFinish }: { accountId: string | null; onFinish: (
         </label>
       ) : null}
       <p className="m-0 font-sans text-caption text-ink-muted">{S.privacy}</p>
-      <a href="/questions#q-feedback" className="text-link self-start font-sans text-body-sm underline decoration-1 underline-offset-3 hover:decoration-2">
+      <a href="/questions#q-feedback" target="_blank" rel="noopener" className="text-link self-start font-sans text-body-sm underline decoration-1 underline-offset-3 hover:decoration-2">
         {O.learnMore}
+        <span className="sr-only">: {S.learnMoreLabel}{O.newTab}</span>
       </a>
       <div className="flex items-center justify-between gap-3">
         <Button onClick={skip} disabled={sending}>
@@ -328,9 +331,10 @@ function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { vi
             {O.survey.title}
           </h2>
         ) : (
-          <h2 id={titleId} ref={titleRef} tabIndex={-1} className="sr-only outline-none">
+          // names the dialog only; the screen's own visible heading is the one heading (no duplicate h2)
+          <p id={titleId} ref={titleRef as React.RefObject<HTMLParagraphElement | null>} tabIndex={-1} className="sr-only outline-none">
             {O.screens[step]?.title}
-          </h2>
+          </p>
         )
       }
     >

@@ -19,6 +19,17 @@ export default defineConfig({
   use: {
     baseURL: external ?? `http://127.0.0.1:${PORT}`,
     trace: "retain-on-failure",
+    // The first-time onboarding (Onboarding.tsx) would cover any page a spec signs in on, however it connects the
+    // mock wallet: every context starts with it done. onboarding.spec.ts opts back in (useMockWallet { onboarding }).
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: new URL(external ?? `http://127.0.0.1:${PORT}`).origin,
+          localStorage: [{ name: "satchel:onboarding:v1", value: JSON.stringify({ v: 1, doneAt: 0, skippedSurvey: true, submitted: false }) }],
+        },
+      ],
+    },
   },
   projects: [
     { name: "mobile", use: { ...devices["Pixel 7"], browserName: "chromium" }, testMatch: /responsive\.spec\.ts/ },

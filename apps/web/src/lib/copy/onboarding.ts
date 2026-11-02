@@ -13,6 +13,8 @@ export const onboardingCopy = {
   close: "Close intro",
   replayIntro: "Replay intro",
   learnMore: "Learn more",
+  /** read after a Learn more link's topic: the answer opens in a new tab, so the intro stays put */
+  newTab: " (opens in a new tab)",
   screens: [
     {
       id: "hand-over",
@@ -39,6 +41,7 @@ export const onboardingCopy = {
   survey: {
     title: "Help us build Satchel",
     lead: "About 20 seconds, and everything here is optional.",
+    learnMoreLabel: "What we collect, and why",
     goal: {
       q: "What brings you here?",
       options: {

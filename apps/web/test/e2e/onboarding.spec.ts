@@ -15,7 +15,8 @@ async function axeViolations(page: Page) {
   return r.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => `${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
 }
 
-const onboarding = (page: Page) => page.getByTestId("onboarding");
+// the testid is on the sheet's root (a zero-size wrapper); the dialog inside it is what shows
+const onboarding = (page: Page) => page.getByTestId("onboarding").getByRole("dialog");
 const screens = (page: Page) => page.getByTestId("onboarding-screens");
 
 test.describe("first-time onboarding", () => {
@@ -73,7 +74,7 @@ test.describe("first-time onboarding", () => {
     await survey.getByRole("button", { name: copy.onboarding.survey.goal.options.explore }).click();
     await survey.getByRole("button", { name: copy.onboarding.survey.goal.options.build }).click();
     await survey.getByRole("button", { name: copy.onboarding.survey.experience.options.builder }).click();
-    await survey.getByRole("button", { name: copy.onboarding.survey.chains.options.near }).click();
+    await survey.getByRole("button", { name: copy.onboarding.survey.chains.options.near, exact: true }).click();
     await survey.getByRole("button", { name: copy.onboarding.survey.source.options.hackathon }).click();
 
     await survey.getByRole("button", { name: copy.onboarding.survey.send }).click();
@@ -134,7 +135,7 @@ test.describe("first-time onboarding", () => {
     await onboarding(page).getByRole("button", { name: copy.onboarding.skip }).click();
     await expect(onboarding(page)).toBeHidden();
 
-    await page.getByTestId("account-pill").click();
+    await page.locator('[data-testid="account-pill"]:visible').click();
     await page.getByRole("button", { name: copy.onboarding.replayIntro }).click();
     await expect(onboarding(page)).toBeVisible();
     await expect(screens(page)).toHaveAttribute("data-step", "0");
