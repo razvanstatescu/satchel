@@ -4,7 +4,7 @@ import { overview } from "@/lib/overview";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
-import { CircleCheck, Hourglass, Info, Landmark, LoaderCircle, Lock, Package, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
+import { CircleCheck, Hourglass, Info, Landmark, LoaderCircle, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
 import {
   GateLine,
   Record,
@@ -30,7 +30,7 @@ import { SoldReceipt, TxValue, useUsdcRegistration } from "@/components/client/S
 import { ObjCol, ObjMain } from "@/components/SatchelWallet";
 import { announce, toast, usePinnedBar } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
-import { AmountInput, Button, EmptyState, ExternalLink, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
+import { AmountInput, Button, EmptyState, ExternalLink, HelpLink, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
 import { useNow } from "@/lib/clock";
 import { copy, errorCopy } from "@/lib/copy";
 import { CONTRACT_ROLE, FAUCETS } from "@/lib/config";
@@ -1177,22 +1177,12 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             <dd className="m-0 text-right t-num">{priceShown}</dd>
           </div>
         </dl>
-        <p className="font-sans text-body-sm text-ink-muted">{copy.sell.form.paid(accountId ?? "")}</p>
       </section>
 
-      <section aria-labelledby="sell-while-title" className="flex flex-col gap-2.5">
-        <h3 id="sell-while-title" className="font-sans text-label text-ink">
-          {copy.sell.while.title}
-        </h3>
-        <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-          {copy.sell.while.rows(id, priceShown).map((r, i) => (
-            <li key={r} className="flex items-start gap-2.5 font-sans text-body-sm text-ink">
-              <Icon icon={[Lock, Tag, Package, Undo2][i] ?? Info} size={16} className="mt-0.5 text-ink-muted" />
-              <span>{r}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <p className="m-0 font-sans text-body-sm text-ink-muted">
+        {copy.sell.while}
+        <HelpLink anchor="q-paused" label={copy.questions["q-paused"].q} className="ml-1 align-middle" />
+      </p>
     </FlowShell>
   );
 }

@@ -202,9 +202,7 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
           />
           </BookField>
           <div id="allowance-to-status" aria-live="polite" className="flex flex-col gap-2 font-sans text-body-sm">
-            {!text.trim() ? (
-              <p className="text-ink-muted">{copy.allowance.add.help}</p>
-            ) : err ? (
+            {!text.trim() ? null : err ? (
               <p className="flex items-start gap-1.5 text-danger" data-testid="allowance-to-error">
                 <Icon icon={TriangleAlert} size={16} className="mt-0.5" />
                 <span className="min-w-0 wrap-anywhere">{err}</span>
@@ -242,10 +240,10 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
           <span className="min-w-0 truncate font-mono text-[0.9375rem] leading-5 font-[450]">{target}</span>
         </div>
         <section aria-labelledby="allowance-caps-title" className="flex flex-col gap-2.5">
-          <h3 id="allowance-caps-title" className="m-0 font-sans text-label text-ink">
+          <h3 id="allowance-caps-title" className="m-0 flex items-center gap-1.5 font-sans text-label text-ink">
             {copy.allowance.add.capsTitle}
+            <HelpLink anchor="q-allow-caps" label={copy.questions["q-allow-caps"].q} />
           </h3>
-          <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.allowance.add.capsHelp}</p>
           <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
             {capRows.map(({ chain, ticker, row, invalid }) => (
               <li key={chain} className="flex flex-col gap-2 rounded-md border border-line p-3.5">
@@ -332,7 +330,6 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
           <h3 id="allowance-expiry-title" className="m-0 font-sans text-label text-ink">
             {copy.allowance.add.expiryTitle}
           </h3>
-          <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.allowance.add.expiryHelp}</p>
           <Segmented
             size="sm"
             label={copy.allowance.add.expiryTitle}

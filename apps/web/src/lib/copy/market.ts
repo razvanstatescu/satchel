@@ -25,7 +25,6 @@ export const market = {
     blockedListed: "You can't take anything out while it's for sale. Stop selling first.",
     storage: {
       title: "Storage credit",
-      body: "USDC and wNEAR deposits pay their one-time storage from a small prepaid credit, not from the deposit itself.",
       need: (amount: string) => `Prepay ${amount} of storage credit first.`,
       prepay: "Prepay storage · 0.01 NEAR",
       prepaying: "Prepaying…",

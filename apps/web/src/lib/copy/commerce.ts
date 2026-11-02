@@ -61,17 +61,9 @@ export const commerce = {
       depositValue: "0.01 NEAR",
       depositNote: "unused part refunded",
       receive: "You receive",
-      paid: (account: string) => `Paid to ${account} in the same transaction as the sale.`,
     },
-    while: {
-      title: "While it's for sale",
-      rows: (id: string, price: string) => [
-        `You can't send from Satchel #${id} or give it away.`,
-        `Anyone can buy it at exactly ${price}, right away.`,
-        "The buyer gets everything inside.",
-        "You can stop selling at any time.",
-      ],
-    },
+    /** less-labels: the four "While it's for sale" rows became one line and a link to /questions#q-paused. */
+    while: "While it's for sale, you can't send from it or give it away.",
     /** NEW (app-screens §5.2): the owner's view of the buyer's check. */
     buyersSee: "What buyers see",
     buyersSeeNote: "A buyer's browser runs this same check before Buy turns on.",
