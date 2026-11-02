@@ -94,7 +94,6 @@ export const EXTRA_FAQ_IDS = [
   "q-withdraw-inside",
   "q-fees-near",
   "q-fees-chain",
-  "q-fees-mint-list",
   "q-txs-vs-activity",
   "q-wallets",
   "q-safety-message",
@@ -116,7 +115,7 @@ export const FAQ_GROUPS: readonly FaqGroup[] = [
   { id: "giving", title: "Giving", ids: ["q-give", "q-give-link"] },
   { id: "allowances", title: "Allowances", ids: ["q-allow-what", "q-allow-caps", "q-allow-btc", "q-allow-history", "q-allow-revoke"] },
   { id: "inside", title: "Inside balances", ids: ["q-inside", "q-storage-credit", "q-withdraw-inside"] },
-  { id: "fees", title: "Fees and costs", ids: ["q-cost", "q-fees-near", "q-fees-chain", "q-fees-mint-list"] },
+  { id: "fees", title: "Fees and costs", ids: ["q-cost", "q-fees-near", "q-fees-chain"] },
   { id: "txs-vs-activity", title: "Transactions vs Activity", ids: ["q-txs-vs-activity"] },
   { id: "testnet", title: "Testnet and safety", ids: ["q-testnet", "q-wallets", "q-safety-message"] },
 ];

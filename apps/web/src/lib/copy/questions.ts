@@ -106,17 +106,13 @@ export const questionsCopy = {
     q: "What about the network fee on each chain?",
     a: "That one comes out of the Satchel's own coins, shown as an estimate before you confirm a send. It goes to that chain's own network, not to Satchel.",
   },
-  "q-fees-mint-list": {
-    q: "What does minting, listing or giving one away cost?",
-    a: "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded either way. Giving a Satchel away costs only NEAR gas, and Satchel takes no fee at all on a sale.",
-  },
   "q-txs-vs-activity": {
     q: "What's the difference between Transactions and Activity?",
-    a: "Transactions lists coins moving in and out of this Satchel: at its Bitcoin, Ethereum and Solana addresses, and its NEAR-side balances. Activity lists every signature its contract has ever made, which is what clean history checks. Arbitrum Sepolia transactions aren't listed yet; everything it signs still shows under Activity.",
+    a: "Transactions shows coins moving in and out: at the Satchel's Bitcoin, Ethereum and Solana addresses, and inside it. Activity shows what its contract did: every signature it made, plus mints, gifts, listings and sales. Clean history checks those signatures. Arbitrum Sepolia transfers aren't listed under Transactions yet, but anything signed for them still shows under Activity.",
   },
   "q-wallets": {
     q: "Which wallets does Satchel work with?",
-    a: "Any NEAR testnet wallet, such as Meteor or Intear. Connect one to mint, send, give, list or sign from a Satchel you own.",
+    a: "A NEAR testnet wallet from the Connect list, such as Meteor or Intear. You need one to mint, and to send, give, list or sign from a Satchel you own; reading any Satchel needs no wallet at all.",
   },
   "q-safety-message": {
     q: "Is it safe to sign a message?",
