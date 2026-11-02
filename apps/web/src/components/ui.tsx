@@ -909,6 +909,24 @@ export function KeepWhole({ text }: { text: string }) {
 /* ── Links, avatar, chain marks ──────────────────────────────────────────────────────────────────────────────────── */
 
 /**
+ * The one help affordance (less-labels): a small inline link to a question's answer on /questions. It never grows
+ * the row it sits in — a 16 px circled question mark, no visible label, `aria-label` naming the question for
+ * assistive tech ("Why: <question>" by convention; pass the full phrase). `anchor` is the question's id on
+ * /questions (e.g. "q-fees-near"), without the leading "#".
+ */
+export function HelpLink({ anchor, label, className }: { anchor: string; label: string; className?: string }) {
+  return (
+    <Link
+      href={`/questions#${anchor}`}
+      aria-label={label}
+      className={cx("inline-flex size-5 flex-none items-center justify-center rounded-full text-ink-muted transition-colors duration-120 hover:text-ink", className)}
+    >
+      <Icon icon={CircleQuestionMark} size={16} />
+    </Link>
+  );
+}
+
+/**
  * An external link: opens in a new tab, says so to screen readers, and wears a 14 px arrow. The label and the arrow are
  * one inline run, so when a long link wraps the arrow stays after its last word (never stranded at the far edge).
  */

@@ -9,7 +9,7 @@ import { FlowShell } from "@/components/client/FlowShell";
 import { BroadcastAgain, SigningActions, SigningProgress, UnsentCard } from "@/components/client/SigningProgress";
 import { useViewer } from "@/components/client/SatchelPage";
 import { AddressDisplay } from "@/components/AddressDisplay";
-import { AmountInput, Banner, Button, Icon, IconButton, Morph, SatchelThumb, Segmented, Skeleton, TextInput, cx } from "@/components/ui";
+import { AmountInput, Banner, Button, HelpLink, Icon, IconButton, Morph, SatchelThumb, Segmented, Skeleton, TextInput, cx } from "@/components/ui";
 import { capForAsset, capForChain, evmAsset, formatCapAmount } from "@/lib/allowanceView";
 import { copy, errorCopy, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { SATCHEL_CONTRACT, SOL_SEND_ENABLED } from "@/lib/config";
@@ -591,10 +591,6 @@ export function SendFlow({
     );
     action = (
       <>
-        <p className="mb-3 flex items-start gap-2 font-sans text-body-sm font-semibold text-ink">
-          <Icon icon={Info} size={16} className="mt-0.5 text-ink-muted" />
-          {usdc ? copy.usdc.final : copy.send.review.final[chain]}
-        </p>
         <Button
           variant="primary"
           size="lg"
@@ -621,8 +617,12 @@ export function SendFlow({
           <FootNote id="send-why" tone="neutral" icon={Undo2} role="status" testId="cancelled">
             {cancelMsg}
           </FootNote>
+        ) : cta === "wallet" ? (
+          <FootNote id="send-why">{copy.send.review.walletHint}</FootNote>
+        ) : ackMissing && prepared ? (
+          <FootNote id="send-why">{copy.send.review.ackFirst}</FootNote>
         ) : (
-          <FootNote id="send-why">{cta === "wallet" ? copy.send.review.walletHint : ackMissing && prepared ? copy.send.review.ackFirst : copy.send.review.helper(SATCHEL_CONTRACT)}</FootNote>
+          <p id="send-why" className="sr-only" />
         )}
       </>
     );
@@ -958,8 +958,6 @@ function ReviewStep(p: {
   const pr = p.prepared;
   const amount = formatAmount(pr.amount, ticker);
   const fee = p.chain === "btc" ? formatSats(pr.fee) : formatAmount(pr.fee, feeTicker);
-  // the NEAR fee line stays verbatim (kb/90 §8.9): the value, then its explanation on the next line
-  const [nearValue, ...nearRest] = copy.send.review.near.split(" (");
   return (
     <>
       <div className="flex flex-col gap-4" data-testid="review-card" data-blockhash={pr.sol?.recentBlockhash} data-fetched-at={pr.sol?.fetchedAt}>
@@ -1010,16 +1008,11 @@ function ReviewStep(p: {
             <dd className="m-0 text-right text-ink t-num">{formatAmount(pr.after < 0n ? 0n : pr.after, ticker)}</dd>
           </div>
           <div className="flex justify-between gap-4">
-            <dt className="whitespace-nowrap text-ink-muted">{copy.send.review.nearFee}</dt>
-            <dd className="m-0 max-w-[68%] text-right text-ink t-num">
-              {nearValue}
-              {nearRest.length ? (
-                <>
-                  {" "}
-                  <small className="block text-caption text-ink-muted">({nearRest.join(" (")}</small>
-                </>
-              ) : null}
-            </dd>
+            <dt className="flex items-center gap-1.5 whitespace-nowrap text-ink-muted">
+              {copy.send.review.nearFee}
+              <HelpLink anchor="q-fees-near" label={copy.questions["q-fees-near"].q} />
+            </dt>
+            <dd className="m-0 max-w-[68%] text-right text-ink t-num">{copy.send.review.near}</dd>
           </div>
         </dl>
         <p className="flex items-start gap-2 rounded-md bg-surface-sunken px-3 py-2.5 font-sans text-body-sm text-ink">
@@ -1039,15 +1032,6 @@ function ReviewStep(p: {
           </label>
         ) : null}
       </div>
-      <details className="group rounded-md border border-line bg-surface">
-        <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-3 px-4 font-sans text-label text-ink [&::-webkit-details-marker]:hidden">
-          {copy.send.review.nearAbout}
-          <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden="true" className="text-ink-muted transition-transform duration-150 group-open:rotate-180">
-            <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </summary>
-        <p className="px-4 pb-4 font-sans text-body-sm text-ink">{copy.send.review.nearTip}</p>
-      </details>
     </>
   );
 }

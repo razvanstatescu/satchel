@@ -6,7 +6,7 @@ import { SectionHead } from "@/components/Facts";
 import { utcShort } from "@/components/Timeline";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
-import { Button, Icon, Morph, cx } from "@/components/ui";
+import { Button, HelpLink, Icon, Morph, cx } from "@/components/ui";
 import { assetTicker, formatCapAmount } from "@/lib/allowanceView";
 import { copy, errorCopy } from "@/lib/copy";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
@@ -139,7 +139,10 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
           <span>{copy.allowance.manage.limitReached}</span>
         </p>
       ) : null}
-      <p className="m-0 font-sans text-body-sm text-ink-muted">{copy.allowance.manage.trustNote}</p>
+      <p className="m-0 font-sans text-body-sm text-ink-muted">
+        {copy.allowance.manage.trustNote}
+        <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} className="ml-1 align-middle" />
+      </p>
     </section>
   );
 }

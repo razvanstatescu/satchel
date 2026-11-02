@@ -185,6 +185,7 @@ const FOOTER_GROUPS: { id: string; title: string; links: FooterLink[] }[] = [
       { href: "/market", label: copy.nav.market },
       { href: "/mint", label: copy.nav.mint },
       { href: "/#how", label: copy.footer.howItWorks },
+      { href: "/questions", label: copy.nav.questions },
     ],
   },
   {

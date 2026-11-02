@@ -27,6 +27,7 @@ import { satchel } from "@/lib/copy/satchel";
 import { shell } from "@/lib/copy/shell";
 import { walletOps } from "@/lib/copy/wallet-ops";
 import { multichain } from "@/lib/copy/multichain";
+import { questionsCopy, questionsPageCopy } from "@/lib/copy/questions";
 
 export type { SolVariant } from "@/lib/copy/landing";
 
@@ -83,6 +84,8 @@ export const copy = {
   pill,
   card,
   landing,
+  questions: questionsCopy,
+  questionsPage: questionsPageCopy,
   inside: market.inside,
   offers: market.offers,
   offerEntry: market.offerEntry,

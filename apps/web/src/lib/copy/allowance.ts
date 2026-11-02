@@ -24,9 +24,9 @@ export const allowanceCopy = {
       revokedToast: (who: string) => `${who} can no longer spend from this Satchel.`,
       revokeCancelled: "Revoking was cancelled. Nothing changed.",
       limitReached: "This Satchel already lets 4 accounts spend. Revoke one before adding another.",
-      /** The history-griefing note (spec §7 "Security notes"), in calm, plain words. */
-      trustNote:
-        "Their signatures become part of this Satchel's history, same as your own, and this access ends the moment you give or sell it. Add only someone you trust that much.",
+      /** The history-griefing note (spec §7 "Security notes"), shortened (less-labels); the full explanation moved
+       * to /questions#q-allow-history, linked by the Allowance/AllowanceFlow components. */
+      trustNote: "Their signatures count as yours. Add only someone you trust.",
     },
 
     /** The Add sheet (/s/[id]/allowance). */
@@ -36,18 +36,15 @@ export const allowanceCopy = {
       stepCaps: "Limits",
       to: "NEAR account",
       placeholder: "name.testnet",
-      help: "They'll be able to send up to the caps below, every rolling 24 hours, until you revoke it or give this Satchel away.",
       checking: "Checking…",
       found: (owns: number) => (owns > 0 ? `Owns ${n(owns, "Satchel", "Satchels")}` : "No Satchels yet"),
       review: "Continue",
       capsTitle: "Daily caps",
-      capsHelp: "Turn on each coin they may send, and set its cap for any rolling 24 hours. Fees count toward the cap.",
       capAmountIn: (ticker: string) => `Daily cap in ${ticker}`,
       otherNetworksHelp: "ETH on Base, Arbitrum and OP, and USDC on any of the four testnets.",
       networkTicker: (ticker: string, network: string) => `${ticker} on ${network}`,
       capLimitReached: "That's 8 caps, the most one access grant can hold. Turn one off to add another.",
       expiryTitle: "Expiry",
-      expiryHelp: "This access stops working on its own after this, even if you forget to revoke it.",
       expiryOptions: { "24h": "24 hours", "7d": "7 days", "30d": "30 days", never: "No expiry" } as const,
       needCap: "Turn on at least one coin.",
       cta: (who: string) => `Let ${who} spend`,

@@ -277,8 +277,10 @@ export function SignMessageFlow({ snap, intentId }: { snap: SatchelSnapshot; int
           <FootNote id="msg-sign-why" tone="neutral" icon={Undo2} role="status">
             {copy.msg.cancelled}
           </FootNote>
+        ) : !ack ? (
+          <FootNote id="msg-sign-why">{copy.msg.ackFirst}</FootNote>
         ) : (
-          <FootNote id="msg-sign-why">{ack ? copy.msg.helper(SATCHEL_CONTRACT) : copy.msg.ackFirst}</FootNote>
+          <p id="msg-sign-why" className="sr-only" />
         )}
         <Button size="md" block variant="link" className="mt-1 justify-center" onClick={() => setStep("form")}>
           {copy.msg.edit}

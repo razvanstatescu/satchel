@@ -80,9 +80,9 @@ export const multichain = {
       page: { title: "Loading", detail: "One moment…" },
     } as Record<string, { title: string; detail: string }>,
   },
-  /** The Transactions tab (lib/chain-txs.ts): coins in and out of the Satchel on each chain we can read. */
+  /** The Transactions tab (lib/chain-txs.ts): coins in and out of the Satchel on each chain we can read. The lead
+   * explaining it vs. Activity is gone (less-labels): it's covered once at /questions#q-txs-vs-activity. */
   txs: {
-    lead: "Coins in and out of this Satchel: at its Bitcoin, Ethereum and Solana addresses, and inside it. What its contract signed is under Activity.",
     in: "Received",
     out: "Sent",
     self: "Moved between its own outputs",
@@ -197,7 +197,7 @@ export const multichain = {
     feeIn: "paid in ETH by this Satchel",
     tooMuch: "That's more USDC than this Satchel holds on this network.",
     after: (id: string) => `Satchel #${id} USDC after`,
-    final: "A USDC send can't be undone. Check the address above.",
+    // The "can't be undone" line is gone (less-labels): /questions#q-undo covers every chain, USDC included.
     sendTitle: "Send USDC",
   },
   msg: {
@@ -232,7 +232,8 @@ export const multichain = {
     ackFirst: "Tick the box above to sign.",
     cta: "Sign message",
     signing: "Signing…",
-    helper: (contract: string) => `Your wallet will ask you to approve a request to ${contract}. Nothing is sent to any chain.`,
+    // The wallet-approval helper is gone (less-labels): the wallet names itself and the contract; `warn` above
+    // already says a signed message can't move coins.
     cancelled: "You cancelled in your wallet. Nothing was signed.",
     failed: "It wasn't signed. Nothing was recorded twice; you can try again.",
     retry: "Try again",

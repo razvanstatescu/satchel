@@ -4,7 +4,7 @@ import { overview } from "@/lib/overview";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
-import { CircleCheck, Hourglass, Info, Landmark, LoaderCircle, Lock, Package, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
+import { CircleCheck, Hourglass, Info, Landmark, LoaderCircle, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
 import {
   GateLine,
   Record,
@@ -30,7 +30,7 @@ import { SoldReceipt, TxValue, useUsdcRegistration } from "@/components/client/S
 import { ObjCol, ObjMain } from "@/components/SatchelWallet";
 import { announce, toast, usePinnedBar } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
-import { AmountInput, Button, EmptyState, ExternalLink, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
+import { AmountInput, Button, EmptyState, ExternalLink, HelpLink, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
 import { useNow } from "@/lib/clock";
 import { copy, errorCopy } from "@/lib/copy";
 import { CONTRACT_ROLE, FAUCETS } from "@/lib/config";
@@ -293,6 +293,7 @@ const idsFor = (id: string) => ({
   done: `buy-done-title-${id}`,
   listWhy: `list-why-${id}`,
   priceError: `price-error-${id}`,
+  priceWhyA11y: `price-why-${id}`,
 });
 
 /* ── Buy ────────────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -962,7 +963,12 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
   const c = report ? counts(report.items) : null;
   const agg = report?.aggregate ?? null;
   const risky = agg === "blocked" || agg === "settling" || agg === "unknown" || agg === "unsafe";
-  const reason = phase !== "idle" ? null : !quietOk ? (left === null ? null : { icon: Hourglass, text: copy.sell.quiet.waitWhy(formatBlocks(left, DEFAULT_BLOCK_MS)) }) : !usdcOk ? { icon: Info, text: copy.sell.usdc.first } : !priceOk ? { icon: Info, text: copy.sell.form.priceWhy } : null;
+  // The visible reason under List: only quiet-period and USDC-registration blockers get a line (less-labels dropped
+  // "Enter a price to list it." — a disabled button with an empty price says enough on its own). `priceHint` keeps
+  // that fact as the button's accessible description only, for when price is the sole remaining blocker.
+  const reason = phase !== "idle" ? null : !quietOk ? (left === null ? null : { icon: Hourglass, text: copy.sell.quiet.waitWhy(formatBlocks(left, DEFAULT_BLOCK_MS)) }) : !usdcOk ? { icon: Info, text: copy.sell.usdc.first } : null;
+  const priceHintId = idsFor(id).priceWhyA11y;
+  const showPriceHint = phase === "idle" && quietOk && usdcOk && !priceOk;
 
   const list = () => {
     if (!canList || !wallet || !accountId || base === null) return;
@@ -1026,7 +1032,7 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             data-testid="list-cta"
             aria-disabled={!canList}
             aria-busy={phase !== "idle" || undefined}
-            aria-describedby={reason ? idsFor(id).listWhy : undefined}
+            aria-describedby={reason ? idsFor(id).listWhy : showPriceHint ? priceHintId : undefined}
             data-press={canList ? "" : undefined}
             data-latched={phase !== "idle" ? "" : undefined}
             onClick={list}
@@ -1046,6 +1052,10 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             <FootNote id={idsFor(id).listWhy} icon={reason.icon}>
               {reason.text}
             </FootNote>
+          ) : showPriceHint ? (
+            <p id={priceHintId} className="sr-only">
+              {copy.sell.form.priceWhyA11y}
+            </p>
           ) : null}
           {risky && phase === "idle" ? <FootNote icon={TriangleAlert}>{copy.sell.history.warn}</FootNote> : null}
           {note ? <NoteLine note={note} /> : null}
@@ -1167,22 +1177,12 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             <dd className="m-0 text-right t-num">{priceShown}</dd>
           </div>
         </dl>
-        <p className="font-sans text-body-sm text-ink-muted">{copy.sell.form.paid(accountId ?? "")}</p>
       </section>
 
-      <section aria-labelledby="sell-while-title" className="flex flex-col gap-2.5">
-        <h3 id="sell-while-title" className="font-sans text-label text-ink">
-          {copy.sell.while.title}
-        </h3>
-        <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-          {copy.sell.while.rows(id, priceShown).map((r, i) => (
-            <li key={r} className="flex items-start gap-2.5 font-sans text-body-sm text-ink">
-              <Icon icon={[Lock, Tag, Package, Undo2][i] ?? Info} size={16} className="mt-0.5 text-ink-muted" />
-              <span>{r}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <p className="m-0 font-sans text-body-sm text-ink-muted">
+        {copy.sell.while}
+        <HelpLink anchor="q-paused" label={copy.questions["q-paused"].q} className="ml-1 align-middle" />
+      </p>
     </FlowShell>
   );
 }
