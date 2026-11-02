@@ -82,7 +82,7 @@ Paste this into the team channel (text from H-20):
 
 Also on Nov 1: create the private GitHub repo `satchel` under your account or org. It stays private until Day 13.
 
-## 7. Add the Upstash for Redis integration (onboarding survey)
+## 7. Add the Upstash for Redis integration (onboarding survey) — DONE 2026-11-02 (`upstash-kv-charcoal-saddle`, connected to `satchel`)
 
 The first-time onboarding's optional "about you" survey (`apps/web/README.md` §Onboarding survey) needs a small
 Redis store to collect answers. Without it the app still works — `POST /api/onboarding` answers 204 and stores
