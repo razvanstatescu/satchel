@@ -1,12 +1,12 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { ChainCharms } from "@/components/brand/ChainCharm";
+import { CoinIcon } from "@/components/brand/CoinIcon";
 import { Mark } from "@/components/brand/Mark";
 import { SatchelCard, type CardChip } from "@/components/SatchelCard";
 import { ModalSheet } from "@/components/client/LandingMenu";
 import { toast } from "@/components/client/Toaster";
-import { Button, FilterChip, ItemPill, cx } from "@/components/ui";
+import { Avatar, Button, FilterChip, ItemPill, cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
 import { SOL_UI_ENABLED, SATCHEL_CONTRACT } from "@/lib/config";
 import { dataSource } from "@/lib/data/source";
@@ -45,8 +45,8 @@ const SCREEN_CHIPS: CardChip[] = (SOL_UI_ENABLED ? (["btc", "evm", "sol"] as con
 }));
 
 /** The three screens' illustrations, each built from an existing brand part: the card (a wallet you can hand over),
- * the sticker S with two "Used" pills (every signature is on the record), and the chain charms (one NEAR wallet for
- * all three chains). */
+ * the sticker S with two "Used" pills (every signature is on the record), and an access row with a daily cap (let
+ * someone spend, within limits). */
 function ScreenArt({ screenId }: { screenId: string }) {
   return (
     <div aria-hidden="true" className="flex items-center justify-center rounded-card bg-sky px-6 py-7">
@@ -61,10 +61,28 @@ function ScreenArt({ screenId }: { screenId: string }) {
           </div>
         </div>
       ) : (
-        <div className="py-3">
-          <ChainCharms layout="pack" width={168} />
-        </div>
+        <SpendArt />
       )}
+    </div>
+  );
+}
+
+/** Screen 3's art: one sticker-style access row, someone you added and their daily cap (sample words, not data). */
+function SpendArt() {
+  const a = O.screens[2]!.art!;
+  return (
+    <div className="flex w-full max-w-60 flex-col gap-2.5 rounded-card border-3 border-sticker bg-surface p-3.5 text-ink shadow-sticker">
+      <div className="flex items-center gap-2.5">
+        <Avatar account={a.who} size={32} />
+        <span className="min-w-0 truncate font-sans text-label">{a.who}</span>
+      </div>
+      <div className="flex items-center justify-between gap-3 rounded-md bg-surface-sunken px-3 py-2 font-sans text-body-sm">
+        <span className="flex items-center gap-2 text-ink-muted">
+          <CoinIcon coin="BTC" size={20} />
+          {a.coin}
+        </span>
+        <span className="t-num text-ink">{a.cap}</span>
+      </div>
     </div>
   );
 }

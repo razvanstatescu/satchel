@@ -29,10 +29,12 @@ export const onboardingCopy = {
       learnMore: { anchor: "q-proves", label: "What the buyer's check covers" },
     },
     {
-      id: "one-wallet",
-      title: "No new keys to keep",
-      body: "Send Bitcoin, Ethereum and Solana with the NEAR wallet you already use. There's no seed phrase for each chain: whoever owns the Satchel controls what's inside.",
-      learnMore: { anchor: "q-keys", label: "Who holds the keys" },
+      id: "let-spend",
+      title: "Let someone spend, within limits",
+      body: "Add someone you trust and set a daily cap for each coin. They can send up to it, and their access ends when you revoke it or the Satchel changes hands.",
+      learnMore: { anchor: "q-allow-what", label: "What someone you add can do" },
+      /** the art's sample row (an illustration, not real data) */
+      art: { who: "dana.near", coin: "Bitcoin", cap: "0.001 a day" },
     },
   ],
   mintCta: "Mint your first Satchel",

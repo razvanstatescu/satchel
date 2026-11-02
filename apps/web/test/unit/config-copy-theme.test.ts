@@ -279,7 +279,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
   it("the first-time onboarding: three screens, each with a Learn-more anchor that exists on /questions", () => {
     const O = copy.onboarding;
     expect(O.screens).toHaveLength(3);
-    expect(O.screens.map((s) => s.title)).toEqual(["A wallet you can hand over", "Every signature is on the record", "No new keys to keep"]);
+    expect(O.screens.map((s) => s.title)).toEqual(["A wallet you can hand over", "Every signature is on the record", "Let someone spend, within limits"]);
     const knownAnchors: readonly string[] = [...FAQ_IDS, ...EXTRA_FAQ_IDS];
     for (const s of O.screens) {
       expect(knownAnchors, s.learnMore.anchor).toContain(s.learnMore.anchor);
