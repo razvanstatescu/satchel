@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { SOL_SEND_ENABLED, SOL_UI_ENABLED } from "@/lib/config";
 import { copy } from "@/lib/copy";
-import { APP_SOL, FAQ_IDS, faqItems, LANDING_SOL, solVariant, splitLead, type FaqId, type SolVariant } from "@/lib/faq";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { allFaqGroups, APP_SOL, EXTRA_FAQ_IDS, FAQ_IDS, faqItems, LANDING_SOL, solVariant, splitLead, type FaqId, type SolVariant } from "@/lib/faq";
+
+const SRC = join(__dirname, "../../src");
 
 /**
  * The landing's Questions (design-spec §4.8): seven answers, one paragraph each, with the role and Solana variants; the
@@ -203,5 +207,35 @@ describe("splitLead", () => {
       "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded.",
       "Satchel is new, unaudited hackathon software.",
     ]);
+  });
+});
+
+describe("/questions (allFaqGroups)", () => {
+  const groups = allFaqGroups({ role: "final", sol: LANDING_SOL });
+  const ids = groups.flatMap((g) => g.items.map((i) => i.id));
+
+  it("lists every homepage question and every extra one exactly once", () => {
+    expect(new Set(ids).size).toBe(ids.length);
+    expect([...ids].sort()).toEqual([...FAQ_IDS, ...EXTRA_FAQ_IDS].sort());
+  });
+  it("shares the homepage's seven word for word", () => {
+    const home = new Map(faqItems({ role: "final", sol: LANDING_SOL }).map((i) => [i.id, i]));
+    for (const g of groups) for (const it of g.items) if (home.has(it.id as FaqId)) expect(it).toEqual(home.get(it.id as FaqId));
+  });
+  it("gives every group a unique id, a title and at least one question", () => {
+    expect(new Set(groups.map((g) => g.group.id)).size).toBe(groups.length);
+    for (const g of groups) {
+      expect(g.group.title).not.toBe("");
+      expect(g.items.length).toBeGreaterThan(0);
+    }
+  });
+  it("gives every answer a bold lead sentence", () => {
+    for (const g of groups) for (const it of g.items) expect(splitLead(it.a).lead.length).toBeGreaterThan(0);
+  });
+  it("every help link in the app points at a question that exists", () => {
+    const files = readdirSync(SRC, { recursive: true, encoding: "utf8" }).filter((f) => f.endsWith(".tsx"));
+    const anchors = files.flatMap((f) => [...readFileSync(join(SRC, f), "utf8").matchAll(/<HelpLink[^>]*anchor="([^"]+)"/g)].map((m) => m[1]!));
+    expect(anchors.length).toBeGreaterThan(0);
+    for (const a of anchors) expect(ids, `HelpLink anchor ${a}`).toContain(a);
   });
 });

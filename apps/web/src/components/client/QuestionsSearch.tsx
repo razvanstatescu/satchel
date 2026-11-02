@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Search, X } from "lucide-react";
 import { Icon, IconButton, TextInput } from "@/components/ui";
 import { copy } from "@/lib/copy";
@@ -10,11 +10,27 @@ import { copy } from "@/lib/copy";
  * Every question is already in the HTML (judge pages render their facts with no Suspense fallback, kb/90 §7-9), so
  * with JS off — or before hydration — the full list just shows: this only ever hides matches, never fetches or
  * replaces content. It matches each question's own text (`data-faq-q`, lower-cased) and, if every question in a
- * group is hidden, hides that group's heading too (`data-faq-group`).
+ * group is hidden, hides that group's heading too (`data-faq-group`). It also opens the question a link points at
+ * (`/questions#q-fees-near`, the help links in the app), on arrival and on every later hash change, without relying
+ * on the browser to expand a closed `<details>` for a fragment.
  */
 export function QuestionsSearch({ children }: { children: ReactNode }) {
   const [q, setQ] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const openHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const el = id ? document.getElementById(id) : null;
+      if (!(el instanceof HTMLDetailsElement)) return;
+      el.open = true;
+      el.scrollIntoView({ block: "start" });
+      el.querySelector("summary")?.focus({ preventScroll: true });
+    };
+    openHash();
+    window.addEventListener("hashchange", openHash);
+    return () => window.removeEventListener("hashchange", openHash);
+  }, []);
 
   function apply(next: string) {
     setQ(next);

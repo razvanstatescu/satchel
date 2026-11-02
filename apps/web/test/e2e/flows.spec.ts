@@ -29,7 +29,11 @@ test.describe("send (EVM): Review → tracker → receipt", () => {
     const flow = await fillEvmSend(page);
     // the ReviewCard is the exact outcome
     await expect(flow.getByTestId("review-card")).toContainText("Satchel #1 after");
-    await expect(flow.getByTestId("review-card")).toContainText("≈ 0.004 NEAR (gas + permanent signature record)");
+    // the NEAR fee is just the amount; why it costs NEAR is one tap away on /questions (less-labels)
+    await expect(flow.getByTestId("review-card")).toContainText("≈ 0.004 NEAR");
+    await expect(flow.getByTestId("review-card")).not.toContainText("permanent signature record");
+    await expect(flow.getByTestId("review-card").getByRole("link", { name: "Why does a signature cost NEAR?" })).toHaveAttribute("href", "/questions#q-fees-near");
+    await expect(flow).not.toContainText("can't be undone");
     await flow.getByTestId("send").click();
     await expect(flow.getByTestId("send")).toHaveText(/Approve in your wallet…|Preparing…/);
     // the intent is persisted BEFORE the wallet resolves
@@ -348,7 +352,8 @@ test.describe("mint, transfer, sale gating", () => {
     await expect(flow.getByTestId("list-checklist")).toContainText("Quiet period");
     await expect(flow.getByTestId("list-checklist")).toContainText("Past signatures");
     await expect(flow.getByTestId("list-cta")).toHaveAttribute("aria-disabled", "true");
-    await expect(flow).toContainText("Enter a price to list it.");
+    // no visible "enter a price" line: the disabled button says it, and screen readers get it as its description
+    await expect(flow.getByTestId("list-cta")).toHaveAccessibleDescription("Enter a price to list it.");
     // NEAR is the default currency (the landing's promise, H-26)
     await expect(flow.getByRole("radio", { name: "NEAR" })).toHaveAttribute("aria-checked", "true");
     await flow.getByTestId("price").fill("5");

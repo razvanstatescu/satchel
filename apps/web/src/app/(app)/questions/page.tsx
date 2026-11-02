@@ -4,7 +4,7 @@ import { QuestionsSearch } from "@/components/client/QuestionsSearch";
 import { Icon } from "@/components/ui";
 import { CONTRACT_ROLE } from "@/lib/config";
 import { copy } from "@/lib/copy";
-import { allFaqGroups, APP_SOL, splitLead } from "@/lib/faq";
+import { allFaqGroups, LANDING_SOL, splitLead } from "@/lib/faq";
 
 /**
  * /questions (less-labels): the long version of the homepage's Questions section, every answer in the server HTML
@@ -18,7 +18,7 @@ export const instant = false;
 export const metadata: Metadata = { title: copy.questionsPage.title, description: copy.questionsPage.meta };
 
 export default function QuestionsPage() {
-  const groups = allFaqGroups({ role: CONTRACT_ROLE, sol: APP_SOL });
+  const groups = allFaqGroups({ role: CONTRACT_ROLE, sol: LANDING_SOL });
   return (
     <article className="mx-auto flex w-full max-w-180 flex-col gap-7" data-page="questions">
       <header className="flex flex-col gap-2.5">
