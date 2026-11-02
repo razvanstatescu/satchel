@@ -345,23 +345,23 @@ function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { vi
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const { ready, accountId } = useWallet();
-  const [view, setView] = useState<View>("closed");
-  const [step, setStep] = useState(0);
+  const [state, setState] = useState<{ view: View; step: number }>({ view: "closed", step: 0 });
   const autoTriggered = useRef(false);
 
   // The first wallet connect in this browser with no stored record: open screen 1. Checked once per account
   // becoming available; `view !== "closed"` guards a replay already in progress.
   useEffect(() => {
-    if (!ready || !accountId || autoTriggered.current || view !== "closed") return;
+    if (!ready || !accountId || autoTriggered.current || state.view !== "closed") return;
     if (!shouldShowOnboarding()) return;
     autoTriggered.current = true;
-    setStep(0);
-    setView("screens");
-  }, [ready, accountId, view]);
+    setState({ view: "screens", step: 0 });
+  }, [ready, accountId, state.view]);
+
+  const setStep = useCallback((step: number) => setState((s) => ({ ...s, step })), []);
 
   const finish = useCallback((submitted: boolean) => {
     writeOnboardingDone(submitted);
-    setView("closed");
+    setState((s) => ({ ...s, view: "closed" }));
   }, []);
 
   const onFinishScreens = useCallback(
@@ -369,7 +369,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       if (!toSurvey) return finish(false);
       // a replay whose survey was already submitted skips straight past it (never shown twice)
       if (readOnboarding()?.submitted) return finish(true);
-      setView("survey");
+      setState((s) => ({ ...s, view: "survey" }));
     },
     [finish],
   );
@@ -380,14 +380,13 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   );
 
   const replay = useCallback(() => {
-    setStep(0);
-    setView("screens");
+    setState({ view: "screens", step: 0 });
   }, []);
 
   return (
     <OnboardingReplayCtx.Provider value={replay}>
       {children}
-      <OnboardingOverlay view={view} step={step} setStep={setStep} close={close} onFinishScreens={onFinishScreens} />
+      <OnboardingOverlay view={state.view} step={state.step} setStep={setStep} close={close} onFinishScreens={onFinishScreens} />
     </OnboardingReplayCtx.Provider>
   );
 }
