@@ -353,8 +353,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready || !accountId || autoTriggered.current || state.view !== "closed") return;
     if (!shouldShowOnboarding()) return;
-    autoTriggered.current = true;
-    setState({ view: "screens", step: 0 });
+    // next tick, like the rest of the app's effects (no synchronous setState in an effect body)
+    const t = setTimeout(() => {
+      autoTriggered.current = true;
+      setState({ view: "screens", step: 0 });
+    }, 0);
+    return () => clearTimeout(t);
   }, [ready, accountId, state.view]);
 
   const setStep = useCallback((step: number) => setState((s) => ({ ...s, step })), []);
