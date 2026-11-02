@@ -210,6 +210,8 @@ interface SurveyState {
 }
 
 const EMPTY_SURVEY: SurveyState = { goal: new Set(), experience: null, chains: new Set(), source: null, shareAccount: false };
+const EMPTY_EXPERIENCE: ReadonlySet<ExperienceOption> = new Set();
+const EMPTY_SOURCE: ReadonlySet<SourceOption> = new Set();
 
 function toggleIn<T>(set: ReadonlySet<T>, id: T): ReadonlySet<T> {
   const next = new Set(set);
@@ -262,7 +264,7 @@ function Survey({ accountId, onFinish }: { accountId: string | null; onFinish: (
       <ChipGroup
         legend={S.experience.q}
         options={Object.entries(S.experience.options).map(([id, label]) => ({ id: id as ExperienceOption, label }))}
-        selected={s.experience ? new Set([s.experience]) : new Set()}
+        selected={s.experience ? new Set([s.experience]) : EMPTY_EXPERIENCE}
         onToggle={(id) => setS((p) => ({ ...p, experience: p.experience === id ? null : id }))}
       />
       <ChipGroup
@@ -274,7 +276,7 @@ function Survey({ accountId, onFinish }: { accountId: string | null; onFinish: (
       <ChipGroup
         legend={S.source.q}
         options={Object.entries(S.source.options).map(([id, label]) => ({ id: id as SourceOption, label }))}
-        selected={s.source ? new Set([s.source]) : new Set()}
+        selected={s.source ? new Set([s.source]) : EMPTY_SOURCE}
         onToggle={(id) => setS((p) => ({ ...p, source: p.source === id ? null : id }))}
       />
       {accountId ? (
@@ -304,7 +306,7 @@ function Survey({ accountId, onFinish }: { accountId: string | null; onFinish: (
   );
 }
 
-function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { view: View; step: number; setStep: (n: number) => void; close: () => void; onFinishScreens: (opts: { toSurvey: boolean }) => void }) {
+function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { view: View; step: number; setStep: (n: number) => void; close: (submitted?: boolean) => void; onFinishScreens: (opts: { toSurvey: boolean }) => void }) {
   const { accountId } = useWallet();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null); // nothing to return focus to on an auto-open or a replay
@@ -313,7 +315,7 @@ function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { vi
   return (
     <ModalSheet
       open={view !== "closed"}
-      onClose={close}
+      onClose={() => close(false)}
       label={title}
       labelledBy={title ? undefined : titleId}
       closeLabel={O.close}
