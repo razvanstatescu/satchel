@@ -11,8 +11,19 @@ export const ADDR1 = {
   sol: "AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd",
 };
 
-/** Fixture-mode mock wallet + simulation knobs, set before any page script runs. */
-export async function useMockWallet(page: Page, account: string | null, knobs: { mode?: "normal" | "timeout" | "broadcast-fail"; delay?: number; reject?: boolean } = {}) {
+/**
+ * Fixture-mode mock wallet + simulation knobs, set before any page script runs.
+ *
+ * `onboarding` (default false): the first-time onboarding overlay (lib/onboarding-storage.ts) would otherwise show
+ * on every spec's first connected load, since every spec here IS "a first wallet connect in this browser". Unless a
+ * spec passes `{ onboarding: true }` to test the overlay itself, this pre-seeds `satchel:onboarding:v1` as already
+ * done, so the rest of the suite never sees it.
+ */
+export async function useMockWallet(
+  page: Page,
+  account: string | null,
+  knobs: { mode?: "normal" | "timeout" | "broadcast-fail"; delay?: number; reject?: boolean; onboarding?: boolean } = {},
+) {
   await page.addInitScript(
     ([acct, k]) => {
       try {
@@ -20,11 +31,16 @@ export async function useMockWallet(page: Page, account: string | null, knobs: {
         window.sessionStorage.setItem("__e2e_init", "1");
         if (acct) window.localStorage.setItem("satchel:mock-wallet", acct as string);
         else window.localStorage.removeItem("satchel:mock-wallet");
-        const kn = k as { mode?: string; delay?: number; reject?: boolean };
+        const kn = k as { mode?: string; delay?: number; reject?: boolean; onboarding?: boolean };
         window.localStorage.setItem("satchel:sim:mode", kn.mode ?? "normal");
         window.localStorage.setItem("satchel:sim:delay", String(kn.delay ?? 1500));
         if (kn.reject) window.localStorage.setItem("satchel:mock-wallet:reject", "1");
         else window.localStorage.removeItem("satchel:mock-wallet:reject");
+        if (!kn.onboarding) {
+          window.localStorage.setItem("satchel:onboarding:v1", JSON.stringify({ v: 1, doneAt: Date.now(), skippedSurvey: true, submitted: false }));
+        } else {
+          window.localStorage.removeItem("satchel:onboarding:v1");
+        }
       } catch {
         /* ignore */
       }
