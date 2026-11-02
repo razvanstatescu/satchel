@@ -25,7 +25,6 @@ export function QuestionsSearch({ children }: { children: ReactNode }) {
       if (!(el instanceof HTMLDetailsElement)) return;
       el.open = true;
       el.scrollIntoView({ block: "start" });
-      el.querySelector("summary")?.focus({ preventScroll: true });
     };
     openHash();
     window.addEventListener("hashchange", openHash);

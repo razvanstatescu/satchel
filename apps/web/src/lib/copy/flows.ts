@@ -94,9 +94,8 @@ export const flows = {
       // Shortened (less-labels): the breakdown (gas + the permanent signature record) and who pays it moved to
       // /questions#q-fees-near, linked next to this value by SendFlow's ReviewCard.
       near: "≈ 0.004 NEAR",
-      nearTip: "Needs ≈ 0.1–0.3 NEAR free while signing (refunded).",
-      /** NEW (app-screens §6): the disclosure that holds `nearTip` (a disclosure, not a tooltip). */
-      nearAbout: "About the NEAR fee",
+      // nearTip and its "About the NEAR fee" disclosure are gone (less-labels): the help link beside the NEAR fee leads
+      // to /questions#q-fees-near, which says both (the cost and the 0.1–0.3 NEAR held while signing).
       timeSign: "Signing: usually about 10 seconds",
       timeChain: { btc: "Confirmation: minutes to hours on testnet4", evm: "Confirmation: about 12 seconds", sol: "Confirmation: a few seconds" },
       inputs: (count: number) => `Uses ${count} coins from this Satchel, so it needs ${count} signatures.`,

@@ -139,9 +139,9 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
           <span>{copy.allowance.manage.limitReached}</span>
         </p>
       ) : null}
-      <p className="m-0 flex items-center gap-1.5 font-sans text-body-sm text-ink-muted">
+      <p className="m-0 font-sans text-body-sm text-ink-muted">
         {copy.allowance.manage.trustNote}
-        <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} />
+        <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} className="ml-1 align-middle" />
       </p>
     </section>
   );

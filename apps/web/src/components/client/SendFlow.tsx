@@ -1032,15 +1032,6 @@ function ReviewStep(p: {
           </label>
         ) : null}
       </div>
-      <details className="group rounded-md border border-line bg-surface">
-        <summary className="flex min-h-13 cursor-pointer list-none items-center justify-between gap-3 px-4 font-sans text-label text-ink [&::-webkit-details-marker]:hidden">
-          {copy.send.review.nearAbout}
-          <svg viewBox="0 0 24 24" width={20} height={20} aria-hidden="true" className="text-ink-muted transition-transform duration-150 group-open:rotate-180">
-            <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </summary>
-        <p className="px-4 pb-4 font-sans text-body-sm text-ink">{copy.send.review.nearTip}</p>
-      </details>
     </>
   );
 }

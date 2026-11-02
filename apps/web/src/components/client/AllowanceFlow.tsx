@@ -341,9 +341,9 @@ export function AllowanceFlow({ snap }: { snap: SatchelSnapshot }) {
             options={(Object.keys(EXPIRY_MS) as Expiry[]).map((v) => ({ value: v, label: copy.allowance.add.expiryOptions[v] }))}
           />
         </section>
-        <p className="m-0 flex items-center gap-1.5 font-sans text-body-sm text-ink-muted">
+        <p className="m-0 font-sans text-body-sm text-ink-muted">
           {copy.allowance.manage.trustNote}
-          <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} />
+          <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} className="ml-1 align-middle" />
         </p>
       </>
     );
