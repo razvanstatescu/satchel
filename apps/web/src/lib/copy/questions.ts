@@ -118,6 +118,10 @@ export const questionsCopy = {
     q: "Is it safe to sign a message?",
     a: "A signed message can never move coins out of a Satchel, but a site may still treat it as a login or as a promise made by whoever owns the Satchel at the time. It's recorded in this Satchel's history for good, with its full text, and every future buyer can read it.",
   },
+  "q-feedback": {
+    q: "What happens to the answers I give in the intro survey?",
+    a: "We send your answers, the time and the app version to a small store we keep, along with your account id only if you ticked that box. Nothing else is collected: no IP address stored, no cookies, and skipping it is counted too so we know how many people pass.",
+  },
 } as const;
 
 export type QuestionId = keyof typeof questionsCopy;
