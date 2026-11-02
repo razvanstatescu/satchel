@@ -72,3 +72,11 @@ describe("isWithinSizeLimit (the ~2 KB body cap)", () => {
     expect(isWithinSizeLimit(JSON.stringify({ goal: Array(500).fill("explore") }))).toBe(false);
   });
 });
+
+describe("parseOnboardingBody: a repeated option counts once", () => {
+  it("dedupes goal and chains", () => {
+    const r = parseOnboardingBody({ goal: ["explore", "explore", "gift"], chains: ["btc", "btc"] });
+    expect(r.ok && r.data.goal).toEqual(["explore", "gift"]);
+    expect(r.ok && r.data.chains).toEqual(["btc"]);
+  });
+});

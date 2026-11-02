@@ -68,9 +68,9 @@ export function parseOnboardingBody(raw: unknown): ParseResult {
     ok: true,
     data: {
       skipped: v.skipped === true,
-      goal: v.goal ?? [],
+      goal: [...new Set(v.goal ?? [])], // a repeated option counts once
       experience: v.experience ?? null,
-      chains: v.chains ?? [],
+      chains: [...new Set(v.chains ?? [])],
       source: v.source ?? null,
       shareAccount,
       accountId: shareAccount ? v.account_id ?? null : null,

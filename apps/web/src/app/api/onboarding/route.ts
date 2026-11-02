@@ -11,6 +11,9 @@ import { isWithinSizeLimit, MAX_BODY_BYTES, parseOnboardingBody, type Onboarding
  * are unset — fixture mode, e2e, local dev — this answers 204 and stores nothing.
  */
 
+/** How many individual responses are kept (the counts hash keeps every total regardless). */
+const MAX_KEPT = 5000;
+
 function clientIp(req: Request): string {
   const fwd = req.headers.get("x-forwarded-for");
   return fwd?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
@@ -31,6 +34,8 @@ function countCommands(countsKey: string, data: OnboardingPayload): (string | nu
 export async function POST(req: Request): Promise<Response> {
   if (!allowOnboardingRequest(clientIp(req))) return Response.json({ error: "too many requests" }, { status: 429 });
 
+  // a declared oversize body is refused before it's read; the text check below catches an undeclared one
+  if (Number(req.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) return Response.json({ error: `body must be at most ${MAX_BODY_BYTES} bytes` }, { status: 400 });
   const text = await req.text();
   if (!isWithinSizeLimit(text)) return Response.json({ error: `body must be at most ${MAX_BODY_BYTES} bytes` }, { status: 400 });
 
@@ -52,7 +57,11 @@ export async function POST(req: Request): Promise<Response> {
   const countsKey = "satchel:onboarding:counts";
   const commands: (string | number)[][] = data.skipped
     ? [["HINCRBY", countsKey, "skipped", 1]]
-    : [["LPUSH", responsesKey, JSON.stringify({ ...data, ts: Date.now(), role: CONTRACT_ROLE, v: 1 })], ...countCommands(countsKey, data)];
+    : [
+        ["LPUSH", responsesKey, JSON.stringify({ ...data, ts: Date.now(), role: CONTRACT_ROLE, v: 1 })],
+        ["LTRIM", responsesKey, 0, MAX_KEPT - 1], // the latest answers only; the counts keep the totals
+        ...countCommands(countsKey, data),
+      ];
 
   try {
     await upstashPipeline(config, commands);
