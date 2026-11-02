@@ -101,19 +101,6 @@ function useOwnsAny(accountId: string | null): boolean | null {
 
 const O = copy.onboarding;
 
-function ScreenNav({ step, onBack, onSkip }: { step: number; onBack: () => void; onSkip: () => void }) {
-  return (
-    <div className="flex items-center justify-between gap-3">
-      <Button onClick={onBack} disabled={step === 0}>
-        {O.back}
-      </Button>
-      <Button variant="link" onClick={onSkip}>
-        {O.skip}
-      </Button>
-    </div>
-  );
-}
-
 function Screens({
   step,
   setStep,
@@ -142,6 +129,7 @@ function Screens({
         </a>
       </div>
       <Dots step={step} total={total} />
+      {/* Skip lives in the top bar (OnboardingOverlay's head); Back and the forward button share the bottom row */}
       {last ? (
         <div className="flex flex-col gap-2">
           <Button
@@ -153,19 +141,23 @@ function Screens({
           >
             {owns ? O.openCta : O.mintCta}
           </Button>
-          <Button size="lg" block onClick={() => onFinish({ toSurvey: true })}>
-            {O.continueCta}
-          </Button>
-          <Button variant="link" onClick={() => onFinish({ toSurvey: false })}>
-            {O.skip}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="lg" onClick={() => setStep(step - 1)}>
+              {O.back}
+            </Button>
+            <Button size="lg" className="flex-1" onClick={() => onFinish({ toSurvey: true })}>
+              {O.continueCta}
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          <Button variant="primary" size="lg" block onClick={() => setStep(step + 1)}>
+        <div className="flex items-center gap-2">
+          <Button size="lg" onClick={() => setStep(step - 1)} disabled={step === 0}>
+            {O.back}
+          </Button>
+          <Button variant="primary" size="lg" className="flex-1" onClick={() => setStep(step + 1)}>
             {O.next}
           </Button>
-          <ScreenNav step={step} onBack={() => setStep(step - 1)} onSkip={() => onFinish({ toSurvey: false })} />
         </div>
       )}
     </div>
@@ -332,9 +324,15 @@ function OnboardingOverlay({ view, step, setStep, close, onFinishScreens }: { vi
           </h2>
         ) : (
           // names the dialog only; the screen's own visible heading is the one heading (no duplicate h2)
-          <p id={titleId} ref={titleRef as React.RefObject<HTMLParagraphElement | null>} tabIndex={-1} className="sr-only outline-none">
-            {O.screens[step]?.title}
-          </p>
+          <div className="flex min-h-11 items-center">
+            <p id={titleId} ref={titleRef as React.RefObject<HTMLParagraphElement | null>} tabIndex={-1} className="sr-only outline-none">
+              {O.screens[step]?.title}
+            </p>
+            {/* Skip at the top, beside the close button: always within reach, out of the way of Next */}
+            <Button variant="link" className="ml-auto" onClick={() => close(false)}>
+              {O.skip}
+            </Button>
+          </div>
         )
       }
     >
