@@ -81,3 +81,20 @@ Paste this into the team channel (text from H-20):
 > Excluded: force-push, making the repo public, X posts, the submission, creating or deploying `satchel.satchelhq.testnet`, anything on mainnet, spending beyond the caps.
 
 Also on Nov 1: create the private GitHub repo `satchel` under your account or org. It stays private until Day 13.
+
+## 7. Add the Upstash for Redis integration (onboarding survey)
+
+The first-time onboarding's optional "about you" survey (`apps/web/README.md` §Onboarding survey) needs a small
+Redis store to collect answers. Without it the app still works — `POST /api/onboarding` answers 204 and stores
+nothing — but nobody sees the responses.
+
+On the Vercel dashboard, for the Satchel project:
+1. Project → Integrations → Browse Marketplace → "Upstash" → "Upstash for Redis" → Add Integration.
+2. Create (or connect an existing) Redis database, and connect it to the **Production** environment (Preview is
+   optional; e2e and local dev never need it, since fixture mode never calls the route).
+3. The integration injects `KV_REST_API_URL` and `KV_REST_API_TOKEN` into the project's env vars automatically — no
+   values to copy by hand.
+4. Redeploy once so the new env vars take effect.
+
+Check it worked: `pnpm --filter @satchel/tools onboarding:report` (with those two env vars set locally, e.g. via
+`vercel env pull`) should print "sent: 0  skipped: 0  completion: 0%" instead of the "set the env vars" error.
