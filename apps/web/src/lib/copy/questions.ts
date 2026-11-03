@@ -12,7 +12,7 @@
 export const questionsCopy = {
   "q-what-is": {
     q: "What exactly is a Satchel?",
-    a: "An NFT on NEAR testnet that is a wallet. Each token has its own Bitcoin, Ethereum and Solana address, derived through NEAR's chain signatures, and only its current owner can ask the contract to sign from them. The app is how you see what's inside and send, give or sell it.",
+    a: "An NFT on NEAR testnet that is a wallet. Each token has its own Bitcoin, Ethereum and Solana address, derived through NEAR's chain signatures, and only its current owner, or someone the owner lets spend within daily caps, can ask the contract to sign from them. The app is how you see what's inside and send, give or sell it.",
   },
   "q-undo": {
     q: "Can I undo a send?",
@@ -24,7 +24,7 @@ export const questionsCopy = {
   },
   "q-where-arrive": {
     q: "Where do coins I receive show up?",
-    a: "Anyone can send to a Satchel's Bitcoin, Ethereum or Solana address, or add NEAR, USDC or wNEAR to it directly, and only its owner can take any of it back out. Unconfirmed deposits never count toward what it holds.",
+    a: "Anyone can send to a Satchel's Bitcoin, Ethereum or Solana address, or add NEAR, USDC or wNEAR to it directly. Only its owner can take it back out, plus anyone the owner lets spend coins from those addresses within daily caps. Unconfirmed deposits never count toward what it holds.",
   },
   "q-address-book": {
     q: "What's the address book for?",
