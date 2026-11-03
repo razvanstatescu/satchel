@@ -48,7 +48,7 @@ export const questionsCopy = {
   },
   "q-offers": {
     q: "What's the difference between a listing and an offer?",
-    a: "A listing is a fixed price anyone can accept instantly; an offer is a bid the owner chooses whether to accept, on a Satchel that's listed or not. Offers expire after 1, 7 or 30 days, and an open one is cancelled any time before it's accepted.",
+    a: "A listing is a fixed price anyone can accept instantly; an offer is a bid the owner chooses whether to accept, on a Satchel that's listed or not. Offers expire after 1, 7 or 30 days. Whoever made an offer can cancel it any time before it's accepted, and anyone can once it has expired; the money only ever goes back to them.",
   },
   "q-usdc-payouts": {
     q: "How do USDC sale payouts work?",
