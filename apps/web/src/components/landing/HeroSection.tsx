@@ -1,8 +1,8 @@
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ChainCharm } from "@/components/brand";
 import { HeroStage } from "@/components/landing/hero/HeroStage";
 import { CONTAINER, sentences } from "@/components/landing/layout";
-import { Button, Icon } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { LANDING_NAMES_SOL } from "@/lib/faq";
 import { copy } from "@/lib/copy";
 
@@ -52,10 +52,6 @@ export function HeroSection() {
               {h.cta.secondary}
             </Button>
           </div>
-          <p className="inline-flex items-center gap-2 text-[0.875rem] leading-5 font-medium text-ink-muted" data-hero-note="">
-            <Icon icon={Info} size={16} />
-            {copy.home.note}
-          </p>
         </div>
         <HeroStage />
       </div>

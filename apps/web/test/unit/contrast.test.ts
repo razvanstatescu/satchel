@@ -110,6 +110,7 @@ describe("the 2.0 tokens (globals.css :root, [data-scheme])", () => {
 
 describe("text, 4.5:1 (design-system-impl §2)", () => {
   it("ink and ink-muted on every surface and on brand-soft (toasts, selected rows)", () => pairs(["ink", "ink-muted"], [...SURFACES, "brand-soft"], TEXT));
+  it("ink and ink-muted on --band (site polish round, #more's own band; kb/81 R4)", () => pairs(["ink", "ink-muted"], ["band"], TEXT));
   it("links on the grounds and surfaces", () => pairs(["link"], SURFACES, TEXT));
   it("state words (pills, banners, the tracker) on every surface and on brand-soft", () => pairs(["success", "frozen", "danger"], [...SURFACES, "brand-soft"], TEXT));
   it("the Ethereum and Solana colours if they ever carry text", () => pairs(["chain-evm", "chain-sol"], SURFACES, TEXT));

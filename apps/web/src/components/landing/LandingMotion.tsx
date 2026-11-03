@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { mountCode } from "@/components/landing/code/engine";
 import { mountHero } from "@/components/landing/hero/engine";
 import { mountCharms } from "@/components/landing/motion/charms";
 import { mountEnter } from "@/components/landing/motion/enter";
@@ -14,13 +15,15 @@ import { mountEnter } from "@/components/landing/motion/enter";
 export function LandingMotion() {
   useEffect(() => {
     const hero = mountHero(document.querySelector<HTMLElement>("[data-stage]"));
+    const code = mountCode(document.querySelector<HTMLElement>("[data-code]"));
     const enter = mountEnter(document);
     const offCharms = mountCharms(document);
     // QA hooks for frame strips (motion-spec §11), next to the hand-off's
     const w = window as unknown as { __satchelMotion?: Record<string, unknown> };
-    if (process.env.NODE_ENV !== "production") (w.__satchelMotion ??= {}).landing = { hero, enter };
+    if (process.env.NODE_ENV !== "production") (w.__satchelMotion ??= {}).landing = { hero, code, enter };
     return () => {
       hero.destroy();
+      code.destroy();
       enter.destroy();
       offCharms();
       if (w.__satchelMotion) delete w.__satchelMotion.landing;

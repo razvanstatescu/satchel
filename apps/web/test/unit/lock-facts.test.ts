@@ -5,32 +5,31 @@ import { lockView, type ContractRole } from "@/lib/lock-facts";
 
 /**
  * The landing trust band's head (landing v4 §2.6, D-42): the landing reads nothing, so "No admin key" is a build-time
- * claim keyed to the contract role (spec risk 5). Role → variant: dev → the dev twin; rc → the main copy plus the
- * release-candidate line; final → the main copy. No variant names an account, a Satchel or a time; `/contract` keeps the
- * live proof.
+ * claim keyed to the contract role (spec risk 5). Role → variant: dev → the dev twin; rc → the same band as final (the
+ * role strip's release-candidate line is gone site-wide, D-52). No variant names an account, a Satchel or a time;
+ * `/contract` keeps the live proof.
  */
 
 const L = copy.landing.lock;
 const ROLES: ContractRole[] = ["dev", "rc", "final"];
 const all = (role: ContractRole) => {
   const v = lockView(role);
-  return [v.h2, v.body, v.note ?? ""].join(" ");
+  return [v.h2, v.body].join(" ");
 };
 
 describe("lockView(role)", () => {
   it("final: the main H2 and the generic body, no note", () => {
-    expect(lockView("final")).toEqual({ variant: "locked", h2: "No admin key. Not even ours.", body: L.body, note: null });
+    expect(lockView("final")).toEqual({ variant: "locked", h2: "No admin key. Not even ours.", body: L.body });
     expect(L.body).toBe("Satchel's contract was born without a key and can't be upgraded. Nobody can add one or change its code, us included.");
   });
 
-  it("rc: the main H2 and body, plus the release-candidate line", () => {
-    expect(lockView("rc")).toEqual({ variant: "locked", h2: L.h2, body: L.body, note: copy.role.rc });
-    expect(copy.role.rc).toBe("Release candidate: testnet rehearsal");
+  it("rc: the same band as final", () => {
+    expect(lockView("rc")).toEqual(lockView("final"));
   });
 
   it("dev: the dev twin, which never claims 'No admin key' (the dev contract still has keys)", () => {
     const v = lockView("dev");
-    expect(v).toEqual({ variant: "dev", h2: L.dev.h2, body: L.dev.body, note: null });
+    expect(v).toEqual({ variant: "dev", h2: L.dev.h2, body: L.dev.body });
     expect(v.h2).toBe("Development contract");
     expect(v.body).toContain("still has keys");
     expect(all("dev")).not.toContain(L.h2);

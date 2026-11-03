@@ -1,5 +1,18 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Check, FileCode, FlaskConical, Lock, Plus } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  FileCode,
+  Lock,
+  Pause,
+  PenLine,
+  Play,
+  Plus,
+  ScanSearch,
+  ScrollText,
+  UserRoundCheck,
+} from "lucide-react";
 import { ArtIcon, Coin, Lbl } from "@/components/landing/art";
 import { CONTAINER, H2, HEAD, LEAD, SECTION_Y, SPLIT } from "@/components/landing/layout";
 import { Button, cx, Icon } from "@/components/ui";
@@ -7,6 +20,7 @@ import { CONTRACT_ROLE, REPO_URL } from "@/lib/config";
 import { copy, type SolVariant } from "@/lib/copy";
 import { LANDING_SOL } from "@/lib/faq";
 import { lockView, type ContractRole } from "@/lib/lock-facts";
+import { REST_STEP } from "@/components/landing/code/timeline";
 
 /** "What you still trust: rest" → the bold lead (up to and with the colon) and the rest. */
 export function colonLead(s: string): { lead: string; rest: string } {
@@ -16,24 +30,22 @@ export function colonLead(s: string): { lead: string; rest: string } {
 
 /**
  * Trust (`#trust`, design-spec §4.7; 49 words, plus Under the hood's 12 while closed): what you trust, said calmly, with
- * real UI as proof. Text left, art right from 1024 (text first on phones):
+ * real UI as proof. Text left, art right from 1024 (text first on phones), for every role (site polish round §2.1):
  * - the H2 and the lead from `lockView(role)`, a build-time claim (the landing reads nothing): rc and final say "No
- *   admin key. Not even ours."; rc adds the release-candidate line; dev shows its twin and no art (that contract still
- *   has keys);
+ *   admin key. Not even ours."; dev shows its twin;
  * - the honest limits on a sunken panel with a bold "What you still trust:";
  * - "See the contract facts" (→ /contract, where the live proof is);
  * - Under the hood, one closed native `<details>`: the six rules and five "Check it yourself" links, in the server HTML.
- * The art (rc and final): a flat lemon field holding a Contract facts slip, the BTC and ETH coins peeking over its top
- * edge (they peek up once on enter). No account, no Satchel number, no time.
+ * The art: rc and final get the Contract facts slip on a flat lemon field (the BTC and ETH coins peek over its top
+ * edge once on enter); dev gets a looping code card on a sunken field (never lemon: lemon means locked, R2).
  */
 export function TrustSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { role?: ContractRole; sol?: SolVariant }) {
   const v = lockView(role);
   const L = copy.landing.lock;
   const limits = colonLead(L.limits);
-  const art = v.variant === "locked";
   return (
     <section id="trust" aria-labelledby="trust-title" data-lock-variant={v.variant} className={SECTION_Y}>
-      <div className={cx(CONTAINER, art && SPLIT)}>
+      <div className={cx(CONTAINER, SPLIT)}>
         <div className="flex min-w-0 flex-col gap-5">
           <div className={HEAD}>
             <h2 id="trust-title" className={H2}>
@@ -41,12 +53,6 @@ export function TrustSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { role
             </h2>
             <p className={LEAD}>{v.body}</p>
           </div>
-          {v.note ? (
-            <p className="flex items-start gap-3 text-ink-muted" data-testid="lock-note">
-              <Icon icon={FlaskConical} size={20} className="mt-0.5" />
-              <span className="min-w-0">{v.note}</span>
-            </p>
-          ) : null}
           <p className="rounded-md bg-surface-sunken px-4.5 py-4" data-testid="trust-limits">
             {limits.lead ? <strong className="font-bold">{limits.lead}</strong> : null}
             {limits.lead ? " " : null}
@@ -59,7 +65,7 @@ export function TrustSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { role
           </div>
           <UnderTheHood sol={sol} />
         </div>
-        {art ? <ContractFacts /> : null}
+        {v.variant === "locked" ? <ContractFacts /> : <CodeCard />}
       </div>
     </section>
   );
@@ -101,6 +107,68 @@ function ContractFacts() {
             <Lbl l={s.verdict} />
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const CAP_ICONS = [UserRoundCheck, ScanSearch, ScrollText, PenLine] as const;
+
+/** Trust, dev: a simplified `sign_for` whose rail walks its four steps (`code/timeline.ts`, looped by `mountCode`,
+ * registered in `LandingMotion`). The card is `aria-hidden` art; Pause sits outside it, named like the hero's. The
+ * server frame is step 3 (`REST_STEP`) held: no JS and reduced motion show exactly this — no admin claim, no account,
+ * no address; the card is labelled "Simplified" (P6) so a reader diffing it against sign.rs sees it's an illustration. */
+function CodeCard() {
+  const c = copy.landing.lock.dev.code;
+  return (
+    <div className="lp-codefield" data-code="">
+      <div className="lp-slip lp-code" aria-hidden="true">
+        <p className="lp-code__head">
+          <ArtIcon icon={FileCode} />
+          <Lbl l={c.file} className="lp-code__file" />
+          <Lbl l={c.tag} className="lp-code__tag" />
+        </p>
+        <div className="lp-code__body">
+          <span className="lp-code__rail" data-k="code-rail" />
+          <ol className="lp-code__lines">
+            {c.lines.map((line, i) => (
+              <li key={i} className="lp-code__line" data-line={i + 1}>
+                <Lbl l={String(i + 1)} className="lp-code__n" />
+                <span className="lp-code__src">
+                  {line.map(([t, s], j) => (
+                    <Lbl key={j} l={s} className={`lp-tok lp-tok--${t}`} />
+                  ))}
+                </span>
+                {i >= 1 && i <= 3 ? (
+                  <span className="lp-code__tick" data-k={`code-tick-${i}`} data-off={i >= REST_STEP ? "" : undefined}>
+                    <ArtIcon icon={Check} />
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+        <p className="lp-code__caps lp-stack lp-stack--block">
+          {c.caps.map((t, i) => (
+            <span key={t} className="lp-code__cap" data-k={`code-cap-${i + 1}`} data-off={i + 1 === REST_STEP ? undefined : ""}>
+              <ArtIcon icon={CAP_ICONS[i]!} />
+              <Lbl l={t} />
+            </span>
+          ))}
+        </p>
+      </div>
+      <div className="lp-code__bar">
+        <ol className="lp-code__steps" aria-hidden="true">
+          {([1, 2, 3, 4] as const).map((n) => (
+            <li key={n} className="lp-code__step" data-done={n < REST_STEP ? "" : undefined} data-cur={n === REST_STEP ? "" : undefined}>
+              <b data-k={`code-bar-${n}`} />
+            </li>
+          ))}
+        </ol>
+        <button type="button" className="lp-code__pause" data-code-pause="" aria-pressed="false" aria-label={copy.landing.hero.anim.pause}>
+          <ArtIcon icon={Pause} className="lp-i-pause" />
+          <ArtIcon icon={Play} className="lp-i-play" />
+        </button>
       </div>
     </div>
   );

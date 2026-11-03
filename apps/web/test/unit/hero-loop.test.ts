@@ -170,7 +170,6 @@ describe("the stage's server markup (HeroStage.tsx)", () => {
     for (const l of [
       D.name,
       o.estimate(usdText(D.usd)),
-      o.atPrices,
       "BTC",
       shareText(0.5),
       o.plus(1),
@@ -188,6 +187,7 @@ describe("the stage's server markup (HeroStage.tsx)", () => {
     ]) {
       expect(scene, l).toContain(`data-l="${attr(l)}"`);
     }
+    expect(scene).not.toContain('data-l="at mainnet prices"'); // site polish round D-52: "≈ $X" alone
     expect(stage.match(/<div class="lp-hang lp-hang--[lr]" data-charm="" aria-hidden="true">/g)).toHaveLength(2);
   });
 
@@ -235,16 +235,17 @@ describe("the stage's server markup (HeroStage.tsx)", () => {
 });
 
 describe("the hero section (HeroSection.tsx)", () => {
-  it("the who-line, then one H1, H1 C two-tone (each sentence its own span), then the lead, the two CTAs and the note, in order", () => {
+  it("the who-line, then one H1, H1 C two-tone (each sentence its own span), then the lead and the two CTAs, in order", () => {
     expect(hero.match(/<h1\b/g)).toHaveLength(1);
     const [what, why] = copy.home.h1.split(/(?<=\.)\s+/);
     expect(hero).toMatch(new RegExp(`<h1 id="hero-title"[^>]*><span class="lg:block">${what}</span> <span class="text-ink-muted lg:block">${why}</span></h1>`));
     const t = text(hero);
-    const at = [copy.landing.hero.who, copy.home.h1, copy.landing.hero.lead(true), copy.landing.hero.cta.primary, copy.landing.hero.cta.secondary, copy.home.note, A.alt.replace(/\u00a0/g, " ")].map((s) =>
+    const at = [copy.landing.hero.who, copy.home.h1, copy.landing.hero.lead(true), copy.landing.hero.cta.primary, copy.landing.hero.cta.secondary, A.alt.replace(/\u00a0/g, " ")].map((s) =>
       t.replace(/\u00a0/g, " ").indexOf(s),
     );
     for (const p of at) expect(p).toBeGreaterThan(-1);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
+    expect(hero).not.toContain("data-hero-note");
   });
 
   it("Look inside a Satchel is the coral primary (→ /s/1), See Satchels for sale the secondary (→ /market)", () => {

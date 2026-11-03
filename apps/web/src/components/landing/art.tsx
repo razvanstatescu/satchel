@@ -77,10 +77,11 @@ export function ArtCard({
 }
 
 /**
- * The card's body (D-50, SatchelCard's `Contents`): "≈ $X" and "at mainnet prices" beside the state pill, then the
- * value bar and the coin chips ("BTC 50%" · "ETH 25%" · "SOL 15%" · "+1", folding to "+2" below 352 px of card). Every
- * label is drawn from an attribute. `moving` adds the hero loop's `data-k` hooks (design-spec notes §2.3, §3.3); every
- * other scene renders the same markup still, so the loop's keys are the only difference.
+ * The card's body (D-50, SatchelCard's `Contents`): "≈ $X" alone (site polish round, D-52: the landing presents the
+ * product in mainnet terms, so no "at mainnet prices" label) beside the state pill, then the value bar and the coin
+ * chips ("BTC 50%" · "ETH 25%" · "SOL 15%" · "+1", folding to "+2" below 352 px of card). Every label is drawn from an
+ * attribute. `moving` adds the hero loop's `data-k` hooks (design-spec notes §2.3, §3.3); every other scene renders
+ * the same markup still, so the loop's keys are the only difference.
  */
 export function ArtOverview({ mix, usd, state, moving }: { mix: readonly MixEntry[]; usd: number; state?: ReactNode; moving?: boolean }) {
   const o = copy.overview;
@@ -90,7 +91,6 @@ export function ArtOverview({ mix, usd, state, moving }: { mix: readonly MixEntr
       <div className="lp-card__head">
         <span className="lp-card__est" data-k={k("est")}>
           <Lbl l={o.estimate(usdText(usd))} className="lp-card__total" />
-          <Lbl l={o.atPrices} className="lp-card__prices" />
         </span>
         {state}
       </div>

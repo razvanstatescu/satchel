@@ -17,7 +17,7 @@ export const landing = {
   meta: {
     title: "An NFT that is a wallet",
     description: (sol = false) =>
-      `An NFT on NEAR testnet with its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.`,
+      `An NFT on NEAR with its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.`,
     /** The OG image's alt, as in src/app/opengraph-image.alt.txt (a unit test keeps the two equal). `/` lists the image
      * itself because its own `openGraph` replaces the layout's, file-based image included. */
     ogAlt: "Satchel: an NFT that is a wallet",
@@ -123,7 +123,7 @@ export const landing = {
      * NEW (DL-15): the address tags hanging from the card (aria-hidden art, drawn from attributes). Generic, no real
      * address; `btc`/`evm` from 480 px, the short names below.
      */
-    tags: { btc: "Bitcoin address", evm: "Ethereum address", sol: "Solana address", btcShort: "Bitcoin", evmShort: "Ethereum", solShort: "Solana", btcAddr: "tb1q…", evmAddr: "0x…", solAddr: "7xKX…" },
+    tags: { btc: "Bitcoin address", evm: "Ethereum address", sol: "Solana address", btcShort: "Bitcoin", evmShort: "Ethereum", solShort: "Solana", btcAddr: "bc1q…", evmAddr: "0x…", solAddr: "7xKX…" },
   },
 
   /** design-spec §4.5: the three verbs, each over a scene of real UI. 47 words; 48 with the SOL variant. */
@@ -169,6 +169,9 @@ export const landing = {
     /** v4's hang tags (design-spec §4.4 drops them as chips); `tags[0]` is the sample's price (`desk.price`, site-refresh R9);
      * `tags[2]` "New owner" labels How it works' third scene. */
     tags: [`2,000${NBSP}NEAR`, "For you", "New owner"],
+    /** NEW (site polish round, P3/U1): an attribute-drawn chip under row 1's body (0 visible words), echoing the bento's
+     * "USDC and L2s" tile so the fact stays in text there. */
+    hint: "+ USDC and L2s",
   },
 
   /**
@@ -231,7 +234,32 @@ export const landing = {
     slip: { title: "Contract facts", keys: "Access keys", keysValue: "None since birth", admin: "Admin methods", adminValue: "None", code: "Code hash", codeValue: "Matches", verdict: "Born without a key" },
     dev: {
       h2: "Development contract",
-      body: "This build reads a development contract that still has keys, so the lock and code checks are skipped here. Release builds read a contract born in one transaction with no key and no admin or upgrade methods.",
+      /** R2 (site polish round, D-52): no "checks are skipped" (that line moved to `copy.clean.checks.dev`); 26 words. */
+      body: "This site's contract still has keys, so we can change its code. The release contract is born with no key and no admin or upgrade methods.",
+      /**
+       * NEW (site polish round, §2.2): a simplified `sign_for` excerpt for the dev Trust loop, attribute-drawn
+       * (`aria-hidden`; the copy test scans every token and caption). Traces to contracts/satchel/src/sign.rs:
+       * `authorize_signer` → `parse::classify` → the signature-log write → `sign_network::sign` (never "MPC"). The
+       * card is labelled "Simplified" (P6) so a reader diffing it against sign.rs sees it's an illustration.
+       */
+      code: {
+        file: "sign.rs",
+        tag: "Simplified",
+        lines: [
+          [["k", "fn"], ["s", " "], ["f", "sign_for"], ["p", "("], ["i", "satchel"], ["p", ", "], ["i", "request"], ["p", ") {"]],
+          [["s", "  "], ["k", "let"], ["s", " "], ["i", "signer"], ["p", " = "], ["f", "authorize"], ["p", "("], ["i", "caller"], ["p", ")?;"]],
+          [["s", "  "], ["k", "let"], ["s", " "], ["i", "parsed"], ["p", " = "], ["f", "classify"], ["p", "("], ["i", "request"], ["p", ")?;"]],
+          [["s", "  "], ["f", "record"], ["p", "("], ["i", "satchel"], ["p", ", "], ["i", "parsed"], ["p", ", "], ["i", "signer"], ["p", ");"]],
+          [["s", "  "], ["f", "sign_network::sign"], ["p", "("], ["i", "parsed"], ["p", ")"]],
+          [["p", "}"]],
+        ] as const,
+        caps: [
+          "Owner, or someone they let spend within daily caps",
+          "Refuses raw hashes, unreadable requests",
+          "Written here, before anything is signed",
+          "NEAR's signer network, called last",
+        ],
+      },
     },
   },
 
@@ -253,8 +281,8 @@ export const landing = {
           // kb/90 §5.9; D-40; DP5; C7S:61-73, :91-114; risky claim 10
           title: "Readable requests only",
           body: none
-            ? "The contract signs only what it can read: ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends and Ethereum text messages. It refuses raw hashes, permits, any other contract call and Solana messages."
-            : "The contract signs only what it can read: ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and text messages. It refuses raw hashes, permits and any other contract call.",
+            ? "The contract signs only what it can read: ETH and USDC transfers on four Ethereum networks, standard Bitcoin spends and Ethereum text messages. It refuses raw hashes, permits, any other contract call and Solana messages."
+            : "The contract signs only what it can read: ETH and USDC transfers on four Ethereum networks, standard Bitcoin spends, plain SOL transfers and text messages. It refuses raw hashes, permits and any other contract call.",
         },
         {
           // kb/90 §5.8 step 5, §7.1; kb/70 F16; C7S:116-127; risky claim 3
@@ -324,7 +352,7 @@ export const landing = {
       {
         // C7S:24-35; site-refresh R1: no currency named, never "every L2"
         title: "USDC and L2s",
-        body: "Ethereum, Base, Arbitrum and OP Sepolia.",
+        body: "Ethereum, Base, Arbitrum and Optimism.",
         help: { anchor: "q-chains", label: "Which chains and coins work" },
       },
       {
@@ -333,6 +361,14 @@ export const landing = {
         body: "Every coin to your wallets.",
       },
     ],
+    /** NEW (site polish round, §1.5): the bento tiles' attribute-drawn art labels (0 visible words; `aria-hidden`). */
+    art: {
+      offer: `1,900${NBSP}NEAR`,
+      claimPath: "/claim#",
+      secret: "•••• •••• ••••",
+      sameAddress: "One address on all four",
+      networks: ["Ethereum", "Base", "Arbitrum", "Optimism"] as const,
+    },
   },
 
   /**
@@ -344,8 +380,8 @@ export const landing = {
     h2: "Questions",
     /** Below the seven closed questions (less-labels): the long version, grouped, on its own page. */
     all: "All questions",
-    /** Appended to `q-keys` on the dev role only. */
-    keysDev: "This build reads a development contract that still has keys, so its lock checks are skipped.",
+    /** Appended to `q-keys` on the dev role only (shared across both framings: it names no network). 12 words; was 16. */
+    keysDev: "This site's development contract has keys, so we can change its code.",
     "q-send": {
       // The blind tester's "why buy a whole wallet?". kb/90 §5.12, D-14; risky claim 7 (one transaction, sales only; the
       // payout is a detached receipt, escrowed on failure); risky claim 5 ("keeps the same addresses").
@@ -353,16 +389,21 @@ export const landing = {
       a: "You can, one chain at a time. A Satchel hands over Bitcoin, Ethereum and Solana together, keeps the same addresses, and lets a buyer pay and take over in one transaction, so neither side sends first.",
     },
     "q-keys": {
-      // kb/70 F17; kb/90 §3 (the MPC contract account has full-access keys on testnet), §4 T1; risky claims 1, 15. "That
-      // network's own" keeps the keys off Satchel's contract, which "No admin key" is about.
+      // kb/70 F17; kb/90 §3 (the MPC contract account has full-access keys on testnet), §4 T1; risky claims 1, 15. The
+      // landing (product framing) drops the testnet keys clause; /questions (deployment framing, P1) keeps it.
       q: "Who holds the keys?",
-      a: "No single party. NEAR's signer network makes each signature together, only when the Satchel contract asks, for the NFT's owner or someone they let spend within daily caps. You trust that network: enough colluding nodes could sign anything, and on testnet that network's own contract account has full-access keys.",
+      a: "No single party. NEAR's signer network makes each signature together, only when the Satchel contract asks, for the NFT's owner or someone they let spend within daily caps. You trust that network: enough colluding nodes could sign anything.",
+      // deployment framing only (/questions, byte for byte, P1): "that network's own" keeps the keys off Satchel's
+      // contract, which "No admin key" is about.
+      aDeployment: "No single party. NEAR's signer network makes each signature together, only when the Satchel contract asks, for the NFT's owner or someone they let spend within daily caps. You trust that network: enough colluding nodes could sign anything, and on testnet that network's own contract account has full-access keys.",
     },
     "q-proves": {
       // kb/90 §4 "does not cover", §7.2–7.5, §7.7; risky claims 2, 18. The landing's one disclosure (D-42): the browser,
-      // not the contract, runs the check.
+      // not the contract, runs the check. Product framing says "Bitcoin reorgs"; /questions (deployment, P1) keeps
+      // "testnet4 reorgs" byte for byte.
       q: "What does the buyer's check cover?",
-      a: "Every signature the Satchel has ever made. Your browser, not the contract, checks each one on its own chain, and Buy stays off until none can still move the coins. It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or testnet4 reorgs.",
+      a: "Every signature the Satchel has ever made. Your browser, not the contract, checks each one on its own chain, and Buy stays off until none can still move the coins. It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or Bitcoin reorgs.",
+      aDeployment: "Every signature the Satchel has ever made. Your browser, not the contract, checks each one on its own chain, and Buy stays off until none can still move the coins. It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or testnet4 reorgs.",
     },
     "q-after": {
       // kb/90 §5.7 (frozen while listed, INV-13; `buy` names the listing and the signature count, INV-14, INV-16).
@@ -377,19 +418,26 @@ export const landing = {
       // addresses" is deliberate: wNEAR, and USDC if H-26 lands, can sit inside and come out again, so "sent to it"
       // would be false. "The app can't move": the contract can't tell Bitcoin testnet4 from signet or Solana devnet from
       // other clusters (one address string on each), so a hand-built request could move coins sent there (site-refresh W1).
-      a: (sol: SolVariant = "off") => {
-        const evm = "ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia";
-        const lead = sol === "ui" ? `BTC on Bitcoin testnet4, SOL on Solana devnet, and ${evm}.` : `BTC on Bitcoin testnet4, plus ${evm}.`;
+      // `framing` picks the network names: "product" (the landing, default) names Bitcoin, Solana and the four
+      // mainnet-named EVM networks; "deployment" (/questions, P1) reproduces today's four testnet-named strings byte
+      // for byte.
+      a: (sol: SolVariant = "off", framing: "product" | "deployment" = "product") => {
+        const n =
+          framing === "product"
+            ? { btc: "Bitcoin", sol: "Solana", evm: "Ethereum, Base, Arbitrum and Optimism" }
+            : { btc: "Bitcoin testnet4", sol: "Solana devnet", evm: "Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia" };
+        const evm = `ETH and USDC on ${n.evm}`;
+        const lead = sol === "ui" ? `BTC on ${n.btc}, SOL on ${n.sol}, and ${evm}.` : `BTC on ${n.btc}, plus ${evm}.`;
         // ui: Solana is in the lead, so this slot holds the shared address and NEAR inside; the cut variants spend it
         // on their Solana line (every variant stays ≤ 50 words)
         const middle =
           sol === "ui"
             ? "The four Ethereum networks share one address. A Satchel can also hold NEAR inside. "
             : sol === "send"
-              ? "Each Satchel also has a Solana devnet address; its owner can send SOL from the app, and clean history checks those signatures too. "
+              ? `Each Satchel also has a ${n.sol} address; its owner can send SOL from the app, and clean history checks those signatures too. `
               : sol === "none"
-                ? "Each Satchel also has a Solana devnet address, but this contract doesn't sign for Solana. "
-                : "Each Satchel also has a Solana devnet address; the contract can sign SOL transfers, but the app can't send SOL yet. ";
+                ? `Each Satchel also has a ${n.sol} address, but this contract doesn't sign for Solana. `
+                : `Each Satchel also has a ${n.sol} address; the contract can sign SOL transfers, but the app can't send SOL yet. `;
         return `${lead} ${middle}The app can't move anything else at its addresses.`;
       },
     },
@@ -399,11 +447,19 @@ export const landing = {
       a: "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded. Each signature costs about 0.004 NEAR; network fees come from the Satchel's coins. Offers, spending allowances and long messages keep a little NEAR for storage. Giving by link adds 0.02 NEAR. Satchel charges no fee.",
     },
     "q-testnet": {
-      // kb/90 §4 T2, T9; README; risky claim 21
-      q: "Why testnet only? Is it audited?",
-      a: "Satchel is new, unaudited hackathon software. Its contract can't be upgraded, so a bug can't be patched in place, and if NEAR's signer network changed its interface, its Satchels couldn't sign. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
-      // site-refresh R2; the dev role's twin, picked in `faqItems` (site-refresh F7; facts §1.9): dev2's contract has keys.
-      aDev: "Satchel is new, unaudited hackathon software. The development contract behind this build can still be upgraded; the release contract can't, so a bug there can't be patched in place. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
+      // kb/90 §4 T2, T9; risky claim 21; D-52: the landing (product framing) names no testnet, the header badge does.
+      // "No." leads: splitLead takes it as the bold lead, as q-after does.
+      q: "Is it audited?",
+      a: "No. Satchel is new hackathon software. Its contract can't be upgraded, so a bug can't be patched in place, and if NEAR's signer network changed its interface, its Satchels couldn't sign.",
+      // site-refresh R2; the dev role's twin (site-refresh F7; facts §1.9): dev2's contract has keys. Now also carries
+      // the signer-network risk, dropped from this twin last round.
+      aDev: "No. Satchel is new hackathon software. The development contract behind this site can still be upgraded; the release contract can't, so a bug there can't be patched in place, and if NEAR's signer network changed its interface, its Satchels couldn't sign.",
+      /** Deployment framing (/questions, P1): today's text, byte for byte, including the wallet line. */
+      deployment: {
+        q: "Why testnet only? Is it audited?",
+        a: "Satchel is new, unaudited hackathon software. Its contract can't be upgraded, so a bug can't be patched in place, and if NEAR's signer network changed its interface, its Satchels couldn't sign. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
+        aDev: "Satchel is new, unaudited hackathon software. The development contract behind this build can still be upgraded; the release contract can't, so a bug there can't be patched in place. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
+      },
     },
   },
 
@@ -415,6 +471,6 @@ export const landing = {
     /** R12.1: the brand line's home, the page's sign-off on the coral cover. */
     h2: "Stick it on. Hand it over.",
     /** kb/90 §8.5. */
-    body: "Look around without a wallet. To mint your own, connect a NEAR testnet wallet.",
+    body: "Look around without a wallet. To mint your own, connect a NEAR wallet.",
   },
 } as const;

@@ -173,6 +173,25 @@ export const ENTER: readonly EnterDef[] = [
       })),
   },
   {
+    // What else it does, Make an offer: the buyer's offer slip slides in and settles, then its check sticks on: an
+    // offer waits for the same check as Buy (site polish round §1.6)
+    name: "offer",
+    trigger: '[data-enter="offer"]',
+    T: 900,
+    tracks: (q) => {
+      const slip = q("offer-slip");
+      const check = q("offer-check");
+      return [
+        { el: slip, prop: "opacity", frames: [[0, 0, EASE.out], [160, 1]] },
+        { el: slip, prop: "translate", frames: [[0, "28px 10px", EASE.out], [460, "0 0"]] },
+        { el: slip, prop: "rotate", frames: [[0, "7deg", EASE.out], [460, "0deg"]] }, // on top of its static 2.5° transform
+        { el: check, prop: "opacity", frames: [[0, 0], [520, 0, EASE.out], [680, 1]] },
+        { el: check, prop: "translate", frames: [[0, "0 6px"], [520, "0 6px", EASE.out], [700, "0 0"]] },
+        ...stickOnTracks(q("offer-tick"), 560, { from: 1.5, turn: 0 }),
+      ];
+    },
+  },
+  {
     // the finale: the S face drops onto its own drop, which darkens as it nears, presses 10 units in and rests. "Stick it
     // on." The S never rotates.
     name: "finale",

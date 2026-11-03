@@ -1,102 +1,550 @@
-/* ── "What else it does" (#more, after Trust + Under the hood, before Questions). strip-refs pattern 1: an icon, a
-   title, one line; no card chrome, no border, no coral. Five items: one list on phones, 3 + 2 from 768, one row of
-   five from 1280. The icon sits in a flat sunken disc (not a sticker: stickers are for what you own, press or
-   celebrate). The "?" is the app's HelpLink (a 16 px CircleQuestionMark, ink-muted) with a 44 px target.
-   site-refresh design notes §1.3; ported as-is from the design prototype's CSS. ──────────────────────────────────── */
-.lp-more {
+/* "What else it does" as a bento (#more, after Trust + Under the hood, before Questions; site polish round §1): five
+   tiles on their own band (`--band`, kb/81 R4), two rows from 1024 (Make an offer 4 + Give by link 2, then 2 + 2 + 2),
+   two columns from 640 (the lead tile across), one column below. Each tile is a flat panel holding a well (the band's
+   tone) with one piece of Satchel's own UI (`more-art.tsx`, `aria-hidden`), then the title, its "?" and one line. The
+   "?" is the app's HelpLink recipe (a 16 px CircleQuestionMark, ink-muted) with a 44 px target.
+   Ported verbatim from the design prototype's polish.css §P5. ──────────────────────────────────────────────────── */
+.lp-band {
+  border-block: 1px solid var(--line);
+  background: var(--band);
+}
+.lp-bento {
   display: grid;
-  gap: 22px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
   margin: 28px 0 0;
   padding: 0;
   list-style: none;
 }
-.lp-more__item {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr);
-  align-content: start;
-  column-gap: 14px;
+@media (min-width: 640px) {
+  .lp-bento {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .lp-tile[data-more="1"] {
+    grid-column: 1 / -1;
+  }
+}
+@media (min-width: 768px) {
+  .lp-bento {
+    margin-top: 40px;
+  }
+}
+@media (min-width: 1024px) {
+  .lp-bento {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .lp-tile {
+    grid-column: span 2;
+  }
+  .lp-tile[data-more="1"] {
+    grid-column: span 4;
+  }
+}
+.lp-tile {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--surface);
 }
-.lp-more__icon {
-  display: grid;
-  grid-row: span 2;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--surface-sunken);
-  color: var(--ink);
+.lp-tile__art {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  height: 176px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--band);
 }
-.lp-more__icon > svg {
-  width: 20px;
-  height: 20px;
+@media (min-width: 640px) {
+  .lp-tile__art {
+    height: 196px;
+  }
 }
-.lp-more__head {
+@media (min-width: 1024px) {
+  .lp-tile__art {
+    height: 204px;
+  }
+}
+.lp-tile__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 12px 10px;
+}
+@media (min-width: 640px) {
+  .lp-tile {
+    padding: 8px;
+  }
+  .lp-tile__text {
+    gap: 4px;
+    padding: 14px 12px 12px;
+  }
+}
+.lp-tile__head {
   display: flex;
   align-items: center;
   gap: 2px;
   min-width: 0;
-  min-height: 22px;
+  min-height: 24px;
 }
-.lp-more__title {
+.lp-tile__title {
   margin: 0;
   color: var(--ink);
-  font: 700 17px/22px var(--font-display);
+  font: 700 19px/24px var(--font-display);
   letter-spacing: -0.01em;
 }
+@media (min-width: 768px) {
+  .lp-tile__title {
+    font-size: 20px;
+    line-height: 26px;
+  }
+}
 /* the help link: a 44 px target around a 16 px icon, pulled back so it never grows the title's line */
-.lp-more__help {
+.lp-tile__help {
   display: inline-grid;
   flex: none;
   place-items: center;
   width: 44px;
   height: 44px;
-  margin: -11px -14px -11px -10px;
+  margin: -10px -14px -10px -10px;
   border-radius: 999px;
   color: var(--ink-muted);
 }
-.lp-more__help > svg {
+.lp-tile__help > svg {
   width: 16px;
   height: 16px;
 }
 @media (hover: hover) {
-  .lp-more__help:hover {
+  .lp-tile__help:hover {
     color: var(--ink);
   }
 }
-.lp-more__body {
-  margin: 2px 0 0;
+.lp-tile__help:focus-visible {
+  outline: none;
+}
+.lp-tile__help:focus-visible > svg {
+  border-radius: 999px;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.lp-tile__body {
+  margin: 0;
   color: var(--ink-muted);
   font: 400 15px/22px var(--font-sans);
 }
-@media (min-width: 768px) {
-  .lp-more {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 40px 32px;
-    margin-top: 44px;
-  }
-  .lp-more__item {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 0;
-  }
-  .lp-more__icon {
-    grid-row: auto;
-    width: 48px;
-    height: 48px;
-    margin-bottom: 14px;
-  }
-  .lp-more__icon > svg {
-    width: 22px;
-    height: 22px;
-  }
-  .lp-more__title {
-    font-size: 18px;
-    line-height: 24px;
+
+/* the tiles' art: small slips (the landing's paper-sticker recipe), sized for the well */
+.lp-tile__art .lp-slip {
+  position: relative;
+  flex: none;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+}
+.lp-tile__art .lp-slip__head {
+  font-size: 13px;
+  line-height: 18px;
+}
+.lp-tile__art .lp-slip__head > svg {
+  width: 16px;
+  height: 16px;
+}
+.lp-tile__art .lp-slip__meta {
+  margin: 0;
+}
+
+/* 1 · Make an offer: the card (Active: not for sale) and the buyer's offer slip.
+   - Below 480 px: the hero's own pose. The slip sits on the card's lower right, below its total and pill, so the card
+     stays whole (P12). The lead well grows to 220, and the slip drops its expiry line and steps its amount down.
+   - From 480: side by side, tied by a short dashed string. */
+@media (max-width: 479px) {
+  .lp-tile[data-more="1"] .lp-tile__art {
+    height: 220px;
   }
 }
-@media (min-width: 1280px) {
-  .lp-more {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    column-gap: 36px;
+@media (min-width: 480px) and (max-width: 639px) {
+  .lp-tile[data-more="1"] .lp-tile__art {
+    height: 196px;
   }
+}
+.lp-offer {
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10px;
+}
+.lp-card.lp-offer__card {
+  flex: none;
+  width: 204px;
+}
+.lp-offer__slip {
+  z-index: 1;
+  width: 152px;
+  margin: 74px 0 0 -80px;
+  padding: 10px 12px;
+  transform: rotate(-2deg);
+}
+/* the tie (from 480): a short dashed string from the card's edge to the slip: it's this Satchel's offer */
+.lp-offer__slip::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  display: none;
+  width: var(--tie, 0px);
+  border-top: 2px dashed var(--line-strong);
+}
+.lp-offer__exp {
+  display: none;
+}
+.lp-offer__amt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  padding: 3px 8px 4px;
+  border: 2px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-sunken);
+}
+.lp-offer__num {
+  color: var(--ink);
+  font: 800 20px/24px var(--font-display);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lp-offer__unit {
+  color: var(--ink-muted);
+  font: 600 13px/18px var(--font-sans);
+}
+.lp-offer__check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line-strong);
+  color: var(--success);
+  font: 700 13px/18px var(--font-sans);
+}
+.lp-offer__tick {
+  display: inline-flex;
+  flex: none;
+}
+.lp-offer__tick > svg {
+  width: 16px;
+  height: 16px;
+}
+@media (max-width: 359px) {
+  .lp-card.lp-offer__card {
+    width: 200px;
+  }
+  .lp-offer__slip {
+    width: 148px;
+    margin-left: -84px;
+  }
+}
+@media (min-width: 480px) {
+  .lp-offer {
+    --tie: 28px;
+    align-items: center;
+    gap: 28px;
+    padding-top: 0;
+  }
+  .lp-card.lp-offer__card {
+    width: 208px;
+  }
+  .lp-offer__slip {
+    width: 176px;
+    margin: 0;
+    padding: 12px 14px;
+    transform: rotate(2.5deg);
+  }
+  .lp-offer__slip::before,
+  .lp-offer__exp {
+    display: block;
+  }
+  .lp-offer__amt {
+    padding: 4px 10px 5px;
+  }
+  .lp-offer__num {
+    font-size: 24px;
+    line-height: 28px;
+  }
+}
+@media (min-width: 640px) {
+  .lp-offer {
+    --tie: 40px;
+    gap: 40px;
+  }
+  .lp-card.lp-offer__card {
+    width: 232px;
+  }
+  .lp-offer__slip {
+    width: 196px;
+  }
+}
+@media (min-width: 1024px) {
+  .lp-offer {
+    --tie: 48px;
+    gap: 48px;
+  }
+  .lp-card.lp-offer__card {
+    width: 268px;
+  }
+  .lp-offer__slip {
+    width: 208px;
+  }
+}
+
+/* 2 · Give by link: the claim-link slip and its "Claimed" sticker */
+.lp-claim__stack {
+  position: relative;
+}
+.lp-claim__slip {
+  width: 228px;
+  gap: 10px;
+  transform: rotate(-2deg);
+}
+.lp-claim__field {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin: 0;
+  padding: 7px 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-sunken);
+  white-space: nowrap;
+  font: 450 13px/18px var(--font-mono);
+}
+.lp-claim__path {
+  color: var(--ink);
+}
+.lp-claim__secret {
+  color: var(--ink-muted);
+}
+.lp-claim__copy {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 2px solid var(--line-strong);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 13px/1 var(--font-sans);
+}
+.lp-claim__copy > svg {
+  width: 14px;
+  height: 14px;
+}
+.lp-claim__done {
+  position: absolute;
+  right: -18px;
+  bottom: -12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 7px;
+  border: 2px solid var(--on-brand);
+  border-radius: 999px;
+  background: var(--lemon);
+  color: var(--on-brand);
+  white-space: nowrap;
+  box-shadow: 0 3px 0 var(--on-brand);
+  font: 700 12px/16px var(--font-sans);
+  transform: rotate(-5deg);
+}
+.lp-claim__done > svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* 3 · Let someone spend: someone (an icon), their daily cap as a meter, what's left today, Revoke */
+.lp-allow__slip {
+  width: 248px;
+  gap: 10px;
+}
+.lp-allow__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line-strong);
+}
+.lp-allow__who {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--on-brand);
+  border-radius: 50%;
+  background: var(--sky);
+  color: var(--on-brand);
+}
+.lp-allow__who > svg {
+  width: 15px;
+  height: 15px;
+}
+.lp-allow__caps {
+  color: var(--ink);
+  font: 700 13px/18px var(--font-sans);
+}
+.lp-allow__revoke {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 10px;
+  border: 2px solid var(--line-strong);
+  border-radius: 10px;
+  color: var(--ink);
+  font: 700 12px/1 var(--font-sans);
+}
+.lp-allow__revoke > svg {
+  width: 13px;
+  height: 13px;
+}
+.lp-allow__meter {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border: 2px solid var(--sticker-line);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+}
+.lp-allow__left {
+  width: 40%;
+  height: 100%;
+  border-right: 2px solid var(--sticker-line);
+  background: var(--charm-evm);
+  transform-origin: 0 50%;
+}
+.lp-allow__line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -2px 0 0;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  font: 600 12px/16px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+.lp-allow__line .lp-coin {
+  width: 16px;
+  height: 16px;
+}
+
+/* 4 · USDC and L2s: one address, ETH and USDC, on four networks (text chips, no third-party logos) */
+.lp-nets__slip {
+  width: 236px;
+  gap: 8px;
+}
+.lp-nets__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.lp-nets__coins {
+  display: flex;
+}
+.lp-nets__coins .lp-coin {
+  width: 26px;
+  height: 26px;
+}
+.lp-nets__coins .lp-coin + .lp-coin {
+  margin-left: -8px;
+}
+.lp-nets__words {
+  display: flex;
+  gap: 8px;
+  color: var(--ink);
+  font: 700 14px/18px var(--font-sans);
+}
+.lp-nets__meta {
+  margin-top: -4px !important;
+}
+.lp-nets__list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 2px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px dashed var(--line-strong);
+  list-style: none;
+}
+.lp-net {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px 9px 4px 7px;
+  border-radius: 999px;
+  background: var(--surface-sunken);
+  color: var(--ink);
+  white-space: nowrap;
+  font: 600 12px/16px var(--font-sans);
+}
+.lp-net::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--sticker-line);
+  border-radius: 50%;
+  background: var(--charm-evm);
+}
+
+/* 5 · Take it all out: the done screen as a slip, every coin sent, and a sparkle */
+.lp-out__slip {
+  width: 232px;
+}
+.lp-out__rows {
+  margin: 0;
+}
+.lp-out__row {
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+}
+.lp-out__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.lp-out__row .lp-coin {
+  width: 18px;
+  height: 18px;
+}
+.lp-out__row .lp-slip__state {
+  margin-left: auto;
+}
+.lp-out__stack {
+  position: relative;
+}
+.lp-out__spark {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+}
+.lp-out__spark > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }

@@ -74,7 +74,6 @@ test.describe("landing trust: server HTML", () => {
     expect([...at].sort((a, b) => a - b)).toEqual(at);
     expect(trust).toMatch(/<strong\b[^>]*>What you still trust:<\/strong>/);
     expect(hrefs(trust)).toEqual(["/contract"]);
-    expect(text).not.toContain(copy.role.rc); // final: no release-candidate line
   });
 
   test("the Contract facts slip is art: lemon, aria-hidden, every label an attribute; the band reads nothing live", async ({ request }) => {
@@ -134,7 +133,7 @@ test.describe("landing trust: server HTML", () => {
     expect(RULES[0].body).toContain("plain SOL transfers");
     expect(documentText(between(raw, "under-the-hood", "more"))).toContain(RULES[0].body);
     const chains = FAQ.find((i) => i.id === "q-chains")!.a;
-    expect(chains).toContain("SOL on Solana devnet");
+    expect(chains).toContain("SOL on Solana,");
     expect(documentText(between(raw, "questions", "try-it"))).toContain(chains);
   });
 });

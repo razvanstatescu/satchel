@@ -7,7 +7,7 @@ import { copy } from "@/lib/copy";
  * `rc`/`final` is set for a contract born without keys (H-15). `/contract` keeps the live proof (keys, birth
  * transaction, code hash), and the band links to it.
  * - `dev`: the dev twin ("Development contract" and its body), because the dev contract still has keys;
- * - `rc`: the main H2 and body, plus the release-candidate line;
+ * - `rc`: the same band as `final` (the role strip's release-candidate line is gone site-wide, D-52: rc reads like final).
  * - `final`: the main H2 and body.
  * No variant names an account, a Satchel or a time.
  */
@@ -19,12 +19,10 @@ export interface LockView {
   variant: "locked" | "dev";
   h2: string;
   body: string;
-  /** The one line under the body, or null: the release-candidate line on rc. */
-  note: string | null;
 }
 
 export function lockView(role: ContractRole): LockView {
   const L = copy.landing.lock;
-  if (role === "dev") return { variant: "dev", h2: L.dev.h2, body: L.dev.body, note: null };
-  return { variant: "locked", h2: L.h2, body: L.body, note: role === "rc" ? copy.role.rc : null };
+  if (role === "dev") return { variant: "dev", h2: L.dev.h2, body: L.dev.body };
+  return { variant: "locked", h2: L.h2, body: L.body };
 }

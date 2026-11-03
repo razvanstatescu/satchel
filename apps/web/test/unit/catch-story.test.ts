@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { CleanSection } from "@/components/landing/CleanSection";
 import { HowSection } from "@/components/landing/HowSection";
+import { MoreSection } from "@/components/landing/MoreSection";
 import { WhatSection } from "@/components/landing/WhatSection";
 import { FinaleSection } from "@/components/landing/FinaleSection";
 import { TrustSection } from "@/components/landing/TrustSection";
@@ -33,6 +34,7 @@ const page = [
   renderToStaticMarkup(createElement(HowSection)),
   renderToStaticMarkup(createElement(WhatSection)),
   renderToStaticMarkup(createElement(TrustSection, { role: "final" })),
+  renderToStaticMarkup(createElement(MoreSection)),
   renderToStaticMarkup(createElement(FinaleSection)),
 ].join("");
 
@@ -136,7 +138,7 @@ describe("the once-on-enter moments (motion/enter.ts)", () => {
   const defs = ENTER.map((d) => ({ d, tracks: mergeTracks(d.tracks<string>((k) => k)) }));
 
   it("the moments the spec lists, each with its trigger in the server HTML", () => {
-    expect(ENTER.map((d) => d.name)).toEqual(["what", "how-mint", "how-give", "beat-1", "beat-2", "beat-3", "beat-4", "beat-5", "trust", "finale"]);
+    expect(ENTER.map((d) => d.name)).toEqual(["what", "how-mint", "how-give", "beat-1", "beat-2", "beat-3", "beat-4", "beat-5", "trust", "offer", "finale"]);
     for (const { d } of defs) {
       const sel = d.trigger.match(/^\[data-([a-z]+)="([^"]+)"\]/)!;
       expect(page, d.name).toMatch(new RegExp(`data-${sel[1]}="${sel[2]}"`));

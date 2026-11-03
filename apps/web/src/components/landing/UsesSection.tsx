@@ -1,6 +1,8 @@
 import { Fragment } from "react";
 import { Gift, Tag, UsersRound, type LucideIcon } from "lucide-react";
+import { Lbl } from "@/components/landing/art";
 import { CONTAINER, FLOW, H2, HEAD, LEAD, SPLIT, sentences } from "@/components/landing/layout";
+import { CoinIcon } from "@/components/brand/CoinIcon";
 import { cx, Icon } from "@/components/ui";
 import { copy } from "@/lib/copy";
 
@@ -54,6 +56,14 @@ export function UsesSection() {
                 </span>
                 <h3 className="text-heading">{item.title}</h3>
                 <p className="text-ink-muted">{item.body}</p>
+                {i === 0 ? (
+                  <span className="lp-hint" aria-hidden="true">
+                    <span className="lp-coin">
+                      <CoinIcon coin="USDC" size={14} />
+                    </span>
+                    <Lbl l={u.hint} />
+                  </span>
+                ) : null}
               </li>
             );
           })}

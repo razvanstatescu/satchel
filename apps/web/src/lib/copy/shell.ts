@@ -1,5 +1,5 @@
 /**
- * Copy deck, shell namespaces (package H after F1): app, title, nav, connect, theme, role, footer, toast, home, mint,
+ * Copy deck, shell namespaces (package H after F1): app, title, nav, connect, theme, footer, toast, home, mint,
  * contract, errors, a11y. Merged into `copy` by src/lib/copy.ts; import from "@/lib/copy", never from here.
  * Rules (voice-copy.md §1): sentence case, verb first, one verb per action, no fiat, no glyphs typed into strings, a
  * no-break space before every ticker, straight apostrophes. `test/unit/config-copy-theme.test.ts` enforces them.
@@ -64,10 +64,6 @@ export const shell = {
     failed: (wallet: string) => `Couldn't connect to ${wallet}. Try again, or pick another wallet.`,
   },
   theme: { label: "Theme", system: "System", night: "Night", day: "Day" },
-  role: {
-    dev: "Dev contract: lock and code checks skipped",
-    rc: "Release candidate: testnet rehearsal",
-  },
   footer: {
     product: "Product",
     verify: "Verify",
@@ -91,7 +87,6 @@ export const shell = {
     h1: "Sell a wallet with everything inside. The buyer checks it first.",
     /** Also the site-wide meta description (app/layout.tsx), so search snippets say testnet. */
     lead: "Satchel is an NFT that is a wallet. Each one has its own Bitcoin, Ethereum and Solana addresses on testnet. Give it or sell it, and everything inside goes too.",
-    note: "Testnet only. Coins here have no value.",
     howTitle: "How it works",
     empty: {
       title: "You don't own a Satchel yet",

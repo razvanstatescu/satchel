@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowUpRight, Info, TriangleAlert } from "lucide-react";
+import { ArrowUpRight, Info } from "lucide-react";
 import { Charm, Lockup, MarkSmall } from "@/components/brand";
 import { Badge, Button, Icon, cx } from "@/components/ui";
 import { AccountBlock, AccountControl, LandingAccount } from "@/components/client/AccountControl";
@@ -13,7 +13,7 @@ import { RefreshAfterSend } from "@/components/client/RefreshAfterSend";
 import { RestoreHeadFlags } from "@/components/client/RestoreHeadFlags";
 import { ThemeControl } from "@/components/client/ThemeControl";
 import { copy } from "@/lib/copy";
-import { CONTRACT_ROLE, IS_FIXTURE, REPO_URL } from "@/lib/config";
+import { IS_FIXTURE, REPO_URL } from "@/lib/config";
 
 /**
  * The one shell of Satchel 2.0 (design-spec §3.3; app-screens §1.1; proto/shell.html). Server components; the
@@ -25,8 +25,8 @@ import { CONTRACT_ROLE, IS_FIXTURE, REPO_URL } from "@/lib/config";
  * - `SideNav` (from 1024, 256 px, sticky, full height): My Satchels · Market · Mint · Contract facts, then the account,
  *   the theme control and the testnet note.
  * - `MenuSheet` (client): one sheet on both surfaces.
- * - `Footer`: the brand column, Product, Verify, Hackathon, then the Testnet badge and `footer.testnet` (R8), plus the
- *   theme control on the landing.
+ * - `Footer`: the brand column, Product, Verify, Hackathon, then the Testnet badge and `footer.testnet` (R8) in the
+ *   app; the landing drops that row (badge-only framing, D-52) and right-aligns the theme control instead.
  * - One ThemeControl per surface: the side nav from 1024 and the menu sheet below it in the app; the footer (and the
  *   menu sheet) on the landing.
  * - `AppShell` composes the app (the `(app)` layout and the root not-found); the `(landing)` layout composes TopBar
@@ -154,22 +154,19 @@ export function SideNav() {
   );
 }
 
-/** The fixture ("Sample data") and role (dev / rc) strips. `contained` aligns their text with the landing's container. */
+/** The fixture ("Sample data") strip. `contained` aligns its text with the landing's container. The role strip (dev /
+ * rc) is gone on every page (D-52): the role still shows on /contract and in the buyer's Clean
+ * history checklist's dev line (`copy.clean.checks.dev`). */
 export function Strips({ contained = false }: { contained?: boolean }) {
-  const rows: { key: string; icon: typeof Info; text: string; tone: string }[] = [];
-  if (IS_FIXTURE) rows.push({ key: "fixture-strip", icon: Info, text: copy.app.fixture, tone: "text-ink-muted" });
-  if (CONTRACT_ROLE !== "final") rows.push({ key: "role-strip", icon: TriangleAlert, text: CONTRACT_ROLE === "dev" ? copy.role.dev : copy.role.rc, tone: "text-danger" });
-  if (!rows.length) return null;
+  if (!IS_FIXTURE) return null;
   return (
     <div className="bg-surface-sunken">
-      {rows.map((r) => (
-        <div key={r.key} className={GUTTER} data-testid={r.key}>
-          <p className={cx("m-0 flex items-center gap-2 py-2 font-sans text-caption text-ink-muted", contained && "mx-auto max-w-app")}>
-            <Icon icon={r.icon} size={16} className={r.tone} />
-            {r.text}
-          </p>
-        </div>
-      ))}
+      <div className={GUTTER} data-testid="fixture-strip">
+        <p className={cx("m-0 flex items-center gap-2 py-2 font-sans text-caption text-ink-muted", contained && "mx-auto max-w-app")}>
+          <Icon icon={Info} size={16} className="text-ink-muted" />
+          {copy.app.fixture}
+        </p>
+      </div>
     </div>
   );
 }
@@ -206,7 +203,8 @@ const FOOTER_LINK =
 
 /**
  * The one footer: the brand column (lockup, "An NFT that is a wallet."), Product, Verify and Hackathon (2 columns at
- * 390, 3 from 480, 4 from 1024), then the Testnet badge with `footer.testnet` (R8) and, on the landing, the theme control.
+ * 390, 3 from 480, 4 from 1024). The app footer's bottom row keeps the Testnet badge with `footer.testnet` (R8); the
+ * landing (badge-only framing, D-52) drops that row and right-aligns the theme control instead.
  */
 export function Footer({ surface }: { surface: "app" | "landing" }) {
   const landing = surface === "landing";
@@ -244,11 +242,13 @@ export function Footer({ surface }: { surface: "app" | "landing" }) {
           </nav>
         ))}
       </div>
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-        <p className="m-0 inline-flex flex-wrap items-center gap-2 font-sans text-body-sm font-semibold text-ink">
-          <Badge kind="testnet" aria-hidden="true" />
-          {copy.footer.testnet}
-        </p>
+      <div className={cx("mt-8 flex flex-wrap items-center gap-4 border-t border-line pt-5", landing ? "justify-end" : "justify-between")}>
+        {landing ? null : (
+          <p className="m-0 inline-flex flex-wrap items-center gap-2 font-sans text-body-sm font-semibold text-ink">
+            <Badge kind="testnet" aria-hidden="true" />
+            {copy.footer.testnet}
+          </p>
+        )}
         {landing ? <ThemeControl size="sm" /> : null}
       </div>
     </>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
-import { CONTAINER, FLOW, H2, HEAD_CENTER } from "@/components/landing/layout";
+import { CONTAINER, H2, HEAD_CENTER, SECTION_Y } from "@/components/landing/layout";
 import { Icon } from "@/components/ui";
 import { CONTRACT_ROLE } from "@/lib/config";
 import { copy, type SolVariant } from "@/lib/copy";
@@ -13,12 +13,13 @@ import type { ContractRole } from "@/lib/lock-facts";
  * anchor id, a summary in Funnel 18/24 (20/26 from 768) at least 64 px tall (72 from 768) and a plus that turns 45°.
  * Every answer is in the server HTML, its first sentence the bold lead. `q-proves` carries the landing's one disclosure
  * (D-42): the buyer's browser, not the contract, runs the check. The chains answer takes the same `SolVariant` as Under
- * the hood's rules; `role` adds the dev line to the custody answer.
+ * the hood's rules; `role` adds the dev line to the custody answer. Site polish round: it now follows `#more`'s own
+ * band, so it needs its own top padding (`SECTION_Y`, not `FLOW`'s shared gap).
  */
 export function QuestionsSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { role?: ContractRole; sol?: SolVariant }) {
   const items = faqItems({ role, sol });
   return (
-    <section id="questions" aria-labelledby="questions-title" className={FLOW}>
+    <section id="questions" aria-labelledby="questions-title" className={SECTION_Y}>
       <div className={CONTAINER}>
         <div className="mx-auto max-w-[51.25rem]">
           <div className={HEAD_CENTER}>

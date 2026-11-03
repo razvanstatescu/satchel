@@ -111,7 +111,7 @@ async function visibleWords(page: Page) {
     for (const id of ids) sections[id] = count(document.getElementById(id), (el) => !el.closest("#under-the-hood"));
     const heroCopy = document.querySelector("[data-hero-text]")!;
     return {
-      hero: count(heroCopy, (el) => !el.closest("[data-hero-note]")),
+      hero: count(heroCopy),
       captions: [...document.querySelectorAll("#top [data-step] .sr-only")].reduce((n, el) => n + words(el.textContent ?? ""), 0),
       hood: count(document.getElementById("under-the-hood")),
       aboveQuestions: count(document.querySelector("main"), above),
@@ -121,7 +121,7 @@ async function visibleWords(page: Page) {
 }
 
 test.describe("landing: server HTML", () => {
-  test("the who-line, one H1 (H1 C), the lead, both CTAs and the note, then the stage's description and its four captions; nothing streamed", async ({ request }) => {
+  test("the who-line, one H1 (H1 C), the lead, both CTAs, then the stage's description and its four captions; nothing streamed", async ({ request }) => {
     const res = await request.get("/");
     expect(res.status()).toBe(200);
     const raw = await res.text();
@@ -130,13 +130,14 @@ test.describe("landing: server HTML", () => {
 
     expect(headings(raw, 1)).toEqual([copy.home.h1]);
     const text = documentText(raw);
-    const at = [L.hero.who, copy.home.h1, L.hero.lead(true), L.hero.cta.primary, L.hero.cta.secondary, copy.home.note, L.hero.anim.alt.replace(/\u00a0/g, " "), ...L.hero.anim.captions].map((s) =>
+    const at = [L.hero.who, copy.home.h1, L.hero.lead(true), L.hero.cta.primary, L.hero.cta.secondary, L.hero.anim.alt.replace(/\u00a0/g, " "), ...L.hero.anim.captions].map((s) =>
       text.indexOf(s),
     );
     for (const [i, p] of at.entries()) expect(p, `hero string ${i}`).toBeGreaterThan(-1);
     expect([...at].sort((a, b) => a - b)).toEqual(at);
     // no word is split from its punctuation by React's text separator (a naive extractor would read "only ." or "record :")
     expect(noScripts(raw)).not.toMatch(/[\p{L}\p{N}]<!-- -->[.,:;!?]/u);
+    expect(noScripts(raw)).not.toContain("data-hero-note");
   });
 
   test("title, description, Open Graph, one theme-color (the Day ground) and no server data-theme", async ({ request }) => {
@@ -200,6 +201,13 @@ test.describe("landing: server HTML", () => {
     expect(raw).toMatch(/<div class="lp-stage__scene" data-scene="" aria-hidden="true">/);
     expect(raw).toMatch(/<div class="lp-what lg:order-first" aria-hidden="true" data-enter="what">/);
     expect(raw).toMatch(/<div class="lp-trust" data-scheme="day" aria-hidden="true"/);
+    // site polish round \u00a71: every bento tile's well is aria-hidden art with no text, and the Uses hint is a
+    // data-l attribute, never text
+    const wells = [...raw.matchAll(/<div class="lp-tile__art[^"]*" aria-hidden="true"[^>]*>[\s\S]*?<\/div>\s*<div class="lp-tile__text">/g)];
+    expect(wells.length).toBe(5);
+    for (const [well] of wells) expect(documentText(well.slice(0, well.indexOf('<div class="lp-tile__text">'))).trim()).toBe("");
+    expect(text).not.toContain(L.uses.hint);
+    expect(raw).toContain(`data-l="${attr(L.uses.hint)}"`);
   });
 });
 
@@ -226,6 +234,11 @@ test.describe("landing: without JavaScript", () => {
     await expect(page.locator("#clean [data-beat]")).toHaveCount(5);
     for (const b of L.clean.beats) await expect(page.getByText(b, { exact: true })).toBeVisible();
     for (const s of [L.uses.lead, ...L.uses.items.map((i) => i.body), L.cta.body]) await expect(page.getByText(s, { exact: true }).first(), s).toBeVisible();
+    // the bento: every title and line reads, and the offer slip (its once-on-enter moment) rests on its end frame
+    await expect(page.locator("#more h3")).toHaveCount(5);
+    for (const h of await page.locator("#more h3").all()) await expect(h).toBeVisible();
+    for (const b of await page.locator("#more .lp-tile__body").all()) await expect(b).toBeVisible();
+    expect(await page.locator('[data-k="offer-slip"]').evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
     await ctx.close();
   });
 });
@@ -343,7 +356,53 @@ test.describe("landing: layout", () => {
     expect(await style("#try-it h2", "color")).toBe("rgb(29, 19, 64)"); // ink on coral, always
     expect(await style(".lp-what .lp-card", "border-top-color")).toBe("rgb(138, 130, 174)"); // the Night sticker line
     expect(await style(".lp-what .lp-card", "background-color")).toBe("rgb(28, 21, 56)"); // the Night surface
+    // the bento's own band (--band, kb/81 R4): Night = surface-sunken, Day = a periwinkle tint; a tile is --surface,
+    // and a tile's slip outline is the Night sticker line
+    expect(await style("#more", "background-color")).toBe("rgb(41, 33, 75)");
+    expect(await style(".lp-tile", "background-color")).toBe("rgb(28, 21, 56)");
+    expect(await style(".lp-tile .lp-slip", "border-top-color")).toBe("rgb(138, 130, 174)");
     await ctx.close();
+  });
+
+  test("Day: the bento's band is a soft periwinkle, not lemon and not the page ground", async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await ctx.newPage();
+    await page.goto("/");
+    const style = (s: string, prop: string) => page.locator(s).first().evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), prop);
+    expect(await style("#more", "background-color")).toBe("rgb(227, 230, 246)");
+    await ctx.close();
+  });
+
+  test("P12: the lead tile's card and slip are never cropped, fully inside the well at every width", async ({ browser }) => {
+    const inside = (box: { x: number; y: number; width: number; height: number }, well: { x: number; y: number; width: number; height: number }, slack = 1) =>
+      box.x >= well.x - slack && box.y >= well.y - slack && box.x + box.width <= well.x + well.width + slack && box.y + box.height <= well.y + well.height + slack;
+
+    for (const w of [320, 360, 390, 430, 480, 600, 1024, 1280]) {
+      // reduced motion: the offer slip's once-on-enter moment never arms, so the page sits straight on its settled,
+      // static layout (the moment's own end frame equals the static CSS, motion-spec §10) — the geometry a reader
+      // sees once it's done, not a frame mid-flight
+      const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, reducedMotion: "reduce" });
+      const page = await ctx.newPage();
+      await page.goto("/");
+      const total = page.locator("#more .lp-offer .lp-card__total").first();
+      const [sw, cw] = await total.evaluate((el) => [el.scrollWidth, el.clientWidth]);
+      expect(sw, `#more .lp-offer .lp-card__total at ${w}`).toBeLessThanOrEqual(cw);
+      await expect(total, `#more .lp-offer .lp-card__total visible at ${w}`).toBeVisible();
+      // the pill stays on the same row as the total (never dropped to a second line)
+      const totalBox = await total.boundingBox();
+      const pillBox = await page.locator("#more .lp-offer .lp-card__state").first().boundingBox();
+      expect(totalBox && pillBox, `total/pill boxes at ${w}`).toBeTruthy();
+      if (totalBox && pillBox) expect(Math.abs(totalBox.y - pillBox.y)).toBeLessThan(totalBox.height);
+      // the card and the slip are fully inside the well's box: the fix for the real bug (a specificity collision let
+      // .lp-card's own width:100% override .lp-offer__card's intended width, blowing the card up past the well)
+      const well = await page.locator('#more .lp-tile[data-more="1"] .lp-tile__art').first().boundingBox();
+      const card = await page.locator("#more .lp-offer .lp-card").first().boundingBox();
+      const slip = await page.locator('[data-k="offer-slip"]').first().boundingBox();
+      expect(well && card && slip, `well/card/slip boxes at ${w}`).toBeTruthy();
+      if (well && card) expect(inside(card, well), `card inside well at ${w}: card=${JSON.stringify(card)} well=${JSON.stringify(well)}`).toBe(true);
+      if (well && slip) expect(inside(slip, well), `slip inside well at ${w}: slip=${JSON.stringify(slip)} well=${JSON.stringify(well)}`).toBe(true);
+      await ctx.close();
+    }
   });
 });
 
@@ -386,10 +445,10 @@ test.describe("landing: budgets", () => {
     }
   });
 
-  test("heights: ≤ 6,500 px at 1280 and ≤ 9,000 px at 390 (site-refresh design notes §1.4), #clean ≤ 900 px at 1280", async ({ page }) => {
+  test("heights: ≤ 7,000 px at 1280 and ≤ 10,100 px at 390 (site polish round P8), #clean ≤ 900 px at 1280", async ({ page }) => {
     for (const [w, h, max] of [
-      [1280, 900, 6_500],
-      [390, 844, 9_000],
+      [1280, 900, 7_000],
+      [390, 844, 10_100],
     ] as const) {
       await page.setViewportSize({ width: w, height: h });
       await page.goto("/");

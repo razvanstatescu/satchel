@@ -185,15 +185,15 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
       "Can the seller sign after I check?",
       "Which chains and coins work?",
       "What does it cost?",
-      "Why testnet only? Is it audited?",
+      "Is it audited?",
     ]);
     // D-42: the browser-not-contract disclosure lives in the collapsed q-proves
     expect(Q["q-proves"].a).toContain("Your browser, not the contract, checks each one on its own chain");
     expect(Q["q-after"].a).toMatch(/^No\. A Satchel that's for sale can't sign anything new/);
     expect(Q["q-cost"].a).toMatch(/Satchel charges no fee\.$/);
-    expect(L.cta.body).toBe("Look around without a wallet. To mint your own, connect a NEAR testnet wallet.");
+    expect(L.cta.body).toBe("Look around without a wallet. To mint your own, connect a NEAR wallet.");
     expect(L.meta.description(false)).toBe(
-      "An NFT on NEAR testnet with its own Bitcoin and Ethereum addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.",
+      "An NFT on NEAR with its own Bitcoin and Ethereum addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.",
     );
   });
 
@@ -202,9 +202,9 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     const Q = L.questions;
     const landing = allStrings([
       L.hero.who, L.hero.lead(false), L.hero.lead(true), L.hero.cta, L.hero.anim, L.desk, L.desk.sig(1), L.what.h2, L.what.body(false), L.what.body(true), L.what.tags,
-      L.uses.h2, L.uses.lead, L.uses.items, L.uses.tags, L.how.h2, L.how.steps(false), L.how.steps(true), L.clean.h2, L.clean.beats, L.clean.alt,
-      L.clean.stepsLabel, L.clean.labels, L.lock.h2, L.lock.body, L.lock.limits, L.lock.cta, L.lock.slip, L.lock.dev, L.hood.summary,
-      L.hood.links.one, L.hood.links.activity, Q["q-send"], Q["q-proves"], Q["q-after"], Q["q-cost"], L.cta, copy.home.h1,
+      L.uses.h2, L.uses.lead, L.uses.items, L.uses.tags, L.uses.hint, L.how.h2, L.how.steps(false), L.how.steps(true), L.clean.h2, L.clean.beats, L.clean.alt,
+      L.clean.stepsLabel, L.clean.labels, L.lock.h2, L.lock.body, L.lock.limits, L.lock.cta, L.lock.slip, L.lock.dev, L.lock.dev.code, L.hood.summary,
+      L.hood.links.one, L.hood.links.activity, Q["q-send"], Q["q-proves"], Q["q-after"], Q["q-cost"], L.cta, copy.home.h1, L.more.art,
     ]);
     expect(landing.length).toBeGreaterThan(70);
     for (const s of landing) {
@@ -241,17 +241,23 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
       trust: words(L.lock.h2, L.lock.body, L.lock.limits, L.lock.cta),
       hood: words(L.hood.h2, L.hood.summary),
       questions: words(Q.h2, ...(["q-send", "q-keys", "q-proves", "q-after", "q-chains", "q-cost", "q-testnet"] as const).map((id) => Q[id].q)),
-      tryIt: words(L.cta.h2, L.cta.body, L.hero.cta.primary, copy.mint.cta, copy.home.note),
+      tryIt: words(L.cta.h2, L.cta.body, L.hero.cta.primary, copy.mint.cta),
     };
     // the hero: the who-line (7, W4) + H1 C (11) + the lead (34) + the CTAs (8)
     // site-refresh F1 (facts §2): "or someone they let spend within daily caps" adds 6 words to What (41 → 47). The
-    // "What else it does" strip (site-refresh design notes §1, between Trust and Questions) adds 49: the H2 (4) + five items
-    // of 9 words each (a 3–4 word title, a 5–6 word line).
-    expect(sections).toEqual({ hero: 60, captions: 10, what: 47, uses: 50, how: 47, clean: 50, more: 49, trust: 49, hood: 12, questions: 39, tryIt: 34 });
+    // "What else it does" strip (site-refresh design notes §1, between Trust and Questions) adds 48 in mainnet
+    // framing (site polish round, D-52): the H2 (4) + five items of 8–9 words each.
+    expect(sections).toEqual({ hero: 60, captions: 10, what: 47, uses: 50, how: 47, clean: 50, more: 48, trust: 49, hood: 12, questions: 36, tryIt: 26 });
     expect([hero(true), words(L.what.h2, L.what.body(true)), words(L.how.h2, L.how.steps(true))]).toEqual([61, 48, 48]);
     const { hero: h, captions, what, uses, how, clean, more, trust, hood } = sections;
-    // cap 380 (site-refresh design notes §1.1, §1.5): 320 plus the who-line (W4), plus F1's 6 words, plus the strip's 49.
-    expect(h + captions + what + uses + how + clean + more + trust + hood, "everything above Questions").toBe(374);
+    // cap 380 (site-refresh design notes §1.1, §1.5): kept (R-e) even though the site polish round's edits leave the
+    // exact sum below it (373: the dev-role "Is it audited?" wording trims the closed Questions by 3 words).
+    expect(h + captions + what + uses + how + clean + more + trust + hood, "everything above Questions").toBe(373);
+  });
+  it("P5: the dev role's Trust band (37 → 26-word body) stays at the section's 50-word cap", () => {
+    const L = copy.landing;
+    const words = (...parts: unknown[]) => allStrings(parts).join(" ").split(/\s+/).filter(Boolean).length;
+    expect(words(L.lock.dev.h2, L.lock.dev.body, L.lock.limits, L.lock.cta)).toBeLessThanOrEqual(50);
   });
   it("uses the measured ETA thresholds and the honest timeout copy", () => {
     expect(copy.sign.mpc[0]).toBe("Usually about 10 seconds.");

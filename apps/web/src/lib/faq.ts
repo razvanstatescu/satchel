@@ -38,19 +38,33 @@ export interface FaqItem {
   a: string;
 }
 
-/** The seven questions with their variants applied: the chains answer by `sol`, the custody answer's dev line by role. */
-export function faqItems(opts: { role: "dev" | "rc" | "final"; sol: SolVariant }): FaqItem[] {
+/**
+ * The seven questions with their variants applied: the chains answer by `sol`, the custody answer's dev line by role,
+ * and the network-naming framing (P1): `"product"` (the landing, default) names Bitcoin, Solana and the four
+ * mainnet-named EVM networks; `"deployment"` (/questions, via `allFaqGroups`) reproduces today's testnet-named
+ * strings byte for byte, for every shared answer that names a network (`q-keys`, `q-proves`, `q-chains`, `q-testnet`).
+ */
+export function faqItems(opts: { role: "dev" | "rc" | "final"; sol: SolVariant; framing?: "product" | "deployment" }): FaqItem[] {
   const Q = copy.landing.questions;
+  const framing = opts.framing ?? "product";
   return FAQ_IDS.map((id): FaqItem => {
-    if (id === "q-chains") return { id, q: Q[id].q, a: Q[id].a(opts.sol) };
-    const a =
-      id === "q-keys" && opts.role === "dev"
-        ? `${Q[id].a} ${Q.keysDev}`
-        : // site-refresh F7, R2: dev2's contract has keys, so "can't be upgraded" is false there until rc/final.
-          id === "q-testnet" && opts.role === "dev"
-          ? Q[id].aDev
-          : Q[id].a;
-    return { id, q: Q[id].q, a };
+    if (id === "q-chains") return { id, q: Q[id].q, a: Q[id].a(opts.sol, framing) };
+    if (id === "q-testnet") {
+      const t = framing === "deployment" ? Q[id].deployment : Q[id];
+      // site-refresh F7, R2: dev2's contract has keys, so "can't be upgraded" is false there until rc/final.
+      const a = opts.role === "dev" ? t.aDev : t.a;
+      return { id, q: t.q, a };
+    }
+    if (id === "q-keys") {
+      const base = framing === "deployment" ? Q[id].aDeployment : Q[id].a;
+      const a = opts.role === "dev" ? `${base} ${Q.keysDev}` : base;
+      return { id, q: Q[id].q, a };
+    }
+    if (id === "q-proves") {
+      const a = framing === "deployment" ? Q[id].aDeployment : Q[id].a;
+      return { id, q: Q[id].q, a };
+    }
+    return { id, q: Q[id].q, a: Q[id].a };
   });
 }
 
@@ -128,9 +142,10 @@ export const FAQ_GROUPS: readonly FaqGroup[] = [
 ];
 
 /** Every question on /questions, grouped, with the landing's variants applied to the seven it shares with the
- * homepage. One `FaqItem[]` per group, in `FAQ_GROUPS` order. */
+ * homepage, in deployment framing (P1): /questions is an app page, and an Ethereum address is the same on mainnet,
+ * so it keeps today's testnet-named strings byte for byte. One `FaqItem[]` per group, in `FAQ_GROUPS` order. */
 export function allFaqGroups(opts: { role: "dev" | "rc" | "final"; sol: SolVariant }): { group: FaqGroup; items: FaqItem[] }[] {
-  const landingItems = new Map(faqItems(opts).map((it) => [it.id, it] as const));
+  const landingItems = new Map(faqItems({ ...opts, framing: "deployment" }).map((it) => [it.id, it] as const));
   const Q = copy.questions;
   return FAQ_GROUPS.map((group) => ({
     group,

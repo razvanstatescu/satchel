@@ -1,15 +1,15 @@
 import { Fragment } from "react";
-import { ArrowRight, Info } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ART, S_PATH } from "@/components/brand/art";
 import { CONTAINER, sentences } from "@/components/landing/layout";
-import { Button, Icon } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { copy } from "@/lib/copy";
 
 /**
- * The final call (`#try-it`, design-spec §4.9; 34 words): the page signs off on the brand cover itself. A full-bleed
+ * The final call (`#try-it`, design-spec §4.9; 26 words since D-52): the page signs off on the brand cover itself. A full-bleed
  * coral band (a Day island, constant in both themes) with the brand line "Stick it on. Hand it over." in ink at
- * clamp(48–104)/0.95, the body, **Look inside a Satchel** (the paper button: the primary on coral) and **Mint a Satchel**
- * (ghost on coral), and the testnet note. The charm S (never the tiled mark on coral) sits right from 1024 (330 px) and
+ * clamp(48–104)/0.95, the body and **Look inside a Satchel** (the paper button: the primary on coral) and **Mint a Satchel**
+ * (ghost on coral). The charm S (never the tiled mark on coral) sits right from 1024 (330 px) and
  * above the H2 on phones (132 px); once on enter its face stamps into its own drop. It never rotates.
  */
 export function FinaleSection() {
@@ -35,10 +35,6 @@ export function FinaleSection() {
               {copy.mint.cta}
             </Button>
           </div>
-          <p className="mt-5.5 inline-flex items-center gap-2 text-[0.875rem] leading-5 font-semibold">
-            <Icon icon={Info} size={16} />
-            {copy.home.note}
-          </p>
         </div>
         <FinaleS />
       </div>

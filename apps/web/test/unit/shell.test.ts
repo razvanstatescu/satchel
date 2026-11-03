@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { safeReturnPath } from "@/app/(app)/mint/safe-from";
 import { swingFrames } from "@/components/client/MintFlow";
 import { APP_NAV, navKeyFor, satchelIdOf } from "@/components/client/NavLinks";
-import { HACKATHON_URL, LANDING_ANCHORS } from "@/components/NavShell";
+import { HACKATHON_URL, LANDING_ANCHORS, Strips } from "@/components/NavShell";
 import { copy } from "@/lib/copy";
 
 /**
@@ -84,6 +86,15 @@ describe("the charms' swing (motion-spec §7)", () => {
     expect(times[2] - times[1]).toBe(420);
     expect(times[times.length - 1] - times[0]).toBeGreaterThan(2000);
     expect(times[times.length - 1] - times[0]).toBeLessThan(2500);
+  });
+});
+
+describe("the Strips (D-52: only the fixture strip stays; the role strip is gone on every page)", () => {
+  it("renders no role-strip, and (fixture mode) the fixture strip", () => {
+    const html = renderToStaticMarkup(createElement(Strips));
+    expect(html).not.toContain("role-strip");
+    expect(html).toContain('data-testid="fixture-strip"');
+    expect(html).toContain(copy.app.fixture.replace(/'/g, "&#x27;"));
   });
 });
 

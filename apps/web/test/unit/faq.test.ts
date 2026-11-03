@@ -15,8 +15,9 @@ const SRC = join(__dirname, "../../src");
 
 const VARIANTS: SolVariant[] = ["send", "off", "ui", "none"];
 const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
-const item = (id: FaqId, role: "dev" | "rc" | "final" = "final", sol: SolVariant = "send") => faqItems({ role, sol }).find((i) => i.id === id)!;
-const chains = (sol: SolVariant) => item("q-chains", "final", sol).a;
+const item = (id: FaqId, role: "dev" | "rc" | "final" = "final", sol: SolVariant = "send", framing: "product" | "deployment" = "product") =>
+  faqItems({ role, sol, framing }).find((i) => i.id === id)!;
+const chains = (sol: SolVariant, framing: "product" | "deployment" = "product") => item("q-chains", "final", sol, framing).a;
 const rules = (sol: SolVariant) => copy.landing.hood.rules(sol);
 
 describe("solVariant", () => {
@@ -45,7 +46,7 @@ describe("faqItems", () => {
       "Can the seller sign after I check?",
       "Which chains and coins work?",
       "What does it cost?",
-      "Why testnet only? Is it audited?",
+      "Is it audited?",
     ]);
     for (const i of items) {
       expect(typeof i.a).toBe("string");
@@ -68,7 +69,7 @@ describe("faqItems", () => {
     expect(item("q-keys", "dev").a).toBe(`${item("q-keys").a} ${copy.landing.questions.keysDev}`);
     expect(item("q-keys", "dev").a).toContain("development contract");
     expect(item("q-testnet", "dev").a).toBe(copy.landing.questions["q-testnet"].aDev);
-    expect(item("q-testnet", "dev").a).toContain("development contract behind this build can still be upgraded");
+    expect(item("q-testnet", "dev").a).toContain("development contract behind this site can still be upgraded");
     const others = (items: typeof dev) => items.filter((i) => i.id !== "q-keys" && i.id !== "q-testnet");
     expect(others(dev)).toEqual(others(fin));
     for (const role of ["rc", "final"] as const) {
@@ -76,14 +77,23 @@ describe("faqItems", () => {
     }
   });
 
-  it("answers the chains question per variant, always ending on the anything-else warning", () => {
+  it("answers the chains question per variant, in product (mainnet) framing, always ending on the anything-else warning", () => {
     expect(chains("send")).toBe(
+      "BTC on Bitcoin, plus ETH and USDC on Ethereum, Base, Arbitrum and Optimism. Each Satchel also has a Solana address; its owner can send SOL from the app, and clean history checks those signatures too. The app can't move anything else at its addresses.",
+    );
+    expect(chains("off")).toContain("Each Satchel also has a Solana address; the contract can sign SOL transfers, but the app can't send SOL yet.");
+    expect(chains("ui")).toMatch(/^BTC on Bitcoin, SOL on Solana, and ETH and USDC on Ethereum, Base, Arbitrum and Optimism\./);
+    expect(chains("none")).toContain("Each Satchel also has a Solana address, but this contract doesn't sign for Solana.");
+    for (const sol of VARIANTS) expect(chains(sol)).toMatch(/The app can't move anything else at its addresses\.$/);
+  });
+
+  it("the deployment framing (/questions, P1) reproduces today's testnet-named chains answer byte for byte", () => {
+    expect(chains("send", "deployment")).toBe(
       "BTC on Bitcoin testnet4, plus ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia. Each Satchel also has a Solana devnet address; its owner can send SOL from the app, and clean history checks those signatures too. The app can't move anything else at its addresses.",
     );
-    expect(chains("off")).toContain("Each Satchel also has a Solana devnet address; the contract can sign SOL transfers, but the app can't send SOL yet.");
-    expect(chains("ui")).toMatch(/^BTC on Bitcoin testnet4, SOL on Solana devnet, and ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia\./);
-    expect(chains("none")).toContain("Each Satchel also has a Solana devnet address, but this contract doesn't sign for Solana.");
-    for (const sol of VARIANTS) expect(chains(sol)).toMatch(/The app can't move anything else at its addresses\.$/);
+    expect(chains("off", "deployment")).toContain("Each Satchel also has a Solana devnet address; the contract can sign SOL transfers, but the app can't send SOL yet.");
+    expect(chains("ui", "deployment")).toMatch(/^BTC on Bitcoin testnet4, SOL on Solana devnet, and ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia\./);
+    expect(chains("none", "deployment")).toContain("Each Satchel also has a Solana devnet address, but this contract doesn't sign for Solana.");
   });
 
   it("never reads as 'no Solana': tokens are ruled out as a whole, and SOL works wherever the contract signs it (re-test issue 8)", () => {
@@ -91,10 +101,12 @@ describe("faqItems", () => {
     expect(chains("send")).toContain("its owner can send SOL from the app");
   });
 
-  it("the custody answer puts the full-access keys on the signer network's own account, never on Satchel's contract", () => {
-    const keys = item("q-keys").a;
+  it("the custody answer puts the full-access keys on the signer network's own account, never on Satchel's contract (deployment framing only, P1)", () => {
+    const keys = item("q-keys", "final", "send", "deployment").a;
     expect(keys).toContain("that network's own contract account has full-access keys");
     expect(keys).not.toMatch(/\bits contract account\b/);
+    // the landing (product framing) drops the testnet keys clause entirely
+    expect(item("q-keys").a).not.toContain("full-access keys");
   });
 });
 
@@ -109,7 +121,8 @@ describe("the disclosure and the answers (D-42; voice-copy §3.7)", () => {
       }
     }
     // honest scope: what the check doesn't cover (risky claims 2, 18)
-    expect(item("q-proves").a).toMatch(/It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or testnet4 reorgs\.$/);
+    expect(item("q-proves").a).toMatch(/It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or Bitcoin reorgs\.$/);
+    expect(item("q-proves", "final", "send", "deployment").a).toMatch(/NEAR's signer network or testnet4 reorgs\.$/);
   });
 
   it("q-send: a whole wallet in one transaction, neither side sending first; q-after: a purchase bound to what was checked", () => {
@@ -140,7 +153,7 @@ describe("one Solana story: Under the hood's rules agree with the chains answer"
       expect(rule1.includes("plain SOL transfers"), sol).toBe(signs);
       expect(rule1.includes("Solana messages"), sol).toBe(!signs); // `none` refuses them outright
       expect(chains(sol).includes("doesn't sign for Solana"), sol).toBe(!signs);
-      expect(chains(sol), sol).toContain("Solana devnet"); // the address exists in every variant
+      expect(chains(sol), sol).toContain("Solana"); // the address exists in every variant
       // the record and the check name the blockhash only when SOL can be signed
       expect(rules(sol)[1].body.includes("blockhash"), sol).toBe(signs);
       expect(rules(sol)[3].body.includes("blockhash"), sol).toBe(signs);
@@ -205,9 +218,9 @@ describe("splitLead", () => {
       "No single party.",
       "Every signature the Satchel has ever made.",
       "No.",
-      "BTC on Bitcoin testnet4, plus ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia.",
+      "BTC on Bitcoin, plus ETH and USDC on Ethereum, Base, Arbitrum and Optimism.",
       "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded.",
-      "Satchel is new, unaudited hackathon software.",
+      "No.",
     ]);
   });
 });
@@ -220,9 +233,12 @@ describe("/questions (allFaqGroups)", () => {
     expect(new Set(ids).size).toBe(ids.length);
     expect([...ids].sort()).toEqual([...FAQ_IDS, ...EXTRA_FAQ_IDS].sort());
   });
-  it("shares the homepage's seven word for word", () => {
-    const home = new Map(faqItems({ role: "final", sol: LANDING_SOL }).map((i) => [i.id, i]));
+  it("shares the homepage's seven word for word, in deployment framing (P1): /questions keeps today's testnet-named text", () => {
+    const home = new Map(faqItems({ role: "final", sol: LANDING_SOL, framing: "deployment" }).map((i) => [i.id, i]));
     for (const g of groups) for (const it of g.items) if (home.has(it.id as FaqId)) expect(it).toEqual(home.get(it.id as FaqId));
+  });
+  it("keeps the group title 'Testnet and safety' (P1: /questions doesn't change)", () => {
+    expect(groups.find((g) => g.group.id === "testnet")?.group.title).toBe("Testnet and safety");
   });
   it("gives every group a unique id, a title and at least one question", () => {
     expect(new Set(groups.map((g) => g.group.id)).size).toBe(groups.length);

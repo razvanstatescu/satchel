@@ -48,14 +48,10 @@ describe("TrustSection", () => {
     expect(html).toContain(`<strong class="font-bold">What you still trust:</strong> ${esc(L.limits.slice("What you still trust: ".length))}`);
     expect(hrefs(head(html))).toEqual(["/contract"]);
     expect(html).not.toContain('data-testid="lock-note"');
-    expect(text(html)).not.toContain(copy.role.rc);
   });
 
-  it("rc adds the release-candidate line between the lead and the limits", () => {
-    const html = trust("rc");
-    expect(html).toContain('data-lock-variant="locked"');
-    expect(html).toContain('data-testid="lock-note"');
-    inOrder(text(html), [L.h2, L.body, copy.role.rc, L.limits, L.cta]);
+  it("rc renders exactly the final band (the role strip's release-candidate line is gone site-wide, P2)", () => {
+    expect(trust("rc")).toBe(trust("final"));
   });
 
   it("dev: the dev twin, never 'No admin key', and no Contract facts art (that contract has keys)", () => {
@@ -66,6 +62,42 @@ describe("TrustSection", () => {
     expect(text(html)).not.toContain(L.body);
     expect(html).not.toContain("data-trust-art");
     expect(labels(html)).not.toContain(L.slip.verdict);
+  });
+
+  it("dev: a simplified sign_for code card (site polish round §2), aria-hidden, labelled Simplified", () => {
+    const html = trust("dev");
+    const art = /<div class="lp-codefield" data-code="">[\s\S]*$/.exec(html)?.[0] ?? "";
+    expect(art).not.toBe("");
+    expect(art).toContain('<div class="lp-slip lp-code" aria-hidden="true">');
+    expect(text(art)).toBe(""); // every line, caption and the file/tag chip is attribute-drawn
+    const c = L.dev.code;
+    expect(labels(art)).toContain(c.file);
+    expect(labels(art)).toContain(c.tag);
+    expect(c.tag).toBe("Simplified");
+    for (const cap of c.caps) expect(labels(art)).toContain(cap);
+    // none of the final slip's values, and none of the banned plumbing words
+    for (const v of Object.values(L.slip)) if (typeof v === "string") expect(labels(art)).not.toContain(v);
+    expect(labels(art).join(" ")).not.toMatch(/\bdelegate\b|\bMPC\b|\bapproval\b|\btrustless\b|\.testnet\b|0x[0-9a-f]{4,}/i);
+    // every line, its tokens joined, stays within the 320 px card's slack (≤ 34 characters)
+    for (const line of c.lines) {
+      const joined = line.map(([, s]) => s).join("");
+      expect(joined.length, joined).toBeLessThanOrEqual(34);
+    }
+    // exactly one Pause button, outside the aria-hidden card, named and toggled like the hero's
+    const buttons = art.match(/<button\b[^>]*>/g) ?? [];
+    expect(buttons).toHaveLength(1);
+    const pauseBtn = buttons[0]!;
+    expect(pauseBtn).toContain(`aria-label="${esc(copy.landing.hero.anim.pause)}"`);
+    expect(pauseBtn).toContain('aria-pressed="false"');
+    expect(art.indexOf("lp-slip lp-code")).toBeLessThan(art.indexOf(pauseBtn));
+  });
+
+  it("rc and final keep Contract facts (never the code card) and show no dev-only labels", () => {
+    for (const role of ["rc", "final"] as const) {
+      const html = trust(role);
+      expect(html).not.toContain("data-code");
+      expect(html).not.toContain("lp-codefield");
+    }
   });
 
   it("rc and final show the Contract facts slip: a lemon Day island, aria-hidden, every label an attribute", () => {

@@ -35,6 +35,18 @@ const ART_LABELS = [
   L.lock.slip.verdict,
   L.lock.slip.keysValue,
   L.what.tags.btc,
+  // site polish round §1.5/§3: the bento tiles' and the Uses hint's attribute-drawn art labels
+  copy.offers.amount,
+  `${copy.offers.expiry} ${copy.offers.expiry7}`,
+  copy.giveLink.linkLabel,
+  copy.giveLink.copy,
+  copy.claim.claimedTitle,
+  copy.allowance.manage.title,
+  copy.allowance.capRow("ETH", "0.20", "0.50"),
+  L.more.art.sameAddress,
+  copy.empty.allDoneTitle,
+  copy.empty.chainDone("Bitcoin"),
+  L.uses.hint,
 ];
 
 const decode = (s: string) =>

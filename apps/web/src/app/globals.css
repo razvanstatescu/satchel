@@ -50,6 +50,9 @@
   --overlay-shade: light-dark(rgb(29 19 64 / 0.18), rgb(0 0 0 / 0.55));
   --scrim: light-dark(rgb(29 19 64 / 0.4), rgb(0 0 0 / 0.4));
   --overlay-edge: light-dark(transparent, #352c5c); /* 1 px edge on Night overlays */
+  --band: light-dark(#e3e6f6, #29214b); /* site polish round: #more's own band. Day = --charm-evm (#a3abe0) at 30% on
+    white, a soft periwinkle (not lemon: locked; not coral: the finale). Night = --surface-sunken (separates better
+    from the Night ground than a tint). kb/81 R4 has the row and its contrast */
   /* illustration fills: the chain charms' own colours, fixed in both themes (§6) */
   --charm-btc: #f7931a;
   --charm-evm: #a3abe0;

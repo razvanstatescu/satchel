@@ -308,8 +308,8 @@ test("mobile landing: the 390 budget, the hero order and the phone layout", asyn
   }
 
   expect(clean, "#clean at 390 (≤ 1,800 px)").toBeLessThanOrEqual(1_800);
-  // site-refresh design notes §1.4: the "What else it does" strip raises the 390 cap from 8,500 to 9,000.
-  expect(height, "page height at 390 (≤ 9,000 px)").toBeLessThanOrEqual(9_000);
+  // site polish round P8: the bento band and the P12 lead-tile fix raise the 390 cap from 9,000 to 10,100.
+  expect(height, "page height at 390 (≤ 10,100 px)").toBeLessThanOrEqual(10_100);
 });
 
 /**
