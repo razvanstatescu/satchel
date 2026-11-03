@@ -60,7 +60,8 @@ function Contents({ ov, status }: { ov: Overview; status: CardStatus }) {
   const legend = ov.coins.slice(0, 3);
   return (
     <>
-      <div className="flex min-w-0 items-start justify-between gap-2">
+      {/* the pill sits beside the total: top-aligned when "at mainnet prices" adds a second line, centred otherwise */}
+      <div className={cx("flex min-w-0 justify-between gap-2", priced && IS_TESTNET && ov.coins.length ? "items-start" : "items-center")}>
         <div className="flex min-w-0 flex-col">
           {!ov.coins.length ? (
             <p data-overview-total="empty" className="m-0 font-display text-[1.25rem] leading-6 font-extrabold tracking-[-0.02em] text-ink-muted @min-[352px]/card:text-[1.625rem] @min-[352px]/card:leading-8 @max-[250px]/card:text-[1rem] @max-[250px]/card:leading-5">
