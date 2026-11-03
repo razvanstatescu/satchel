@@ -120,7 +120,9 @@ export const multichain = {
     addInside: (coin: string, id: string) => `Add ${coin} inside Satchel #${id}`,
     inside: "Inside on NEAR testnet",
     insideBody: (coin: string) => `${coin} goes inside the Satchel through its contract on NEAR testnet. Connect a NEAR wallet to add it.`,
-    whose: (id: string) => `Satchel #${id} is an NFT on NEAR testnet with its own addresses. Coins sent here belong to it, and only its owner can send them out.`,
+    // C5; C46:129-147: true for inside coins too, where only the owner can take them out. Same words as `coins.addressesNote`.
+    whose: (id: string) =>
+      `Satchel #${id} is an NFT on NEAR testnet with its own addresses. Coins sent here belong to it, and whoever owns it controls them.`,
     see: (id: string) => `See Satchel #${id}`,
     share: "Share link",
     shareAria: (id: string) => `Share link to add coins to Satchel #${id}`,
@@ -162,7 +164,7 @@ export const multichain = {
     sheetTitle: (ticker: string, network: string) => `${ticker} on ${network}`,
     on: (network: string) => `on ${network}`,
     insideNote: "Held for this Satchel by its contract on NEAR testnet. It goes with the Satchel when it's given or sold.",
-    chainNote: (network: string) => `At this Satchel's own address on ${network}. Only its owner can send it.`,
+    chainNote: (network: string) => `At this Satchel's own address on ${network}. Only its owner, or someone they let spend within daily caps, can send it.`,
     address: "Address",
     addresses: "Addresses",
     addressesNote: "Coins sent to these addresses belong to this Satchel. Whoever owns it controls them.",
@@ -254,6 +256,12 @@ export const multichain = {
     doneBtn: "Done",
     viewHistory: "See it in Activity",
     paused: "Signing is paused while it's for sale.",
+    /** Message signing is owner-only (C5:147): its own guard body, never shared with Send's "someone they let
+     * spend" wording. */
+    guard: {
+      connectBody: (id: string) => `Only the owner of Satchel #${id} can sign messages with it.`,
+      notOwnerBody: (account: string, owner: string) => `You're connected as ${account}. Only ${owner} can sign messages with it.`,
+    },
   },
   /** Activity and the clean-history record. */
   record: {

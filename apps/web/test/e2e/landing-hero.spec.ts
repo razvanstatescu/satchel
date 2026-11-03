@@ -254,14 +254,18 @@ test.describe("hero loop: full motion", () => {
         const cut = await page.evaluate(() => {
           const out: string[] = [];
           const shown = (el: Element) => getComputedStyle(el).opacity !== "0" && !el.closest("[data-off]");
-          // the card's words stay inside the card (at rest: before and after the hand-off)
+          // the card's words stay inside the card, on all four sides (at rest: before and after the hand-off)
           const card = document.querySelector("[data-stage] .lp-card")!.getBoundingClientRect();
           for (const el of document.querySelectorAll("[data-stage] .lp-card .lp-l, [data-stage] .lp-card .lp-pill")) {
             const r = el.getBoundingClientRect();
-            if (shown(el) && r.right > card.right + 1) out.push(`${el.getAttribute("data-l") ?? el.className} leaves the card by ${Math.round(r.right - card.right)} px`);
+            if (!shown(el)) continue;
+            if (r.right > card.right + 1) out.push(`${el.getAttribute("data-l") ?? el.className} leaves the card by ${Math.round(r.right - card.right)} px`);
+            if (r.bottom > card.bottom + 1) out.push(`${el.getAttribute("data-l") ?? el.className} leaves the card's bottom by ${Math.round(r.bottom - card.bottom)} px`);
           }
           const name = document.querySelector<HTMLElement>("[data-stage] .lp-card__name")!;
           if (name.scrollWidth > name.clientWidth + 1) out.push("the card's name is cut");
+          const total = document.querySelector<HTMLElement>("[data-stage] .lp-card__total")!;
+          if (total.scrollWidth > total.clientWidth + 1) out.push("the estimate is cut");
           // the caption on show fits its ticker (one line from 360; two below)
           const ticker = document.querySelector<HTMLElement>("[data-stage] .lp-stage__ticker")!;
           for (const cap of ticker.children) if (getComputedStyle(cap).opacity === "1" && cap.scrollWidth > ticker.clientWidth + 1) out.push(`caption ${cap.getAttribute("data-cap")} is cut`);

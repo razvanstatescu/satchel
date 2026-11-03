@@ -67,21 +67,23 @@ describe("faqItems", () => {
     const fin = faqItems({ role: "final", sol: "send" });
     expect(item("q-keys", "dev").a).toBe(`${item("q-keys").a} ${copy.landing.questions.keysDev}`);
     expect(item("q-keys", "dev").a).toContain("development contract");
-    const others = (items: typeof dev) => items.filter((i) => i.id !== "q-keys");
+    expect(item("q-testnet", "dev").a).toBe(copy.landing.questions["q-testnet"].aDev);
+    expect(item("q-testnet", "dev").a).toContain("development contract behind this build can still be upgraded");
+    const others = (items: typeof dev) => items.filter((i) => i.id !== "q-keys" && i.id !== "q-testnet");
     expect(others(dev)).toEqual(others(fin));
     for (const role of ["rc", "final"] as const) {
       expect(faqItems({ role, sol: "send" }).map((i) => i.a).join(" ")).not.toContain("development contract");
     }
   });
 
-  it("answers the chains question per variant, always ending on the Sepolia warning", () => {
+  it("answers the chains question per variant, always ending on the anything-else warning", () => {
     expect(chains("send")).toBe(
-      "Native coins only, no tokens: Bitcoin testnet4 and Ethereum Sepolia. Each Satchel also has a Solana devnet address; its owner can send SOL from the app, and clean history checks those signatures too. Send only Sepolia ETH to the Ethereum address: coins sent on another network can't be moved.",
+      "BTC on Bitcoin testnet4, plus ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia. Each Satchel also has a Solana devnet address; its owner can send SOL from the app, and clean history checks those signatures too. The app can't move anything else at its addresses.",
     );
     expect(chains("off")).toContain("Each Satchel also has a Solana devnet address; the contract can sign SOL transfers, but the app can't send SOL yet.");
-    expect(chains("ui")).toMatch(/^Native coins only, no tokens: Bitcoin testnet4, Ethereum Sepolia and Solana devnet\. Send only/);
+    expect(chains("ui")).toMatch(/^BTC on Bitcoin testnet4, SOL on Solana devnet, and ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia\./);
     expect(chains("none")).toContain("Each Satchel also has a Solana devnet address, but this contract doesn't sign for Solana.");
-    for (const sol of VARIANTS) expect(chains(sol)).toMatch(/Send only Sepolia ETH to the Ethereum address: coins sent on another network can't be moved\.$/);
+    for (const sol of VARIANTS) expect(chains(sol)).toMatch(/The app can't move anything else at its addresses\.$/);
   });
 
   it("never reads as 'no Solana': tokens are ruled out as a whole, and SOL works wherever the contract signs it (re-test issue 8)", () => {
@@ -107,7 +109,7 @@ describe("the disclosure and the answers (D-42; voice-copy §3.7)", () => {
       }
     }
     // honest scope: what the check doesn't cover (risky claims 2, 18)
-    expect(item("q-proves").a).toMatch(/It doesn't cover other tokens, signatures made after you buy, NEAR's signer network or testnet4 reorgs\.$/);
+    expect(item("q-proves").a).toMatch(/It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or testnet4 reorgs\.$/);
   });
 
   it("q-send: a whole wallet in one transaction, neither side sending first; q-after: a purchase bound to what was checked", () => {
@@ -160,7 +162,7 @@ describe("one Solana story: Under the hood's rules agree with the chains answer"
 
   it("names the six rules in order", () => {
     expect(rules("send").map((r) => r.title)).toEqual([
-      "Plain transfers only",
+      "Readable requests only",
       "Recorded before it's signed",
       "Listing pauses signing",
       "The buyer's browser checks every record",
@@ -203,7 +205,7 @@ describe("splitLead", () => {
       "No single party.",
       "Every signature the Satchel has ever made.",
       "No.",
-      "Native coins only, no tokens: Bitcoin testnet4 and Ethereum Sepolia.",
+      "BTC on Bitcoin testnet4, plus ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia.",
       "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded.",
       "Satchel is new, unaudited hackathon software.",
     ]);

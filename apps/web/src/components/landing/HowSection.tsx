@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
 import { CircleCheck, CircleDashed, LoaderCircle } from "lucide-react";
 import { Sparkle } from "@/components/brand";
-import { ArtBadge, ArtCard, ArtIcon, CoinRow, Initial, Lbl } from "@/components/landing/art";
+import { ArtBadge, ArtCard, ArtEmpty, ArtIcon, ArtOverview, Initial, Lbl } from "@/components/landing/art";
 import { CONTAINER, FLOW, H2, HEAD_CENTER } from "@/components/landing/layout";
 import { cx } from "@/components/ui";
 import { LANDING_NAMES_SOL } from "@/lib/faq";
-import { copy, TICKER } from "@/lib/copy";
-import { NBSP } from "@/lib/format";
+import { copy } from "@/lib/copy";
 
 /**
  * How it works (`#how`, design-spec §4.5; 47 words, 48 with Solana): the three verbs, "Stick it on. Hand it over." in
@@ -68,7 +67,6 @@ function Scene({ tone, children }: { tone: "lemon" | "sunken" | "sky"; children:
 }
 
 function MintScene() {
-  const zero = (t: string) => `0${NBSP}${t}`;
   return (
     <Scene tone="lemon">
       <span className="lp-spark lp-spark--a" data-k="mint-spark-1">
@@ -78,8 +76,7 @@ function MintScene() {
         <Sparkle size={16} />
       </span>
       <ArtCard name={copy.card.preview} badge={<ArtBadge kind="new" l={copy.card.new} data-k="mint-new" />} className="lp-how-card" data-k="mint-card">
-        <CoinRow chain="btc" value={zero(TICKER.btc)} zero />
-        <CoinRow chain="evm" value={zero(TICKER.evm)} zero />
+        <ArtEmpty />
       </ArtCard>
     </Scene>
   );
@@ -117,9 +114,8 @@ function GiveScene() {
       <div className="-mt-1.5 flex flex-col items-center gap-3.5">
         <div className="lp-pin">
           <div className="lp-pose" data-k="give-pose">
-            <ArtCard name={d.name} className="lp-card--sm">
-              <CoinRow chain="btc" value={d.btc} />
-              <CoinRow chain="evm" value={d.eth} />
+            <ArtCard name={d.name}>
+              <ArtOverview mix={d.mix} usd={d.usd} />
             </ArtCard>
           </div>
         </div>

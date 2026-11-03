@@ -43,7 +43,13 @@ export function faqItems(opts: { role: "dev" | "rc" | "final"; sol: SolVariant }
   const Q = copy.landing.questions;
   return FAQ_IDS.map((id): FaqItem => {
     if (id === "q-chains") return { id, q: Q[id].q, a: Q[id].a(opts.sol) };
-    const a = id === "q-keys" && opts.role === "dev" ? `${Q[id].a} ${Q.keysDev}` : Q[id].a;
+    const a =
+      id === "q-keys" && opts.role === "dev"
+        ? `${Q[id].a} ${Q.keysDev}`
+        : // site-refresh F7, R2: dev2's contract has keys, so "can't be upgraded" is false there until rc/final.
+          id === "q-testnet" && opts.role === "dev"
+          ? Q[id].aDev
+          : Q[id].a;
     return { id, q: Q[id].q, a };
   });
 }

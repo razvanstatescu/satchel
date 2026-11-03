@@ -185,7 +185,7 @@ export const commerce = {
     checksAgain: "It checks again every 10 s.",
     justNow: "just now",
     verdict: {
-      checking: (count: number) => [count ? `Checking ${n(count, "past signature", "past signatures")}…` : "Checking its history…", "Reading Bitcoin testnet4 and Ethereum Sepolia from your browser."],
+      checking: (count: number) => [count ? `Checking ${n(count, "past signature", "past signatures")}…` : "Checking its history…", "Reading Bitcoin, Ethereum and Solana from your browser."],
       empty: ["This Satchel has never signed anything.", "No signature from a previous owner can move these coins."],
       clean: (sub: string) => ["Clean. No past signature can move these coins.", sub],
       settling: (count: number, sub: string) => [`${n(count, "signature is", "signatures are")} still confirming.`, sub],

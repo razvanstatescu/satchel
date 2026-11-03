@@ -115,3 +115,19 @@ export function parseUnits(input: string, decimals: number): bigint | null {
   if (f.length > decimals) return null;
   return BigInt(w || "0") * 10n ** BigInt(decimals) + BigInt((f || "").padEnd(decimals, "0") || "0");
 }
+
+const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** "$1,148.72"; "< $0.01" for dust above zero; "$0.00" for nothing (kb/80 §Fiat: 2 decimals, US dollars). Pure, so the
+ * landing's simulated sample can format a dollar figure without importing `lib/overview` → `lib/holdings` →
+ * `@/lib/near/contract` (landing-no-data only scans direct imports). Re-exported from `lib/overview.ts`. */
+export function usdText(v: number): string {
+  if (v > 0 && v < 0.01) return "< $0.01";
+  return USD.format(v);
+}
+
+/** "41%"; "< 1%" for a sliver; for the legend beside the value bar. */
+export function shareText(share: number): string {
+  if (share > 0 && share < 0.01) return "< 1%";
+  return `${Math.round(share * 100)}%`;
+}

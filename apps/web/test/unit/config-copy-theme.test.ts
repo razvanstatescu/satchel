@@ -121,7 +121,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     expect(L.hero.who).toBe("For anyone selling or gifting a wallet");
     expect(L.hero.anim.captions).toEqual(["Coins inside", "Seller lists it", "Buyer checks first", "Coins included"]);
     expect(L.hero.anim.alt).toBe(
-      `Illustration: a Satchel holds 0.05${NBSP}BTC and 0.80${NBSP}ETH. Its seller lists it for 300${NBSP}NEAR, and signing pauses. The buyer's browser checks its 3 past signatures: none can move the coins, so Buy turns on. One transaction moves the Satchel to the buyer and pays the seller, and the coins go with it.`,
+      `Illustration: a Satchel holds BTC, ETH, SOL and USDC. Its seller lists it for 2,000${NBSP}NEAR, and signing pauses. The buyer's browser checks its 3 past signatures: none can move the coins, so Buy turns on. One transaction moves the Satchel to the buyer and pays the seller, and the coins go with it.`,
     );
     // the toggle has one name (WCAG 2.2.2) plus aria-pressed; no "Play animation" twin
     expect(L.hero.anim).toMatchObject({ pause: "Pause animation", checking: "Checking 3 signatures…", paid: "Seller is paid" });
@@ -135,7 +135,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
       btc: `0.05${NBSP}BTC`,
       eth: `0.80${NBSP}ETH`,
       eth0: `0.00${NBSP}ETH`,
-      price: `300${NBSP}NEAR`,
+      price: `2,000${NBSP}NEAR`,
       checking: "Checking…",
       settled: "Used",
       unused: "Unused",
@@ -150,13 +150,13 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     const L = copy.landing;
     expect(L.what.h2).toBe("One NFT. Its own addresses.");
     expect(L.what.body(false)).toBe(
-      "Each Satchel has its own Bitcoin and Ethereum addresses, on their own chains: no bridge, no wrapped tokens. Only the NFT's owner can send the coins, and when it changes hands, everything inside goes with it.",
+      "Each Satchel has its own Bitcoin and Ethereum addresses, on their own chains: no bridge, no wrapped tokens. Only its owner, or someone they let spend within daily caps, can send the coins. When it changes hands, everything inside goes with it.",
     );
     expect(L.what.body(true)).toContain("its own Bitcoin, Ethereum and Solana addresses");
     expect(L.uses.lead).toBe("One NFT, one step.");
     expect(L.uses.items).toEqual([
       { title: "Sell BTC, ETH and SOL together", body: "One trade, in NEAR. Neither side sends first." },
-      { title: "Give a funded wallet", body: "To a friend's account. Gifts skip the buyer's check." }, // risky claim 13
+      { title: "Give a funded wallet", body: "To a friend. Gifts don't wait for the check." }, // site-refresh facts §1.5: no check gates a gift
       { title: "Hand over a project wallet", body: "Same addresses. Payments keep coming." },
     ]);
     expect(L.how.h2).toBe("Mint it. Add coins. Hand it over.");
@@ -175,7 +175,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     expect(L.clean.labels.slipWhat).toBe(`Send ${L.desk.eth}`); // the slip sends exactly the ETH the desk holds
     expect(L.lock.body).toBe("Satchel's contract was born without a key and can't be upgraded. Nobody can add one or change its code, us included.");
     expect(L.hood.rules("off")[2].body).toBe(
-      "A Satchel can be listed only after 250 blocks (about 2 min 20 s) without signing. While it's for sale, it can't sign, and only a purchase can move it.",
+      "A Satchel can be listed only after 250 blocks (about 2 min 20 s) without signing. While it's for sale, it can't sign, and only a purchase or an accepted offer can move it.",
     );
     const Q = L.questions;
     expect([Q["q-send"].q, Q["q-keys"].q, Q["q-proves"].q, Q["q-after"].q, Q["q-chains"].q, Q["q-cost"].q, Q["q-testnet"].q]).toEqual([
@@ -190,7 +190,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     // D-42: the browser-not-contract disclosure lives in the collapsed q-proves
     expect(Q["q-proves"].a).toContain("Your browser, not the contract, checks each one on its own chain");
     expect(Q["q-after"].a).toMatch(/^No\. A Satchel that's for sale can't sign anything new/);
-    expect(Q["q-cost"].a).toMatch(/Giving one away costs only NEAR gas, and Satchel charges no fee on sales\.$/);
+    expect(Q["q-cost"].a).toMatch(/Satchel charges no fee\.$/);
     expect(L.cta.body).toBe("Look around without a wallet. To mint your own, connect a NEAR testnet wallet.");
     expect(L.meta.description(false)).toBe(
       "An NFT on NEAR testnet with its own Bitcoin and Ethereum addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.",
@@ -233,18 +233,25 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
       uses: words(L.uses.h2, L.uses.lead, L.uses.items),
       how: words(L.how.h2, L.how.steps(false)),
       clean: words(L.clean.h2, L.clean.beats),
+      // `help` is attribute-drawn (an aria-label, site-refresh copy §3): only the title and body are visible words.
+      more: words(
+        L.more.h2,
+        L.more.items.map((it) => ({ title: it.title, body: it.body })),
+      ),
       trust: words(L.lock.h2, L.lock.body, L.lock.limits, L.lock.cta),
       hood: words(L.hood.h2, L.hood.summary),
       questions: words(Q.h2, ...(["q-send", "q-keys", "q-proves", "q-after", "q-chains", "q-cost", "q-testnet"] as const).map((id) => Q[id].q)),
       tryIt: words(L.cta.h2, L.cta.body, L.hero.cta.primary, copy.mint.cta, copy.home.note),
     };
     // the hero: the who-line (7, W4) + H1 C (11) + the lead (34) + the CTAs (8)
-    expect(sections).toEqual({ hero: 60, captions: 10, what: 41, uses: 50, how: 47, clean: 50, trust: 49, hood: 12, questions: 39, tryIt: 34 });
-    expect([hero(true), words(L.what.h2, L.what.body(true)), words(L.how.h2, L.how.steps(true))]).toEqual([61, 42, 48]);
-    const { hero: h, captions, what, uses, how, clean, trust, hood } = sections;
-    // cap 325: 320 plus the who-line the blind test asked for (W4, 2026-10-26). The live landing names Solana (D-45):
-    // three more words in the hero, What and How, so 322 on the page (landing.spec measures it against the cap).
-    expect(h + captions + what + uses + how + clean + trust + hood, "everything above Questions").toBe(319);
+    // site-refresh F1 (facts §2): "or someone they let spend within daily caps" adds 6 words to What (41 → 47). The
+    // "What else it does" strip (site-refresh design notes §1, between Trust and Questions) adds 49: the H2 (4) + five items
+    // of 9 words each (a 3–4 word title, a 5–6 word line).
+    expect(sections).toEqual({ hero: 60, captions: 10, what: 47, uses: 50, how: 47, clean: 50, more: 49, trust: 49, hood: 12, questions: 39, tryIt: 34 });
+    expect([hero(true), words(L.what.h2, L.what.body(true)), words(L.how.h2, L.how.steps(true))]).toEqual([61, 48, 48]);
+    const { hero: h, captions, what, uses, how, clean, more, trust, hood } = sections;
+    // cap 380 (site-refresh design notes §1.1, §1.5): 320 plus the who-line (W4), plus F1's 6 words, plus the strip's 49.
+    expect(h + captions + what + uses + how + clean + more + trust + hood, "everything above Questions").toBe(374);
   });
   it("uses the measured ETA thresholds and the honest timeout copy", () => {
     expect(copy.sign.mpc[0]).toBe("Usually about 10 seconds.");

@@ -3,6 +3,7 @@ import { FinaleSection } from "@/components/landing/FinaleSection";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { HowSection } from "@/components/landing/HowSection";
 import { LandingMotion } from "@/components/landing/LandingMotion";
+import { MoreSection } from "@/components/landing/MoreSection";
 import { QuestionsSection } from "@/components/landing/QuestionsSection";
 import { TrustSection } from "@/components/landing/TrustSection";
 import { UsesSection } from "@/components/landing/UsesSection";
@@ -30,6 +31,7 @@ export function Landing() {
       <HowSection />
       <CleanSection />
       <TrustSection />
+      <MoreSection />
       <QuestionsSection />
       <FinaleSection />
       <LandingMotion />

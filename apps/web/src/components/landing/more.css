@@ -1,0 +1,102 @@
+/* ── "What else it does" (#more, after Trust + Under the hood, before Questions). strip-refs pattern 1: an icon, a
+   title, one line; no card chrome, no border, no coral. Five items: one list on phones, 3 + 2 from 768, one row of
+   five from 1280. The icon sits in a flat sunken disc (not a sticker: stickers are for what you own, press or
+   celebrate). The "?" is the app's HelpLink (a 16 px CircleQuestionMark, ink-muted) with a 44 px target.
+   site-refresh design notes §1.3; ported as-is from the design prototype's CSS. ──────────────────────────────────── */
+.lp-more {
+  display: grid;
+  gap: 22px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-more__item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-content: start;
+  column-gap: 14px;
+  min-width: 0;
+}
+.lp-more__icon {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.lp-more__icon > svg {
+  width: 20px;
+  height: 20px;
+}
+.lp-more__head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  min-height: 22px;
+}
+.lp-more__title {
+  margin: 0;
+  color: var(--ink);
+  font: 700 17px/22px var(--font-display);
+  letter-spacing: -0.01em;
+}
+/* the help link: a 44 px target around a 16 px icon, pulled back so it never grows the title's line */
+.lp-more__help {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -11px -14px -11px -10px;
+  border-radius: 999px;
+  color: var(--ink-muted);
+}
+.lp-more__help > svg {
+  width: 16px;
+  height: 16px;
+}
+@media (hover: hover) {
+  .lp-more__help:hover {
+    color: var(--ink);
+  }
+}
+.lp-more__body {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font: 400 15px/22px var(--font-sans);
+}
+@media (min-width: 768px) {
+  .lp-more {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 40px 32px;
+    margin-top: 44px;
+  }
+  .lp-more__item {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0;
+  }
+  .lp-more__icon {
+    grid-row: auto;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 14px;
+  }
+  .lp-more__icon > svg {
+    width: 22px;
+    height: 22px;
+  }
+  .lp-more__title {
+    font-size: 18px;
+    line-height: 24px;
+  }
+}
+@media (min-width: 1280px) {
+  .lp-more {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    column-gap: 36px;
+  }
+}

@@ -1,7 +1,11 @@
 import type { SatchelSnapshot } from "@/lib/data/types";
-import { formatAmount, type Ticker } from "@/lib/format";
+import { formatAmount, shareText, usdText, type Ticker } from "@/lib/format";
 import { hasCoins, holdings, type Coin } from "@/lib/holdings";
 import type { PriceView, PricedCoin } from "@/lib/prices";
+
+/** Re-exported so existing callers don't change; the landing's simulated sample imports both from `lib/format`
+ * directly, which pulls in no NEAR reader. */
+export { shareText, usdText };
 
 /**
  * A Satchel at a glance (D-50): what it holds, one entry per COIN (ETH on four networks is one ETH; USDC at its
@@ -70,17 +74,3 @@ export function overview(s: Pick<SatchelSnapshot, "balances"> & Partial<Pick<Sat
 
 /** "0.00189718 BTC" for a coin total. */
 export const coinTotalText = (c: CoinTotal, withTicker = true) => formatAmount(c.amount, c.ticker, { withTicker });
-
-const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-/** "$1,148.72"; "< $0.01" for dust above zero; "$0.00" for nothing (kb/80 §Fiat: 2 decimals, US dollars). */
-export function usdText(v: number): string {
-  if (v > 0 && v < 0.01) return "< $0.01";
-  return USD.format(v);
-}
-
-/** "41%"; "< 1%" for a sliver; for the legend beside the value bar. */
-export function shareText(share: number): string {
-  if (share > 0 && share < 0.01) return "< 1%";
-  return `${Math.round(share * 100)}%`;
-}

@@ -130,7 +130,7 @@ test.describe("add coins (receive): anyone, no wallet needed", () => {
     await expect(sheet.getByRole("img", { name: "QR code for tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5" })).toBeVisible();
     await expect(sheet.locator('[data-full-address="btc"]')).toHaveText("tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5");
     await expect(sheet).toContainText("Send only Bitcoin testnet4 coins to this address.");
-    await expect(sheet).toContainText("Anyone can add coins. Only the owner can send them out.");
+    await expect(sheet).toContainText("Anyone can add coins. Only the owner, or someone they let spend within daily caps, can send them out.");
     await expect(sheet.getByRole("link", { name: /Get testnet BTC/ })).toBeVisible();
     await expect(sheet.locator("[data-incoming]")).toHaveAttribute("data-incoming", "waiting");
     await expect(sheet.locator("[data-incoming]")).toContainText("Waiting for coins…");

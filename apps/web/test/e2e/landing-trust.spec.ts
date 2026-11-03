@@ -93,7 +93,8 @@ test.describe("landing trust: server HTML", () => {
 
   test("Under the hood: one closed <details> with the six rules (send), the five generic links and no addresses", async ({ request }) => {
     const raw = await (await request.get("/")).text();
-    const hood = between(raw, "under-the-hood", "questions");
+    // the "What else it does" strip (#more) follows Trust since the 2026-11-03 refresh: stop the slice there, or its help links count
+    const hood = between(raw, "under-the-hood", "more");
     const details = noScripts(raw).match(/<details id="under-the-hood"[^>]*>/g) ?? [];
     expect(details).toHaveLength(1);
     expect(details[0]).not.toMatch(/\sopen(?:=|\s|>)/);
@@ -131,9 +132,9 @@ test.describe("landing trust: server HTML", () => {
     const raw = await (await request.get("/")).text();
     expect(documentText(raw).toLowerCase()).not.toContain("other chains");
     expect(RULES[0].body).toContain("plain SOL transfers");
-    expect(documentText(between(raw, "under-the-hood", "questions"))).toContain(RULES[0].body);
+    expect(documentText(between(raw, "under-the-hood", "more"))).toContain(RULES[0].body);
     const chains = FAQ.find((i) => i.id === "q-chains")!.a;
-    expect(chains).toContain("Bitcoin testnet4, Ethereum Sepolia and Solana devnet");
+    expect(chains).toContain("SOL on Solana devnet");
     expect(documentText(between(raw, "questions", "try-it"))).toContain(chains);
   });
 });

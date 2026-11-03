@@ -121,13 +121,13 @@ export function SignMessageFlow({ snap, intentId }: { snap: SatchelSnapshot; int
   const tracking = step === "progress" && !!intent;
   if (ready && !accountId) {
     guard = (
-      <Guard icon={Wallet} title={copy.send.guard.connectTitle} body={copy.send.guard.connectBody(snap.token_id)}>
+      <Guard icon={Wallet} title={copy.send.guard.connectTitle} body={copy.msg.guard.connectBody(snap.token_id)}>
         <ConnectButton size="lg" />
       </Guard>
     );
   } else if (ready && accountId && !isOwner && !tracking) {
     guard = (
-      <Guard icon={Lock} title={copy.send.guard.notOwnerTitle(snap.token_id)} body={copy.send.guard.notOwnerBody(accountId, live.owner)}>
+      <Guard icon={Lock} title={copy.send.guard.notOwnerTitle(snap.token_id)} body={copy.msg.guard.notOwnerBody(accountId, live.owner)}>
         <Button size="lg" href={closeHref} replace>
           {copy.sign.close}
         </Button>

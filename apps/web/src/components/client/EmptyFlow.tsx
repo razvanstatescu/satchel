@@ -291,7 +291,7 @@ export function EmptyFlow({ snap, records }: { snap: SatchelSnapshot; records: S
   } else if (ready && !isOwner && step === "form") {
     guarded = true;
     body = (
-      <Guard icon={Lock} title={copy.empty.guard.notOwnerTitle(snap.token_id)} body={copy.send.guard.notOwnerBody(accountId ?? "", live.owner)}>
+      <Guard icon={Lock} title={copy.empty.guard.notOwnerTitle(snap.token_id)} body={copy.empty.guard.notOwnerBody(accountId ?? "", live.owner)}>
         <Button size="lg" href={closeHref} replace>
           {copy.sign.close}
         </Button>

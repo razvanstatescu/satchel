@@ -1,6 +1,6 @@
 import { Check, CircleCheck, LoaderCircle, Pause, Play, ScrollText, Snowflake } from "lucide-react";
 import { ChainCharm, Sparkle } from "@/components/brand";
-import { ArtBadge, ArtCard, ArtIcon, ArtPill, CoinRow, Lbl } from "@/components/landing/art";
+import { ArtBadge, ArtCard, ArtIcon, ArtOverview, ArtPill, Lbl } from "@/components/landing/art";
 import { copy } from "@/lib/copy";
 
 /**
@@ -37,18 +37,18 @@ export function HeroStage() {
         <div className="lp-stage__card" data-k="card">
           <div className="lp-stage__hanger" data-k="hanger">
             <div className="lp-stage__plate" data-k="plate" />
-            <ArtCard
-              name={d.name}
-              badge={<ArtBadge kind="yours" l={copy.card.yours} data-k="yours" />}
-              foot={
-                <span className="lp-stack lp-stack--start">
-                  <ArtPill tone="frozen" icon={Snowflake} l={p.listed} data-k="pill-paused" />
-                  <ArtPill tone="success" icon={Check} l={p.active} data-k="pill-active" data-off="" />
-                </span>
-              }
-            >
-              <CoinRow chain="btc" value={d.btc} k="btc" />
-              <CoinRow chain="evm" value={d.eth} k="eth" />
+            <ArtCard name={d.name} badge={<ArtBadge kind="yours" l={copy.card.yours} data-k="yours" />}>
+              <ArtOverview
+                mix={d.mix}
+                usd={d.usd}
+                moving
+                state={
+                  <span className="lp-stack lp-stack--end lp-card__state">
+                    <ArtPill tone="frozen" icon={Snowflake} l={p.listed} data-k="pill-paused" />
+                    <ArtPill tone="success" icon={Check} l={p.active} data-k="pill-active" data-off="" />
+                  </span>
+                }
+              />
             </ArtCard>
           </div>
         </div>

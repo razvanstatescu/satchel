@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { Check, CircleCheck, Lock, PenLine, ScrollText, Send, ShieldCheck, Signature, TriangleAlert } from "lucide-react";
-import { ArtCard, ArtIcon, ArtPill, Coin, CoinRow, Initial, Lbl, amountParts } from "@/components/landing/art";
+import { Check, CircleCheck, Lock, PenLine, ScrollText, Send, ShieldCheck, Signature, TriangleAlert, Wallet } from "lucide-react";
+import { ArtCard, ArtIcon, ArtOverview, ArtPill, Coin, Initial, Lbl, amountParts } from "@/components/landing/art";
 import { CONTAINER, H2, HEAD, SECTION_Y } from "@/components/landing/layout";
 import { cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
@@ -102,8 +102,7 @@ function DeskSigned() {
   return (
     <Desk variant="lp-desk--top">
       <ArtCard name={d.name}>
-        <CoinRow chain="btc" value={d.btc} />
-        <CoinRow chain="evm" value={d.eth} />
+        <ArtOverview mix={d.mix} usd={d.usd} />
       </ArtCard>
       <div className="lp-slip lp-note" data-k="note">
         <p className="lp-slip__head">
@@ -117,7 +116,9 @@ function DeskSigned() {
   );
 }
 
-/** 2 · Sent after the sale, it drains the buyer's ETH: the buyer's card at 0.00 ETH, a sad coin, the stamp. */
+/** 2 · Sent after the sale, it drains the buyer's ETH: the buyer's holdings slip at 0.00 ETH, a sad coin, the stamp.
+ * A ledger detail, not the D-50 card (design notes §2.1): the beat is about an amount leaving, which a native
+ * 0.80 → 0.00 says at a glance; on the card the drained ETH would just vanish from the chips. */
 function DeskDrained() {
   const d = copy.landing.desk;
   const [btc, btcTick] = amountParts(d.btc);
@@ -129,24 +130,30 @@ function DeskDrained() {
         <Initial of={d.buyer} />
         <Lbl l={d.buyer} />
       </span>
-      <ArtCard name={d.name}>
-        <li className="lp-card__coin">
-          <Coin chain="btc" />
-          <Lbl l={btc} className="lp-card__amt" />
-          <Lbl l={btcTick} className="lp-card__tick" />
-        </li>
-        <li className="lp-card__coin" data-zero="">
-          <span className="lp-stack" data-k="eth-coin">
-            <Coin chain="evm" mood="sad" data-k="eth-coin-new" />
-            <Coin chain="evm" data-k="eth-coin-old" data-off="" />
-          </span>
-          <span className="lp-card__amt lp-stack lp-stack--start">
-            <Lbl l={eth0} data-k="eth-amt-new" />
-            <Lbl l={eth} className="lp-amt-was" data-k="eth-amt-old" data-off="" />
-          </span>
-          <Lbl l={ethTick} className="lp-card__tick" />
-        </li>
-      </ArtCard>
+      <div className="lp-slip lp-hold">
+        <p className="lp-slip__head">
+          <ArtIcon icon={Wallet} />
+          <Lbl l={d.name} />
+        </p>
+        <ul className="lp-hold__rows">
+          <li className="lp-hold__row">
+            <Coin chain="btc" />
+            <Lbl l={btc} className="lp-hold__amt" />
+            <Lbl l={btcTick} className="lp-hold__tick" />
+          </li>
+          <li className="lp-hold__row" data-zero="">
+            <span className="lp-stack" data-k="eth-coin">
+              <Coin chain="evm" mood="sad" data-k="eth-coin-new" />
+              <Coin chain="evm" data-k="eth-coin-old" data-off="" />
+            </span>
+            <span className="lp-hold__amt lp-stack lp-stack--start">
+              <Lbl l={eth0} data-k="eth-amt-new" />
+              <Lbl l={eth} className="lp-amt-was" data-k="eth-amt-old" data-off="" />
+            </span>
+            <Lbl l={ethTick} className="lp-hold__tick" />
+          </li>
+        </ul>
+      </div>
       <span className="lp-stamp" data-k="stamp">
         <ArtIcon icon={Send} />
         <Lbl l={copy.landing.clean.labels.moved} />

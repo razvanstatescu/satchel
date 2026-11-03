@@ -87,46 +87,116 @@
   gap: 8px;
   padding: 12px 16px 14px;
 }
-.lp-card__inside {
+/* the card's overview (D-50, SatchelCard's `Contents`): the estimate and its label beside the state pill, then the
+   value bar and the coin chips. Tiers by the card's own width: lg ≥ 352 · md 251–351 · sm ≤ 250 (the app's) · mini
+   < 200 (landing only: the 196 px scene cards). */
+.lp-card__head {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.lp-card__coin {
-  display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
   min-width: 0;
 }
-.lp-card__amt {
+.lp-card__est {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.lp-card__total {
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--ink);
   font: 800 24px/28px var(--font-display);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
-.lp-card__tick {
+.lp-card__prices {
+  white-space: nowrap;
+  color: var(--ink-muted);
+  font: 600 12px/16px var(--font-sans);
+}
+.lp-card__state {
+  flex: none;
+}
+.lp-card__ov {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+/* the value bar (ValueBarTips' look, inert): a sticker-outlined pill, one segment per coin sized by its share, in
+   the coins' own artwork colours; the fill motion scales each segment from its left edge */
+.lp-bar {
+  display: flex;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  border: 2px solid var(--sticker-line);
+  border-radius: 999px;
+  background: var(--surface-sunken);
+}
+.lp-bar__seg {
+  flex-basis: 0;
+  min-width: 6px;
+  height: 100%;
+  background: var(--charm-btc);
+  transform-origin: 0 50%;
+}
+.lp-bar__seg + .lp-bar__seg {
+  border-left: 2px solid var(--sticker-line);
+}
+.lp-bar__seg[data-coin="evm"] {
+  background: var(--charm-evm);
+}
+.lp-bar__seg[data-coin="sol"] {
+  background: var(--charm-sol);
+}
+.lp-bar__seg[data-coin="usdc"] {
+  background: var(--sky);
+}
+/* the chips: "BTC 50%" (the ticker, then its share in muted medium), two below 352 px of card and "+N" for the rest */
+.lp-chips {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-chip {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+.lp-chip .lp-coin {
+  width: 20px;
+  height: 20px;
+}
+.lp-chip__words {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+  color: var(--ink);
+  font: 600 13px/18px var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+.lp-chip__share {
+  margin-left: 0.28em;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+.lp-chips__more {
+  white-space: nowrap;
   color: var(--ink-muted);
   font: 600 13px/18px var(--font-sans);
 }
-.lp-card__coin[data-zero] .lp-card__amt {
-  color: var(--ink-muted);
-}
-/* the catch's frame 2: the ETH it held before (0.80, ink) rolls away to 0.00 (muted) */
-.lp-card__coin[data-zero] .lp-amt-was {
-  color: var(--ink);
-}
-.lp-card__coin > .lp-stack {
-  flex: none;
-}
-.lp-card__foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
+/* "+N" counts what the chips leave out: below 352 px "+{n − 2}" (the third chip folds in too), from 352 "+{n − 3}" */
+.lp-chips__more-lg,
+.lp-chip--3 {
+  display: none;
 }
 @container lpcard (min-width: 352px) {
   .lp-card__band {
@@ -143,23 +213,25 @@
   .lp-card__body {
     padding: 16px 20px 18px;
   }
-  .lp-card__inside {
-    gap: 6px;
-  }
-  .lp-card__coin {
-    gap: 10px;
-  }
-  .lp-card__coin .lp-coin {
-    width: 28px;
-    height: 28px;
-  }
-  .lp-card__amt {
+  .lp-card__total {
     font-size: 32px;
     line-height: 36px;
   }
-  .lp-card__tick {
-    font-size: 15px;
-    line-height: 20px;
+  .lp-card__prices {
+    font-size: 13px;
+  }
+  .lp-chip .lp-coin {
+    width: 24px;
+    height: 24px;
+  }
+  .lp-chip--3 {
+    display: flex;
+  }
+  .lp-chips__more-lg {
+    display: inline;
+  }
+  .lp-chips__more-md {
+    display: none;
   }
 }
 @container lpcard (max-width: 250px) {
@@ -177,24 +249,97 @@
     gap: 4px;
     padding: 8px 12px 10px;
   }
-  .lp-card__inside {
-    gap: 2px;
-  }
-  .lp-card__coin .lp-coin {
-    width: 18px;
-    height: 18px;
-  }
-  .lp-card__amt {
+  .lp-card__total {
     font-size: 19px;
     line-height: 23px;
   }
-  .lp-card__tick {
+  .lp-card__prices {
+    font-size: 11px;
+  }
+  .lp-card__state .lp-pill {
+    padding: 3px 8px;
     font-size: 12px;
     line-height: 16px;
   }
-  .lp-card__foot .lp-pill {
-    padding: 3px 8px;
+  .lp-card__ov {
+    gap: 6px;
+  }
+  .lp-bar {
+    height: 8px;
+  }
+  .lp-chips {
+    gap: 8px;
+  }
+  .lp-chip .lp-coin {
+    width: 16px;
+    height: 16px;
+  }
+  .lp-chip__words,
+  .lp-chips__more {
     font-size: 12px;
+  }
+}
+/* mini (landing only): the 196 px scene cards (How it works step 3, the catch's desk 1). Everything stays, smaller;
+   the "+N" steps aside so two chips fit. */
+@container lpcard (max-width: 199px) {
+  .lp-card__body {
+    gap: 3px;
+    padding: 7px 10px 9px;
+  }
+  .lp-card__total {
+    font-size: 18px;
+    line-height: 22px;
+  }
+  .lp-card__prices {
+    font-size: 10px;
+    line-height: 13px;
+  }
+  .lp-card__ov {
+    gap: 5px;
+  }
+  .lp-bar {
+    height: 7px;
+  }
+  .lp-chips {
+    gap: 7px;
+  }
+  .lp-chip {
+    gap: 3px;
+  }
+  .lp-chip .lp-coin {
+    width: 14px;
+    height: 14px;
+  }
+  .lp-chip__words {
+    font-size: 11px;
+    line-height: 14px;
+  }
+  .lp-chips__more {
+    display: none;
+  }
+}
+
+/* the empty card (How it works step 1): "Nothing inside yet" in muted display type, no bar, the three home coins as
+   dimmed chips without shares (all three at every width: with no shares they fit) */
+.lp-card__empty {
+  color: var(--ink-muted);
+  font: 800 20px/24px var(--font-display);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.lp-chips--home .lp-chip {
+  opacity: 0.5;
+}
+@container lpcard (min-width: 352px) {
+  .lp-card__empty {
+    font-size: 26px;
+    line-height: 32px;
+  }
+}
+@container lpcard (max-width: 250px) {
+  .lp-card__empty {
+    font-size: 16px;
+    line-height: 20px;
   }
 }
 
@@ -403,6 +548,7 @@
 /* ── 4. Hero: the shelf (design-spec §4.2; a flat sky field, a Day island, holding the stage) ─────────────────────── */
 .lp-stage {
   position: relative;
+  container-type: inline-size;
   margin: 36px 0 0;
   padding: 22px 20px 14px;
   border-radius: 32px;
@@ -462,6 +608,18 @@
 /* Yours is stuck on in act 4 only: in the server frame (act 3) it keeps its place, unseen */
 .lp-stage [data-k="yours"] {
   opacity: 0;
+}
+/* below 300 px of card (every phone) "Paused for sale" and "≈ $X" can't share a row, so the state pill keeps its
+   icon and drops its word (the price tag and the caption say "for sale"); from 768 the card is 400 wide and the pill
+   is whole. A conscious, art-only exception to "icon + word" (design notes §2.4). */
+@container lpcard (max-width: 299px) {
+  .lp-stage .lp-card__state .lp-pill {
+    gap: 0;
+    padding: 5px;
+  }
+  .lp-stage .lp-card__state .lp-pill > .lp-l {
+    display: none;
+  }
 }
 .lp-stage__tag {
   position: absolute;
@@ -597,6 +755,52 @@
   }
   .lp-stage__slip {
     width: 66%;
+  }
+}
+
+/* the price tag reads 2,000 NEAR (site-refresh R9): on phones it hangs nearer the card's left corner, a touch tighter, and the
+   slip narrows a little below 390, so the tag's words never slide under the slip. */
+@media (max-width: 767px) {
+  .lp-stage__tag {
+    left: 4px;
+  }
+  .lp-hangtag {
+    gap: 5px;
+    padding: 5px 10px 5px 7px;
+    font-size: 14px;
+  }
+  .lp-hangtag::before {
+    width: 8px;
+    height: 8px;
+  }
+}
+@media (min-width: 360px) and (max-width: 389px) {
+  .lp-stage__slip {
+    width: 54%;
+  }
+}
+/* 768–827 (the scene is under 700 wide): the slip moves right, so it stops short of the third chip */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lp-stage__slip {
+    right: 8px;
+  }
+}
+/* the new card fills its width (bar and chips), so below 768 the shelf grows with the card and the slip keeps clear
+   of the chips (390 unchanged: 336; 412 +12; 430 +21; 480–767, where the slip is full size: card height + 214).
+   51.7cqi = the card's height (82 % of the scene / 1.586), capped at the 400 px card's 252. */
+@media (max-width: 767px) {
+  .lp-stage__scene {
+    height: max(336px, calc(min(51.7cqi, 252px) + 172px));
+  }
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  .lp-stage__scene {
+    height: calc(min(51.7cqi, 252px) + 214px);
+  }
+}
+@media (max-width: 359px) {
+  .lp-stage__scene {
+    height: 352px;
   }
 }
 
@@ -885,7 +1089,7 @@
   }
 }
 .lp-what .lp-card {
-  width: min(100%, 320px);
+  width: min(100%, 360px);
 }
 .lp-what__tags {
   display: flex;
@@ -1130,12 +1334,67 @@
   padding-top: 52px;
 }
 .lp-desk .lp-card {
-  width: 176px;
+  width: 196px;
 }
 .lp-desk__buyer {
   position: absolute;
   top: 12px;
   left: 12px;
+}
+/* the catch's desk 2: the buyer's holdings (the Wallet tab's rows: coin, amount, ticker), not a card. The ETH row
+   keeps the beat's keys (eth-coin*, eth-amt-*) and its 0.80 → 0.00 roll. */
+.lp-hold {
+  width: 200px;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-radius: 14px;
+}
+.lp-hold .lp-slip__head {
+  font-size: 12px;
+  line-height: 16px;
+}
+.lp-hold .lp-slip__head > svg {
+  width: 16px;
+  height: 16px;
+}
+.lp-hold__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 0 0;
+  border-top: 1px dashed var(--line-strong);
+  list-style: none;
+}
+.lp-hold__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.lp-hold__row .lp-coin {
+  width: 24px;
+  height: 24px;
+}
+.lp-hold__row > .lp-stack {
+  flex: none;
+}
+.lp-hold__amt {
+  white-space: nowrap;
+  color: var(--ink);
+  font: 800 22px/26px var(--font-display);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lp-hold__tick {
+  color: var(--ink-muted);
+  font: 600 12px/16px var(--font-sans);
+}
+.lp-hold__row[data-zero] .lp-hold__amt {
+  color: var(--ink-muted);
+}
+.lp-hold__row[data-zero] .lp-amt-was {
+  color: var(--ink);
 }
 .lp-desk-slip {
   width: 200px;

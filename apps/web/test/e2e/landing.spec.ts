@@ -13,14 +13,15 @@ import { copy } from "@/lib/copy";
 
 const L = copy.landing;
 /** Every section of the page, in order (design-spec §4). */
-const SECTION_IDS = ["top", "what", "uses", "how", "clean", "trust", "questions", "try-it"];
+const SECTION_IDS = ["top", "what", "uses", "how", "clean", "trust", "more", "questions", "try-it"];
 /** The header's in-page anchors (design-spec §4.1), in page order. */
 const ANCHORS = ["how", "clean", "questions"];
 /**
  * voice-copy §3.9: the hero's copy (the who-line + H1 + lead + CTAs; 61 with Solana), each section, and everything above
- * Questions (320, plus 5 for the who-line the W4 blind test asked for).
+ * Questions (320, plus 5 for the who-line the W4 blind test asked for, plus site-refresh F1's 6 words and the "What else
+ * it does" strip's 49: site-refresh design notes §1, R9).
  */
-const WORDS = { hero: 61, captions: 10, section: 50, aboveQuestions: 325 };
+const WORDS = { hero: 61, captions: 10, section: 50, aboveQuestions: 380 };
 const CORAL = "rgb(255, 92, 77)";
 
 const decode = (s: string) =>
@@ -213,7 +214,7 @@ test.describe("landing: without JavaScript", () => {
     for (const name of [L.hero.cta.primary, L.hero.cta.secondary]) await expect(top.getByRole("link", { name })).toBeVisible();
     // the server frame: for sale, checked, clean; the price tag on; Yours not yet; the third caption showing
     const op = (k: string) => page.locator(`[data-k="${k}"]`).evaluate((el) => getComputedStyle(el).opacity);
-    for (const k of ["card", "tag", "slip", "verdict", "pill-paused", "sig-3-used", "spark-1", "cap-3"]) expect(await op(k), k).toBe("1");
+    for (const k of ["card", "tag", "slip", "verdict", "pill-paused", "sig-3-used", "spark-1", "cap-3", "est", "seg-btc"]) expect(await op(k), k).toBe("1");
     for (const k of ["yours", "pill-active", "sig-1-checking", "cap-1", "cap-2", "cap-4"]) expect(await op(k), k).toBe("0");
     await expect(top.locator("[data-step]")).toHaveCount(4);
     await expect(top.locator('[data-step][aria-current="step"]')).toHaveAttribute("data-step", "3");
@@ -385,10 +386,10 @@ test.describe("landing: budgets", () => {
     }
   });
 
-  test("heights: ≤ 6,500 px at 1280 and ≤ 8,500 px at 390 (design brief), #clean ≤ 900 px at 1280", async ({ page }) => {
+  test("heights: ≤ 6,500 px at 1280 and ≤ 9,000 px at 390 (site-refresh design notes §1.4), #clean ≤ 900 px at 1280", async ({ page }) => {
     for (const [w, h, max] of [
       [1280, 900, 6_500],
-      [390, 844, 8_500],
+      [390, 844, 9_000],
     ] as const) {
       await page.setViewportSize({ width: w, height: h });
       await page.goto("/");

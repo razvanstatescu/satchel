@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import { ChainCharm, Charm } from "@/components/brand";
 import { cx, STROKE } from "@/components/ui";
-import { NBSP } from "@/lib/format";
+import { NBSP, shareText, usdText } from "@/lib/format";
+import { copy, TICKER } from "@/lib/copy";
 
 /**
  * The landing's illustration pieces (design-spec §2.3, §4.0): the product's own UI, the Satchel card, its state pill, the
@@ -39,34 +40,30 @@ export function amountParts(s: string): [string, string] {
   return i < 0 ? [s, ""] : [s.slice(0, i), s.slice(i + 1)];
 }
 
-/**
- * One row of the card's charm ledger: the charm, the amount (Funnel 800, tabular) and the ticker. `zero` greys the
- * amount, as SatchelCard does. `k` names the row's moving pieces for the hero loop (`coin-btc`, `amt-btc`, `tick-btc`).
- */
-export function CoinRow({ chain, value, zero, mood, k }: { chain: "btc" | "evm"; value: string; zero?: boolean; mood?: "happy" | "sad"; k?: string }) {
-  const [amount, ticker] = amountParts(value);
-  return (
-    <li className="lp-card__coin" data-zero={zero ? "" : undefined}>
-      <Coin chain={chain} mood={mood} data-k={k && `coin-${k}`} />
-      <Lbl l={amount} className="lp-card__amt" data-k={k && `amt-${k}`} />
-      <Lbl l={ticker} className="lp-card__tick" data-k={k && `tick-${k}`} />
-    </li>
-  );
-}
+/** A coin's share of the mix (D-50): `copy.landing.desk.mix`'s shape. */
+export type MixEntry = { ticker: string; share: number };
+
+/** A mix ticker's chain code (the chip's charm and the bar segment's colour, `data-coin`; `ChainCharm`'s "evm", never
+ * "eth"). `USDC` has no chain charm at these widths (it never gets a chip, only "+N"), but it still fills a bar
+ * segment in `--sky` (`COIN_FILL.USDC`, app-true). */
+const CHAIN: Record<string, "btc" | "evm" | "sol" | "usdc"> = { BTC: "btc", ETH: "evm", SOL: "sol", USDC: "usdc" };
+/** The same ticker as the hero loop's `data-k` suffix (`timeline.ts`'s `Coin`/`Seg` types: "btc" | "eth" | "sol" |
+ * "usdc", never "evm"). */
+const KEY: Record<string, "btc" | "eth" | "sol" | "usdc"> = { BTC: "btc", ETH: "eth", SOL: "sol", USDC: "usdc" };
+const CHARM: Record<string, "btc" | "evm" | "sol"> = { BTC: "btc", ETH: "evm", SOL: "sol" };
 
 /**
- * The Satchel card as an illustration (SatchelCard's look: the coral band with the name, a sticker and the charm S; the
- * charm ledger; the state pill), sized by its own width through container queries like the real card.
+ * The Satchel card as an illustration (SatchelCard's look: the coral band with the name, a sticker and the charm S;
+ * the overview body), sized by its own width through container queries like the real card.
  */
 export function ArtCard({
   name,
   badge,
   children,
-  foot,
   className,
   style,
   ...data
-}: { name: string; badge?: ReactNode; children: ReactNode; foot?: ReactNode; className?: string; style?: CSSProperties } & DataAttrs) {
+}: { name: string; badge?: ReactNode; children: ReactNode; className?: string; style?: CSSProperties } & DataAttrs) {
   return (
     <div className={cx("lp-card", className)} style={style} {...data}>
       <div className="lp-card__band">
@@ -74,11 +71,73 @@ export function ArtCard({
         {badge}
         <Charm height={30} className="lp-card__charm" />
       </div>
-      <div className="lp-card__body">
-        <ul className="lp-card__inside">{children}</ul>
-        {foot ? <div className="lp-card__foot">{foot}</div> : null}
-      </div>
+      <div className="lp-card__body">{children}</div>
     </div>
+  );
+}
+
+/**
+ * The card's body (D-50, SatchelCard's `Contents`): "≈ $X" and "at mainnet prices" beside the state pill, then the
+ * value bar and the coin chips ("BTC 50%" · "ETH 25%" · "SOL 15%" · "+1", folding to "+2" below 352 px of card). Every
+ * label is drawn from an attribute. `moving` adds the hero loop's `data-k` hooks (design-spec notes §2.3, §3.3); every
+ * other scene renders the same markup still, so the loop's keys are the only difference.
+ */
+export function ArtOverview({ mix, usd, state, moving }: { mix: readonly MixEntry[]; usd: number; state?: ReactNode; moving?: boolean }) {
+  const o = copy.overview;
+  const k = (name: string) => (moving ? name : undefined);
+  return (
+    <>
+      <div className="lp-card__head">
+        <span className="lp-card__est" data-k={k("est")}>
+          <Lbl l={o.estimate(usdText(usd))} className="lp-card__total" />
+          <Lbl l={o.atPrices} className="lp-card__prices" />
+        </span>
+        {state}
+      </div>
+      <div className="lp-card__ov">
+        <span className="lp-bar">
+          {mix.map((m) => (
+            <span key={m.ticker} className="lp-bar__seg" data-coin={CHAIN[m.ticker]} style={{ flexGrow: m.share }} data-k={k(`seg-${KEY[m.ticker]}`)} />
+          ))}
+        </span>
+        <ul className="lp-chips">
+          {mix.slice(0, 3).map((m, i) => (
+            <li key={m.ticker} className={cx("lp-chip", i === 2 && "lp-chip--3")}>
+              <Coin chain={CHARM[m.ticker]} data-k={k(`coin-${KEY[m.ticker]}`)} />
+              <span className="lp-chip__words" data-k={k(`tick-${KEY[m.ticker]}`)}>
+                <Lbl l={m.ticker} className="lp-chip__tick" />
+                <Lbl l={shareText(m.share)} className="lp-chip__share" />
+              </span>
+            </li>
+          ))}
+          <li className="lp-chips__more" data-k={k("more")}>
+            <Lbl l={o.plus(mix.length - 3)} className="lp-chips__more-lg" />
+            <Lbl l={o.plus(mix.length - 2)} className="lp-chips__more-md" />
+          </li>
+        </ul>
+      </div>
+    </>
+  );
+}
+
+/** The empty card (How it works step 1, a fresh Satchel): "Nothing inside yet" and the three home coins (BTC, ETH,
+ * SOL) as dimmed chips with no shares, no bar and no "+N". Unlike `ArtOverview`'s chips, none is marked `lp-chip--3`,
+ * so all three show at every width (the app's layout hides the third below 352 px of card; §7 of the design notes). */
+export function ArtEmpty() {
+  return (
+    <>
+      <div className="lp-card__head">
+        <Lbl l={copy.overview.empty} className="lp-card__empty" />
+      </div>
+      <ul className="lp-chips lp-chips--home">
+        {(["btc", "evm", "sol"] as const).map((chain) => (
+          <li key={chain} className="lp-chip">
+            <Coin chain={chain} />
+            <Lbl l={TICKER[chain]} className="lp-chip__tick" />
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

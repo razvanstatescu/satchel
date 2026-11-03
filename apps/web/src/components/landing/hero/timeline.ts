@@ -6,8 +6,9 @@ import { appearTracks, EASE, hopTracks, resetTrack } from "@/components/landing/
  * The hero loop as data (motion-spec §10; a port of proto/motion/landing-motion.js `heroTracks`). One 12 s clock, every
  * moving piece a track over the whole loop, so the loop is seekable by one number and testable without a DOM.
  *
- *   act 1 · 0–3.0 s   "Bitcoin and Ethereum inside": the card fades in; the BTC, then the ETH coin sticks on.
- *   act 2 · 3.0–5.4   "Seller lists it": the pill rolls Active → Paused for sale; the 300 NEAR tag swings in on its string.
+ *   act 1 · 0–3.0 s   "Coins inside": the card fades in; the BTC, ETH and SOL chips stick on, the value bar fills
+ *                      share by share, "+1"/"+2" appears, then the estimate rises in whole.
+ *   act 2 · 3.0–5.4   "Seller lists it": the pill rolls Active → Paused for sale; the price tag swings in on its string.
  *   act 3 · 5.4–9.0   "Buyer checks first": the check slip slides up; its rows roll Checking… → Used; Clean history
  *                      sticks on; the sparkles pop. Settled by 7.72 s: the server frame (START_AT) is this act at rest.
  *   act 4 · 9.0–12.0  "Coins included": the tag unclips, the slip leaves, and the card does the free-card hand-off (lift,
@@ -28,7 +29,16 @@ export const ACTS = [0, 3_000, 5_400, 9_000] as const;
 /** The timeline, in ms (motion-spec §10's table). */
 export const H = {
   fadeIn: 380,
-  coins: [600, 1_050],
+  /** the BTC, ETH and SOL chips' coins, 360 ms apart */
+  coins: [560, 920, 1_280],
+  /** "+N" appears ("+1" from 352 px of card, "+2" below) */
+  more: 1_640,
+  /** each share starts filling this long after its trigger… */
+  fill: 80,
+  /** …and fills in this long */
+  fillDur: 320,
+  /** the estimate rises in whole (no counting number) */
+  est: 2_100,
   toPaused: 3_200,
   tagIn: 3_500,
   slipIn: 5_600,
@@ -61,7 +71,8 @@ export const TOUCH = at(HAND.touch);
 /** The reset instant: the card is out of sight, everything behind it goes back to act 1. */
 export const RESET = H.seamDone + 1;
 
-type Coin = "btc" | "eth";
+type Coin = "btc" | "eth" | "sol";
+type Seg = "btc" | "eth" | "sol" | "usdc";
 type N3 = 1 | 2 | 3;
 type N4 = 1 | 2 | 3 | 4;
 
@@ -71,8 +82,10 @@ export type HeroKey =
   | "hanger"
   | "plate"
   | `coin-${Coin}`
-  | `amt-${Coin}`
   | `tick-${Coin}`
+  | `seg-${Seg}`
+  | "est"
+  | "more"
   | "pill-active"
   | "pill-paused"
   | "tag"
@@ -86,7 +99,10 @@ export type HeroKey =
   | `cap-${N4}`
   | `bar-${N4}`;
 
-const COINS = ["btc", "eth"] as const;
+/** The chips' coins (D-50): BTC, ETH and SOL stick on in act 1; USDC never gets a chip, only a bar share and "+N". */
+const COINS = ["btc", "eth", "sol"] as const;
+/** The value bar's four shares, largest first (site-refresh R9 sample). */
+const SEGS = ["btc", "eth", "sol", "usdc"] as const;
 const SIGS = [1, 2, 3] as const;
 const FOUR = [1, 2, 3, 4] as const;
 
@@ -94,7 +110,10 @@ export const HERO_KEYS: readonly HeroKey[] = [
   "card",
   "hanger",
   "plate",
-  ...COINS.flatMap((c) => [`coin-${c}`, `amt-${c}`, `tick-${c}`] as const),
+  ...COINS.flatMap((c) => [`coin-${c}`, `tick-${c}`] as const),
+  ...SEGS.map((c) => `seg-${c}` as const),
+  "est",
+  "more",
   "pill-active",
   "pill-paused",
   "tag",
@@ -116,7 +135,7 @@ export const EMPTY_AT_REST: readonly HeroKey[] = ["bar-4"];
 
 /** Which box carries a piece out of sight at the seam (the card fades out, the slip has gone), or null. */
 export function carriedBy(k: HeroKey): "card" | "slip" | null {
-  if (/^(hanger|plate|coin-|amt-|tick-|pill-|yours)/.test(k)) return "card";
+  if (/^(hanger|plate|coin-|tick-|seg-|est$|more$|pill-|yours)/.test(k)) return "card";
   if (/^(sig-|verdict)/.test(k)) return "slip";
   return null;
 }
@@ -174,19 +193,36 @@ export function heroTracks<E>(q: (k: HeroKey) => E | null | undefined, dx: numbe
   });
   tr.push({ el: plate, prop: "opacity", frames: [[0, 1], [at(0), 1, EASE.out], [at(HAND.liftEnd), 0.5], [at(HAND.fall), 0.5, EASE.fall], [TOUCH, 1], [T, 1]] });
 
-  // act 1: the coins stick on one after the other; act 4: they hop once after the landing (they came along)
+  // act 1: each coin sticks on with its chip's words, and its share of the value bar fills from the left, in the
+  // chips' order. Act 4: the coins hop once after the landing (they came along).
   COINS.forEach((c, i) => {
     const t0 = H.coins[i];
-    const turn = c === "btc" ? -18 : 18;
+    const turn = i % 2 ? 18 : -18;
     const coin = q(`coin-${c}`);
     tr.push(...stickOnTracks(coin, t0, { from: 1.7, turn }));
     tr.push(...hopTracks(coin, TOUCH + 300 + i * 150));
     tr.push(resetTrack(coin, "opacity", RESET, 1, 0, T), resetTrack(coin, "scale", RESET, "1", "1.7", T), resetTrack(coin, "rotate", RESET, "0deg", `${turn}deg`, T));
-    for (const el of [q(`amt-${c}`), q(`tick-${c}`)]) {
-      tr.push(...appearTracks(el, t0 + 60, 220, 6));
-      tr.push(resetTrack(el, "opacity", RESET, 1, 0, T), resetTrack(el, "translate", RESET, "0 0", "0 6px", T));
-    }
+    const words = q(`tick-${c}`);
+    tr.push(...appearTracks(words, t0 + 60, 220, 6));
+    tr.push(resetTrack(words, "opacity", RESET, 1, 0, T), resetTrack(words, "translate", RESET, "0 0", "0 6px", T));
   });
+  // the value bar fills share by share, in the chips' order: transform only (scale on x, origin left), never a width
+  SEGS.forEach((c, i) => {
+    const t0 = (i < COINS.length ? H.coins[i] : H.more) + H.fill;
+    tr.push({
+      el: q(`seg-${c}`),
+      prop: "scale",
+      frames: [[0, "0 1"], [t0, "0 1", EASE.inOut], [t0 + H.fillDur, "1 1"], [RESET, "1 1"], [RESET + 1, "0 1"], [T, "0 1"]],
+    });
+  });
+  // "+N" (the app's rule: "+1" from 352 px of card, "+2" below, where the SOL chip folds in too) appears last
+  const more = q("more");
+  tr.push(...appearTracks(more, H.more, 220, 6));
+  tr.push(resetTrack(more, "opacity", RESET, 1, 0, T), resetTrack(more, "translate", RESET, "0 0", "0 6px", T));
+  // the estimate rises in whole once the coins are in: no counting number (transform and opacity only)
+  const est = q("est");
+  tr.push(...appearTracks(est, H.est, 240, 8));
+  tr.push(resetTrack(est, "opacity", RESET, 1, 0, T), resetTrack(est, "translate", RESET, "0 0", "0 8px", T));
 
   // the pill: Active → Paused for sale (act 2) → Active again for the new owner (act 4)
   const active = q("pill-active");

@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { ArtCard, ArtPill, Coin, CoinRow, Lbl } from "@/components/landing/art";
+import { ArtCard, ArtOverview, ArtPill, Coin, Lbl } from "@/components/landing/art";
 import { CONTAINER, FLOW, H2, HEAD, LEAD, SPLIT, sentences } from "@/components/landing/layout";
 import { cx } from "@/components/ui";
 import { LANDING_NAMES_SOL } from "@/lib/faq";
@@ -26,9 +26,8 @@ export function WhatSection() {
           <p className={LEAD}>{w.body(LANDING_NAMES_SOL)}</p>
         </div>
         <div className="lp-what lg:order-first" aria-hidden="true" data-enter="what">
-          <ArtCard name={d.name} className="lp-card--md" foot={<ArtPill tone="success" icon={Check} l={copy.pill.active} />}>
-            <CoinRow chain="btc" value={d.btc} />
-            <CoinRow chain="evm" value={d.eth} />
+          <ArtCard name={d.name}>
+            <ArtOverview mix={d.mix} usd={d.usd} state={<span className="lp-card__state"><ArtPill tone="success" icon={Check} l={copy.pill.active} /></span>} />
           </ArtCard>
           <div className="lp-what__tags">
             <AddressTag chain="btc" k="addr-btc" label={w.tags.btc} short={w.tags.btcShort} address={w.tags.btcAddr} />

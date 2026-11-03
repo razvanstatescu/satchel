@@ -58,7 +58,7 @@ export const landing = {
      */
     anim: {
       captions: ["Coins inside", "Seller lists it", "Buyer checks first", "Coins included"],
-      alt: `Illustration: a Satchel holds 0.05${NBSP}BTC and 0.80${NBSP}ETH. Its seller lists it for 300${NBSP}NEAR, and signing pauses. The buyer's browser checks its 3 past signatures: none can move the coins, so Buy turns on. One transaction moves the Satchel to the buyer and pays the seller, and the coins go with it.`,
+      alt: `Illustration: a Satchel holds BTC, ETH, SOL and USDC. Its seller lists it for 2,000${NBSP}NEAR, and signing pauses. The buyer's browser checks its 3 past signatures: none can move the coins, so Buy turns on. One transaction moves the Satchel to the buyer and pays the seller, and the coins go with it.`,
       pause: "Pause animation",
       /** The steps list's accessible name (the four captions, real text, with `aria-current` on the act that shows). */
       stepsLabel: "The story, step by step",
@@ -86,7 +86,20 @@ export const landing = {
     btc: `0.05${NBSP}BTC`,
     eth: `0.80${NBSP}ETH`,
     eth0: `0.00${NBSP}ETH`,
-    price: `300${NBSP}NEAR`,
+    sol: `12${NBSP}SOL`,
+    usdc: `800${NBSP}USDC`,
+    /** The sample's listing price (site-refresh R9): par with `usd` at the app's fixture prices (NEAR 4). */
+    price: `2,000${NBSP}NEAR`,
+    /** The sample's total, at mainnet prices (D-50); a number, never a "$…" string (site-refresh R3). Composed at render with
+     * `usdText` (`lib/format.ts`), as `copy.overview.estimate(usdText(desk.usd))`. */
+    usd: 8000,
+    /** The value bar's segments and chips, largest share first (site-refresh R3): 0.05 BTC + 0.80 ETH + 12 SOL + 800 USDC. */
+    mix: [
+      { ticker: "BTC", share: 0.5 },
+      { ticker: "ETH", share: 0.25 },
+      { ticker: "SOL", share: 0.15 },
+      { ticker: "USDC", share: 0.1 },
+    ],
     sig: (n: number) => `Signature ${n}`,
     checking: "Checking…",
     settled: "Used",
@@ -105,7 +118,7 @@ export const landing = {
   what: {
     h2: "One NFT. Its own addresses.",
     body: (sol = false) =>
-      `Each Satchel has its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses, on their own chains: no bridge, no wrapped tokens. Only the NFT's owner can send the coins, and when it changes hands, everything inside goes with it.`,
+      `Each Satchel has its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses, on their own chains: no bridge, no wrapped tokens. Only its owner, or someone they let spend within daily caps, can send the coins. When it changes hands, everything inside goes with it.`,
     /**
      * NEW (DL-15): the address tags hanging from the card (aria-hidden art, drawn from attributes). Generic, no real
      * address; `btc`/`evm` from 480 px, the short names below.
@@ -150,11 +163,12 @@ export const landing = {
      */
     items: [
       { title: "Sell BTC, ETH and SOL together", body: "One trade, in NEAR. Neither side sends first." },
-      { title: "Give a funded wallet", body: "To a friend's account. Gifts skip the buyer's check." },
+      { title: "Give a funded wallet", body: "To a friend. Gifts don't wait for the check." },
       { title: "Hand over a project wallet", body: "Same addresses. Payments keep coming." },
     ],
-    /** v4's hang tags (design-spec §4.4 drops them as chips); `tags[2]` "New owner" labels How it works' third scene. */
-    tags: [`300${NBSP}NEAR`, "For you", "New owner"],
+    /** v4's hang tags (design-spec §4.4 drops them as chips); `tags[0]` is the sample's price (`desk.price`, site-refresh R9);
+     * `tags[2]` "New owner" labels How it works' third scene. */
+    tags: [`2,000${NBSP}NEAR`, "For you", "New owner"],
   },
 
   /**
@@ -236,36 +250,36 @@ export const landing = {
       const none = sol === "none";
       return [
         {
-          // kb/90 §5.9; D-40; DP5; risky claim 10
-          title: "Plain transfers only",
+          // kb/90 §5.9; D-40; DP5; C7S:61-73, :91-114; risky claim 10
+          title: "Readable requests only",
           body: none
-            ? "The contract signs only transfers it can read: native ETH on Sepolia and standard Bitcoin spends. It refuses raw hashes, messages, permits, contract calls and Solana messages."
-            : "The contract signs only transfers it can read: native ETH on Sepolia, standard Bitcoin spends and plain SOL transfers. It refuses raw hashes, messages, permits and contract calls.",
+            ? "The contract signs only what it can read: ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends and Ethereum text messages. It refuses raw hashes, permits, any other contract call and Solana messages."
+            : "The contract signs only what it can read: ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and text messages. It refuses raw hashes, permits and any other contract call.",
         },
         {
-          // kb/90 §5.8 step 5, §7.1; kb/70 F16; risky claim 3
+          // kb/90 §5.8 step 5, §7.1; kb/70 F16; C7S:116-127; risky claim 3
           title: "Recorded before it's signed",
-          body: `Each request is written on NEAR, with the ${none ? "nonce or coins" : "nonce, coins or blockhash"} it can spend, before NEAR's signer network sees it. Timed-out requests stay on the record.`,
+          body: `Each request is written on NEAR before NEAR's signer network sees it: the ${none ? "nonce or coins" : "nonce, coins or blockhash"} it can spend, or a message's full text. Timed-out requests stay on the record.`,
         },
         {
-          // kb/90 §5.5, §5.7, INV-13; risky claim 4
+          // kb/90 §5.5, §5.7, INV-13; offers.rs:294-300; C46:227-242; risky claim 4
           title: "Listing pauses signing",
-          body: "A Satchel can be listed only after 250 blocks (about 2 min 20 s) without signing. While it's for sale, it can't sign, and only a purchase can move it.",
+          body: "A Satchel can be listed only after 250 blocks (about 2 min 20 s) without signing. While it's for sale, it can't sign, and only a purchase or an accepted offer can move it.",
         },
         {
-          // kb/90 §7.2, §7.5; H-25; risky claim 17
+          // kb/90 §7.2, §7.5; H-25; C7S:277-286; kb90:1065-1072 (INV-37); risky claim 17
           title: "The buyer's browser checks every record",
-          body: `It asks each chain whether the nonce was used${none ? " or the coin spent" : ", the coin spent or the blockhash expired"}. For Bitcoin and Ethereum two data providers must agree; the page says when only one answered.`,
+          body: `It asks each chain, and each Ethereum network on its own, whether the nonce was used${none ? " or the coin spent" : ", the coin spent or the blockhash expired"}. For Bitcoin and Ethereum two data providers must agree; the page says when only one answered. Signed messages are listed too; they can't move coins, so they never block a sale.`,
         },
         {
-          // kb/90 §7.3, §7.5; risky claim 18
+          // kb/90 §7.3, §7.5; C46:255-256; Market.tsx:398-433; risky claim 18
           title: "Buy stays disabled until it passes",
-          body: "It stays off if any signature could still move coins or can't be checked right now. The app has no override, and checks again just before buying.",
+          body: "It stays off if any signature could still move coins or can't be checked right now. The app has no override, and checks again just before buying. Make an offer waits for the same check.",
         },
         {
-          // kb/90 §5.7 buy, INV-14, INV-16; risky claim 7
+          // kb/90 §5.7 buy, INV-14, INV-16; C46:250-256; site-refresh R6 (no refund claim for offers); risky claim 7
           title: "One transaction, bound to that history",
-          body: "The purchase names the listing and the signature count the browser checked. If either changed, it fails and refunds; if not, the NFT moves and the seller is paid.",
+          body: "The purchase names the listing and the signature count the browser checked. If either changed, it fails and refunds; if not, the NFT moves and the seller is paid. An offer holds only for the history checked when it was made: if anything is signed or taken out, it can't be accepted.",
         },
       ];
     },
@@ -278,6 +292,47 @@ export const landing = {
       contract: "Contract facts and commands to verify them", // /contract
       repo: "The source code and README", // REPO_URL (404s until Day 13, H-21)
     },
+  },
+
+  /**
+   * NEW: the "What else it does" strip (`#more`, site-refresh copy §3), a coda after Trust and before Questions. 49 visible
+   * words (cap 50): the H2 (4) plus five items (9 each: a 3–4 word title and a 5–6 word line). Each item reads as one
+   * sentence: "Make an offer, even if it's not for sale." `help` names a "?" icon link to `/questions#<anchor>`, by
+   * `help.label` (an `aria-label`, so 0 visible words); "Take it all out" has no `/questions` id, so it gets none.
+   */
+  more: {
+    h2: "What else it does",
+    items: [
+      {
+        // C46:14-17; anyone but the owner, any Satchel, listed or not
+        title: "Make an offer",
+        body: "Even if it's not for sale.",
+        help: { anchor: "q-offers", label: "How offers work" },
+      },
+      {
+        // site-refresh facts §1.5; wallet-ops `intro`: no NEAR account needed first, they connect one to claim
+        title: "Give by link",
+        body: "To someone not on NEAR yet.",
+        help: { anchor: "q-give-link", label: "How giving by link works" },
+      },
+      {
+        // C5:109-113, :208-213; site-refresh R7, R8: spending only, cleared on every change of owner
+        title: "Let someone spend",
+        body: "Daily caps, until it changes hands.",
+        help: { anchor: "q-allow-what", label: "What someone you add can do" },
+      },
+      {
+        // C7S:24-35; site-refresh R1: no currency named, never "every L2"
+        title: "USDC and L2s",
+        body: "Ethereum, Base, Arbitrum and OP Sepolia.",
+        help: { anchor: "q-chains", label: "Which chains and coins work" },
+      },
+      {
+        // wallet-ops.ts:77-117; owner only; one signature per coin, never "one click"
+        title: "Take it all out",
+        body: "Every coin to your wallets.",
+      },
+    ],
   },
 
   /**
@@ -301,13 +356,13 @@ export const landing = {
       // kb/70 F17; kb/90 §3 (the MPC contract account has full-access keys on testnet), §4 T1; risky claims 1, 15. "That
       // network's own" keeps the keys off Satchel's contract, which "No admin key" is about.
       q: "Who holds the keys?",
-      a: "No single party. NEAR's signer network makes each signature together, only when the Satchel contract asks, and the contract asks only for the NFT's current owner. You trust that network: enough colluding nodes could sign anything, and on testnet that network's own contract account has full-access keys.",
+      a: "No single party. NEAR's signer network makes each signature together, only when the Satchel contract asks, for the NFT's owner or someone they let spend within daily caps. You trust that network: enough colluding nodes could sign anything, and on testnet that network's own contract account has full-access keys.",
     },
     "q-proves": {
       // kb/90 §4 "does not cover", §7.2–7.5, §7.7; risky claims 2, 18. The landing's one disclosure (D-42): the browser,
       // not the contract, runs the check.
       q: "What does the buyer's check cover?",
-      a: "Every signature the Satchel has ever made. Your browser, not the contract, checks each one on its own chain, and Buy stays off until none can still move the coins. It doesn't cover other tokens, signatures made after you buy, NEAR's signer network or testnet4 reorgs.",
+      a: "Every signature the Satchel has ever made. Your browser, not the contract, checks each one on its own chain, and Buy stays off until none can still move the coins. It doesn't cover tokens other than USDC, signatures made after you buy, NEAR's signer network or testnet4 reorgs.",
     },
     "q-after": {
       // kb/90 §5.7 (frozen while listed, INV-13; `buy` names the listing and the signature count, INV-14, INV-16).
@@ -318,28 +373,37 @@ export const landing = {
       // kb/90 §2, §5.9, §7.2 (SOL records are checked too); D-15, D-40, DP5. `sol` = solVariant(SOL_UI_ENABLED,
       // SOL_SEND_ENABLED), as for `hood.rules`. "No tokens" covers ERC-20 and Solana tokens without reading as "no Solana".
       q: "Which chains and coins work?",
+      // site-refresh facts §2, §1.3 (C7S:24-38, :66-70; C46:9-12); site-refresh R1 (no USDC inside on NEAR named here). "At its
+      // addresses" is deliberate: wNEAR, and USDC if H-26 lands, can sit inside and come out again, so "sent to it"
+      // would be false. "The app can't move": the contract can't tell Bitcoin testnet4 from signet or Solana devnet from
+      // other clusters (one address string on each), so a hand-built request could move coins sent there (site-refresh W1).
       a: (sol: SolVariant = "off") => {
-        const chains = sol === "ui" ? "Bitcoin testnet4, Ethereum Sepolia and Solana devnet" : "Bitcoin testnet4 and Ethereum Sepolia";
-        const solLine =
+        const evm = "ETH and USDC on Ethereum Sepolia, Base Sepolia, Arbitrum Sepolia and OP Sepolia";
+        const lead = sol === "ui" ? `BTC on Bitcoin testnet4, SOL on Solana devnet, and ${evm}.` : `BTC on Bitcoin testnet4, plus ${evm}.`;
+        // ui: Solana is in the lead, so this slot holds the shared address and NEAR inside; the cut variants spend it
+        // on their Solana line (every variant stays ≤ 50 words)
+        const middle =
           sol === "ui"
-            ? ""
+            ? "The four Ethereum networks share one address. A Satchel can also hold NEAR inside. "
             : sol === "send"
               ? "Each Satchel also has a Solana devnet address; its owner can send SOL from the app, and clean history checks those signatures too. "
               : sol === "none"
                 ? "Each Satchel also has a Solana devnet address, but this contract doesn't sign for Solana. "
                 : "Each Satchel also has a Solana devnet address; the contract can sign SOL transfers, but the app can't send SOL yet. ";
-        return `Native coins only, no tokens: ${chains}. ${solLine}Send only Sepolia ETH to the Ethereum address: coins sent on another network can't be moved.`;
+        return `${lead} ${middle}The app can't move anything else at its addresses.`;
       },
     },
     "q-cost": {
       // kb/90 §5.4, §5.7; risky claims 19, 20
       q: "What does it cost?",
-      a: "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded. Each signature costs about 0.004 NEAR. Network fees on each chain come out of the Satchel's own coins. Giving one away costs only NEAR gas, and Satchel charges no fee on sales.",
+      a: "Minting takes a 0.02 NEAR deposit and listing 0.01 NEAR, with the unused part refunded. Each signature costs about 0.004 NEAR; network fees come from the Satchel's coins. Offers, spending allowances and long messages keep a little NEAR for storage. Giving by link adds 0.02 NEAR. Satchel charges no fee.",
     },
     "q-testnet": {
       // kb/90 §4 T2, T9; README; risky claim 21
       q: "Why testnet only? Is it audited?",
       a: "Satchel is new, unaudited hackathon software. Its contract can't be upgraded, so a bug can't be patched in place, and if NEAR's signer network changed its interface, its Satchels couldn't sign. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
+      // site-refresh R2; the dev role's twin, picked in `faqItems` (site-refresh F7; facts §1.9): dev2's contract has keys.
+      aDev: "Satchel is new, unaudited hackathon software. The development contract behind this build can still be upgraded; the release contract can't, so a bug there can't be patched in place. To try it, use a NEAR testnet wallet such as Meteor or Intear.",
     },
   },
 

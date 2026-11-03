@@ -11,8 +11,9 @@ export const satchel = {
   how: [
     { title: "Mint a Satchel", body: `The NFT gets its own ${chainList()} addresses. They're derived from the NFT, so they stay the same when it changes hands.` },
     {
-      title: "Only the owner can sign",
-      body: "To move coins, the owner asks the Satchel contract. It checks who owns the NFT, then asks NEAR's signer network for a signature.",
+      // C5:125-129
+      title: "The owner decides who signs",
+      body: "To move coins, the owner, or someone they let spend within daily caps, asks the Satchel contract. It checks who owns the NFT, then asks NEAR's signer network for a signature.",
     },
     {
       title: "Give it or sell it",
@@ -20,8 +21,9 @@ export const satchel = {
     },
   ],
   proof: {
+    // clean-view.test reads this key.
     cleanTip:
-      "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Ethereum Sepolia and Solana devnet: none can still move the coins you are buying.",
+      "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Solana devnet and the four Ethereum testnets: none can still move the coins you are buying.",
   },
   page: {
     visitorH1: "This NFT is a wallet.",
@@ -87,7 +89,7 @@ export const satchel = {
     fund: "Add coins",
     fundcard: {
       title: "Add coins to this Satchel",
-      body: "Anyone can send testnet coins to its addresses. Only its owner can send them out.",
+      body: "Anyone can send testnet coins to its addresses. Only its owner, or someone they let spend within daily caps, can send them out.",
     },
   },
   facts: {
@@ -123,7 +125,8 @@ export const satchel = {
     path: (id: string, chain: string) => `Path satchel/${id}/${chain}`,
     /** After the path (mono): "derives the Bitcoin address above." The addresses themselves live in the Inside rows. */
     derives: (chain: string) => `derives the ${chain} address above.`,
-    guarantee: "Anyone can re-derive these addresses. Only the current owner can get signatures for them.",
+    // C5:125-129
+    guarantee: "Anyone can re-derive these addresses. Only the current owner, or someone they let spend within daily caps, can get signatures for them.",
     yourself: "Verify it yourself",
   },
   fund: {
@@ -131,7 +134,8 @@ export const satchel = {
     label: (network: string) => `This Satchel's ${network} address`,
     only: { btc: "Send only Bitcoin testnet4 coins to this address.", evm: "Send only Sepolia ETH to this address.", sol: "Send only Solana devnet SOL to this address." },
     time: { btc: "Testnet4 confirmations are irregular: minutes to hours.", evm: "About 12 seconds to confirm.", sol: "A few seconds to confirm." },
-    anyone: "Anyone can add coins. Only the owner can send them out.",
+    // e2e flows.spec.ts:133 pins it.
+    anyone: "Anyone can add coins. Only the owner, or someone they let spend within daily caps, can send them out.",
     faucet: { btc: "Get testnet BTC", evm: "Get Sepolia ETH", sol: "Get devnet SOL" },
     copy: "Copy address",
     share: "Share",

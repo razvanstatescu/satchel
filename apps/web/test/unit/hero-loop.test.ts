@@ -24,6 +24,7 @@ import {
 import { holdAt } from "@/components/landing/motion/tracks";
 import { mergeTracks, toKeyframes, type Frame } from "@/lib/motion/play";
 import { copy } from "@/lib/copy";
+import { shareText, usdText } from "@/lib/format";
 
 /**
  * The hero loop (design-spec §4.2; motion-spec §10; LANDING-CONCEPT-READY): the 12 s timeline as data, and the server
@@ -165,7 +166,26 @@ describe("the stage's server markup (HeroStage.tsx)", () => {
     const scene = stage.slice(stage.indexOf('<div class="lp-stage__scene"'), stage.indexOf('<div class="lp-stage__bar"'));
     expect(scene).toMatch(/^<div class="lp-stage__scene" data-scene="" aria-hidden="true">/);
     expect(text(scene)).toBe("");
-    for (const l of [D.name, D.btc.split("\u00a0")[0], D.price, D.sigs, D.checkedBy, D.sig(3), D.settled, D.checking, D.clean, copy.pill.listed, copy.pill.active, copy.card.yours]) {
+    const o = copy.overview;
+    for (const l of [
+      D.name,
+      o.estimate(usdText(D.usd)),
+      o.atPrices,
+      "BTC",
+      shareText(0.5),
+      o.plus(1),
+      o.plus(2),
+      D.price,
+      D.sigs,
+      D.checkedBy,
+      D.sig(3),
+      D.settled,
+      D.checking,
+      D.clean,
+      copy.pill.listed,
+      copy.pill.active,
+      copy.card.yours,
+    ]) {
       expect(scene, l).toContain(`data-l="${attr(l)}"`);
     }
     expect(stage.match(/<div class="lp-hang lp-hang--[lr]" data-charm="" aria-hidden="true">/g)).toHaveLength(2);
@@ -178,6 +198,9 @@ describe("the stage's server markup (HeroStage.tsx)", () => {
     expect(css).toMatch(/\.lp-stage \[data-k="yours"\] \{\s*opacity: 0;/);
     expect(css).toMatch(/\.lp-stage__ticker > :not\(\[data-cap="3"\]\) \{\s*opacity: 0;/);
     expect(css).toMatch(/\.lp-stage__step\[data-done\] > b,\s*\.lp-stage__step\[aria-current\] > b \{\s*scale: 1 1;/);
+    // the value bar fills on scale from its left edge (never a width), and the pill drops its word below 300 px of card
+    expect(css).toMatch(/\.lp-bar__seg \{[^}]*transform-origin: 0 50%;/);
+    expect(css).toMatch(/@container lpcard \(max-width: 299px\) \{\s*\.lp-stage \.lp-card__state \.lp-pill \{\s*gap: 0;\s*padding: 5px;\s*\}\s*\.lp-stage \.lp-card__state \.lp-pill > \.lp-l \{\s*display: none;/);
   });
 
   it("the steps list holds the four captions as real text, act 3 current; the visible ticker is aria-hidden attributes", () => {

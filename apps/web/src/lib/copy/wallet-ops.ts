@@ -110,6 +110,8 @@ export const walletOps = {
       connectTitle: "Connect a wallet first",
       connectBody: (id: string) => `Connect the wallet that owns Satchel #${id} to empty it.`,
       notOwnerTitle: (id: string) => `You don't own Satchel #${id}`,
+      // Take it all out is owner-only (wallet-ops.ts:77-117): its own body, never "someone they let spend".
+      notOwnerBody: (account: string, owner: string) => `You're connected as ${account}. Only ${owner} can take everything out.`,
       listedTitle: "Paused for sale",
       listedBody: (id: string) => `Signing is paused while Satchel #${id} is listed. Stop selling first.`,
       zeroTitle: "Nothing to take out",

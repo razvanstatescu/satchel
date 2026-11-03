@@ -12,7 +12,8 @@ export const shell = {
   app: {
     name: "Satchel",
     badge: "Testnet",
-    badgeTip: "Satchel runs on NEAR testnet, Bitcoin testnet4 and Ethereum Sepolia. Coins here have no value.",
+    // site-refresh R5; D-46; C7S:24-35: the header badge's tooltip missed Solana and the L2s.
+    badgeTip: "Satchel runs on NEAR testnet, Bitcoin testnet4, Solana devnet and four Ethereum testnets. Coins here have no value.",
     fixture: "Sample data: these pages don't read the chains live.",
     /** A flow sheet's step line (FlowShell), on input steps only: "Step 1 of 2". */
     step: (index: number, count: number) => `Step ${index} of ${count}`,
@@ -133,7 +134,7 @@ export const shell = {
       "Its own Bitcoin testnet4 address",
       "Its own Ethereum Sepolia address",
       ...(SOL_NAMED ? ["Its own Solana devnet address"] : []),
-      "Only its owner can move the coins",
+      "Its owner decides who can move the coins",
       "A public record of every signature it makes",
     ],
     /** The CTA while the wallet is open, and the note under it. */

@@ -59,9 +59,10 @@ export const flows = {
     },
     guard: {
       connectTitle: "Connect the owner's wallet",
-      connectBody: (id: string) => `Only the owner of Satchel #${id} can send from it.`,
+      // C5:147: send stays open to someone the owner lets spend, unlike message signing and giving.
+      connectBody: (id: string) => `Only the owner of Satchel #${id}, or someone they let spend, can send from it.`,
       notOwnerTitle: (id: string) => `You don't own Satchel #${id}`,
-      notOwnerBody: (account: string, owner: string) => `You're connected as ${account}. Only ${owner} can send from it.`,
+      notOwnerBody: (account: string, owner: string) => `You're connected as ${account}. Only ${owner}, or someone they let spend, can send from it.`,
       listedTitle: "Paused for sale",
       listedBody: (id: string) => `Satchel #${id} is for sale. Stop selling it to send.`,
       /** app-screens §6, §7: the listed guards' action (send and give). */

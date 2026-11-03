@@ -117,7 +117,7 @@ describe("How it works (HowSection.tsx)", () => {
 
   it("the scenes: a New card on lemon, the signing tracker on sunken, the card mid-swing (−8°) over its new owner on sky", () => {
     const l = labels(html);
-    for (const s of [copy.card.preview, copy.card.new, copy.sign.steps.wallet.done, copy.pill.signing, copy.sign.mpc[0], C.labels.sent, copy.landing.uses.tags[2]]) expect(l, s).toContain(s);
+    for (const s of [copy.card.preview, copy.card.new, copy.overview.empty, copy.sign.steps.wallet.done, copy.pill.signing, copy.sign.mpc[0], C.labels.sent, copy.landing.uses.tags[2]]) expect(l, s).toContain(s);
     expect(html).toContain('data-k="mint-card"');
     expect(html).toContain('data-k="give-pose"');
     expect(css).toMatch(/\.lp-pose \{\s*transform: rotate\(-8deg\);\s*transform-origin: 50% -22px;/);
