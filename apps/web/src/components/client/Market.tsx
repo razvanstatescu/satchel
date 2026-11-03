@@ -438,9 +438,15 @@ export function MakeOfferFlow({ snap }: { snap: SatchelSnapshot }) {
       setNote({ kind: "error", text: copy.buy.readFailed });
       return;
     }
+    // bind only the count the browser just checked, like Buy (SaleTab): a record made while the check read the chains
+    // would otherwise be bound unchecked, and could stay unused through the accept
+    if (sat.sig_count !== fresh.sig_count) {
+      setNote({ kind: "error", text: copy.offers.stale });
+      return;
+    }
     const now = clockNow();
     const expiresAtMs = now + (EXPIRY_OPTIONS.find((o) => o.value === expiry)?.ms ?? 7 * 24 * 3600 * 1000);
-    const terms = { tokenId: id, expectedSigCount: sat.sig_count, expectedInsideEpoch: inside?.inside_epoch ?? 0, expiresAtMs };
+    const terms = { tokenId: id, expectedSigCount: fresh.sig_count, expectedInsideEpoch: inside?.inside_epoch ?? 0, expiresAtMs };
     const tx = currency === "usdc" ? marketCalls.makeOfferUsdc(amount, terms, USDC_CONTRACT, SATCHEL_CONTRACT) : marketCalls.makeOfferNear(amount, terms, SATCHEL_CONTRACT);
     const r = await runCall(wallet, tx, accountId, (s) => setPhase(s === "wallet" ? "wallet" : "doing"));
     setPhase("idle");

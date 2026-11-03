@@ -158,6 +158,27 @@ test.describe("C4: offers", () => {
     await expect(offers.getByTestId("offer-blocked")).toContainText("This Satchel changed since the offer was made");
   });
 
+  test("a signature recorded while the re-check runs stops the offer: it binds only the count it checked, like Buy", async ({ page }) => {
+    await useMockWallet(page, BOB);
+    await page.goto("/s/6/offer");
+    const flow = page.getByTestId("offer-flow");
+    await expect(flow.getByTestId("offer-gate")).toHaveAttribute("data-gate", "empty", { timeout: 20_000 });
+    await flow.getByTestId("offer-amount").fill("1");
+    await flow.getByTestId("offer-cta").click();
+    // the fixture re-check reads the contract, then waits 700 ms (useCleanCheck.ts): a record lands in between
+    await page.evaluate((owner) => {
+      const key = "satchel:sim:v1";
+      const s = JSON.parse(sessionStorage.getItem(key) ?? "null") ?? { startedAt: Date.now() };
+      const now = Date.now();
+      const record = { tokenId: "6", seq: 0, chain: "evm", payload: "", detail: { evm_message: { message: "6869" } }, requester: owner, createdAt: now, height: 1, resolveAt: now, outcome: "signed" };
+      sessionStorage.setItem(key, JSON.stringify({ ...s, records: [...(s.records ?? []), record] }));
+    }, ALICE);
+    await expect(flow.locator('[data-note="error"]')).toHaveText("This Satchel changed since you reviewed it (a new signature or a withdrawal). Check again.", { timeout: 10_000 });
+    await expect(page).toHaveURL(/\/s\/6\/offer$/);
+    const offers = await page.evaluate(() => JSON.parse(sessionStorage.getItem("satchel:sim:v1") ?? "{}").offers ?? {});
+    expect(Object.keys(offers)).toHaveLength(0);
+  });
+
   test("a USDC offer needs a storage-credit prepay first; once prepaid, the owner can accept it", async ({ page }) => {
     await useMockWallet(page, BOB);
     await page.goto("/s/6/offer");
