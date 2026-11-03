@@ -331,3 +331,30 @@ always has a SOL source (`cleanSources()` in `clean-live.ts`, pinned by a unit t
   - unit 340/340; Playwright 133/133;
   - `responsive.spec`'s menu-row height check now waits for the sheet to settle (it was flaky mid-slide);
   - the `playwright.config.ts` environment still sets `NEXT_PUBLIC_SOL_SEND=on`, which is now redundant.
+
+## Update 2026-11-03 (D-51): the landing catches up with the feature sprint
+- **Copy** (`lib/copy/landing.ts`, `lib/faq.ts`):
+  - What it is, `q-keys` and the strip name someone the owner lets spend within daily caps.
+  - Under the hood rule 1 lists what the contract signs (ETH and USDC on four Ethereum testnets, Bitcoin, SOL, text
+    messages). Rules 3, 5 and 6 cover offers.
+  - `q-chains`, `q-proves` and `q-cost` cover USDC, the L2s, NEAR held inside, messages and giving by link.
+  - `q-testnet` has a dev twin (`aDev`), picked in `faqItems` on the dev role.
+- **App strings:**
+  - the header badge's tooltip and `proof.cleanTip` name Solana and the four Ethereum testnets;
+  - the send lines say "the owner, or someone they let spend within daily caps";
+  - Sign a message and Take it all out keep owner-only guards (`multichain.msg.guard`, `walletOps.empty.guard`).
+- **Art** (`landing/art.tsx`, `landing.css`, `hero/*`):
+  - `ArtOverview` mimics the app's value card (D-50): "≈ $8,000.00 at mainnet prices", value bar, chips with shares,
+    "+N", pill.
+  - `ArtEmpty` is the app's empty card ("Nothing inside yet"), shown in How step 1.
+  - The sample is `copy.landing.desk.{usd, mix}`, formatted at render by `usdText()`/`shareText()`. Both moved to
+    `lib/format.ts` and are re-exported by `lib/overview.ts`.
+  - The hero loop has 37 `data-k` keys (was 31). Act 1 fills the bar's segments as the chips stick on (560–1,640 ms),
+    then shows the estimate (2,100 ms).
+- **The strip:** `landing/MoreSection.tsx` + `more.css` (`#more`), between Trust and Questions. It has five items with
+  `HelpLink`s to `/questions`.
+- **Offers:** `MakeOfferFlow` (`Market.tsx`) refuses when the signature count moved during the re-check, and binds the
+  checked count, as Buy does (`offers.spec.ts` regression test).
+- **Budgets:** above Questions ≤ 380 words; page height ≤ 9,000 px at 390 (was 8,500) and ≤ 6,500 at 1280.
+- **Research and design:** `docs/design/site-refresh/`; the blind test is `docs/design/satchel-2.0/tests/blind-test-3.md`.
+- **Tests:** tsc 0, lint clean, vitest 636/636, Playwright 305/305 (`CI=1 E2E_PORT=3337`).

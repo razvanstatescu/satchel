@@ -1141,6 +1141,49 @@ value." note.
 
 **Human:** decided by Razvan.
 
+## D-51 · The landing catches up with the feature sprint (2026-11-03, Razvan)
+
+**Decision.** Razvan approved all three parts of the plan for `/` ("Let's build all 3"):
+1. **Fix the claims the sprint made false.**
+   - "Only the owner can send" (C5 spending allowances).
+   - "Native coins only" and "Sepolia only" (C2 USDC; C3 Base, Arbitrum and OP Sepolia).
+   - "Refuses messages and contract calls" (C7 message signing; USDC transfers).
+   - "Only a purchase can move it" while it's for sale (C4 offers).
+   - The clean-history scope (USDC is covered).
+
+   App strings with the same claims changed too: the header badge's tooltip, the Clean history tooltip and the
+   owner-only send lines. Sign a message and Take it all out got their own owner-only guards.
+2. **The sample card is the app's value card (D-50)** in the hero, What it is, How it works and the catch strip.
+   - It shows "≈ $8,000.00 at mainnet prices", the value bar, coin chips with shares and the pill.
+   - The sample is fixed and round: 0.05 BTC, 0.80 ETH, 12 SOL and 800 USDC, with shares of 50/25/15/10.
+   - The figure is formatted at render with the app's `usdText()` and drawn only in `aria-hidden` art.
+   - It's listed at 2,000 NEAR: par at the fixture prices (NEAR = 4).
+   - The hero loop keeps its four acts and 12 s; in act 1 the value bar fills as the coins stick on.
+3. **A "What else it does" strip** after Trust: Make an offer, Give by link, Let someone spend, USDC and L2s, and
+   Take it all out, with help links to `/questions`.
+
+**Rules kept** (site-refresh rulings R1–R9):
+- Sale and offer currencies on the landing say NEAR only. USDC held on NEAR isn't advertised until H-26 (Nov 8).
+- "Can't be upgraded" and "no admin key" follow the contract role: `q-testnet` gets a dev twin (`aDev`), as `q-keys`
+  and the trust band already have.
+- Someone the owner lets spend can only send coins from the chain addresses, within daily caps. They can never sign
+  messages, take inside coins out, list, give or sell.
+- Offer refunds are never called automatic.
+
+**Also fixed after the claims audit:**
+- `q-chains` ends "The app can't move anything else at its addresses." The contract can't tell testnet4 from signet,
+  or devnet from other Solana clusters.
+- `q-cost` names the storage that long messages keep.
+- **Make an offer bound a signature count it hadn't checked** (`Market.tsx`). A record made during the re-check was
+  bound unchecked. It now refuses, as Buy does, and an e2e regression test in `offers.spec.ts` covers it.
+- The README and the kb/90 §7.7 disclosure no longer say the contract refuses messages and contract calls. The README
+  names the allowance path to `sign_for` and `accept_offer` as an ownership path.
+
+**Evidence:** `docs/design/site-refresh/` holds the facts, rulings, copy deck, design notes, Mobbin strip references
+and claims audit. The blind test is `docs/design/satchel-2.0/tests/blind-test-3.md`.
+
+**Human:** Razvan decided the plan; the rulings were made during the build.
+
 ## Decisions that need the human (Razvan / team)
 
 Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into the existing H-xx. Every row has a default and a deadline. "Default" means what happens if nobody objects by the deadline. H-02 and the payout account have no default, because an agent may never fill them in.

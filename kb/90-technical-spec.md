@@ -1163,7 +1163,7 @@ Demo token #4 is deliberately un-settleable (R-13):
 
 ### 7.7 The badge's exact promise and the README disclosure
 
-**Badge (Hallmark "CLEAN HISTORY") tooltip:** "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Ethereum Sepolia and Solana devnet: none can still move the coins you are buying."
+**Badge (Hallmark "CLEAN HISTORY") tooltip:** "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Solana devnet and the four Ethereum testnets: none can still move the coins you are buying." (Wording updated 2026-11-03 for C3's three L2 testnets, which the check also reads; D-51.)
 
 **README disclosure (final text; fill in the placeholders on Day 10):**
 
@@ -1179,9 +1179,10 @@ Demo token #4 is deliberately un-settleable (R-13):
 > **What gets recorded.** Before NEAR's MPC network signs anything, `sign_for` records on-chain exactly what is being signed:
 > - the Ethereum chain and nonce;
 > - the Bitcoin coin (outpoint) being spent;
-> - the Solana blockhash.
+> - the Solana blockhash;
+> - the full text of a signed message.
 >
-> It refuses everything else: raw hashes, messages, permits, EIP-7702 authorizations, contract calls, other chains, Bitcoin sighash types other than ALL, and Solana durable nonces.
+> It accepts only plain ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and plain-text messages (EIP-191 and Solana off-chain). It refuses everything else: raw hashes, EIP-712 permits, EIP-7702 authorizations, any other contract call, other chains, Bitcoin sighash types other than ALL, and Solana durable nonces.
 >
 > **What "Clean history" means.** Your browser read every record and found that none can still move funds:
 > - Ethereum: the nonce was used (3 confirmations on Sepolia).
@@ -1196,7 +1197,7 @@ Demo token #4 is deliberately un-settleable (R-13):
 > - It trusts the data providers it queries (two per chain for Bitcoin and Ethereum; the UI says when only one answered) and the confirmation depth used.
 >
 > **What it does not cover.**
-> - Other chains, tokens or addresses.
+> - Other chains or addresses, and tokens other than USDC.
 > - Signatures made after you buy.
 > - Testnet4 reorgs: one confirmation on testnet4 can be undone by anyone mining two difficulty-1 blocks.
 > - Coins that another wallet later sends to an outpoint an old signature already spends: the app marks them "encumbered". Satchel's own sends cannot create such outpoints, because the app refuses to build any transaction whose id an old record already references.

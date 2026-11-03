@@ -1576,7 +1576,7 @@ Brand sample copy corrected by product facts (`brand/README.md` table, applied):
 | `clean.trust` / `.hint` | "Runs in your browser. Satchel's server isn't trusted for this." / "Server check {t} ago: {verdict}" + "Waiting for your browser's check" |
 | `clean.how` | "How Satchel checks this" → kb/90 §7.7 badge promise verbatim → "What it doesn't cover" (kb/90 §4 list) → "README disclosure" |
 | `clean.disclosure` | "The contract doesn't run this check; this app does, by reading each chain. Buy stays disabled until it passes." |
-| `proof.clean` | "Clean history · checked {t} ago" · tooltip = kb/90 §7.7 **verbatim**: "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Ethereum Sepolia and Solana devnet: none can still move the coins you are buying." |
+| `proof.clean` | "Clean history · checked {t} ago" · tooltip = kb/90 §7.7 **verbatim**: "Every signature this Satchel has issued is recorded on-chain. Your browser just checked each one against Bitcoin testnet4, Solana devnet and the four Ethereum testnets: none can still move the coins you are buying." |
 | `proof.balance` | "Verified balance · read {t} ago" · tooltip "Read live from each chain for the addresses derived from this NFT. Coins an earlier signature can still spend are excluded. Unconfirmed deposits never count." |
 
 **Market, Mint and Contract**

@@ -77,7 +77,7 @@ The product follows the right-hand column. Propose the fixes upstream in the des
 | Brand text | Correct for Satchel | Evidence |
 |---|---|---|
 | "An NFT that is a wallet on every chain"; "The NFT that carries every chain." (`web/og-image.png`, `site.webmanifest`); "One NFT. Every chain inside." (In context) | Never "every chain": name the chains. The website and the app say **Bitcoin, Ethereum and Solana** (D-45, D-46). The Solana UI is on by default; `NEXT_PUBLIC_SOL_UI=off` is the cut switch. Tagline: "An NFT that is a wallet." | D-37, D-40, D-45, D-46, kb/90 §5.9 |
-| "real Bitcoin, Ethereum and Solana" (Main board, README intro) | **Testnet only** (Bitcoin testnet4, Ethereum Sepolia, Solana devnet). "Testnet only. Coins here have no value." stays visible | kb/90 §4 T7 |
+| "real Bitcoin, Ethereum and Solana" (Main board, README intro) | **Testnet only** (Bitcoin testnet4, Solana devnet and four Ethereum testnets). "Testnet only. Coins here have no value." stays visible | kb/90 §4 T7 |
 | Fiat totals "$4,812.40", "≈ $2,903.00", "about $4,812"; "fiat to 2" | Native amounts with tickers everywhere, **except** one labelled estimate per Satchel: "≈ $X" with "at mainnet prices" (2 decimals), in its overview only | D-50 (reverses D-37 UX-1) |
 | "Safe to buy in about 2 minutes" | There is **no wait between listing and buying**. The only wait is the 250-block quiet period **before listing** | D-05 rev 2; kb/90 §8.9 |
 | "Usually under a minute." | "Usually about 10 seconds." The network allows up to about 2 minutes | kb/90 §8.6, §8.9 |
@@ -87,4 +87,4 @@ The product follows the right-hand column. Propose the fixes upstream in the des
 | "give it to anyone in one tap" | A gift takes an account check, a review and a wallet approval, and the contract refuses some receivers | kb/90 §5.11 |
 | "Network fee ~0.00002 BTC" | Bitcoin fees in sats: "Network fee ~282 sats" | kb/80; kb/90 §8.9 |
 | Day coral buttons take "a 1px `brand-deep` border"; `brand-deep` is the pressed fill | The canvas sticker recipe: a 2 px ink outline plus the drop. Pressed is the 4 px move with the fill unchanged (`brand-deep` under ink is 3.87:1) | kb/81 R4 contrast |
-| `danger` usage "…Revoke" | There are no approvals or revokes (unbuilt; "approval" is banned in copy) | kb/80 copy rules |
+| `danger` usage "…Revoke" | Revoke exists since C5 (Who can spend) as a plain secondary button, never in the danger tone; "approval" stays banned in copy | kb/80 copy rules; `docs/specs/C5.md` |

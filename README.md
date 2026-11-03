@@ -196,13 +196,16 @@ They sign only with `--send` and a typed `yes`, using keys from `~/.near-credent
 
 - **One contract owns every key.** Token N signs at the MPC paths `satchel/N/btc`, `satchel/N/evm` (secp256k1,
   domain 0) and `satchel/N/sol` (ed25519, domain 1), with the contract as the predecessor. Only the current owner can
-  call `sign_for` ([`contracts/satchel/src/sign.rs`](contracts/satchel/src/sign.rs)). Ownership moves only through
-  `nft_transfer` ([`lib.rs`](contracts/satchel/src/lib.rs)) and `buy` / `ft_on_transfer`
-  ([`sale.rs`](contracts/satchel/src/sale.rs)).
+  call `sign_for` ([`contracts/satchel/src/sign.rs`](contracts/satchel/src/sign.rs)), or an account the owner lets
+  spend within a rolling 24-hour cap per coin and network ([`allowance.rs`](contracts/satchel/src/allowance.rs));
+  allowances end when the Satchel changes hands. Ownership moves only through `nft_transfer`
+  ([`lib.rs`](contracts/satchel/src/lib.rs)), `buy` / `ft_on_transfer` ([`sale.rs`](contracts/satchel/src/sale.rs))
+  and `accept_offer` ([`offers.rs`](contracts/satchel/src/offers.rs)).
 - **Structured payloads, never hashes.** The contract parses the exact bytes and hashes them itself:
-  keccak256 for EVM, sha256d per BTC input, and the raw message for SOL. It refuses anything else, including raw
-  hashes, permits, EIP-7702 authorizations, contract calls, other chains, non-ALL sighash types and durable nonces
-  ([`contracts/satchel/src/parse/`](contracts/satchel/src/parse)).
+  keccak256 for EVM, sha256d per BTC input, and the raw message for SOL. It accepts only plain ETH and USDC transfers
+  on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and plain-text messages, and refuses anything
+  else, including raw hashes, EIP-712 permits, EIP-7702 authorizations, any other contract call, other chains, non-ALL
+  sighash types and durable nonces ([`contracts/satchel/src/parse/`](contracts/satchel/src/parse)).
 - **The record comes before the signature.** It is written in the same receipt as the MPC call, so a signature that
   arrives late or after a timeout is still on record.
 - **The sale is bound to the record count.** `list` needs 250 blocks (≈ 140 s) of signing silence. While listed,
@@ -243,10 +246,12 @@ They sign only with `--send` and a typed `yes`, using keys from `~/.near-credent
 signed:
 - the Ethereum chain and nonce;
 - the Bitcoin coin (outpoint) being spent;
-- the Solana blockhash.
+- the Solana blockhash;
+- the full text of a signed message.
 
-It refuses everything else: raw hashes, messages, permits, EIP-7702 authorizations, contract calls, other chains,
-Bitcoin sighash types other than ALL, and Solana durable nonces.
+It accepts only plain ETH and USDC transfers on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and
+plain-text messages (EIP-191 and Solana off-chain). It refuses everything else: raw hashes, EIP-712 permits, EIP-7702
+authorizations, any other contract call, other chains, Bitcoin sighash types other than ALL, and Solana durable nonces.
 
 **What "Clean history" means.** Your browser read every record and found that none can still move funds:
 - Ethereum: the nonce was used (3 confirmations), on whichever of the four supported testnets the record names.
@@ -266,7 +271,7 @@ It also checked that the Ethereum address has no delegated code and that the Sol
   the confirmation depth used.
 
 **What it does not cover.**
-- Other chains, tokens or addresses.
+- Other chains or addresses, and tokens other than USDC.
 - Signatures made after you buy.
 - Testnet4 reorgs: anyone who mines two difficulty-1 blocks can undo one confirmation on testnet4.
 - Coins that another wallet later sends to an outpoint an old signature already spends. The app marks them
