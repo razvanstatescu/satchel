@@ -358,3 +358,38 @@ always has a SOL source (`cleanSources()` in `clean-live.ts`, pinned by a unit t
 - **Budgets:** above Questions ≤ 380 words; page height ≤ 9,000 px at 390 (was 8,500) and ≤ 6,500 at 1280.
 - **Research and design:** `docs/design/site-refresh/`; the blind test is `docs/design/satchel-2.0/tests/blind-test-3.md`.
 - **Tests:** tsc 0, lint clean, vitest 636/636, Playwright 305/305 (`CI=1 E2E_PORT=3337`).
+
+## Update 2026-11-03 (D-52): the landing presents the mainnet product
+- **Copy** (`lib/copy/landing.ts`, `lib/copy/shell.ts`, `lib/faq.ts`):
+  - `/` names Bitcoin, Solana, and Ethereum, Base, Arbitrum and Optimism: `q-chains`, `q-keys`, `q-proves`, Under the
+    hood rule 1, the bento's "USDC and L2s" line, the meta description and the final CTA ("connect a NEAR wallet").
+  - `faqItems` takes `framing: "product" | "deployment"` (site-polish P1). `/` uses "product". `allFaqGroups`
+    (`/questions`) uses "deployment", which keeps today's strings byte for byte: `aDeployment` on `q-keys` and
+    `q-proves`, `q-testnet.deployment`, and the testnet names in `q-chains`. The group title stays "Testnet and safety".
+  - On `/`, `q-testnet` asks "Is it audited?" and leads with "No.". Its `aDev` now carries the signer-network risk too.
+  - The dev Trust body and `keysDev` say the contract has keys, "so we can change its code". Neither says "checks are
+    skipped".
+  - Deleted: `copy.home.note` and `copy.role`. New, all attribute-drawn: `L.uses.hint`, `L.more.art` and
+    `L.lock.dev.code`.
+- **Testnet notes on `/`:** the hero note, the final CTA note and the landing footer's testnet row are gone
+  (`HeroSection.tsx`, `FinaleSection.tsx`, `NavShell.tsx` `Footer`). The landing footer right-aligns its theme control.
+  The header badge, its tooltip and the menu sheet's line stay (P2).
+- **Role strip:** `NavShell.tsx` `Strips` renders only the fixture strip, on every page. `lockView` has no rc note, so rc
+  reads like final. The checklist's `copy.clean.checks.dev` and `/contract`'s role stay (kb/90 E-55).
+- **Art:**
+  - `ArtOverview` (`landing/art.tsx`) drops "at mainnet prices", so the card reads "≈ $8,000.00", and `.lp-card__head`
+    centres the total and the pill. The app's `SatchelCard` and `Overview` keep the label (`IS_TESTNET`).
+  - What it is: the Bitcoin tag reads "bc1q…".
+  - Uses: a "+ USDC and L2s" chip with the USDC coin under row 1 (`UsesSection.tsx`, `.lp-hint`).
+- **The bento:** `landing/MoreSection.tsx`, the new `landing/more-art.tsx` (each tile's art) and a rewritten `more.css`.
+  - It sits on the new `--band` token (`globals.css`; kb/81 R4), and `QuestionsSection` takes `SECTION_Y` after it.
+  - One once-on-enter moment, `offer` (`motion/enter.ts`): the offer slip slides in and its check sticks on.
+- **Trust, dev:** `TrustSection.tsx` gives every role the split; dev gets `CodeCard`, a simplified `sign_for` labelled
+  "Simplified".
+  - The loop is `landing/code/timeline.ts` (10 s; the server frame is step 3, at 6 s) and `landing/code/engine.ts`
+    (`mountCode`, registered in `LandingMotion`).
+  - It has step bars and a Pause, and stops off-screen, on a hidden tab and when inert.
+- **Budgets:** above Questions ≤ 380 words (unit sum 373); dev Trust ≤ 50 words (unit guard); page height ≤ 7,000 px at
+  1280 and ≤ 10,100 at 390 (P8).
+- **Research and design:** `docs/design/site-polish/`.
+- **Tests:** tsc 0, lint clean, vitest 654/654, Playwright 307/307 (`CI=1 E2E_PORT=3337`); after the lead tile's CSS fix, the landing, responsive, static, catch, hero, theme-a11y and 320/Night specs 117/117.

@@ -1139,6 +1139,9 @@ amounts across chains can't be compared. D-37's concern (judges reading testnet 
 handled by the label: "≈" and "at mainnet prices" every time, next to the "Testnet only. Coins here have no
 value." note.
 
+**Superseded in part by D-52** (2026-11-03): the label and the note now hold in the app only. The landing art shows
+"≈ $X" with no label and no note.
+
 **Human:** decided by Razvan.
 
 ## D-51 · The landing catches up with the feature sprint (2026-11-03, Razvan)
@@ -1162,6 +1165,10 @@ value." note.
 3. **A "What else it does" strip** after Trust: Make an offer, Give by link, Let someone spend, USDC and L2s, and
    Take it all out, with help links to `/questions`.
 
+**Superseded in part by D-52** (2026-11-03): the landing's sample reads "≈ $8,000.00" with no label, the strip is now a
+five-tile bento on its own band, and `q-testnet` on `/` asks "Is it audited?" (id and `aDev` kept; `/questions` keeps
+the old question and the testnet names).
+
 **Rules kept** (site-refresh rulings R1–R9):
 - Sale and offer currencies on the landing say NEAR only. USDC held on NEAR isn't advertised until H-26 (Nov 8).
 - "Can't be upgraded" and "no admin key" follow the contract role: `q-testnet` gets a dev twin (`aDev`), as `q-keys`
@@ -1183,6 +1190,66 @@ value." note.
 and claims audit. The blind test is `docs/design/satchel-2.0/tests/blind-test-3.md`.
 
 **Human:** Razvan decided the plan; the rulings were made during the build.
+
+## D-52 · The landing presents the mainnet product (2026-11-03, Razvan)
+
+**Context.** Razvan asked for a polish round on `/`:
+- drop notes like "at mainnet prices": the website should present the product with every feature it will have on
+  mainnet;
+- drop "Dev contract: lock and code checks skipped";
+- under "Sell BTC, ETH and SOL together", a subtle hint that other coins work too;
+- a small looping visual for the "Development contract" band, "maybe with some code moving";
+- "What else it does" on its own background, in two rows on desktop, as a bento grid, inspired by Mobbin,
+  duskwatch.app and the Just Add site, in Satchel's own style.
+
+**Decision.** His three answers:
+1. **Testnet notes: "Badge only."** On `/`, only the header "Testnet" badge and its tooltip say testnet. The app's own
+   pages keep their testnet notes and labels.
+2. **The role strip goes, on every page.**
+3. **"What else it does" keeps five items, as a bento:** two rows on desktop, adapting on tablet and phone, on its own
+   band.
+
+**What changed** (P1–P13 are the rulings in `docs/design/site-polish/rulings.md`):
+- **Network names on `/`:** Bitcoin, Solana, and Ethereum, Base, Arbitrum and Optimism. No testnet4, devnet, Sepolia or
+  "four Ethereum testnets". "Optimism", not "OP Mainnet", keeps the word "mainnet" out of the page text. The meta
+  description and the final CTA ("connect a NEAR wallet") drop "testnet" too.
+- **Testnet notes on `/`:** the hero note, the final CTA note and the landing footer's testnet row are gone. The header
+  badge and its tooltip remain. So does the phone menu sheet's line: below 420 px, signed out, the badge steps aside
+  for Connect, and the sheet line stands in for it (P2).
+- **The landing art** shows "≈ $8,000.00" with no label.
+- **`/questions` keeps its deployment text** byte for byte (P1). `faqItems` takes a framing option: "product" on `/`,
+  "deployment" on `/questions`. So `/questions` keeps the testnet names, the signer network's keys line, `q-testnet`'s
+  "Why testnet only? Is it audited?" and the group title "Testnet and safety". On `/`, `q-testnet` asks "Is it
+  audited?" (id and `aDev` kept).
+- **The role strip** ("Dev contract: lock and code checks skipped"; rc's "Release candidate: testnet rehearsal") and the
+  Trust band's rc note are gone. The buyer's Clean history checklist keeps its dev line (`copy.clean.checks.dev`), and
+  `/contract` still shows the role (kb/90 E-55).
+- **Trust, dev:** the body is reworded without "checks are skipped": "This site's contract still has keys, so we can
+  change its code. The release contract is born with no key and no admin or upgrade methods." Beside it, a code card
+  shows a simplified `sign_for`, labelled "Simplified" (P6). A 10 s loop walks its four steps, with step bars and a
+  visible Pause (P11).
+- **"What else it does"** is a five-tile bento on its own band, the new `--band` token (kb/81 R4). Make an offer leads,
+  and each tile holds a piece of the app's own UI as art.
+- **Uses:** an attribute-drawn "+ USDC and L2s" chip under "Sell BTC, ETH and SOL together" (0 visible words; P3).
+- **What it is:** the Bitcoin address tag reads "bc1q…" (was "tb1q…"; P4).
+
+**The honesty boundary.** The landing describes the product, never the deployment. Nothing on `/` says Satchel is live
+on mainnet, says the coins have value, gives a launch date or says "soon". The README and the app stay
+testnet-explicit. There, mainnet names would be false for the deployment in use: an Ethereum address is the same on
+mainnet, so a reader could send real ETH or USDC to a testnet Satchel and lose it. The connect dialog keeps its testnet
+guidance, because it's functional. D-51's rules still hold: sale and offer currencies say NEAR only, "can't be
+upgraded" is said only on rc and final, offer refunds are never called automatic, and someone the owner lets spend only
+sends coins within daily caps.
+
+**Supersedes:**
+- D-50's "every time, next to the 'Testnet only…' note": it now applies to the app only.
+- D-51's "≈ $8,000.00 at mainnet prices" sample and its strip wording.
+- On the landing, site-refresh rulings R1 (the EVM network names) and R3 (the label).
+
+**Evidence:** `docs/design/site-polish/` holds the rulings, the copy deck, the design notes, and the bento and code-card
+references.
+
+**Human:** decided by Razvan.
 
 ## Decisions that need the human (Razvan / team)
 

@@ -44,6 +44,16 @@
 > - **Sell** defaults to NEAR and registers USDC inline. Satchel's own wallet picker opens the chosen wallet directly
 >   (near-connect's `connect({ walletId })`).
 
+> **D-52 note (2026-11-03, Razvan): the landing presents the mainnet product.**
+> - **On `/` only:**
+>   - the copy names the product's networks (Bitcoin, Solana, and Ethereum, Base, Arbitrum and Optimism);
+>   - one testnet signal is left: the header badge and its tooltip, plus the phone menu sheet's line;
+>   - the landing footer has no testnet row;
+>   - the art shows "≈ $X" with no label.
+> - **The app keeps** every testnet note and the labelled fiat total below.
+> - **The RoleStrip is gone on every page.** The role shows on `/contract` and in the buyer's Clean history checks
+>   (kb/90 E-55).
+
 > **Decided 2026-10-21 (D-37):** UX-1 = **native only** (no fiat anywhere; the card hero ships the "{n} chains" fallback; prices route cut). UX-32 = landing H1 **"An NFT that is a wallet."** Brass-band stack (UX-17) and global Activity (UX-33) cut. All other R3 defaults accepted.
 
 How R3 relates to the other docs:
@@ -147,7 +157,7 @@ The full R2 rationale and references (R2-D01…D30) are in the R2 snapshot. Stat
 - **Signing reads like a Wise transfer** (R2): the Review button becomes "Approve in your wallet…", then a 4-row tracker that becomes the receipt; the copy changes at 20, 60 and 150 s; "Keep this tab open until it says Sent." until broadcast.
 - **Failures say exactly what moved.** "Signed, not sent" is a recoverable, calm "Needs attention" state with **Broadcast again**, shown wherever the user looks.
 - **Clean history reads like a car's health check:** one verdict sentence, the contract and account checks, the signatures grouped by whether they can still move coins, the sources and the check time. Buy sits under a GateLine; no override exists.
-- **Fiat appears once:** the card total "≈ $X · at mainnet prices" (UX-1 reopened), or "{n} chains" without prices. Testnet coins have no value, and the page says so.
+- **Fiat appears once:** the card total "≈ $X · at mainnet prices" (UX-1 reopened), or "{n} chains" without prices. Testnet coins have no value, and the page says so. (In the app. Since D-52 the landing art shows "≈ $X" alone.)
 - **Measured numbers** (kb/90 §8.9): MPC p50 6.7 s ("usually about 10 seconds"); BTC fee ≈ 282 sats at 2 sat/vB; testnet4 "minutes to hours" to confirm; 250 blocks ≈ 2 min 20 s; SOL blockhash ≈ 36 s; NEAR fee "≈ 0.004 NEAR (gas + permanent signature record)".
 
 ## IA & routes (aligned with kb/90 §8.1)
@@ -178,7 +188,7 @@ Implementation notes:
   - **Close** (✕, Esc, Done) replaces the URL with `/s/[id]`; it never relies on history, so deep links close correctly. **Minimize** (while signing) does the same and keeps the signing store alive (module level).
   - The in-flight intent lives in `localStorage["satchel:pending:v1"]` (kb/90 §8.6), so leaving or reloading resumes.
   - **SSR without JS:** the sheet or dialog markup is server-rendered and positioned by CSS only, so a no-JS visit shows the flow. Flow routes are not judge routes; judge facts never depend on the shell.
-- **Global chrome:** the NavShell (top bar below 1024, left navigation from 1024), the RoleStrip for `dev` and `rc`, the PendingPill (mobile) or PendingCard (desktop) while an intent is open, and a footer on every page with the help link in the same place (WCAG 3.2.6).
+- **Global chrome:** the NavShell (top bar below 1024, left navigation from 1024), the RoleStrip for `dev` and `rc` (removed, D-52), the PendingPill (mobile) or PendingCard (desktop) while an intent is open, and a footer on every page with the help link in the same place (WCAG 3.2.6).
 
 ### NavShell, theme and brand assets (B-08, B-09, B-01)
 | Part | Below 1024 | From 1024 |
@@ -187,7 +197,7 @@ Implementation notes:
 | Logo | The **lockup** at 36 px tall (133 px wide), linking to `/`. Clear space a quarter of the tile height (9 px) | The lockup at the top of the nav, 36 px |
 | Navigation | A **menu** button (44 px, `menu` icon) opens the **NavSheet** (the FlowShell sheet): My Satchels · Market · Mint (· Activity if built) · Contract facts · Theme | Links (`label`, `radius-sm`, 40 px tall, icon + word): My Satchels · Market · Mint (· Activity if built). Active: `surface-raised` + `ink`; inactive `ink-muted` (canvas) |
 | Account | The account control: an AccountAvatar button when connected (opens the account menu), or **Connect wallet** (secondary, never brass in the chrome) | The **account pill** at the bottom of the nav: avatar + account id in `address` style, 1 px `line-strong`, `radius-pill`; its menu holds Copy account ID · View on NearBlocks · Theme · Disconnect |
-| Testnet | A "Testnet" chip from 480 px (tooltip `app.badge.tip`); below 480 the note lives in the NavSheet and the footer | A "Testnet only. Coins here have no value." note at the bottom of the nav |
+| Testnet | A "Testnet" chip from 480 px (tooltip `app.badge.tip`); below 480 the note lives in the NavSheet and the footer (D-52: the landing footer has no note; the chip steps aside below 420 px, signed out, and the NavSheet line stands in) | A "Testnet only. Coins here have no value." note at the bottom of the nav |
 | Theme control | "Theme: System · Night · Day" (segmented, `monitor` / `moon` / `sun`) in the NavSheet and the footer | In the account menu and the footer. **P2** (P1 forces Night and hides it) |
 
 Brand assets (B-09), wired through the Next Metadata API (port `brand/web/head-snippet.html`; never its Google Fonts link):
@@ -259,7 +269,7 @@ The owner view has no sub (−52) but adds the ActionRow (+76), so it lands at a
 
 ### Satchel page layout `/s/[id]` (P1)
 **Order below 1024 (390):**
-1. Top bar, plus the RoleStrip (dev/rc) and the PendingPill (while an intent is open).
+1. Top bar, plus the RoleStrip (dev/rc; removed, D-52) and the PendingPill (while an intent is open).
 2. Meta chips + ⋯ (overflow: Copy token ID (value previewed) · Contract facts → `/contract` · View on NearBlocks · Copy link · Share on X).
 3. H1. Visitor: `title` "This NFT is a wallet." + the sub. Owner: `title` "Satchel #1", no sub.
 4. **SatchelCard `lg`** (stitched for the owner).
@@ -405,7 +415,7 @@ A blocking SSR page (kb/90 §8.1). Its layout and copy depend on the contract ro
 | Role | Shows |
 |---|---|
 | `rc` / `final` | `title` "Born without a key" + the sub "satchel.<team>.testnet was created, deployed, initialized and minted in one transaction with no AddKey. Only `sign_for` can get signatures for its Satchels."<br>A FactsGrid (sentence-case labels):<br>• Contract · Role;<br>• Access keys: "Account is locked (no access keys)";<br>• Birth tx (+ block A);<br>• Signer txs 0 · Oldest tx = the birth;<br>• Code hash (SHA-256) vs Expected (`circle-check` "Matches");<br>• MPC version · Config.<br>Then a "Verify it yourself" block of copy-paste commands (`address` style, each with Copy). Proofs come from FastNEAR (kb/90 §5.16) |
-| `dev` | The RoleStrip, and the `title` "Development contract". It says plainly that this account has keys and that the lock and code-hash checks are skipped |
+| `dev` | The RoleStrip (removed, D-52), and the `title` "Development contract". It says plainly that this account has keys and that the lock and code-hash checks are skipped |
 
 References: [Public](https://mobbin.com/sites/sections/a68d588f-1d33-489d-9e65-920c5df68e2f), [Glow facts](https://mobbin.com/screens/c8df7d33-1540-4ad3-bb4a-e3b17b3c210e), [Portrait](https://mobbin.com/screens/e850a968-e00d-423f-b8ad-63183c2680ea).
 
@@ -1015,7 +1025,7 @@ Primitive names are library-neutral. shadcn 4.22.1 `init -d` gives `base-nova` o
 |---|---|---|---|---|---|
 | **NavShell** (top bar < 1024, left nav ≥ 1024, NavSheet), AccountControl / AccountPill, Testnet chip | custom | Button, Menu, Sheet | P1 | global | **new** (was TopBar) |
 | **ThemeControl** (System · Night · Day) | custom | Toggle Group | P2 (P1 forces Night) | account menu, NavSheet, footer | **new** |
-| RoleStrip | custom | — | P1 | global (`dev`/`rc`) | restyled (neutral) |
+| RoleStrip | custom | — | P1 | global (`dev`/`rc`) | restyled (neutral); **removed** (D-52) |
 | SystemBanner (`banner.rpc-down`, offline) | custom | — | P1 | global | restyled |
 | Footer | custom | — | P1 | global | + theme control, fiat note |
 | **FlowShell** (bottom sheet < 768, 480 px dialog ≥ 768, scrim, inert background, header with ✕/Minimize and the progress line, pinned action) | custom | Dialog/Drawer primitive | P1 | send, transfer, receive, sell (`?list`), mint, NavSheet | **new** (replaces FlowPage) |
@@ -1199,7 +1209,7 @@ A11y: a `<dl>`. A blocking warning disables the CTA (`aria-disabled`) and links 
 | **StatusPill (band)** | The state on the card's brass band | `band-pill` fill, `brand-bright` `caption` at 600, the glyph (12 px) in the Night state colour, padding 4 × 10 | canvas |
 | **Chip** | Identifiers and chains | `radius-sm`, `surface-raised`, `body-sm` (§Chips above) | canvas |
 | **Banner** | FreezeBanner, SignedNotSentCard, the blocked verdict, `banner.rpc-down`, the D-08 soft guard | `surface-raised` panel, `radius-md`, padding `space-4`; 20 px icon + `label` title in the state colour; body `ink`; at most one action. No tints, no coloured borders | brand |
-| RoleStrip | `dev` / `rc` contract roles | A full-width strip under the nav: `surface-raised`, a neutral `triangle-alert` + "Dev contract: lock and code checks skipped" / "Release candidate: testnet rehearsal" (`body-sm` `ink`) | [Dialpad](https://mobbin.com/screens/6f48b680-0e25-4201-bfef-5b979d0a7029) |
+| RoleStrip | `dev` / `rc` contract roles. **Removed** (D-52) | A full-width strip under the nav: `surface-raised`, a neutral `triangle-alert` + "Dev contract: lock and code checks skipped" / "Release candidate: testnet rehearsal" (`body-sm` `ink`) | [Dialpad](https://mobbin.com/screens/6f48b680-0e25-4201-bfef-5b979d0a7029) |
 
 ### Sale, market and mint components (brief)
 | Component | Spec | Reference |
@@ -1300,7 +1310,7 @@ Rules (kb/90 §8.7):
 | `unknown` | any item unknown | `clean.verdict.unknown` + **Check again** | `triangle-alert` "Can't verify {n} signature" | disabled |
 | `unsafe` | an account check fails; or, for roles `rc`/`final`, the contract has keys, doesn't exist or its code hash mismatches | `clean.verdict.unsafe.*` | `shield-x` "Unsafe: {reason}" | disabled, **no override** |
 
-Gate modes (`NEXT_PUBLIC_CONTRACT_ROLE`, kb/90 §7.3): `dev`: the RoleStrip shows `role.dev`, and lock/code-hash failures become the neutral warning row in Checks · `rc`: the RoleStrip shows `role.rc`; strict gate · `final`: no strip; strict gate.
+Gate modes (`NEXT_PUBLIC_CONTRACT_ROLE`, kb/90 §7.3): `dev`: the RoleStrip shows `role.dev`, and lock/code-hash failures become the neutral warning row in Checks · `rc`: the RoleStrip shows `role.rc`; strict gate · `final`: no strip; strict gate. Since D-52 no role shows a strip; dev's warning row in Checks stays (kb/90 E-55).
 
 ### Sale flow (kb/90 §5.10, §5.12): list → listed → buy. No cooldown.
 | State | Contract (`satchel(id)`) | Owner UI | Buyer UI | Transition | Guard / error |
@@ -1377,7 +1387,7 @@ Brand sample copy corrected by product facts (`brand/README.md` table, applied):
 | SOL | Up to 6 decimals | `1.2000 SOL`, `0.000005 SOL` |
 | NEAR | Up to 4 decimals; below that, `< 0.0001 NEAR` | `≈ 0.004 NEAR` |
 | USDC | 2 decimals | `250.00 USDC` |
-| **Fiat (R3)** | 2 decimals, US dollars, always "≈" and always with "at mainnet prices"; below $0.01 "< $0.01"; only on the card total | `≈ $1,148.72` |
+| **Fiat (R3)** | 2 decimals, US dollars, always "≈" and always with "at mainnet prices" (in the app; the landing art drops the label, D-52); below $0.01 "< $0.01"; only on the card total | `≈ $1,148.72` |
 | Rounding | Balances round **down**; Max uses exact base units | — |
 | Numerals | `tabular-nums` on every amount | — |
 | Signs and spacing | `−` (U+2212) for outgoing, `+` for incoming; a no-break space (U+00A0) before the ticker | `−0.0100 BTC` |
@@ -1396,10 +1406,10 @@ Brand sample copy corrected by product facts (`brand/README.md` table, applied):
 | `nav.*` | My Satchels · Market · Mint · Activity (only if built) · Contract facts · Menu · Connect wallet · Connecting… · Copy account ID · View on NearBlocks · Disconnect |
 | `theme.*` | "Theme" · System · Night · Day |
 | `title.*` | "{page} · Satchel" · `title.signing` "({n}) Signing… · Satchel" |
-| `role.dev` / `role.rc` | "Dev contract: lock and code checks skipped" / "Release candidate: testnet rehearsal" (kb/90 §7.3 words, in sentence case) |
+| `role.dev` / `role.rc` | "Dev contract: lock and code checks skipped" / "Release candidate: testnet rehearsal" (kb/90 §7.3 words, in sentence case). Deleted with the RoleStrip (D-52); the dev words stay in `clean.checks.dev` |
 | `banner.rpc-down` | "NEAR testnet isn't responding · {duration} · Showing data from {time}" + **Retry** |
 | `banner.offline` | "You're offline. Showing the last data loaded." |
-| `footer.*` | Product: My Satchels · Market · Mint. Verify: Contract facts · NearBlocks · Repo · README. Hackathon: NEAR Hackathon · Demo video. Bottom row: `footer.testnet` "Testnet only. Coins here have no value." · `footer.note.clean` "¹ Clean history is checked in your browser by reading each chain. The contract doesn't enforce it." · `footer.note.fiat` "Dollar totals use mainnet prices for the same coins." (only if UX-1's default stands) · the theme control |
+| `footer.*` | Product: My Satchels · Market · Mint. Verify: Contract facts · NearBlocks · Repo · README. Hackathon: NEAR Hackathon · Demo video. Bottom row: `footer.testnet` "Testnet only. Coins here have no value." (app only; the landing drops it, D-52) · `footer.note.clean` "¹ Clean history is checked in your browser by reading each chain. The contract doesn't enforce it." · `footer.note.fiat` "Dollar totals use mainnet prices for the same coins." (only if UX-1's default stands) · the theme control |
 | `toast.*` | "Bitcoin address copied" · "Ethereum address copied" · "Account ID copied" · "Transaction ID copied" · "Token ID copied" · "Link copied" · `toast.sent` "Sent {amount} · in mempool" (BTC) / "Sent {amount}" |
 
 **The card**

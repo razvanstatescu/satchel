@@ -390,7 +390,7 @@ real example without connecting".
 
 - **`h2`:** "Try it on testnet" → **"Stick it on. Hand it over."** This is the brand line's home as the page's sign-off, once the page has explained the product. Keep "Try it on testnet" if Razvan picks B for the H1.
 - **`body`:** "You don't need a wallet to look around. To mint your own, connect a NEAR testnet wallet." → **"Look around without a wallet. To mint your own, connect a NEAR testnet wallet."**
-- **Keep the buttons** "Look inside a Satchel" (coral) and "Mint a Satchel", and the note "Testnet only. Coins here have no value.".
+- **Keep the buttons** "Look inside a Satchel" (coral) and "Mint a Satchel", and the note "Testnet only. Coins here have no value.". (D-52: the note is gone from `/`, and the body says "connect a NEAR wallet".)
 - **`meta.description(sol)`:** **"An NFT on NEAR testnet with its own Bitcoin and Ethereum addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first."**
 - **Keep** `meta.title` (T) and `ogAlt` (T: it must equal `opengraph-image.alt.txt`, so change both together if the 2.0 OG image carries another line).
 
@@ -405,7 +405,7 @@ real example without connecting".
 | Brand sample (where) | Use instead | Source |
 |---|---|---|
 | "An NFT that is a wallet on every chain" (DS README); "One NFT. Every chain inside." (In context, welcome) | "An NFT that is a wallet." / "One NFT. Bitcoin and Ethereum inside." Add Solana only when `SOL_UI_ENABLED` | D-37, D-40, kb/90 §5.9. The manifest test bans "every chain" |
-| "real Bitcoin, Ethereum and Solana" (README; Main sub) | "its own Bitcoin and Ethereum addresses", with "Testnet only. Coins here have no value." always visible. Never "real": it reads as real money | kb/90 §4 T7 |
+| "real Bitcoin, Ethereum and Solana" (README; Main sub) | "its own Bitcoin and Ethereum addresses", with "Testnet only. Coins here have no value." always visible. Never "real": it reads as real money. (D-52: always visible in the app; on `/`, only the header badge and its tooltip.) | kb/90 §4 T7; D-52 |
 | "$4,812.40", "≈ $2,903.00" rows, "about $4,812" (Colour and type, In context); "fiat to 2" (README) | No fiat anywhere. The card hero reads "{n} chains" with native chips, and the Give sheet lists native amounts | D-37 UX-1. The test bans "$" followed by a digit |
 | "Safe to buy in about 2 minutes" (README, in the **Say** column) | Never. A Satchel is buyable as soon as it's listed. The only wait is the seller's quiet period **before** listing: "You can list in {n} blocks (~{t})", 250 blocks ≈ 2 min 20 s | D-05 rev 2; kb/90 §5.7, §8.9. The test bans it |
 | "Usually under a minute." (README waiting copy) | "Usually about 10 seconds.", then the 20, 60 and 150 s lines, the last "up to about 2 minutes" | kb/90 §8.6, §8.9 |
@@ -435,7 +435,7 @@ real example without connecting".
 11. **"Stopping is instant."** `delist` takes effect in its own transaction, and signing resumes immediately (kb/90 §5.6).
 12. **"Sending and giving are paused while it's for sale."** `sign_for` panics with `ERR_FROZEN` and `nft_transfer` with `ERR_LISTED`. Adding coins still works, since anyone can pay the addresses (kb/90 §5.7–5.8).
 13. **"While it's for sale … only a purchase can move it"** (hood rule 3). True while listed: `nft_transfer` is refused, and `buy` and `ft_on_transfer` are the only owner changes. The seller can stop selling, then give it (kb/90 §5.11).
-14. **"Real Bitcoin and Ethereum."** Replaced by "on their own chains: no bridge, no wrapped tokens", plus the visible testnet note (kb/90 §2, T7).
+14. **"Real Bitcoin and Ethereum."** Replaced by "on their own chains: no bridge, no wrapped tokens", plus the visible testnet note (kb/90 §2, T7). (D-52: on `/`, the header badge and its tooltip are the testnet signal.)
 15. **"Teams handing over a treasury"** (who line). Kept as "a project wallet": a Satchel has one NEAR owner, and multisig or DAO ownership is untested (risky claim 12).
 16. **"Your NEAR account is your backup"**, which would answer the testers' "no seed phrase, so how do I back up?". Not added. It's true in substance: whoever controls the owning NEAR account controls its Satchels. But no spec phrases it, so leave it for a reviewed question.
 17. **"Everything inside goes with it" for gifts.** True for control of the addresses. An unused old signature could still move coins after a gift, so "Gifts skip the buyer's check" and the D-08 soft guard stay.

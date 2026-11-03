@@ -125,8 +125,9 @@ under 66 characters per line (leads 33–40 rem).
   - Hackathon: NEAR Hackathon.
 
   The bottom row shows the Testnet badge and a note. The landing note is `footer.testnet` with the theme control beside
-  it; the app note is `footer.noteClean`. It has 2 columns at 390, 3 from 480 and 4 from 1024. In the app it sits in
-  the content column.
+  it; the app note is `footer.noteClean`. (D-52: the landing's bottom row has no badge and no note, only the theme
+  control, right-aligned.) It has 2 columns at 390, 3 from 480 and 4 from 1024. In the app it sits in the content
+  column.
 - **One button system** (`components.css` §2), the same on the landing and in the app:
   - primary (the coral sticker), secondary, link, danger, icon;
   - for coral grounds only: **paper** (a white sticker, the primary on coral) and **ghost-on-brand**;
@@ -192,7 +193,7 @@ under 66 characters per line (leads 33–40 rem).
   - Lead: `landing.hero.lead`, 2.0.
   - CTAs: **Look inside a Satchel** (xl primary, the viewport's one coral, going to `/s/1`) and **See Satchels for
     sale** (xl secondary).
-  - Note: `home.note` with `info`.
+  - Note: `home.note` with `info`. (D-52: removed; only the header badge says testnet on `/`.)
 - **Layout:**
   - **1280:** centred copy with the H1 on two lines (62/64, one sentence per line, up to 1200 wide), the lead at 40 rem,
     the CTAs in a row. Then the **shelf**: a full-width flat sky field (radius 44) holding a 700-wide scene (318 tall).
@@ -302,7 +303,7 @@ under 66 characters per line (leads 33–40 rem).
   - `landing.cta.h2` "Stick it on. Hand it over." (or "Try it on testnet" if the H1 is B);
   - `landing.cta.body`, 2.0;
   - **Look inside a Satchel** (xl **paper**: the primary on coral) and **Mint a Satchel** (xl ghost-on-brand);
-  - `home.note`.
+  - `home.note`. (D-52: removed; the section ends on its buttons.)
 - **Layout:** a full-bleed coral band (`data-scheme="day"`, constant in both themes) with an ink H2 at
   clamp(48–104)/0.95.
   - **1280:** copy left; the **charm S** (330) right, as on the Main board.

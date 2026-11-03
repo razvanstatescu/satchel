@@ -7,6 +7,11 @@ The landing (`/`) catches up with the feature sprint (Oct 29 – Nov 2):
 
 The decision and its rules are in `plan/decisions.md` D-51. This folder keeps the research and design behind it.
 
+**Superseded in part by D-52** (2026-11-03, the site polish round, `docs/design/site-polish/`). On the landing, R1's
+network names give way to Ethereum, Base, Arbitrum and Optimism, and R3's "at mainnet prices" label is gone: the art
+shows "≈ $8,000.00" alone. The strip is now a five-tile bento on its own band. `q-testnet` on `/` asks "Is it
+audited?". The app and `/questions` keep this round's testnet wording. The files below are left as they were.
+
 | File | What it holds |
 |---|---|
 | `facts.md` | Verified facts with sources, and an audit of every landing string against the new features (the false items F1–F8) |

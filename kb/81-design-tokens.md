@@ -71,6 +71,7 @@
 | `sticker-shade` | `#1D1340` | `#000000` | the hard drop |
 | `scrim` · `overlay-shade` · `overlay-edge` | ink 40% · ink 18% · transparent | black 40% · black 55% · `#352C5C` | behind sheets and dialogs; overlay shadow; the 1 px Night overlay edge |
 | `charm-btc/evm/sol` | `#F7931A` / `#A3ABE0` / `#C08CFF` | = | the charms' own fills, fixed in both themes |
+| `band` | `#E3E6F6` | `#29214B` | site polish round: `#more`'s own band, so it reads as its own section. Day: `charm-evm` at 30% on white, a soft periwinkle (not lemon: locked; not coral: the finale). Night: = `surface-sunken` (separates better from the Night ground than a tint would). Contrast: ink on band 13.87:1 (Day) / 13.44:1 (Night); ink-muted 5.46:1 / 7.18:1; band on ground 1.15:1 / 1.28:1 |
 | aliases | | | `toast` = `selected` = brand-soft; `skeleton` = `disabled` = sunken; `on-disabled` = line-strong; `inverse` = ink; `on-inverse` = ground |
 
 ## Contrast [VERIFIED]
