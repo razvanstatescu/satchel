@@ -131,13 +131,17 @@ describe('C5 allowance: checkDelegatedSign mirrors the contract order (expiry, l
     caps: [{ asset: 'sol', limit: '1000000', spent: '0', remaining: '1000000', spends: [] }],
   }
   it('refuses once expired, and once the token is listed (ERR_FROZEN)', () => {
-    const req = solMessageSignRequest('hi') // message signing is always ERR_ALLOWANCE_KIND for delegates
+    const req = { sol: { message: '00' } } // any transfer kind: expiry and listing are checked before the classifier
     expect(checkDelegatedSign({ ...baseView, expires_at_ms: 500 }, req, { nowMs: 1000 })).toEqual({ ok: false, error: 'ERR_ALLOWANCE_EXPIRED' })
     expect(checkDelegatedSign(baseView, req, { nowMs: 1000, listed: true })).toEqual({ ok: false, error: 'ERR_FROZEN' })
   })
-  it('refuses message signing for delegates unconditionally (ERR_ALLOWANCE_KIND)', () => {
-    const r = checkDelegatedSign(baseView, solMessageSignRequest('hi'), { nowMs: 1000 })
-    expect(r).toEqual({ ok: false, error: 'ERR_ALLOWANCE_KIND' })
+  it('refuses message signing for delegates unconditionally (ERR_ALLOWANCE_KIND), before expiry and listing like the contract', () => {
+    expect(checkDelegatedSign(baseView, solMessageSignRequest('hi'), { nowMs: 1000 })).toEqual({ ok: false, error: 'ERR_ALLOWANCE_KIND' })
+    // the contract's authorize_signer refuses a delegate's message kind first (R2-02, review round 3)
+    expect(checkDelegatedSign({ ...baseView, expires_at_ms: 500 }, solMessageSignRequest('hi'), { nowMs: 1000 })).toEqual({ ok: false, error: 'ERR_ALLOWANCE_KIND' })
+    expect(checkDelegatedSign(baseView, solMessageSignRequest('hi'), { nowMs: 1000, listed: true })).toEqual({ ok: false, error: 'ERR_ALLOWANCE_KIND' })
+    // and whatever its body (an empty message would be ERR_MSG_EMPTY for the owner)
+    expect(checkDelegatedSign(baseView, { evm_message: { message: '' } }, { nowMs: 1000 })).toEqual({ ok: false, error: 'ERR_ALLOWANCE_KIND' })
   })
   it('allows a sol transfer within the cap, refuses over it (ERR_ALLOWANCE_EXCEEDED)', async () => {
     const { solSignRequest } = await import('@satchel/core/near')

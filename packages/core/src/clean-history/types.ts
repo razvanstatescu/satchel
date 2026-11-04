@@ -12,8 +12,11 @@ export type ContractRole = 'dev' | 'rc' | 'final'
  * bought. Non-blocking, like `unfunded`.
  * `message` (C7): an EIP-191 or Solana off-chain message signature; it can't move coins, so it never blocks Buy, but
  * the Buy tab lists it with its text (docs/specs/C1-C2-C3-C7.md §7.2).
+ * `inactive` (BTC, review R3-S-1 in docs/security/review-round-3.md): only past the `maxBtcTxids` cap. None of the
+ * request's inputs is one of the coins at the Satchel's address right now, so the signature can't move any coin being
+ * bought. Non-blocking like `unfunded`; never cached (it depends on the current coins); its outpoints stay encumbered.
  */
-export type ItemStatus = 'spent' | 'expired' | 'unfunded' | 'foreign' | 'message' | 'settling' | 'unused' | 'unknown'
+export type ItemStatus = 'spent' | 'expired' | 'unfunded' | 'foreign' | 'inactive' | 'message' | 'settling' | 'unused' | 'unknown'
 
 /** Aggregate verdict (spec §7.3). Buy is enabled only for `clean` and `empty`. */
 export type Aggregate = 'empty' | 'unsafe' | 'unknown' | 'blocked' | 'settling' | 'clean'
@@ -85,7 +88,10 @@ export interface Policy {
   solMinAgeMs: number
   /** H-25: allow a verdict from one of two providers on testnet, labelled "1 of 2 sources" */
   allowSingleSource: boolean
-  /** R-20 soft cap on distinct BTC txids per run */
+  /**
+   * R-20 soft cap on distinct BTC txids per run. Past it, only the requests that spend one of the Satchel's current
+   * coins are queried and must fit the cap; every other request is `inactive` (review R3-S-1).
+   */
   maxBtcTxids: number
 }
 
@@ -126,6 +132,12 @@ export interface BtcSource {
    * (S-07). A source without it, or a failed call, leaves the verdict as it was (fail closed: still blocking).
    */
   tx?(txid: string): Promise<unknown | null>
+  /**
+   * Optional `GET /address/:a/utxo` (Esplora; unconfirmed coins included). Used only past the `maxBtcTxids` cap, to
+   * learn which coins are at the Satchel's address now (review R3-S-1). A source without it, or a failed call, leaves
+   * the cap as it was (fail closed).
+   */
+  utxos?(address: string): Promise<{ txid: string; vout: number }[]>
 }
 
 export interface SolSource {

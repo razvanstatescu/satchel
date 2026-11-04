@@ -82,7 +82,17 @@ export function fakeEvm(name: string, o: { chainId?: number; head?: bigint; safe
 
 export function fakeBtc(
   name: string,
-  o: { tip?: number; outs?: Record<string, BtcOutspend[] | null>; fail?: boolean; genesisOk?: boolean; txs?: Record<string, unknown | null> },
+  o: {
+    tip?: number
+    outs?: Record<string, BtcOutspend[] | null>
+    fail?: boolean
+    genesisOk?: boolean
+    txs?: Record<string, unknown | null>
+    /** coins per address for `GET /address/:a/utxo` (R3-S-1); omitted ⇒ the source can't list coins */
+    utxos?: Record<string, { txid: string; vout: number }[]>
+    /** the coin list call fails (the rest of the source works) */
+    utxoFail?: boolean
+  },
   calls: string[] = [],
 ): BtcSource {
   const src: BtcSource = {
@@ -104,6 +114,13 @@ export function fakeBtc(
       calls.push(`tx:${t}`)
       if (!(t in o.txs!)) throw new Error(`unrecorded tx ${t}`)
       return o.txs![t]!
+    }
+  // `GET /address/:a/utxo` only when the test provides coin lists (a source without it never relaxes the R-20 cap)
+  if (o.utxos || o.utxoFail)
+    src.utxos = async (a) => {
+      calls.push(`utxo:${a}`)
+      if (o.utxoFail) throw new Error(`${name} utxo down`)
+      return o.utxos?.[a] ?? []
     }
   return src
 }

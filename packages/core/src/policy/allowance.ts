@@ -266,12 +266,14 @@ export type DelegatedSignCheck =
   | { ok: false; error: PolicyError | AllowanceError | 'ERR_FROZEN'; detail?: string }
 
 /**
- * Would `sign_for(req)` by this delegate pass at `nowMs`? Mirrors the contract's order: expiry (step 1), listing
- * (step 2, `ERR_FROZEN`), classifier, then the caps. `listed` defaults to the view's `paused` status. The nonce-gap
- * rule and deposits are checked elsewhere (`classifySignRequest(req, ctx)`, `signForCall`).
+ * Would `sign_for(req)` by this delegate pass at `nowMs`? Mirrors the contract's order: a message kind
+ * (`ERR_ALLOWANCE_KIND`, whatever its body: `authorize_signer` refuses it before anything else; R2-02, review round 3),
+ * expiry (step 1), listing (step 2, `ERR_FROZEN`), classifier, then the caps. `listed` defaults to the view's `paused`
+ * status. The nonce-gap rule and deposits are checked elsewhere (`classifySignRequest(req, ctx)`, `signForCall`).
  */
 export function checkDelegatedSign(view: AllowanceView, req: SignRequest, opts: { nowMs?: number; listed?: boolean } = {}): DelegatedSignCheck {
   const nowMs = opts.nowMs ?? view.now_ms
+  if ('evm_message' in req || 'sol_message' in req) return { ok: false, error: 'ERR_ALLOWANCE_KIND' }
   if (isExpired(view.expires_at_ms, nowMs)) return { ok: false, error: 'ERR_ALLOWANCE_EXPIRED' }
   if (opts.listed ?? view.status === 'paused') return { ok: false, error: 'ERR_FROZEN' }
   const d = allowanceDebits(req)

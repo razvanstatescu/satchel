@@ -9,6 +9,11 @@
  *   No script ⇒ the verdict stays.
  * Then per request (SIGHASH_ALL + completeness): any input spent ⇒ the whole request is spent ("tx conflict");
  * else any unused ⇒ unused; else any unknown ⇒ unknown; else any settling ⇒ settling; else foreign; else unfunded.
+ * Past the R-20 cap (`maxBtcTxids` distinct uncached txids; review R3-S-1 in docs/security/review-round-3.md): a
+ *   signature can only move the coins its own request spends, so only requests with an input among the coins at the
+ *   Satchel's address now (`GET /address/:a/utxo`, union over the providers) need a verdict, and only those count
+ *   against the cap. Every other request is `inactive`: non-blocking, never cached, its outpoints still encumbered.
+ *   Without that coin list (no source has `utxos`, or too few answered) the cap applies to every record (fail closed).
  */
 import { sha256 } from '@noble/hashes/sha2.js'
 import { hexToBytesStrict, toHex } from '../bytes'
@@ -63,12 +68,49 @@ function outpointVerdict(os: BtcOutspend[] | null, vout: number, tip: number, k:
   return { status: 'settling', reason: 'confirming', evidence: { provider, spending_txid: o.txid, confirmations: conf, needed: k } }
 }
 
-const RANK: ItemStatus[] = ['spent', 'unused', 'unknown', 'settling', 'foreign', 'unfunded']
+const RANK: ItemStatus[] = ['spent', 'unused', 'unknown', 'settling', 'foreign', 'unfunded', 'inactive']
 
-/** Request-level status from its inputs' statuses (precedence: spent > unused > unknown > settling > foreign > unfunded). */
+/**
+ * Request-level status from its inputs' statuses (precedence: spent > unused > unknown > settling > foreign > unfunded
+ * > inactive).
+ */
 export function requestStatus(statuses: ItemStatus[]): ItemStatus {
   for (const s of RANK) if (statuses.includes(s)) return s
   return 'unknown'
+}
+
+const TXID = /^[0-9a-f]{64}$/
+
+/**
+ * `txid:vout` of every coin at `addresses` now (unconfirmed ones included), the union over the providers that
+ * answered (more coins means more requests checked: the safe direction). null when no provider can list coins, or when
+ * only one answered and the policy needs two: the caller then keeps the cap for every record (fail closed).
+ */
+async function currentCoins(
+  sources: BtcSource[],
+  addresses: readonly string[],
+  allowSingleSource: boolean,
+): Promise<{ coins: Set<string>; providers: string[] } | null> {
+  const able = sources.filter((s) => s.utxos)
+  const answers = await Promise.all(
+    able.map(async (s) => {
+      const r = await settle(
+        (async () => {
+          await s.assertTestnet4()
+          const lists = await Promise.all(addresses.map((a) => s.utxos!(a)))
+          return lists.flat().map((u) => {
+            const txid = typeof u?.txid === 'string' ? u.txid.toLowerCase() : ''
+            if (!TXID.test(txid) || !Number.isSafeInteger(u.vout) || u.vout < 0) throw new Error('malformed utxo')
+            return `${txid}:${u.vout}`
+          })
+        })(),
+      )
+      return r.ok ? { name: s.name, coins: r.value } : null
+    }),
+  )
+  const ok = answers.filter((a): a is { name: string; coins: string[] } => a !== null)
+  if (ok.length === 0 || (ok.length === 1 && !allowSingleSource)) return null // the same rule as `agree`
+  return { coins: new Set(ok.flatMap((a) => a.coins)), providers: ok.map((a) => a.name) }
 }
 
 export async function checkBtc(
@@ -78,12 +120,32 @@ export async function checkBtc(
   cachedSeqs: ReadonlyMap<number, Record<string, unknown>> = new Map(),
   /** this token's own scriptPubKeys (`ownBtcScripts(btcPubkey)`); without them no input is ever `foreign` */
   ownScripts?: ReadonlySet<string>,
+  /** the addresses whose coins a buyer pays for (the Satchel's BTC address); used only past the cap (R3-S-1) */
+  ownAddresses?: readonly string[],
 ): Promise<BtcCheckResult> {
   const recs = records.map((r) => {
     const d = 'btc' in r.detail ? r.detail.btc : null
     return { r, txid: d?.txid.toLowerCase() ?? '', vout: d?.vout ?? -1, amount: d ? String(d.amount_sats) : undefined }
   })
-  const needed = [...new Set(recs.filter((x) => x.txid && !cachedSeqs.has(x.r.seq)).map((x) => x.txid))]
+  const uncached = recs.filter((x) => x.txid && !cachedSeqs.has(x.r.seq))
+  const distinctTxids = (xs: typeof recs) => [...new Set(xs.map((x) => x.txid))]
+  let needed = distinctTxids(uncached)
+  // R3-S-1: past the cap, only requests spending a coin that is at the Satchel's address now need a verdict. The
+  // others can't move a coin being bought; without this, a history naming > cap txids (fabricated ones never cache)
+  // would keep every BTC item `unknown`, and Buy disabled, for good.
+  let inactive: { requests: Set<number>; evidence: Record<string, unknown>; sources: number } | null = null
+  if (needed.length > policy.maxBtcTxids && ownAddresses && ownAddresses.length > 0) {
+    const cur = await currentCoins(sources, ownAddresses, policy.allowSingleSource)
+    if (cur) {
+      const touching = new Set(recs.filter((x) => x.txid && cur.coins.has(`${x.txid}:${x.vout}`)).map((x) => x.r.request_id))
+      needed = distinctTxids(uncached.filter((x) => touching.has(x.r.request_id)))
+      inactive = {
+        requests: new Set(recs.map((x) => x.r.request_id).filter((id) => !touching.has(id))),
+        evidence: { current_coins: cur.coins.size, addresses: [...ownAddresses], providers: cur.providers },
+        sources: cur.providers.length,
+      }
+    }
+  }
   const overCap = needed.length > policy.maxBtcTxids
 
   // per provider: genesis guard, tip, one outspends per distinct txid; any failure drops that provider
@@ -129,6 +191,10 @@ export async function checkBtc(
     }
     if (!x.txid || x.vout < 0) {
       own.set(x.r.seq, { status: 'unknown', reason: 'not_btc', evidence: {}, sources: 0, cached: false })
+      continue
+    }
+    if (inactive?.requests.has(x.r.request_id)) {
+      own.set(x.r.seq, { status: 'inactive', reason: 'not_a_current_coin', evidence: inactive.evidence, sources: inactive.sources, cached: false })
       continue
     }
     if (overCap) {

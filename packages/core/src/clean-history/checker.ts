@@ -124,7 +124,7 @@ export async function checkCleanHistory(input: CheckInput, deps: CheckDeps): Pro
 
   const [evmRuns, btc, sol] = await Promise.all([
     Promise.all([...evmGroups].map(([c, recs]) => checkEvm(addrs.evm, recs, evmSources(c), policy, cEvm, c))),
-    checkBtc(btcRecs, deps.btc, policy, cBtc, ownBtcScripts(addrs.btcPubkey)),
+    checkBtc(btcRecs, deps.btc, policy, cBtc, ownBtcScripts(addrs.btcPubkey), [addrs.btc]),
     checkSol(addrs.sol, solRecs, deps.sol, policy, input.now, cSol),
   ])
   const evm: EvmCheckResult = {
