@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C } from "../../brand/tokens";
 import { CardBack } from "../../illustration/characters";
-import { type RequestKind, RequestSticker, requestSize, SignSlot, SLOT } from "../../illustration/props";
+import { RecordOutline, type RequestKind, RequestSticker, requestSize, SignSlot, SLOT } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
 import { FPS } from "../../lib/time";
 import { clamp, EASE2, smear, SPRING2 } from "../../motion";
@@ -10,12 +10,13 @@ import { T2_RECORDS } from "../T2";
 import { At, beatAfter, Caption, cameraStyle, onBeat, sceneBeats, voF } from "../T2/kit";
 
 /**
- * T3 · Plain transfers only (88.5–94.5 s; V20 "It only signs plain transfers it can read, so each one can be checked
- * later."). T2 whips in. Satchel #7 (its history side) with a "Satchel signs" slot on its top edge. Requests are tossed in
- * from the left on the beat: "Send 0.01 BTC → bc1q…" can be read, so it sits in the slot, gets its dashed outline (the
- * record, first), a check, and is swallowed. "Raw hash 0x8cb1…" bounces off the lip with "Can't read it"; "Approve
- * unlimited tokens" and "Durable nonce" bounce too (three boops on the beats). Then the camera tilts down to the three
- * records: each one can be checked later.
+ * T3 · Readable requests only (v4: 88.5–96.0 s; V20 "It only signs what it can read, transfers and messages, so each one
+ * can be checked later."). T2 whips in. Satchel #7 (its history side) with a "Satchel signs" slot on its top edge.
+ * Requests are tossed in from the left on the beat: "Send 0.01 BTC → bc1q…" can be read, so it sits in the slot, gets its
+ * dashed outline (the record, first), a check, and is swallowed. "Raw hash 0x8cb1…" bounces off the lip with "Can't read
+ * it"; "Approve unlimited tokens" and "Durable nonce" bounce too (three boops on the beats). On "messages", "Sign a
+ * message · 'Log in to …'" passes like the send, its record marked "ETH · message". Then the camera tilts down to the
+ * three records: each one can be checked later.
  */
 
 // ── the board (world px) ──────────────────────────────────────────────────────────────────────────────────────────
@@ -43,14 +44,20 @@ export default function T3() {
   const okAt = sendAt + 11; // the check pops, the light goes green
   const sinkFrom = sendAt + 20; // then it is swallowed
   const sinkAt = beatAfter(sendAt + 28, beats); // fully in on the next beat
-  const capAt = vo.word(3) - 0.5; // "Plain transfers only." on "plain"
-  const b1 = onBeat(vo.word(5), beats); // raw hash bounces under "it can read," ("Can't read it")
+  const capAt = vo.wordAt("what") - 0.5; // "Readable requests only." on "what it can read"
+  const b1 = onBeat(vo.wordAt("read"), beats); // raw hash bounces under "read," ("Can't read it")
   const reqs: Req[] = [
     { kind: "rawHash", contact: b1, reason: "Can't read it", seed: 1, hang: 6 },
-    { kind: "approve", contact: b1 + 15, reason: "Not a plain transfer", seed: 2, hang: 4 },
-    { kind: "durableNonce", contact: b1 + 30, reason: "Doesn't expire", seed: 3, hang: 8 },
+    { kind: "approve", contact: b1 + 15, reason: "Not a transfer", seed: 2, hang: 4 },
+    { kind: "durableNonce", contact: b1 + 30, reason: "Doesn't expire", seed: 3, hang: 4 },
   ];
-  const panFrom = Math.max(b1 + 30 + 8, vo.word(9) - 6); // tilt down to the records on "each one can be checked later"
+  // the message lands on "messages": recorded (marked "message"), checked, swallowed like the send
+  const msgAt = onBeat(vo.wordAt("messages"), beats);
+  const msgRead = msgAt + 2;
+  const msgOk = msgAt + 11;
+  const msgSinkFrom = msgAt + 20;
+  const msgSinkAt = beatAfter(msgAt + 28, beats);
+  const panFrom = Math.max(msgSinkAt + 2, vo.wordAt("so") - 6); // tilt down to the records on "so each one can be checked later"
   const panTo = panFrom + 24;
 
   // ── camera: the whip arrives from T2 (content travelling left), then a tilt down to the records ─────────────
@@ -60,13 +67,21 @@ export default function T3() {
   // tight on the slot for the send, out to the full board once the caption has landed, then the tilt to the records
   const wide = interpolate(f, [capAt + 1, capAt + 15], [0, 1], { ...clamp, easing: EASE2.pan });
   const pan = interpolate(f, [panFrom, panTo], [0, 1], { ...clamp, easing: EASE2.pan });
-  const camY = 700 - 160 * wide + 260 * pan;
-  const camZ = 1.3 - 0.3 * wide + 0.06 * pan;
+  // a punch-in for the message (the new request type), released into the tilt
+  const punch = interpolate(f, [msgAt + 1, msgAt + 13], [0, 1], { ...clamp, easing: EASE2.pan });
+  const baseY = 700 - 160 * wide + (640 - 540) * punch;
+  const baseZ = 1.3 - 0.3 * wide + 0.22 * punch;
+  const camY = baseY + (800 - baseY) * pan;
+  const camZ = baseZ + (1.06 - baseZ) * pan;
 
   // ── the slot: green for the send, red flashes on each bounce, a little gulp when it swallows ─────────────────
-  const accept = interpolate(f, [okAt, okAt + 2, sinkAt + 12, sinkAt + 16], [0, 1, 1, 0], clamp);
+  const accept = Math.max(
+    interpolate(f, [okAt, okAt + 2, sinkAt + 12, sinkAt + 16], [0, 1, 1, 0], clamp),
+    interpolate(f, [msgOk, msgOk + 2, msgSinkAt + 6, msgSinkAt + 10], [0, 1, 1, 0], clamp),
+  );
   const reject = Math.max(0, ...reqs.map((r) => interpolate(f, [r.contact, r.contact + 1, r.contact + 8, r.contact + 11], [0, 1, 1, 0], clamp)));
-  const gulp = interpolate(f, [sinkAt - 2, sinkAt, sinkAt + 3, sinkAt + 8], [0, 1, -0.4, 0], clamp);
+  const gulpAt = (at: number) => interpolate(f, [at - 2, at, at + 3, at + 8], [0, 1, -0.4, 0], clamp);
+  const gulp = gulpAt(sinkAt) + gulpAt(msgSinkAt);
 
   // ── the send: tossed in, held in the mouth (a quarter inside), recorded, checked, swallowed ──────────────────
   const sendSize = requestSize(REQ_TEXT.send);
@@ -78,6 +93,19 @@ export default function T3() {
   const sendY = sendFly.y + sink * (sh * 0.85 + 40);
   const outline = interpolate(f, [readFrom, readFrom + 14], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
   const accepted = f < okAt ? 0 : spring({ frame: f - okAt, fps, config: SPRING2.pop });
+
+  // ── the message: the same path, plus its record tag "ETH · message" (a message can never move coins) ────────
+  const msgSize = requestSize(MSG_TEXT);
+  const mw = msgSize.w * RS;
+  const mh = msgSize.h * RS;
+  const msgFly = flight(f, msgAt, { x: 960, y: MOUTH + 0.24 * mh - mh / 2 });
+  const msgSink = interpolate(f, [msgSinkFrom, msgSinkAt], [0, 1], { ...clamp, easing: EASE2.fall });
+  const msgDown = msgSink * (mh * 0.85 + 40 + TAG_H * TAG_S + 30);
+  const msgY = msgFly.y + msgDown;
+  const msgOutline = interpolate(f, [msgRead, msgRead + 14], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
+  const msgAccepted = f < msgOk ? 0 : spring({ frame: f - msgOk, fps, config: SPRING2.pop });
+  const tagDraw = interpolate(f, [msgRead + 3, msgRead + 15], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
+  const tagType = interpolate(f, [msgRead + 8, msgRead + 16], [0, 1], clamp);
 
   return (
     <AbsoluteFill style={{ background: C.ground, overflow: "hidden" }}>
@@ -94,6 +122,18 @@ export default function T3() {
             <Chip x={sendFly.x} y={sendY} w={sw} h={sh} smearK={sendFly.smear}>
               <RequestSticker kind="send" scale={RS} outline={outline} accepted={accepted} drop={sendFly.drop} tilt={sendFly.tilt} />
             </Chip>
+          ) : null}
+          {f >= msgAt - FLIGHT_F && msgSink < 1 ? (
+            <>
+              {tagDraw > 0 ? (
+                <div style={{ position: "absolute", left: msgFly.x - mw / 2 - 8, top: msgY - mh / 2 - 34 - TAG_H * TAG_S }}>
+                  <RecordOutline kind="message" chain="evm" label="ETH · message" w={TAG_W} h={TAG_H} scale={TAG_S} draw={tagDraw} type={tagType} />
+                </div>
+              ) : null}
+              <Chip x={msgFly.x} y={msgY} w={mw} h={mh} smearK={msgFly.smear}>
+                <RequestSticker kind="message" scale={RS} outline={msgOutline} accepted={msgAccepted} drop={msgFly.drop} tilt={msgFly.tilt} />
+              </Chip>
+            </>
           ) : null}
           {reqs.map((r) => {
             const size = requestSize(REQ_TEXT[r.kind]);
@@ -112,7 +152,7 @@ export default function T3() {
             <SignSlot part="front" width={SLOT_W} scale={SS} accept={accept} reject={reject} />
           </div>
         </div>
-        <Caption text="Plain transfers only." contact={capAt} y={150} seed="t3-plain" />
+        <Caption text="Readable requests only." contact={capAt} y={150} seed="t3-readable" />
       </div>
 
       {/* sound: the whip lands, the record draws, the check, the swallow, three boops on the beats, the tilt */}
@@ -120,6 +160,9 @@ export default function T3() {
       <Sfx name="pen-scribble" at={readFrom / FPS} gainDb={2} />
       <Sfx name="pop" at={okAt / FPS} gainDb={-3} />
       <Sfx name="paper-slide" at={(sinkAt - 3) / FPS} align="peak" gainDb={-2} />
+      <Sfx name="pen-scribble" at={msgRead / FPS} gainDb={0} />
+      <Sfx name="pop" at={msgOk / FPS} gainDb={-4} />
+      <Sfx name="paper-slide" at={(msgSinkAt - 3) / FPS} align="peak" gainDb={-3} />
       {reqs.map((r) => (
         <Sfx key={r.kind} name="error-boop" at={r.contact / FPS} gainDb={7} />
       ))}
@@ -136,6 +179,10 @@ const REQ_TEXT: Record<RequestKind, string> = {
 };
 
 const FLIGHT_F = 12; // frames from the left edge to the slot
+const MSG_TEXT = "Sign a message · ‘Log in to …’";
+const TAG_W = 196; // the message's record tag (UI units)
+const TAG_H = 40;
+const TAG_S = 2.0;
 
 /** A sticker tossed in from the left on a low arc; it accelerates down into the mouth and lands on `contact`. */
 function flight(f: number, contact: number, to: { x: number; y: number }) {

@@ -3,6 +3,7 @@ import { interpolate, spring } from "remotion";
 import { Check } from "lucide-react";
 import { type CharmFace, charmFill } from "../../brand/Charm";
 import { C, type Chain, CHAIN, display, mono, sans } from "../../brand/tokens";
+import { type CardCoin, CoinIcon, SatchelCard } from "../../components/Sticker";
 import { CardWithCharms, type CharmSlot, Hand, PhoneFrame } from "../../illustration/characters";
 import { blinkSchedule, CaptionSlap, CHARM_LAG, CHARM_SWING, clamp, EASE2, eyeOpen, pressAt, slapAt, SPRING2 } from "../../motion";
 
@@ -105,9 +106,19 @@ export function charmPoint(i: number, angleDeg = 0, along: "coin" | "mouth" | "b
   return { x: px - r * Math.sin(a), y: py + r * Math.cos(a), px, py };
 }
 
+/** Satchel #7's holdings as the value card draws them (numbers, so scenes interpolate them and the ≈ $ total rolls). */
+export type Holdings = { btc: number; eth: number; sol: number; usdc: number };
+export const NOTHING: Holdings = { btc: 0, eth: 0, sol: 0, usdc: 0 };
+export const toCoins = (h: Holdings): CardCoin[] => [
+  { coin: "BTC", amount: h.btc },
+  { coin: "ETH", amount: h.eth },
+  { coin: "SOL", amount: h.sol },
+  { coin: "USDC", amount: h.usdc, network: "base" },
+];
+
 export function WorldCard({
   charms,
-  chips,
+  coins = NOTHING,
   lift = 0,
   bar = 1,
   scaleX = 1,
@@ -119,7 +130,7 @@ export function WorldCard({
   children,
 }: {
   charms: CharmSlot[];
-  chips?: { chain: Chain; amount?: string }[];
+  coins?: Holdings;
   lift?: number;
   bar?: number;
   scaleX?: number;
@@ -142,7 +153,7 @@ export function WorldCard({
         ...style,
       }}
     >
-      <CardWithCharms width={CARD.w} id="7" total="3 chains" chips={chips} lift={lift} bar={bar} charms={charms} />
+      <CardWithCharms width={CARD.w} id="7" lift={lift} bar={bar} charms={charms} front={<SatchelCard id="7" width={CARD.w} coins={toCoins(coins)} lift={lift} />} />
       {children}
     </div>
   );
@@ -228,6 +239,11 @@ export interface TagState {
   amountIn?: number;
   /** 0..1 the 8 % pop on the final value */
   amountPop?: number;
+  /** a second, compact balance line for USDC on the same address (the ETH tag in P2/P3) */
+  usdc?: string;
+  /** 0..1 the USDC line grows in */
+  usdcIn?: number;
+  usdcPop?: number;
   /** frames since the tag's slap started (14 f slap, contact f4); null = at rest; < 0 = not there yet */
   slap?: number | null;
   /** 0..1 the string drops from the charm to the tag */
@@ -240,7 +256,7 @@ export interface TagState {
  * the charm's address in Geist Mono; `amount` adds the balance line.
  */
 export function AddressTag({ chain, x, y, w = TAG.w, state }: { chain: Chain; x: number; y: number; w?: number; state: TagState }) {
-  const { typed = 1, amount, amountIn = 1, amountPop = 0, slap = null, lift = 0 } = state;
+  const { typed = 1, amount, amountIn = 1, amountPop = 0, usdc, usdcIn = 1, usdcPop = 0, slap = null, lift = 0 } = state;
   if (slap !== null && slap < 0) return null;
   const k = TAG.k;
   const rest = Math.round(4 * k);
@@ -306,6 +322,30 @@ export function AddressTag({ chain, x, y, w = TAG.w, state }: { chain: Chain; x:
               }}
             >
               {amount} <span style={{ ...display(700), fontSize: 15 * k, color: C.inkMuted }}>{CHAIN[chain].ticker}</span>
+            </div>
+          </div>
+        ) : null}
+        {usdc !== undefined && usdcIn > 0 ? (
+          <div style={{ height: 24 * k * usdcIn, overflow: "hidden" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5 * k,
+                height: 24 * k,
+                ...display(800),
+                fontSize: 16 * k,
+                letterSpacing: "-0.02em",
+                fontVariantNumeric: "tabular-nums",
+                color: C.ink,
+                scale: `${1 + 0.08 * usdcPop}`,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <span style={{ ...display(700), fontSize: 14 * k, color: C.inkMuted }}>+</span>
+              <CoinIcon coin="USDC" network="base" size={16 * k} />
+              {usdc} <span style={{ ...display(700), fontSize: 12 * k, color: C.inkMuted }}>USDC</span>
             </div>
           </div>
         ) : null}

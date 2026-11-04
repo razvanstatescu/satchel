@@ -13,7 +13,7 @@ import { AmountTag, ChainStrip, nightOutline, NightRig, pal, StickerButton, type
 
 /**
  * C1 · The catch (58–72 s). Night falls as a roller blind on the music stop. A seller (ink sleeve) holds a Satchel with
- * no number visible; the other hand taps "Send 0.85 ETH" and the signed slip tiptoes into the back pocket (one hop per
+ * no number visible; the other hand taps "Send 0.80 ETH" and the signed slip tiptoes into the back pocket (one hop per
  * pizzicato pluck) while the ETH charm watches it go. The sale swings the card to a buyer (white sleeve), flat faces.
  * After the sale the slip comes back out and is slapped onto the Ethereum strip on the thud: the ETH coins fly into
  * the seller's pocket, the tag drops to 0, the charm goes "o" and grey. On the sub hit the buyer's hand freezes and
@@ -45,10 +45,12 @@ const PIZZ_HITS = [0.01, 0.29, 0.57, 0.715].map((s) => PIZZ + Math.round(s * FPS
 const PLUNK = PIZZ_HITS[3]; // the slip drops into the pocket
 const SALE = T.sale - HANDOFF.apex; // hand-off clock start: the apex (jingle) lands on "sale"
 const CONTACT = SALE + HANDOFF.contact; // the buyer catches it
-const PULL = T.used + 10; // the seller's hand reaches into the pocket
-const STRIP_IN = T.used + 23; // the Ethereum strip slaps in (contact)
+const PULL = T.used + 4; // the seller's hand reaches into the pocket
+const STRIP_IN = T.used + 14; // the Ethereum strip slaps in (contact)
 const DRAIN = T.thud + 4; // the coins start to leave the ETH charm
-const ZERO = T.thud + 12; // the ETH tag rolls to 0
+const ZERO = T.thud + 10; // the ETH tag rolls to 0
+const ETH_ROLL = [DRAIN + 2, DRAIN + 20]; // the card's ETH (and its total) roll to 0 as the coins leave
+const REORDER = DRAIN + 24; // ETH (now 0%) drops out of the card's legend
 export const C1_WHIP = T.end - 4; // whip out (the cut is on the fastest frame; T0 whips in)
 
 // ── world layout (camera at rest: world px = screen px) ──────────────────────────────────────────────────────────────
@@ -175,8 +177,8 @@ function slipAt(f: number): SlipState {
   }
   if (f < PULL + 3) return { ...base, x: SLIP_IN_POCKET.x, y: SLIP_IN_POCKET.y, tilt: -3, drop: 0.3, layer: "pocket" };
   // pulled out, carried over the strip, slapped on the thud
-  const out = prog(f, PULL + 3, PULL + 17, EASE2.out);
-  const carry = prog(f, PULL + 19, T.thud - 16, EASE2.swing);
+  const out = prog(f, PULL + 3, PULL + 13, EASE2.out);
+  const carry = prog(f, PULL + 14, T.thud - 12, EASE2.swing);
   const wind = prog(f, T.thud - 9, T.thud - 4, EASE2.out);
   const slam = prog(f, T.thud - 4, T.thud, EASE2.fall);
   let x = lerp(SLIP_IN_POCKET.x, OUT_TOP.x, out);
@@ -185,7 +187,7 @@ function slipAt(f: number): SlipState {
   y = lerp(y, ABOVE_STRIP.y, carry) - 30 * wind;
   x = lerp(x, SLIP_ON_STRIP.x, slam);
   y = lerp(y, SLIP_ON_STRIP.y, slam);
-  const hover = f > PULL + 19 && f < T.thud - 9 ? 3.5 * Math.sin((f - PULL) * 0.6) * prog(f, T.thud - 30, T.thud - 22) : 0;
+  const hover = f > PULL + 14 && f < T.thud - 9 ? 3.5 * Math.sin((f - PULL) * 0.6) * prog(f, T.thud - 24, T.thud - 18) : 0;
   if (f < T.thud) {
     return { ...base, x, y, tilt: lerp(-3, 8, carry) - 6 * wind + 1.5 * slam + hover, scale: 1 + 0.07 * wind - 0.07 * slam, drop: 1 + 2 * out * (1 - slam), layer: out < 0.9 ? "pocket" : "top" };
   }
@@ -247,7 +249,7 @@ function handR(f: number): HandState {
   const g = slipGrip(f);
   const release = prog(f, T.thud + 12, T.thud + 16, EASE2.out);
   const exit = prog(f, T.thud + 16, T.thud + 30, EASE2.fall);
-  const ang = interpolate(f, [PULL + 3, PULL + 24, T.thud - 12, T.thud], [84, 91, 92, 93], clamp);
+  const ang = interpolate(f, [PULL + 3, PULL + 18, T.thud - 12, T.thud], [84, 91, 92, 93], clamp);
   return { x: lerp(g.x, -420, exit), y: lerp(g.y, g.y - 200, exit), a: ang, pose: "pinch", pinch: 1 - 0.9 * release, press: 0, show: exit < 1 };
 }
 /** The buyer's hand (white sleeve): reaches in from the right, catches the top-right corner, freezes on the sub hit. */
@@ -345,7 +347,7 @@ const CAM = [
   { f: CONTACT + 4, x: 1210, y: 500, s: 0.88 },
   { f: CONTACT + 10, x: 1210, y: 500, s: 0.88 },
   { f: PULL + 2, x: 960, y: 590, s: 0.92 },
-  { f: DRAIN + 30, x: 960, y: 590, s: 0.92 },
+  { f: DRAIN + 20, x: 960, y: 590, s: 0.92 },
   { f: T.subHit - 2, x: 1492, y: 562, s: 1.0 },
   { f: T.end, x: 1500, y: 566, s: 1.02 },
 ];
@@ -389,7 +391,8 @@ function World({ f, theme }: { f: number; theme: Theme }) {
   // the ETH tag (hangs under the ETH charm) and the card's ETH chip
   const roll = prog(f, ZERO, ZERO + 9, EASE2.out);
   const tagPop = 1 + 0.24 * Math.sin(Math.PI * prog(f, ZERO + 2, ZERO + 10)) + 0.12 * Math.sin(Math.PI * prog(f, ZERO + 15, ZERO + 21));
-  const ethGone = f >= ZERO + 4;
+  // the card's ETH rolls 0.80 → 0 with the coins (whole cents on the total: 0.01 ETH steps)
+  const ethLeft = Math.round(80 * (1 - prog(f, ETH_ROLL[0], ETH_ROLL[1], EASE2.swing))) / 100;
 
   const liftU = Math.max(0, card.lift) / (8 * KC);
   const pressU = card.lift < 0 ? Math.min(1, -card.lift / (4 * KC)) : 0;
@@ -430,6 +433,7 @@ function World({ f, theme }: { f: number; theme: Theme }) {
 
   const slipNode = (
     <SignedSlip
+      title="Send 0.80 ETH"
       scale={SLIP_S * slip.scale}
       sign={slip.sign}
       tilt={slip.tilt}
@@ -449,8 +453,8 @@ function World({ f, theme }: { f: number; theme: Theme }) {
 
   // three ETH coins leave the charm and arc into the seller's pocket
   const coins = [0, 1, 2].map((i) => {
-    const t0 = DRAIN + i * 4;
-    const dur = 22;
+    const t0 = DRAIN + i * 3;
+    const dur = 18;
     const t = (f - t0) / dur;
     if (t < 0 || t > 1) return null;
     const start = onCard(t0, CW / 2, COIN_Y);
@@ -463,7 +467,7 @@ function World({ f, theme }: { f: number; theme: Theme }) {
     return <CoinSticker key={i} chain="evm" size={size} k={2} flip={(f - t0) * 31} night={night} drop={night ? 0 : 1} style={{ position: "absolute", left: x - size / 2, top: y - size / 2, scale: `${s}`, filter: night ? nightOutline() : undefined }} />;
   });
 
-  const bump = 1 - 0.04 * Math.sin(Math.PI * prog(f, DRAIN + 18, DRAIN + 32)) - 0.045 * Math.sin(Math.PI * prog(f, PLUNK, PLUNK + 8));
+  const bump = 1 - 0.04 * Math.sin(Math.PI * prog(f, DRAIN + 16, DRAIN + 30)) - 0.045 * Math.sin(Math.PI * prog(f, PLUNK, PLUNK + 8));
   const pocketStyle = { position: "absolute" as const, left: POCKET_BOX.x, top: POCKET_BOX.y, transformOrigin: "50% 0%", scale: `${2 - bump} ${bump}`, filter: night ? nightOutline() : undefined };
 
   return (
@@ -483,7 +487,7 @@ function World({ f, theme }: { f: number; theme: Theme }) {
       {/* the Send button */}
       {showBtn ? (
         <div style={{ position: "absolute", left: BTN.x, top: BTN.y, translate: "-50% -50%", opacity: btnIn.opacity, scale: `${btnIn.sx * btnOut} ${btnIn.sy * btnOut}` }}>
-          <StickerButton label="Send 0.85 ETH" k={2.05} theme={theme} press={press} />
+          <StickerButton label="Send 0.80 ETH" k={2.05} theme={theme} press={press} />
         </div>
       ) : null}
 
@@ -514,18 +518,20 @@ function World({ f, theme }: { f: number; theme: Theme }) {
               name="Satchel"
               icons="dot"
               lift={liftU}
-              chips={[
-                { chain: "btc", amount: "0.0412" },
-                { chain: "evm", amount: ethGone ? "0" : "0.85" },
-                { chain: "sol", amount: "12.4" },
+              coins={[
+                { coin: "BTC", amount: 0.05 },
+                { coin: "ETH", amount: ethLeft },
+                { coin: "SOL", amount: 12 },
+                { coin: "USDC", amount: 800, network: "base" },
               ]}
+              order={f < REORDER ? "given" : "value"}
             />
           }
           charms={charms}
         />
       </div>
       <div style={{ position: "absolute", left: ethCoin.x + tagAnchor.x, top: ethCoin.y + tagAnchor.y, translate: "-50% 0", scale: `${tagPop}`, transformOrigin: "50% 0%" }}>
-        <AmountTag from="0.85 ETH" to="0 ETH" roll={roll} toColor={p.danger} k={1.9} theme={theme} />
+        <AmountTag from="0.80 ETH" to="0 ETH" roll={roll} toColor={p.danger} k={1.9} theme={theme} />
       </div>
       {hand(hl, "front", "L")}
       {hand(buyer, "front", "B")}
@@ -590,14 +596,14 @@ function Sounds() {
       <Sfx name="swing-swish" at={s(SALE + 10)} align="peak" gainDb={-3} />
       <Sfx name="charm-jingle" at={s(SALE + HANDOFF.apex)} align="peak" gainDb={-6} rate={0.84} />
       <Sfx name="sticker-slap" at={s(CONTACT)} gainDb={-7} />
-      <Sfx name="pocket-slip" at={s(PULL + 10)} align="peak" gainDb={3} />
+      <Sfx name="pocket-slip" at={s(PULL + 8)} align="peak" gainDb={3} />
       <Sfx name="sticker-slap" at={s(STRIP_IN)} gainDb={-9} />
       <Sfx name="swoop-up" at={s(T.thud - 6)} align="peak" gainDb={-8} />
       <Sfx name="sticker-slap" at={s(T.thud)} gainDb={-5} />
       <Sfx name="drum-hit-soft" at={s(T.thud)} gainDb={-10} />
-      <Sfx name="whoosh-soft" at={s(DRAIN + 10)} align="peak" gainDb={-2} />
+      <Sfx name="whoosh-soft" at={s(DRAIN + 8)} align="peak" gainDb={-2} />
       <Sfx name="pop" at={s(ZERO + 2)} gainDb={-4} />
-      <Sfx name="coin-ding" at={s(DRAIN + 8 + 22)} gainDb={-9} />
+      <Sfx name="coin-ding" at={s(DRAIN + 6 + 18)} gainDb={-9} />
     </>
   );
 }

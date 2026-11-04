@@ -1,7 +1,6 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { type CharmFace, charmKick } from "../../brand/Charm";
 import { C } from "../../brand/tokens";
-import { holdings, SATCHEL4 } from "../../components/ui";
 import { PocketJeans, POCKET, SignedSlip, SLIP } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
 import { getScene } from "../../lib/timeline";
@@ -32,13 +31,19 @@ const T = {
   redAt: fr(SC.wordAt("V24", "old")) + 2, // the outline turns red as the beam passes, on "old signature"
   slipOut: fr(SC.wordAt("V24", "signature")) + 6,
   contact: fr(SC.wordAt("V24", "move")), // the bonk lands on "could still MOVE coins"
-  camOut: [fr(SC.wordAt("V24", "Buy")) - 2, fr(SC.wordAt("V24", "Buy")) + 14] as const,
+  // a hard cut back to the whole page on the beat before "Buy" (6 beats in): a moving pull-back would drag the
+  // browser's tab and URL bars through the caption band
+  cutOut: 90,
+  buyNo: fr(SC.wordAt("V24", "Buy")), // the greyed Buy shakes "no" on "Buy"…
+  offerNo: fr(SC.wordAt("V24", "offers")), // …and Make an offer on "offers"
 };
 const BLOCK = T.contact + 10; // the verdict turns Blocked
 const CAP = BLOCK + 4; // caption contact
 
 /** CU for #4: its history panel with a caption band above (the panel header sits at y ≈ 240). */
 const CAM_CU4: Cam = { x: 905, y: 300, z: 2.7 };
+/** After the cut: the whole page, 12 px lower than T5's MID so "signature"'s descender clears the tab bar. */
+const CAM_MID6: Cam = { ...CAM_MID, y: CAM_MID.y - 12 / CAM_MID.z };
 
 function charmT6(f: number, fps: number): CharmAnim {
   const t = f / fps;
@@ -77,8 +82,8 @@ export default function T6Scene() {
     { f: 0, cam: CAM_MID },
     { f: T.camIn[0], cam: CAM_MID },
     { f: T.camIn[1], cam: CAM_CU4 },
-    { f: T.camOut[0], cam: CAM_CU4 },
-    { f: T.camOut[1], cam: CAM_MID },
+    { f: T.cutOut - 1, cam: CAM_CU4 },
+    { f: T.cutOut, cam: CAM_MID6 },
   ]);
 
   const spin = (f % 24) / 24;
@@ -101,7 +106,7 @@ export default function T6Scene() {
         <Browser tabs={TABS} active={1} url="satchel/s/4" account="carol.near" slap={f}>
           <SalePage
             id="4"
-            price={SATCHEL4.price}
+            price="720 NEAR"
             rows={ROWS4}
             rowAnim={[
               {
@@ -117,8 +122,16 @@ export default function T6Scene() {
             verdictPop={blocked ? interpolate(f, [BLOCK, BLOCK + 12], [0, 1], clamp) : undefined}
             checked={f >= BLOCK - 2}
             checkedPop={interpolate(f, [BLOCK - 2, BLOCK + 8], [0, 1], clamp)}
-            buy={{ mode: blocked ? "blocked" : "checking", wake: 0, lift: -4, spin, gatePop: blocked ? interpolate(f, [BLOCK + 3, BLOCK + 13], [0, 1], clamp) : undefined }}
-            balances={holdings(SATCHEL4.balances)}
+            buy={{
+              mode: blocked ? "blocked" : "checking",
+              wake: 0,
+              lift: -4,
+              spin,
+              gatePop: blocked ? interpolate(f, [BLOCK + 3, BLOCK + 13], [0, 1], clamp) : undefined,
+              shake: (noWobbleX(f - T.buyNo) * 8) / 12,
+              offerShake: (noWobbleX(f - T.offerNo) * 8) / 12,
+            }}
+            balances="0.015 BTC · 0.40 ETH · 6.8 SOL"
             spin={spin}
             contentY={40 * (1 - arrive)}
           />
@@ -146,7 +159,7 @@ export default function T6Scene() {
       <Sfx name="stamp-thunk" at={T.contact / FPS} gainDb={-5} />
       <Sfx name="boing-soft" at={(T.contact + 2) / FPS} gainDb={-3} />
       <Sfx name="error-boop" at={BLOCK / FPS} gainDb={0} />
-      <Sfx name="whoosh-soft" at={(T.camOut[0] + 8) / FPS} align="peak" gainDb={-12} />
+      <Sfx name="whoosh-soft" at={T.cutOut / FPS} align="peak" gainDb={-12} />
     </AbsoluteFill>
   );
 }

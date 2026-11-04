@@ -10,7 +10,8 @@ import { AddressText, CoinFace, FlowHeader, Group, PhoneScreen, type PhoneChrome
  * will own, then the pinned Mint bar (kb/80 Mint; kb/82 §2.27: the button narrates the wallet).
  *
  * state: "idle" → "pressed" (the button sits 4px down) → "wallet" ("Approve in your wallet…") → "minting" ("Minting…")
- *        → "minted" (Satchel #7 with the lemon "New" badge, "Satchel #7 is yours.", the real addresses).
+ *        → "minted" (Satchel #7 with the lemon "Yours" sticker, "Nothing inside yet" + Active, "Satchel #7 is yours.",
+ *        the real addresses). Mint list per SCRIPT-v4: "Its owner decides who can move the coins".
  * press 0..1 overrides the button press (animate the tap). spin turns the in-button spinner; pulse beats the active step.
  * addressReveal 0..1 types the three addresses in (default: 1 when minted, else 0); they print BTC → ETH → SOL.
  * cardStyle lets the scene hide or move the in-phone card while the "real" card leaps out of the phone.
@@ -66,11 +67,11 @@ export function MintScreen({ state = "idle", press, spin = 0, pulse = 0, address
         <SatchelCard
           id={id}
           width={358}
-          name={minted ? undefined : "New Satchel"}
-          label={minted ? "Inside" : "Addresses on"}
-          total="3 chains"
-          chips={minted ? CHAINS.map((c) => ({ chain: c, amount: "0" })) : CHAINS.map((c) => ({ chain: c }))}
-          pill={minted ? "new" : undefined}
+          preview={!minted}
+          yours={minted}
+          coins={minted ? [] : undefined}
+          chips={minted ? undefined : CHAINS.map((c) => ({ chain: c }))}
+          pill={minted ? "active" : undefined}
           style={cardStyle}
         />
 
@@ -100,7 +101,7 @@ export function MintScreen({ state = "idle", press, spin = 0, pulse = 0, address
           />
         ) : !minted ? (
           <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
-            {["Only its holder can move the coins", "Every signature it makes goes on the record"].map((t) => (
+            {["Its owner decides who can move the coins", "Every signature it makes goes on the record"].map((t) => (
               <div key={t} style={{ display: "flex", alignItems: "center", gap: 10, ...TY.bodySm, color: C.ink }}>
                 <ShieldCheck size={18} strokeWidth={STROKE} color={C.success} />
                 {t}
@@ -110,7 +111,7 @@ export function MintScreen({ state = "idle", press, spin = 0, pulse = 0, address
         ) : (
           <div style={{ marginTop: 16, display: "flex", alignItems: "flex-start", gap: 10, ...TY.bodySm, color: C.inkMuted }}>
             <Info size={18} strokeWidth={STROKE} color={C.inkMuted} style={{ flexShrink: 0, marginTop: 1 }} />
-            Anyone can fund it. Only its holder can send from it.
+            Anyone can add coins. Only the owner, or someone they let spend within daily caps, can send them out.
           </div>
         )}
       </div>

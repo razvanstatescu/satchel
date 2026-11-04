@@ -10,7 +10,7 @@ import { FrostLaminate } from "./FrostLaminate";
 import { GiftBox } from "./GiftBox";
 import { PocketJeans } from "./PocketJeans";
 import { PriceTag } from "./PriceTag";
-import { RecordOutline } from "./RecordOutline";
+import { RecordFill, RecordOutline } from "./RecordOutline";
 import { RequestSticker } from "./RequestSticker";
 import { ScanBeam } from "./ScanBeam";
 import { SignSlot } from "./SignSlot";
@@ -19,7 +19,8 @@ import { Stamp } from "./Stamp";
 import { StickyNote } from "./StickyNote";
 import { ToastSticker } from "./ToastSticker";
 import { TradeDesk } from "./TradeDesk";
-import { UsdcStack } from "./UsdcStack";
+import { NearStack, nearStackSize } from "./NearStack";
+import { UsdcStack, usdcStackSize } from "./UsdcStack";
 
 /**
  * QA gallery for src2/illustration/props (composition `PropsGallery`, 6 s). Every prop and state in a labelled grid on
@@ -56,7 +57,28 @@ function Cap({ x, y, children, center }: { x: number; y: number; children: React
 }
 
 /** Hero-scale QA pages (scale 2, film size): npx remotion still src2/index.ts PropsGallery out.png --props='{"page":"hero1"}' */
-function Hero({ page }: { page: "hero1" | "hero2" | "hero3" }) {
+function Hero({ page }: { page: "hero1" | "hero2" | "hero3" | "hero4" }) {
+  if (page === "hero4") {
+    return (
+      <AbsoluteFill style={{ background: C.ground }}>
+        {(["base", "arbitrum", "optimism", "ethereum"] as const).map((n, i) => (
+          <CoinSticker key={n} chain="usdc" network={n} size={150} style={at(80 + i * 200, 70)} />
+        ))}
+        <CoinSticker chain="usdc" size={150} style={at(880, 70)} />
+        <CoinSticker chain="near" size={150} style={at(1080, 70)} />
+        <CoinSticker chain="wnear" network="near" size={150} style={at(1280, 70)} />
+        <CoinSticker chain="near" size={150} flip={62} face={{ blink: 1, smile: 1.6 }} style={at(1480, 70)} />
+        <NearStack style={at(80, 300)} />
+        <NearStack columns={[3, 5]} face={false} scale={1.4} style={at(760, 380)} />
+        <RequestSticker kind="message" accepted={1} outline={1} style={at(1120, 300)} />
+        <RequestSticker kind="message" bounced={1} style={at(1120, 420)} />
+        <RecordOutline kind="message" style={at(80, 700)} />
+        <RecordOutline kind="message" signed={1} style={at(80, 800)} />
+        <RecordOutline kind="message" chain="sol" label="SOL · message" stamp={1} style={at(80, 900)} />
+        <RecordFill kind="message" drop={2.5} style={at(1000, 760)} />
+      </AbsoluteFill>
+    );
+  }
   return (
     <AbsoluteFill style={{ background: C.ground }}>
       {page === "hero1" ? (
@@ -108,7 +130,7 @@ function Hero({ page }: { page: "hero1" | "hero2" | "hero3" }) {
   );
 }
 
-export function Gallery({ page = "grid" }: { page?: "grid" | "hero1" | "hero2" | "hero3" }) {
+export function Gallery({ page = "grid" }: { page?: "grid" | "hero1" | "hero2" | "hero3" | "hero4" }) {
   if (page !== "grid") return <Hero page={page} />;
   return <Grid />;
 }
@@ -138,28 +160,30 @@ function Grid() {
         <SignedSlip scale={0.8} tilt={-7} style={at(156, 94)} />
       </Cell>
 
-      <Cell row={0} col={1} title="CoinSticker" sub="chains · flip · squash · sizes">
-        {(["btc", "evm", "sol", "usdc"] as const).map((c, i) => (
-          <CoinSticker key={c} chain={c} size={62} k={2} style={at(22 + i * 76, 82)} />
+      <Cell row={0} col={1} title="CoinSticker" sub="chains · faced (app) · network · flip · squash">
+        {(["btc", "evm", "sol"] as const).map((c, i) => (
+          <CoinSticker key={c} chain={c} size={48} k={2} style={at(22 + i * 60, 78)} />
         ))}
-        {["BTC", "ETH", "SOL", "USDC"].map((s, i) => (
-          <Cap key={s} x={53 + i * 76} y={156} center>
+        <CoinSticker chain="usdc" network="base" size={48} k={2} style={at(202, 78)} />
+        <CoinSticker chain="near" size={48} k={2} style={at(262, 78)} />
+        {["BTC", "ETH", "SOL", "USDC", "NEAR"].map((s, i) => (
+          <Cap key={s} x={46 + i * 60} y={138} center>
             {s}
           </Cap>
         ))}
-        <CoinSticker chain="btc" size={78} k={2} flip={t * 220} style={at(22, 200)} />
-        <CoinSticker chain="evm" size={78} k={2} squash={0.75} style={at(114, 200)} />
-        <CoinSticker chain="sol" size={44} k={2} style={at(210, 234)} />
-        <CoinSticker chain="btc" size={30} k={2} style={at(266, 248)} />
-        <Cap x={61} y={292} center>
-          flip
-        </Cap>
-        <Cap x={153} y={292} center>
-          squash
-        </Cap>
-        <Cap x={250} y={292} center>
-          k = 2
-        </Cap>
+        {(["ethereum", "arbitrum", "optimism"] as const).map((n, i) => (
+          <CoinSticker key={n} chain="usdc" network={n} size={44} k={2} style={at(24 + i * 60, 176)} />
+        ))}
+        <CoinSticker chain="wnear" network="near" size={44} k={2} style={at(204, 176)} />
+        <CoinSticker chain="btc" size={50} k={2} flip={t * 220} style={at(22, 240)} />
+        <CoinSticker chain="usdc" network="base" size={50} k={2} flip={t * 180 + 40} style={at(94, 240)} />
+        <CoinSticker chain="evm" size={50} k={2} squash={0.75} style={at(166, 240)} />
+        <CoinSticker chain="near" size={50} k={2} face={{ smile: 1.6, blink: t % 2 > 1.8 ? 1 : 0 }} style={at(244, 240)} />
+        {["flip", "flip", "squash", "face"].map((s, i) => (
+          <Cap key={i} x={[47, 119, 191, 269][i]} y={300} center>
+            {s}
+          </Cap>
+        ))}
       </Cell>
 
       <Cell row={0} col={2} title="PriceTag" sub="string · note · clip">
@@ -196,9 +220,9 @@ function Grid() {
         </div>
       </Cell>
 
-      <Cell row={1} col={2} title="TradeDesk · UsdcStack" sub="the OTC table, a USDC stack (no number)">
-        <SatchelCard width={150} chips={[{ chain: "btc", amount: "1.20" }, { chain: "evm", amount: "18" }, { chain: "sol", amount: "300" }]} total="" style={at(36, 112)} />
-        <UsdcStack scale={0.5} style={at(196, 112)} />
+      <Cell row={1} col={2} title="Desk · NearStack · UsdcStack" sub="money on the OTC table (no numbers)">
+        <NearStack scale={0.62} style={at(40, 214 - 0.62 * nearStackSize().h)} />
+        <UsdcStack scale={0.42} style={at(222, 214 - 0.42 * usdcStackSize().h)} />
         <TradeDesk width={350} scale={1.05} legs={44} style={at(20, 214)} />
       </Cell>
 
@@ -215,10 +239,11 @@ function Grid() {
 
       {/* ---------------- row 3 ---------------- */}
       <Cell row={2} col={0} title="RequestSticker" sub="accepted · bounced · neutral">
-        <RequestSticker scale={0.8} accepted={sp(1.5)} outline={ramp(1.1, 1.6)} style={at(24, 84)} />
-        <RequestSticker scale={0.8} kind="rawHash" bounced={sp(2.0)} style={at(24, 144)} />
-        <RequestSticker scale={0.8} kind="approve" style={at(24, 226)} />
-        <RequestSticker scale={0.8} kind="durableNonce" style={at(24, 278)} />
+        <RequestSticker scale={0.72} accepted={sp(1.5)} outline={ramp(1.1, 1.6)} style={at(24, 76)} />
+        <RequestSticker scale={0.72} kind="message" accepted={sp(1.9)} outline={ramp(1.5, 2.0)} style={at(24, 124)} />
+        <RequestSticker scale={0.72} kind="rawHash" bounced={sp(2.3)} style={at(24, 170)} />
+        <RequestSticker scale={0.72} kind="approve" style={at(24, 240)} />
+        <RequestSticker scale={0.72} kind="durableNonce" style={at(24, 282)} />
       </Cell>
 
       <Cell row={2} col={1} title="SignSlot" sub="back · sticker · front">
@@ -241,12 +266,13 @@ function Grid() {
         })()}
       </Cell>
 
-      <Cell row={2} col={2} title="RecordOutline" sub="drawing · recorded · signed · stamped · unused">
-        <RecordOutline scale={0.9} draw={draw} type={type} style={at(24, 80)} />
-        <RecordOutline scale={0.9} chain="btc" label="BTC · coin 1" style={at(24, 128)} />
-        <RecordOutline scale={0.9} signed={ramp(0.9, 1.3)} style={at(24, 176)} />
-        <RecordOutline scale={0.9} chain="sol" label="SOL · blockhash 1" stamp={hit(1.8)} style={at(24, 224)} />
-        <RecordOutline scale={0.9} label="ETH · nonce 12" variant="unused" style={at(24, 272)} />
+      <Cell row={2} col={2} title="RecordOutline" sub="draw · record · sign · stamp · message · unused">
+        <RecordOutline scale={0.86} draw={draw} type={type} style={at(30, 72)} />
+        <RecordOutline scale={0.86} chain="btc" label="BTC · coin 1" style={at(30, 114)} />
+        <RecordOutline scale={0.86} signed={ramp(0.9, 1.3)} style={at(30, 156)} />
+        <RecordOutline scale={0.86} chain="sol" label="SOL · blockhash 1" stamp={hit(1.8)} style={at(30, 198)} />
+        <RecordOutline scale={0.86} kind="message" stamp={hit(2.2)} style={at(30, 240)} />
+        <RecordOutline scale={0.86} label="ETH · nonce 12" variant="unused" style={at(30, 282)} />
       </Cell>
 
       <Cell row={2} col={3} title="ScanBeam" sub="sweep · brackets">

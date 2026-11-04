@@ -33,7 +33,7 @@ export function SendScreen({ chain = "btc", amount, to, balances = AMOUNTS.fill,
   const t = TICKER[chain];
   const amt = amount ?? AMOUNTS.send[chain];
   const dest = to ?? SEND_TO[chain];
-  const after = chain === "btc" ? AMOUNTS.after.btc : chain === "evm" ? AMOUNTS.after.evm : AMOUNTS.after.sol;
+  const after = AMOUNTS.afterSend[chain];
   const footer = (
     <>
       <UiButton block label={cta === "wallet" ? "Approve in your wallet…" : `Send ${amt} ${t}`} busy={cta === "wallet"} spin={spin} press={cta === "wallet" ? 0 : press} />

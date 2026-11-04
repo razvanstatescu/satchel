@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { ArrowLeft, ArrowRight, Lock, MonitorCheck, RotateCw, ShieldAlert, ShieldCheck, Snowflake, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, HandCoins, Lock, MonitorCheck, RotateCw, ShieldAlert, ShieldCheck, Snowflake, X } from "lucide-react";
 import { interpolate, interpolateColors, random, spring } from "remotion";
 import { type CharmFace, CharmShape } from "../../brand/Charm";
 import { StickerS } from "../../brand/Logo";
@@ -243,6 +243,9 @@ export interface BuyAnim {
   spin?: number;
   /** 0..1 pop of the gate line when it changes. */
   gatePop?: number;
+  /** px sideways "no" shake of the greyed Buy / Make an offer buttons (T6: "Buy and offers stay off"). */
+  shake?: number;
+  offerShake?: number;
 }
 
 export type Verdict = "checking" | "clean" | "blocked";
@@ -454,7 +457,7 @@ function CharmPegs({ rows, charms, show }: { rows: RowSpec[]; charms: CharmAnim[
 
 // ── the Buy panel (the UI kit's BuyBlock, with a Buy button that can wake up and press) ─────────────────────────────
 function BuyPanel({ price, balances, sigCount, unused, buy, spin }: { price: string; balances: string; sigCount: number; unused: number; buy: BuyAnim; spin: number }) {
-  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "USDC"];
+  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "NEAR"];
   const busy = buy.mode === "recheck" || buy.mode === "wallet";
   const label = buy.mode === "recheck" ? "Re-checking history…" : buy.mode === "wallet" ? "Approve in your wallet…" : `Buy for ${price}`;
   const gp = buy.gatePop === undefined ? 1 : popScale(buy.gatePop);
@@ -471,11 +474,12 @@ function BuyPanel({ price, balances, sigCount, unused, buy, spin }: { price: str
         <div style={{ ...TY.caption, color: C.inkMuted, paddingBottom: 7 }}>Paid in {cur}</div>
       </div>
       <BuyButton label={label} buy={buy} busy={busy} spin={spin} />
+      <OfferButton on={buy.wake} shake={buy.offerShake ?? 0} />
       <div style={{ marginTop: 12, minHeight: 42, transform: `scale(${gp})`, transformOrigin: "0 50%" }}>
         {buy.mode === "checking" ? (
-          <Gate tone={C.inkMuted} spinner spin={spin} text="Checking history…" sub="Buy turns on when your browser's check passes." />
+          <Gate tone={C.inkMuted} spinner spin={spin} text="Checking history…" sub="Buy and offers turn on when your browser's check passes." />
         ) : buy.mode === "blocked" ? (
-          <Gate tone={C.danger} Icon={ShieldAlert} text={`Blocked: ${unused} unused ${unused === 1 ? "signature" : "signatures"}`} sub="Buy stays off until no old signature can move coins." />
+          <Gate tone={C.danger} Icon={ShieldAlert} text={`Blocked: ${unused} unused ${unused === 1 ? "signature" : "signatures"}`} sub="Buy and offers stay off until no old signature can move coins." />
         ) : buy.mode === "recheck" ? (
           <Gate tone={C.inkMuted} spinner spin={spin} text="Checking again before you buy" sub="If anything changed, nothing is charged." />
         ) : buy.mode === "wallet" ? (
@@ -525,13 +529,46 @@ function BuyButton({ label, buy, busy, spin }: { label: string; buy: BuyAnim; bu
         color: text,
         border: `2px solid ${border}`,
         boxShadow: `0 ${shadow}px 0 ${C.ink}`,
-        transform: `translateY(${-lift}px)`,
+        transform: `translate(${buy.shake ?? 0}px, ${-lift}px)`,
         whiteSpace: "nowrap",
         opacity: interpolate(w, [0, 1], [0.4, 1]),
       }}
     >
       {busy ? <Spinner size={19} spin={spin} color={C.ink} /> : null}
       <span>{label}</span>
+    </div>
+  );
+}
+
+/**
+ * "Make an offer" under Buy (the app's secondary button: white, line-strong border, ink label, no sticker drop).
+ * It shares Buy's gate: greyed out (sunken, 40 %) while the history is checking or blocked, awake once it's clean.
+ */
+function OfferButton({ on, shake = 0 }: { on: number; shake?: number }) {
+  const w = Math.max(0, Math.min(1, on));
+  return (
+    <div
+      style={{
+        marginTop: 10,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        ...sans(700),
+        fontSize: 16,
+        lineHeight: "22px",
+        padding: "12px 20px",
+        borderRadius: 18,
+        background: interpolateColors(w, [0, 1], [C.sunken, C.surface]),
+        color: interpolateColors(w, [0, 1], [C.inkMuted, C.ink]),
+        border: `2px solid ${C.lineStrong}`,
+        whiteSpace: "nowrap",
+        opacity: interpolate(w, [0, 1], [0.4, 1]),
+        translate: `${shake}px 0`,
+      }}
+    >
+      <HandCoins size={18} strokeWidth={STROKE} />
+      <span>Make an offer</span>
     </div>
   );
 }

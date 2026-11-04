@@ -7,6 +7,7 @@ import { CheckBadge, clamp, DASH, DROP, Dropped, dropColor, Icon, type IconName,
  * RequestSticker: a signing request arriving at the slot (T3). A white sticker chip with an icon disc and the request
  * text; backticks mark Geist Mono runs (addresses, hashes). Presets via `kind`:
  *   send          "Send 0.01 BTC → `bc1q…`"   (arrow)    — readable: it passes
+ *   message       "Sign a message · ‘Log in to …’" (speech bubble) — readable: it passes (v4: "marked Message")
  *   rawHash       "Raw hash `0x8cb1…`"        (hash)     — bounces: "Can't read it"
  *   approve       "Approve unlimited tokens"  (infinity) — bounces
  *   durableNonce  "Durable nonce"             (clock)    — bounces
@@ -25,9 +26,12 @@ import { CheckBadge, clamp, DASH, DROP, Dropped, dropColor, Icon, type IconName,
  *   tilt     deg     default 0 (drop stays vertical); drop multiplier default 1; night boolean
  *   style    CSSProperties on the root <svg> (box = the chip)
  */
+/** The v2 kinds (kept as-is: scenes key records by it). `"message"` (v4) is accepted alongside via `AnyRequestKind`. */
 export type RequestKind = "send" | "rawHash" | "approve" | "durableNonce";
-export const REQUESTS: Record<RequestKind, { text: string; icon: IconName }> = {
+export type AnyRequestKind = RequestKind | "message";
+export const REQUESTS: Record<AnyRequestKind, { text: string; icon: IconName }> = {
   send: { text: "Send 0.01 BTC → `bc1q…`", icon: "arrowUpRight" },
+  message: { text: "Sign a message · ‘Log in to …’", icon: "message" },
   rawHash: { text: "Raw hash `0x8cb1…`", icon: "hash" },
   approve: { text: "Approve unlimited tokens", icon: "infinity" },
   durableNonce: { text: "Durable nonce", icon: "clock" },
@@ -44,7 +48,7 @@ export function requestSize(text: string) {
 }
 
 export interface RequestStickerProps {
-  kind?: RequestKind;
+  kind?: AnyRequestKind;
   text?: string;
   icon?: IconName;
   scale?: number;

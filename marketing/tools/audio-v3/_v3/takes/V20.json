@@ -1,0 +1,117 @@
+{
+ "key": "8244b7435ed88800",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "It only signs plain transfers it can read, so each one can be checked later.",
+ "prev": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+ "next": "List it, and signing pauses. The history stops growing.",
+ "final": {
+  "id": "V20",
+  "scene": "T3",
+  "text": "It only signs plain transfers it can read, so each one can be checked later.",
+  "say": "It only signs plain transfers it can read, so each one can be checked later.",
+  "file": "v2/vo/V20.mp3",
+  "duration": 4.97,
+  "words": [
+   {
+    "text": "It",
+    "start": 0.06,
+    "end": 0.2
+   },
+   {
+    "text": "only",
+    "start": 0.28,
+    "end": 0.54
+   },
+   {
+    "text": "signs",
+    "start": 0.6,
+    "end": 1
+   },
+   {
+    "text": "plain",
+    "start": 1.06,
+    "end": 1.38
+   },
+   {
+    "text": "transfers",
+    "start": 1.42,
+    "end": 1.94
+   },
+   {
+    "text": "it",
+    "start": 1.98,
+    "end": 2.06
+   },
+   {
+    "text": "can",
+    "start": 2.08,
+    "end": 2.24
+   },
+   {
+    "text": "read,",
+    "start": 2.32,
+    "end": 2.64
+   },
+   {
+    "text": "so",
+    "start": 3.04,
+    "end": 3.24
+   },
+   {
+    "text": "each",
+    "start": 3.32,
+    "end": 3.54
+   },
+   {
+    "text": "one",
+    "start": 3.66,
+    "end": 3.86
+   },
+   {
+    "text": "can",
+    "start": 3.9,
+    "end": 4.019
+   },
+   {
+    "text": "be",
+    "start": 4.059,
+    "end": 4.16
+   },
+   {
+    "text": "checked",
+    "start": 4.22,
+    "end": 4.46
+   },
+   {
+    "text": "later.",
+    "start": 4.52,
+    "end": 4.9
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": false,
+     "exact": false,
+     "heard": "It only signs plane transfers it can read, so each one can be checked later."
+    },
+    {
+     "attempt": 1,
+     "ok": true,
+     "exact": true,
+     "heard": "It only signs plain transfers it can read, so each one can be checked later"
+    }
+   ],
+   "chosen": 1
+  }
+ }
+}

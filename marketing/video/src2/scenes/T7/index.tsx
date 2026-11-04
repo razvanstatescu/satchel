@@ -13,12 +13,12 @@ import { Browser, CAM_MID, type Cam, CameraView, camAt, Caption, type CharmAnim,
 
 /**
  * T7 · The hand-off (116–126.5 s, held 20 f under the peel to E1). Back on #7's tab, carol.near presses "Buy for
- * 4,750.00 USDC" → "Re-checking history…" → "Approve in your wallet…" ("One transaction."). A whip to the world: bob
+ * 2,000 NEAR" → "Re-checking history…" → "Approve in your wallet…" ("One transaction."). A whip to the world: bob
  * holds Satchel #7 by its corner, back up and still frosted, the price tag on it; a binder clip snaps the tag on and
  * it reads "bound to 3 signatures". ONE MOVE: the frost melts, the card flips to its front and swings like a charm from
  * bob's hand to carol's (white sleeve, ink stripes) while the tag pops off and flies the other way, over the card, to
  * bob ("pays the seller"). Both land on the music's landing (122.0) with the charm jingle; the charms cheer.
- * "Satchel #7 is yours." · "You now control 0.0412 BTC · 0.85 ETH · 12.4 SOL."
+ * "Satchel #7 is yours." · "You now control 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC."
  */
 
 const SC = getScene("T7");
@@ -59,7 +59,7 @@ const TO_X = 1360; // card centre at carol
 const BOB_PINCH = { x: FROM_X - CW / 2 + 26, y: CARD_TOP + 26 };
 const CAROL_PINCH = { x: TO_X + CW / 2 - 26, y: CARD_TOP + 26 };
 const TAG_SCALE = 1.8;
-const TAG_TEXT = "4,750.00 USDC";
+const TAG_TEXT = "2,000 NEAR";
 const NOTE = "bound to 3 signatures";
 
 const W1: Cam = { x: 600, y: 520, z: 1.0 };
@@ -289,6 +289,7 @@ export default function T7Scene() {
               <CardWithCharms
                 width={CW}
                 charmSize={0.19}
+                yours={f >= LAND + 8}
                 lift={cardFront.lift}
                 flip={flip}
                 back={cardBack}
@@ -366,7 +367,7 @@ function IceSeal({ show }: { show: number }) {
   );
 }
 
-/** "You now control 0.0412 BTC · 0.85 ETH · 12.4 SOL." rising line by line (must-read: Onest 600, 56 px). */
+/** "You now control 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC." rising line by line (must-read: Onest 600, 56 px). */
 function Rise({ frame }: { frame: number }) {
   return (
     <div style={{ display: "inline-block" }}>
@@ -379,7 +380,7 @@ function RiseInner({ frame }: { frame: number }) {
   // line 1 in Onest (must-read, 56 px); the amounts in Funnel Display 800 with tabular figures (motion bible §2.9)
   const lines = [
     { text: "You now control", style: { fontFamily: '"Onest", system-ui, sans-serif', fontSize: 56, fontWeight: 600 } },
-    { text: "0.0412 BTC · 0.85 ETH · 12.4 SOL.", style: { fontFamily: '"Funnel Display", Onest, sans-serif', fontSize: 64, fontWeight: 800, letterSpacing: "-0.02em" } },
+    { text: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC.", style: { fontFamily: '"Funnel Display", Onest, sans-serif', fontSize: 58, fontWeight: 800, letterSpacing: "-0.02em" } },
   ];
   return (
     <div style={{ lineHeight: 1.1, color: C.ink, fontVariantNumeric: "tabular-nums" }}>

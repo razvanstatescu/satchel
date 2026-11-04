@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import { ArrowUpRight, Gift, Tag } from "lucide-react";
 import { C, type Chain, mono, sans } from "../../brand/tokens";
-import { type PillKind, SatchelCard } from "../Sticker";
-import { ACCOUNTS, ADDR7, AMOUNTS, type Balances, CHAIN_NAME, CHAINS, TICKER, truncate } from "./data";
+import { CoinIcon, type PillKind, SatchelCard } from "../Sticker";
+import { ACCOUNTS, ADDR7, AMOUNTS, type Balances, CHAIN_NAME, CHAINS, coinsOf, TICKER, truncate, USDC_NETWORK } from "./data";
 import { AppBar, Avatar, CoinFace, NUM, PausedBanner, PhoneScreen, type PhoneChrome, SectionLabel, TY, UiButton } from "./kit";
 
 /**
@@ -10,7 +10,7 @@ import { AppBar, Avatar, CoinFace, NUM, PausedBanner, PhoneScreen, type PhoneChr
  * "Satchel #7", what's inside as native chips, never fiat), who holds it, the per-chain rows with the chain charms'
  * faces and full balances, and Send (coral) / Give pinned at the bottom.
  *
- * balances   per chain (default: after the P3 sends, 0.0412 BTC · 0.85 ETH · 12.4 SOL; fill numbers before)
+ * balances   per chain + usdc (default: after the P3 sends, 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC; AMOUNTS.fill before)
  *            Count up with fmtAmount(value, chain) from ./data.
  * pill       the card's pill: "new" (lemon), "sent", "paused", "attention"
  * listed     Paused for sale: the card's pill, the frozen banner, Send off (40 %) and Delist instead of Give
@@ -62,9 +62,7 @@ export function SatchelScreen({
         <SatchelCard
           id={id}
           width={358}
-          label="Inside"
-          total="3 chains"
-          chips={CHAINS.map((c) => ({ chain: c, amount: balances[c] }))}
+          coins={coinsOf(balances)}
           pill={listed ? "paused" : pill}
           lift={cardLift}
           style={cardStyle}
@@ -81,7 +79,7 @@ export function SatchelScreen({
         <SectionLabel style={{ marginTop: listed ? 18 : 24 }}>Balances</SectionLabel>
         <div style={{ marginTop: 4 }}>
           {CHAINS.map((c, i) => (
-            <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: i < 2 ? `1px solid ${C.line}` : undefined }}>
+            <div key={c} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0", borderBottom: i < 2 || balances.usdc ? `1px solid ${C.line}` : undefined }}>
               <CoinFace chain={c} size={38} face={faces?.[c]} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ ...TY.label, fontSize: 16, color: C.ink }}>{CHAIN_NAME[c]}</div>
@@ -92,6 +90,18 @@ export function SatchelScreen({
               </div>
             </div>
           ))}
+          {balances.usdc ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0" }}>
+              <CoinIcon coin="USDC" network="base" size={38} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ ...TY.label, fontSize: 16, color: C.ink }}>USD Coin</div>
+                <div style={{ ...sans(450), fontSize: 12.5, lineHeight: "18px", color: C.inkMuted }}>on {USDC_NETWORK}</div>
+              </div>
+              <div style={{ ...sans(700), fontSize: 16, color: C.ink, ...NUM }}>
+                {balances.usdc} <span style={{ ...sans(600), color: C.inkMuted }}>USDC</span>
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </PhoneScreen>

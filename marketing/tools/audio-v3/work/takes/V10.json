@@ -1,5 +1,5 @@
 {
- "key": "1379be4072882d3a",
+ "key": "5abec49e3bb6bc92",
  "masterKey": "49e3af59f94cd5f8",
  "voice": "EXAVITQu4vr4xnSDxMaL",
  "model": "eleven_v4",
@@ -8,21 +8,21 @@
   "stability": 0.45,
   "similarity_boost": 0.8
  },
- "say": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
- "prev": "There's no seed phrase to copy. The contract signs only for the holder.",
- "next": "Gift a funded wallet.",
+ "say": "Give it to a friend, even one who isn't on Near yet. Everything inside goes with it. No bridge. No wrapped tokens.",
+ "prev": "There's no seed phrase to copy. Only the holder can send, or someone they allow, within daily limits.",
+ "next": "Sell a whole position in one trade, or take an offer.",
  "final": {
   "id": "V10",
   "scene": "P5",
-  "text": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
-  "say": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+  "text": "Give it to a friend, even one who isn't on NEAR yet. Everything inside goes with it. No bridge. No wrapped tokens.",
+  "say": "Give it to a friend, even one who isn't on Near yet. Everything inside goes with it. No bridge. No wrapped tokens.",
   "file": "v2/vo/V10.mp3",
-  "duration": 6.05,
+  "duration": 8.39,
   "words": [
    {
     "text": "Give",
     "start": 0.1,
-    "end": 0.2
+    "end": 0.22
    },
    {
     "text": "it",
@@ -32,72 +32,102 @@
    {
     "text": "to",
     "start": 0.38,
-    "end": 0.48
+    "end": 0.46
    },
    {
     "text": "a",
     "start": 0.52,
-    "end": 0.62
+    "end": 0.6
    },
    {
     "text": "friend,",
-    "start": 0.66,
-    "end": 1.06
+    "start": 0.64,
+    "end": 1.04
    },
    {
-    "text": "and",
-    "start": 1.26,
-    "end": 1.36
+    "text": "even",
+    "start": 1.48,
+    "end": 1.7
    },
    {
-    "text": "everything",
-    "start": 1.58,
-    "end": 2
+    "text": "one",
+    "start": 1.8,
+    "end": 1.94
+   },
+   {
+    "text": "who",
+    "start": 1.98,
+    "end": 2.2
+   },
+   {
+    "text": "isn't",
+    "start": 2.28,
+    "end": 2.56
+   },
+   {
+    "text": "on",
+    "start": 2.62,
+    "end": 2.76
+   },
+   {
+    "text": "NEAR",
+    "start": 2.8,
+    "end": 2.98
+   },
+   {
+    "text": "yet.",
+    "start": 3.08,
+    "end": 3.34
+   },
+   {
+    "text": "Everything",
+    "start": 3.92,
+    "end": 4.32
    },
    {
     "text": "inside",
-    "start": 2.04,
-    "end": 2.6
+    "start": 4.38,
+    "end": 4.88
    },
    {
     "text": "goes",
-    "start": 2.64,
-    "end": 2.9
+    "start": 4.96,
+    "end": 5.2
    },
    {
     "text": "with",
-    "start": 2.94,
-    "end": 3.1
-   },
-   {
-    "text": "it.",
-    "start": 3.16,
-    "end": 3.32
-   },
-   {
-    "text": "No",
-    "start": 3.82,
-    "end": 3.94
-   },
-   {
-    "text": "bridge.",
-    "start": 4.04,
-    "end": 4.42
-   },
-   {
-    "text": "No",
-    "start": 4.78,
-    "end": 4.94
-   },
-   {
-    "text": "wrapped",
-    "start": 5.02,
+    "start": 5.26,
     "end": 5.4
    },
    {
+    "text": "it.",
+    "start": 5.46,
+    "end": 5.62
+   },
+   {
+    "text": "No",
+    "start": 6.02,
+    "end": 6.12
+   },
+   {
+    "text": "bridge.",
+    "start": 6.24,
+    "end": 6.62
+   },
+   {
+    "text": "No",
+    "start": 6.94,
+    "end": 7.1
+   },
+   {
+    "text": "wrapped",
+    "start": 7.18,
+    "end": 7.54
+   },
+   {
     "text": "tokens.",
-    "start": 5.44,
-    "end": 5.98
+    "start": 7.6,
+    "end": 8.14
    }
   ],
   "wordSource": "forced-alignment",
@@ -107,7 +137,7 @@
      "attempt": 0,
      "ok": true,
      "exact": true,
-     "heard": "Give it to a friend and everything inside goes with it. No bridge, no wrapped tokens"
+     "heard": "Give it to a friend, even one who isn't on NEAR yet. Everything inside goes with it. No bridge, no wrapped tokens"
     }
    ],
    "chosen": 0

@@ -1,0 +1,91 @@
+{
+ "key": "59a4c47b71b6cdad",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Fill it from any wallet or exchange, straight to its addresses.",
+ "prev": "Mint one on Near, and it gets its own Bitcoin, Ethereum and Solana addresses.",
+ "next": "Then send from it, on all three chains.",
+ "final": {
+  "id": "V06",
+  "scene": "P2",
+  "text": "Fill it from any wallet or exchange, straight to its addresses.",
+  "say": "Fill it from any wallet or exchange, straight to its addresses.",
+  "file": "v2/vo/V06.mp3",
+  "duration": 4.1,
+  "words": [
+   {
+    "text": "Fill",
+    "start": 0.12,
+    "end": 0.26
+   },
+   {
+    "text": "it",
+    "start": 0.32,
+    "end": 0.44
+   },
+   {
+    "text": "from",
+    "start": 0.48,
+    "end": 0.76
+   },
+   {
+    "text": "any",
+    "start": 0.82,
+    "end": 1
+   },
+   {
+    "text": "wallet",
+    "start": 1.12,
+    "end": 1.46
+   },
+   {
+    "text": "or",
+    "start": 1.52,
+    "end": 1.6
+   },
+   {
+    "text": "exchange,",
+    "start": 1.66,
+    "end": 2.3
+   },
+   {
+    "text": "straight",
+    "start": 2.7,
+    "end": 3.02
+   },
+   {
+    "text": "to",
+    "start": 3.06,
+    "end": 3.16
+   },
+   {
+    "text": "its",
+    "start": 3.2,
+    "end": 3.32
+   },
+   {
+    "text": "addresses.",
+    "start": 3.36,
+    "end": 4.019
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Fill it from any wallet or exchange straight to its addresses"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

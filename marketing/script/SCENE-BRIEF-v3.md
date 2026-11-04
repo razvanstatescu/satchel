@@ -101,3 +101,23 @@ timeline lands (`src2/data/timeline.json` without a `placeholder` key), re-check
 ## Final report (≤ 250 words)
 What you built per scene (the hero move), sound cues, shared components used, anything missing from the kits, and known
 weaknesses.
+
+---
+
+## v4 update (2026-11-03): read this first
+The product gained features after v2, so the film gets an UPDATE, not a redesign: `script/SCRIPT-v4.md` lists exactly
+what changes per scene, the new/changed VO lines (✱), the numbers and the presentation rules. **Keep the v2 design,
+style, motion, pacing feel and sound.** The Oct 27 "v3 real-app UI" pass (bottom sheets, restyled screens) was
+rejected and reverted: never reapply any of it.
+- Timing: `src2/data/timeline.json` is rebuilt for v4 (≈ 131 s); `script/timeline-v4.md` has the table. Your scene
+  must still re-time from `getScene()`; check your hard-coded seconds and frame constants against the new lengths.
+- The shared `SatchelCard` becomes the value card (≈ $X, value bar, coin shares; computed from `coins`). Check every shot
+  where the card appears for overlaps and for amounts that should change (numbers table in SCRIPT-v4).
+- New shared art: `src2/components/ui/feature-cards.tsx` (`AllowanceCard`, `OfferCard`, `ClaimLinkCard`,
+  `NetworksCard`), props `CoinSticker` usdc/near with network badges, a NEAR stack, `RequestSticker kind="message"`,
+  `RecordOutline kind="message"`.
+- Same ownership as before (only your scene folders). Same verification: tsc, dense stills, look at them.
+- The app runs locally for reference at http://localhost:3215 (fixture data, read-only; don't start another server;
+  mock wallet: localStorage `satchel:mock-wallet`, onboarding done: `satchel:onboarding:v1`). Current screenshots:
+  /private/tmp/claude-501/-Users-razvanstatescu-Documents-Work-near-Satchel/c14df839-9fb7-4a09-952b-45a7895265a1/scratchpad/app-now/
+  and the landing grid ../land-grid.png. The landing is the closest model for how the film presents features.

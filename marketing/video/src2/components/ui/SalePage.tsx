@@ -3,7 +3,7 @@ import { CircleCheck, FileCheck, MonitorCheck, Plus, ShieldAlert, ShieldCheck, S
 import { Lockup } from "../../brand/Logo";
 import { C, display, mono, sans } from "../../brand/tokens";
 import { SatchelCard } from "../Sticker";
-import { ACCOUNTS, AMOUNTS, type Balances, CHAINS, HISTORY_4, HISTORY_7, type HistoryRecord, holdings, PRICE, SATCHEL4 } from "./data";
+import { ACCOUNTS, AMOUNTS, type Balances, coinsOf, HISTORY_4, HISTORY_7, type HistoryRecord, holdings, PRICE, SATCHEL4 } from "./data";
 import { Avatar, CoinFace, NUM, popScale, Spinner, StatusPill, STROKE, TY, UiButton } from "./kit";
 
 /**
@@ -20,12 +20,15 @@ import { Avatar, CoinFace, NUM, popScale, Spinner, StatusPill, STROKE, TY, UiBut
  *           `press` 0..1 overrides the press
  * scan      0..1 a scan beam sweeping down the records (omit = none)
  * verdictPop 0..1 pops the verdict in       spin  turns spinners
- * satchel   "7" (default) or "4": #4 is the honest blocked example (one unused `ETH · nonce 12`); its holdings, price
- *           and seller are placeholders (override with balances / price / seller)
+ * satchel   "7" (default, "2,000 NEAR", ≈ $8,000.00) or "4": #4 is the honest blocked example (one unused
+ *           `ETH · nonce 12`; 0.015 BTC · 0.40 ETH · 6.8 SOL ≈ $2,880.00, 720 NEAR; seller is a placeholder)
+ * offer     "Make an offer" under Buy: "auto" (default, off with Buy's reason while Buy is off) | "disabled" | "enabled" |
+ *           "hidden"; offerPress 0..1
  */
 
 export type Verdict = "checking" | "clean" | "blocked";
 export type BuyState = "disabled" | "enabled" | "pressed" | "recheck" | "wallet" | "done";
+export type OfferState = "auto" | "disabled" | "enabled" | "hidden";
 
 export interface SalePageProps {
   satchel?: "7" | "4";
@@ -40,6 +43,10 @@ export interface SalePageProps {
   seller?: string;
   price?: string;
   balances?: Balances;
+  /** "Make an offer" under Buy: follows Buy by default (off with the same reason while Buy is off); "hidden" drops it. */
+  offer?: OfferState;
+  /** 0..1 presses "Make an offer". */
+  offerPress?: number;
   /** Fit a ~1274 × 701 page box (the illustrator's default BrowserFrame): tighter spacing, no "How buying works". */
   compact?: boolean;
   style?: CSSProperties;
@@ -58,6 +65,8 @@ export function SalePage({
   seller,
   price,
   balances,
+  offer = "auto",
+  offerPress,
   compact = false,
   style,
 }: SalePageProps) {
@@ -86,8 +95,8 @@ export function SalePage({
 
         <div style={{ marginTop: gap, display: "flex", gap: 32, alignItems: "flex-start" }}>
           <div style={{ width: 392, flexShrink: 0, display: "flex", flexDirection: "column" }}>
-            <SatchelCard id={satchel} width={392} label="Inside" total="3 chains" chips={CHAINS.map((c) => ({ chain: c, amount: bal[c] }))} />
-            <BuyBlock style={{ marginTop: gap }} state={b} verdict={v} price={pr} press={press} spin={spin} seller={sell} id={satchel} balances={bal} unused={recs.filter((r) => r.status === "unused").length} sigCount={recs.length} />
+            <SatchelCard id={satchel} width={392} coins={coinsOf(bal)} pill={b === "done" ? "active" : "paused"} yours={b === "done"} />
+            <BuyBlock style={{ marginTop: gap }} state={b} verdict={v} price={pr} press={press} spin={spin} seller={sell} id={satchel} balances={bal} unused={recs.filter((r) => r.status === "unused").length} sigCount={recs.length} offer={offer} offerPress={offerPress} />
           </div>
           <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 18 }}>
             <HistoryPanel verdict={v} records={recs} scan={scan} verdictPop={verdictPop} spin={spin} />
@@ -277,9 +286,11 @@ function ScanBeam({ t }: { t: number }) {
 /* ───────────────────────────── buy block ───────────────────────────── */
 
 /**
- * BuyBlock: price, the Buy button and its gate line under it (kb/82 §2.23: gate, reason and button in one container).
- * disabled = 40 % with the reason; enabled = coral; pressed; recheck "Re-checking history…"; wallet "Approve in your
- * wallet…" (plus the line that binds the purchase to the checked history).
+ * BuyBlock: price (NEAR), the Buy button, "Make an offer" under it, and their gate line (kb/82 §2.23: gate, reason and
+ * buttons in one container). disabled = 40 % with the reason (both buttons: "Buy and offers stay off…"); enabled =
+ * coral; pressed; recheck "Re-checking history…"; wallet "Approve in your wallet…" (plus the line that binds the
+ * purchase to the checked history). offer: "auto" follows Buy (off while Buy is off) | "disabled" | "enabled" |
+ * "hidden"; offerPress 0..1.
  */
 export function BuyBlock({
   state = "enabled",
@@ -292,8 +303,12 @@ export function BuyBlock({
   balances = AMOUNTS.after,
   unused = 0,
   sigCount = 3,
+  offer = "auto",
+  offerPress = 0,
   style,
 }: {
+  offer?: OfferState;
+  offerPress?: number;
   state?: BuyState;
   verdict?: Verdict;
   price?: string;
@@ -306,8 +321,9 @@ export function BuyBlock({
   sigCount?: number;
   style?: CSSProperties;
 }) {
-  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "USDC"];
+  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "NEAR"];
   const busy = state === "recheck" || state === "wallet";
+  const offerOff = offer === "disabled" || (offer === "auto" && state === "disabled");
   const p = press ?? (state === "pressed" ? 1 : 0);
   const label = state === "recheck" ? "Re-checking history…" : state === "wallet" ? "Approve in your wallet…" : `Buy for ${price}`;
   if (state === "done") {
@@ -341,17 +357,18 @@ export function BuyBlock({
             <span style={{ ...display(700), fontSize: 17, color: C.inkMuted }}>{cur}</span>
           </div>
         </div>
-        <div style={{ ...TY.caption, color: C.inkMuted, paddingBottom: 6 }}>Paid in {cur}</div>
+        <div style={{ ...TY.caption, color: C.inkMuted, paddingBottom: 6 }}>Paid in {cur}.</div>
       </div>
 
       <UiButton block style={{ marginTop: 14 }} label={label} busy={busy} spin={spin} press={busy ? 0 : p} disabled={state === "disabled"} />
+      {offer === "hidden" ? null : <UiButton block kind="secondary" style={{ marginTop: 10 }} label="Make an offer" press={offerOff ? 0 : offerPress} disabled={offerOff} />}
 
       <div style={{ marginTop: 12, minHeight: 40 }}>
         {state === "disabled" ? (
           verdict === "blocked" ? (
-            <Gate tone={C.danger} Icon={ShieldAlert} text={`Blocked: ${unused} unused ${unused === 1 ? "signature" : "signatures"}`} sub="Buy stays off until no old signature can move coins." />
+            <Gate tone={C.danger} Icon={ShieldAlert} text={`Blocked: ${unused} unused ${unused === 1 ? "signature" : "signatures"}`} sub={offer === "hidden" ? "Buy stays off until no old signature can move coins." : "Buy and offers stay off until no old signature can move coins."} />
           ) : (
-            <Gate tone={C.inkMuted} spinner spin={spin} text="Checking history…" sub="Buy turns on when your browser's check passes." />
+            <Gate tone={C.inkMuted} spinner spin={spin} text="Checking history…" sub={offer === "hidden" ? "Buy turns on when your browser's check passes." : "Buy and offers turn on when your browser's check passes."} />
           )
         ) : state === "wallet" ? (
           <Gate tone={C.success} Icon={ShieldCheck} text="Clean history · checked just now" sub={`Bound to this history: ${sigCount} ${sigCount === 1 ? "signature" : "signatures"}`} />

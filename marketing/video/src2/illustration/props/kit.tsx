@@ -29,6 +29,10 @@ export const PAL = {
   denimDark: "#3a5487",
   frost: "#eef4ff",
   steel: "#c9c5dc",
+  // the app's coin art (apps/web/src/components/brand/art.ts ART): never the real logos' colours exactly
+  mint: "#7fe3b8",
+  base: "#6e9bff",
+  arbitrum: "#9ed8f2",
 } as const;
 
 export const clamp = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x));
@@ -324,7 +328,7 @@ export const easeInOut = (u: number) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(
 // ---------------------------------------------------------------------------------------------------------------
 // Icons (24-unit Lucide-style geometry, round caps), drawn at `size` with stroke `sw` in the parent's units.
 
-export type IconName = "check" | "warning" | "snowflake" | "arrowUpRight" | "hash" | "infinity" | "clock" | "pen" | "x";
+export type IconName = "check" | "warning" | "snowflake" | "arrowUpRight" | "hash" | "infinity" | "clock" | "pen" | "x" | "message";
 
 const ICON_PATHS: Record<IconName, string[]> = {
   check: ["M5 12.5l4.5 4.5L19 7.5"],
@@ -348,6 +352,7 @@ const ICON_PATHS: Record<IconName, string[]> = {
   ],
   clock: ["M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18Z", "M12 7.5V12l3.2 2"],
   pen: ["M13 19.5h7.5", "M16.4 3.9a2.1 2.1 0 0 1 3 3L7.6 18.7l-4 1.1 1.1-4Z"],
+  message: ["M20.5 14.5a2 2 0 0 1-2 2H7.5l-4 4V5.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2Z", "M8 8.5h8", "M8 12h5"],
 };
 
 export function Icon({ name, x, y, size, color = C.ink, sw = 2 }: { name: IconName; x: number; y: number; size: number; color?: string; sw?: number }) {

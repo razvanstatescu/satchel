@@ -55,5 +55,11 @@ export {
 export { QrCode } from "./Qr";
 export * from "./data";
 
+// SCRIPT-v4 app-art stickers (landing bento style)
+export { AllowanceCard, ClaimLinkCard, type L2, NetworksCard, OfferCard } from "./feature-cards";
+
+// the value card's maths (the card itself is SatchelCard in ../Sticker)
+export { type CardCoin, cardOverview, type Coin, COIN_FILL, COIN_PRICE, CoinIcon, COINS_7, type Network, usd, usdText, ValueBar, ValueLegend } from "../Sticker";
+
 // QA gallery (composition id "UiGallery")
 export { UI_GALLERY, UiGallery } from "./UiGallery";

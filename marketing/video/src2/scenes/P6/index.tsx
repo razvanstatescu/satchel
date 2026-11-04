@@ -5,17 +5,16 @@ import { HANDOFF } from "../../motion";
 import { Caption, FPS, whip, WhipLayer } from "../P5/rig";
 import { DeskStage } from "./Desk";
 import { FinaleStage } from "./Finale";
-import { GiftStage, LID_AT, RISE_AT } from "./Gift";
 import { RelayStage } from "./Relay";
-import { CAP, CONTACT, CUT, FINALE, LIFT } from "./timing";
+import { ACCEPT, CAP, CONTACT, CUT, FINALE, LIFT } from "./timing";
 
 /**
- * P6 · Use cases (46–58 s), the warmest section. Three 4 s sticker vignettes, each built around the hand-off swing
- * landing on a bar downbeat with the jingle on its apex: (a) a gift box pops and Satchel #12 rises with its charms in
- * party hats, swinging to sam.near; (b) an OTC desk: the heavy #30 (1.20 BTC · 18 ETH · 300 SOL) swings right as an
- * unnumbered USDC stack slides left, crossing mid-table; (c) a relay: #21 passes like a baton from old-team.near to
- * new-team.near under its "Team treasury" pennant. Whips (2-frame smear) link them; the scene ends on the three
- * cards swinging in sync. Captions "Gift a funded wallet." → "One trade. Whole position." → "Hand over a treasury."
+ * P6 · Use cases (v4: 52–59 s), the warmest section. Two sticker vignettes built around the hand-off swing (the v2
+ * gift is cut): (a) an OTC desk: the heavy #30 (1.20 BTC · 18 ETH · 300 SOL, ≈ $171,000.00) swings right as the offer
+ * sticker (42,000 NEAR) slides left, crossing mid-table; on "offer" it flips to ✓ Accepted; (b) a relay: #21 passes
+ * like a baton from old-team.near to new-team.near under its "Team treasury" pennant. A whip links them and the scene
+ * ends on the two cards swinging in sync. Captions "One trade. Whole position." → "Or take an offer." →
+ * "Hand over a treasury."
  */
 
 /** a stage's whip in (from the previous cut) and out (to the next) */
@@ -33,17 +32,12 @@ function stageMotion(frame: number, inCut?: number, outCut?: number) {
 
 export default function P6() {
   const frame = useCurrentFrame();
-  const a = stageMotion(frame, undefined, CUT.b);
-  const b = stageMotion(frame, CUT.b, CUT.c);
+  const b = stageMotion(frame, undefined, CUT.c);
   const c = stageMotion(frame, CUT.c, FINALE);
   const d = stageMotion(frame, FINALE);
   return (
     <AbsoluteFill style={{ background: C.ground, overflow: "hidden" }}>
-      {frame < CUT.b ? (
-        <WhipLayer x={a.x} stretch={a.s}>
-          <GiftStage frame={frame} />
-        </WhipLayer>
-      ) : frame < CUT.c ? (
+      {frame < CUT.c ? (
         <WhipLayer x={b.x} stretch={b.s}>
           <DeskStage frame={frame} />
         </WhipLayer>
@@ -56,8 +50,8 @@ export default function P6() {
           <FinaleStage frame={frame} />
         </WhipLayer>
       )}
-      <Caption text="Gift a funded wallet." at={CAP.a} until={CUT.b} size={110} width={1200} seed="p6-a" />
-      <Caption text={"One trade. Whole position."} at={CAP.b} until={CUT.c} size={112} width={1000} seed="p6-b" />
+      <Caption text={"One trade. Whole position."} at={CAP.b} until={CAP.or - 4} size={112} width={1000} seed="p6-b" />
+      <Caption text="Or take an offer." at={CAP.or} until={CAP.c - 4} size={112} width={1200} seed="p6-o" />
       <Caption text="Hand over a treasury." at={CAP.c} until={FINALE} size={110} width={1200} seed="p6-c" />
       <Sounds />
     </AbsoluteFill>
@@ -77,13 +71,8 @@ function Sounds() {
   );
   return (
     <>
-      {/* gift: the box slaps in on the downbeat, the lid pops, #12 swoops up out of the box */}
-      <Sfx name="sticker-slap" at={at(2)} gainDb={-5} />
-      <Sfx name="pop" at={at(LID_AT + 1)} gainDb={0} />
-      <Sfx name="swoop-up" at={at(RISE_AT + 2)} align="peak" gainDb={-3} />
-      {swing(LIFT.a, CONTACT.a)}
-      <Sfx name="whoosh-zip" at={at(CUT.b)} align="peak" gainDb={-1} />
       {swing(LIFT.b, CONTACT.b, true)}
+      <Sfx name="success-marimba" at={at(ACCEPT)} align="peak" gainDb={-2} />
       <Sfx name="whoosh-zip" at={at(CUT.c)} align="peak" gainDb={-1} />
       {swing(LIFT.c, CONTACT.c)}
       <Sfx name="whoosh-zip" at={at(FINALE)} align="peak" gainDb={-1} />

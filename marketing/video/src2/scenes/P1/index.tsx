@@ -45,21 +45,24 @@ const W = (prefix: string) => fr(sc.wordAt("V05", prefix));
 
 // ── the clock (frames, scene-local), keyed to V05 ──────────────────────────────────────────────────────────────
 export const P1T = (() => {
-  const mint = W("Mint");
-  const one = fr(sc.word("V05", 1));
+  const near = W("NEAR");
   const btc = W("Bitcoin");
   const eth = W("Ethereum");
   const sol = W("Solana");
   const addr = W("addresses");
-  const press = one; // "Mint one…": the finger lands on "one"
+  // V05 now starts on the scene's first frame, under H2's peel (f0–19): the caption lands on "on NEAR" once the
+  // frame is clear and the finger presses just before "NEAR"; the mint then runs tighter so the charms are on before
+  // the first tag prints on "Bitcoin".
+  const on = fr(sc.word("V05", 2));
+  const press = Math.max(near - 2, 20);
   const wallet = press + 3;
-  const minting = wallet + 11;
-  const minted = minting + 10;
+  const minting = wallet + 9;
+  const minted = minting + 8;
   const crouch = minted + 3;
   const takeoff = crouch + 3;
   const land = takeoff + 14; // contact frame
-  const snaps = [land + 3, land + 9, land + 15];
-  return { mint, press, wallet, minting, minted, crouch, takeoff, land, snaps, btc, eth, sol, addr, cap1: mint - 4, cap2: btc - 4, tags: [btc, eth, sol], end: fr(sc.duration) };
+  const snaps = [land + 2, land + 6, land + 10];
+  return { press, wallet, minting, minted, crouch, takeoff, land, snaps, btc, eth, sol, addr, cap1: Math.max(on, 18) - 4, cap2: btc - 4, tags: [btc, eth, sol], end: fr(sc.duration) };
 })();
 
 const T = P1T;
@@ -73,7 +76,6 @@ const G = cardGeo();
 const END = { cx: CARD.cx, cy: CARD.top + G.H / 2, w: CARD.w };
 const BUTTON = ui(195, 785); // the Mint button's centre (frame px)
 const TAP = ui(306, 790); // where the finger lands: the button's right third, so its label stays readable
-const ZEROS = CHAINS3.map((c) => ({ chain: c, amount: "0" }));
 
 export default function P1() {
   const f = useCurrentFrame();
@@ -158,7 +160,7 @@ function FlyingCard({ f }: { f: number }) {
         transform: `rotate(${ang}deg) scale(${stretch}, ${1 / stretch}) rotate(${-ang}deg) scale(${scale})`,
       }}
     >
-      <WorldCard charms={[{ hidden: true }, { hidden: true }, { hidden: true }]} chips={ZEROS} lift={liftPx / (8 * G.k)} bar={0} style={{ left: 0, top: 0 }} />
+      <WorldCard charms={[{ hidden: true }, { hidden: true }, { hidden: true }]} lift={liftPx / (8 * G.k)} bar={0} style={{ left: 0, top: 0 }} />
       <YoursSticker pop={badge} lift={liftPx} />
     </div>
   );
@@ -194,7 +196,7 @@ function LandedCard({ f }: { f: number }) {
   const tags: TagState[] = T.tags.map((at) => ({ slap: f - (at - 4), typed: interpolate(f, [at + 1, at + 12], [0, 1], clamp), string: ease(f, at - 7, at - 2, 0, 1, EASE2.out) }));
   return (
     <>
-      <WorldCard charms={charms} chips={ZEROS} lift={cardLift} bar={bar} scaleX={s.sx} scaleY={s.sy}>
+      <WorldCard charms={charms} lift={cardLift} bar={bar} scaleX={s.sx} scaleY={s.sy}>
         <YoursSticker lift={cardLift * 8 * G.k} />
       </WorldCard>
       {f - T.land < 24 ? (

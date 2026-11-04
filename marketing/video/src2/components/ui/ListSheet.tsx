@@ -4,7 +4,7 @@ import { AMOUNTS, type Balances, holdings, PRICE } from "./data";
 import { NUM, PausedBanner, Sheet, StatusPill, TY, UiButton } from "./kit";
 
 /**
- * ListSheet (T4): "Sell Satchel #7" over the Satchel page. "Ready to list ✓", the price field "4,750.00 USDC", what the
+ * ListSheet (T4): "Sell Satchel #7" over the Satchel page. "Ready to list ✓", the price field "2,000 NEAR" (NEAR only, D-51), what the
  * buyer gets and what the seller receives, then the coral "List for sale". Once listed: the "Paused for sale" pill
  * and banner. There is no countdown and no "safe to buy in …" anywhere (no post-listing wait, kb/90 §5.7).
  *
@@ -32,7 +32,7 @@ export interface ListSheetProps {
 }
 
 export function ListSheet({ open = 1, state = "ready", press, spin = 0, price = PRICE, priceReveal = 1, caret = 0, pausedPop, balances = AMOUNTS.after, id = "7", insetBottom = 34 }: ListSheetProps) {
-  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "USDC"];
+  const [num, cur] = [price.replace(/\s*[A-Z]+$/, ""), price.match(/[A-Z]+$/)?.[0] ?? "NEAR"];
   const busy = state === "wallet" || state === "listing";
   const p = press ?? (state === "pressed" ? 1 : 0);
 
@@ -71,12 +71,9 @@ export function ListSheet({ open = 1, state = "ready", press, spin = 0, price = 
 
       <div style={{ marginTop: 18, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ ...TY.caption, color: C.inkMuted }}>Price</span>
-        <span style={{ display: "flex", padding: 3, gap: 2, borderRadius: 999, background: C.sunken }}>
-          {["USDC", "NEAR"].map((c) => (
-            <span key={c} style={{ ...sans(c === cur ? 650 : 550), fontSize: 12.5, padding: "3px 11px", borderRadius: 999, background: c === cur ? C.surface : "transparent", border: `1.5px solid ${c === cur ? C.ink : "transparent"}`, color: c === cur ? C.ink : C.inkMuted }}>
-              {c}
-            </span>
-          ))}
+        {/* sale and offer prices are in NEAR only (D-51): a fixed currency chip, no switch */}
+        <span style={{ display: "flex", padding: 3, borderRadius: 999, background: C.sunken }}>
+          <span style={{ ...sans(650), fontSize: 12.5, padding: "3px 11px", borderRadius: 999, background: C.surface, border: `1.5px solid ${C.ink}`, color: C.ink }}>{cur}</span>
         </span>
       </div>
       <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 8, padding: "10px 16px", borderRadius: 12, background: C.sunken, border: `2px solid ${state === "ready" && priceReveal < 1 ? C.ink : C.lineStrong}` }}>
@@ -107,7 +104,7 @@ export function ListSheet({ open = 1, state = "ready", press, spin = 0, price = 
 function KV({ k, v, strong = false }: { k: string; v: string; strong?: boolean }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, ...TY.bodySm, fontSize: 14 }}>
-      <span style={{ color: C.inkMuted }}>{k}</span>
+      <span style={{ color: C.inkMuted, whiteSpace: "nowrap", flexShrink: 0 }}>{k}</span>
       <span style={{ ...sans(strong ? 700 : 500), color: C.ink, textAlign: "right", ...NUM }}>{v}</span>
     </div>
   );

@@ -23,7 +23,7 @@ export const RemotionRoot = () => {
         <Composition id="FoundationTest" component={FoundationTest} durationInFrames={FPS * 4} fps={FPS} width={W} height={H} />
         <Composition id="CharactersGallery" component={CharactersGallery} durationInFrames={FPS * 6} fps={FPS} width={W} height={H} />
         <Composition id="PropsGallery" component={PropsGallery} durationInFrames={FPS * 6} fps={FPS} width={W} height={H} />
-        <Composition id="UiGallery" component={UiGallery} durationInFrames={300} fps={FPS} width={W} height={H} />
+        <Composition id="UiGallery" component={UiGallery} durationInFrames={360} fps={FPS} width={W} height={H} />
       </Folder>
     </>
   );

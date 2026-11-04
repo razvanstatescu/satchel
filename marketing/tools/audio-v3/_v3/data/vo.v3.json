@@ -1,0 +1,1877 @@
+{
+ "voice": {
+  "id": "EXAVITQu4vr4xnSDxMaL",
+  "name": "Sarah",
+  "model": "eleven_v4",
+  "format": "mp3_44100_128",
+  "settings": {
+   "stability": 0.45,
+   "similarity_boost": 0.8
+  }
+ },
+ "lines": [
+  {
+   "id": "V01",
+   "scene": "H1",
+   "text": "Stick it on.",
+   "say": "Stick it on.",
+   "file": "v2/vo/V01.mp3",
+   "duration": 0.93,
+   "words": [
+    {
+     "text": "Stick",
+     "start": 0.14,
+     "end": 0.38
+    },
+    {
+     "text": "it",
+     "start": 0.42,
+     "end": 0.5
+    },
+    {
+     "text": "on.",
+     "start": 0.58,
+     "end": 0.84
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Stick it on"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V02",
+   "scene": "H1",
+   "text": "Hand it over.",
+   "say": "Hand it over.",
+   "file": "v2/vo/V02.mp3",
+   "duration": 0.91,
+   "words": [
+    {
+     "text": "Hand",
+     "start": 0.1,
+     "end": 0.3
+    },
+    {
+     "text": "it",
+     "start": 0.34,
+     "end": 0.42
+    },
+    {
+     "text": "over.",
+     "start": 0.5,
+     "end": 0.82
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Hand it over"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V03",
+   "scene": "H2",
+   "text": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+   "say": "Native Bitcoin, Ethereum and Solana, in one NFT.",
+   "file": "v2/vo/V03.mp3",
+   "duration": 4.62,
+   "words": [
+    {
+     "text": "Native",
+     "start": 0.1,
+     "end": 0.4
+    },
+    {
+     "text": "Bitcoin,",
+     "start": 0.52,
+     "end": 1.08
+    },
+    {
+     "text": "Ethereum",
+     "start": 1.36,
+     "end": 1.94
+    },
+    {
+     "text": "and",
+     "start": 2.1,
+     "end": 2.18
+    },
+    {
+     "text": "Solana,",
+     "start": 2.28,
+     "end": 2.82
+    },
+    {
+     "text": "in",
+     "start": 3.14,
+     "end": 3.36
+    },
+    {
+     "text": "one",
+     "start": 3.44,
+     "end": 3.64
+    },
+    {
+     "text": "NFT.",
+     "start": 3.86,
+     "end": 4.4
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Native Bitcoin, Ethereum, and Solana in one NFT"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V04",
+   "scene": "H2",
+   "text": "Whoever holds the Satchel holds everything inside.",
+   "say": "Whoever holds the Satchel holds everything inside.",
+   "file": "v2/vo/V04.mp3",
+   "duration": 3.32,
+   "words": [
+    {
+     "text": "Whoever",
+     "start": 0.06,
+     "end": 0.4
+    },
+    {
+     "text": "holds",
+     "start": 0.5,
+     "end": 0.78
+    },
+    {
+     "text": "the",
+     "start": 0.82,
+     "end": 0.94
+    },
+    {
+     "text": "Satchel",
+     "start": 1.02,
+     "end": 1.5
+    },
+    {
+     "text": "holds",
+     "start": 1.7,
+     "end": 1.94
+    },
+    {
+     "text": "everything",
+     "start": 2.18,
+     "end": 2.64
+    },
+    {
+     "text": "inside.",
+     "start": 2.7,
+     "end": 3.26
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Whoever holds the satchel holds everything inside"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V05",
+   "scene": "P1",
+   "text": "Mint one on NEAR, and it gets its own Bitcoin, Ethereum and Solana addresses.",
+   "say": "Mint one on Near, and it gets its own Bitcoin, Ethereum and Solana addresses.",
+   "file": "v2/vo/V05.mp3",
+   "duration": 5.25,
+   "words": [
+    {
+     "text": "Mint",
+     "start": 0.1,
+     "end": 0.28
+    },
+    {
+     "text": "one",
+     "start": 0.4,
+     "end": 0.54
+    },
+    {
+     "text": "on",
+     "start": 0.6,
+     "end": 0.74
+    },
+    {
+     "text": "NEAR,",
+     "start": 0.8,
+     "end": 1.12
+    },
+    {
+     "text": "and",
+     "start": 1.36,
+     "end": 1.42
+    },
+    {
+     "text": "it",
+     "start": 1.46,
+     "end": 1.54
+    },
+    {
+     "text": "gets",
+     "start": 1.58,
+     "end": 1.76
+    },
+    {
+     "text": "its",
+     "start": 1.8,
+     "end": 2.02
+    },
+    {
+     "text": "own",
+     "start": 2.1,
+     "end": 2.28
+    },
+    {
+     "text": "Bitcoin,",
+     "start": 2.42,
+     "end": 2.94
+    },
+    {
+     "text": "Ethereum",
+     "start": 3.08,
+     "end": 3.66
+    },
+    {
+     "text": "and",
+     "start": 3.78,
+     "end": 3.86
+    },
+    {
+     "text": "Solana",
+     "start": 3.96,
+     "end": 4.4
+    },
+    {
+     "text": "addresses.",
+     "start": 4.46,
+     "end": 5.06
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Mint one on NEAR and it gets its own Bitcoin, Ethereum, and Solana addresses"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V06",
+   "scene": "P2",
+   "text": "Fill it from any wallet or exchange, straight to its addresses.",
+   "say": "Fill it from any wallet or exchange, straight to its addresses.",
+   "file": "v2/vo/V06.mp3",
+   "duration": 4.1,
+   "words": [
+    {
+     "text": "Fill",
+     "start": 0.12,
+     "end": 0.26
+    },
+    {
+     "text": "it",
+     "start": 0.32,
+     "end": 0.44
+    },
+    {
+     "text": "from",
+     "start": 0.48,
+     "end": 0.76
+    },
+    {
+     "text": "any",
+     "start": 0.82,
+     "end": 1
+    },
+    {
+     "text": "wallet",
+     "start": 1.12,
+     "end": 1.46
+    },
+    {
+     "text": "or",
+     "start": 1.52,
+     "end": 1.6
+    },
+    {
+     "text": "exchange,",
+     "start": 1.66,
+     "end": 2.3
+    },
+    {
+     "text": "straight",
+     "start": 2.7,
+     "end": 3.02
+    },
+    {
+     "text": "to",
+     "start": 3.06,
+     "end": 3.16
+    },
+    {
+     "text": "its",
+     "start": 3.2,
+     "end": 3.32
+    },
+    {
+     "text": "addresses.",
+     "start": 3.36,
+     "end": 4.019
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Fill it from any wallet or exchange straight to its addresses"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V07",
+   "scene": "P3",
+   "text": "Then send from it, on all three chains.",
+   "say": "Then send from it, on all three chains.",
+   "file": "v2/vo/V07.mp3",
+   "duration": 2.86,
+   "words": [
+    {
+     "text": "Then",
+     "start": 0.1,
+     "end": 0.28
+    },
+    {
+     "text": "send",
+     "start": 0.46,
+     "end": 0.72
+    },
+    {
+     "text": "from",
+     "start": 0.74,
+     "end": 0.9
+    },
+    {
+     "text": "it,",
+     "start": 0.96,
+     "end": 1.1
+    },
+    {
+     "text": "on",
+     "start": 1.36,
+     "end": 1.6
+    },
+    {
+     "text": "all",
+     "start": 1.68,
+     "end": 1.88
+    },
+    {
+     "text": "three",
+     "start": 1.92,
+     "end": 2.12
+    },
+    {
+     "text": "chains.",
+     "start": 2.24,
+     "end": 2.78
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Then send from it on all three chains"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V08",
+   "scene": "P3",
+   "text": "Approve in your NEAR wallet, and NEAR Chain Signatures signs a native transaction.",
+   "say": "Approve in your Near wallet, and Near Chain Signatures signs a native transaction.",
+   "file": "v2/vo/V08.mp3",
+   "duration": 5.22,
+   "words": [
+    {
+     "text": "Approve",
+     "start": 0.06,
+     "end": 0.52
+    },
+    {
+     "text": "in",
+     "start": 0.62,
+     "end": 0.7
+    },
+    {
+     "text": "your",
+     "start": 0.74,
+     "end": 0.84
+    },
+    {
+     "text": "NEAR",
+     "start": 0.96,
+     "end": 1.14
+    },
+    {
+     "text": "wallet,",
+     "start": 1.26,
+     "end": 1.66
+    },
+    {
+     "text": "and",
+     "start": 1.96,
+     "end": 2.08
+    },
+    {
+     "text": "NEAR",
+     "start": 2.16,
+     "end": 2.34
+    },
+    {
+     "text": "Chain",
+     "start": 2.44,
+     "end": 2.64
+    },
+    {
+     "text": "Signatures",
+     "start": 2.76,
+     "end": 3.34
+    },
+    {
+     "text": "signs",
+     "start": 3.46,
+     "end": 3.76
+    },
+    {
+     "text": "a",
+     "start": 3.88,
+     "end": 3.94
+    },
+    {
+     "text": "native",
+     "start": 4.059,
+     "end": 4.32
+    },
+    {
+     "text": "transaction.",
+     "start": 4.4,
+     "end": 5.16
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Approve in your NEAR Wallet and NEAR Chain Signatures signs a native transaction"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V09",
+   "scene": "P4",
+   "text": "There's no seed phrase to copy. The contract signs only for the holder.",
+   "say": "There's no seed phrase to copy. The contract signs only for the holder.",
+   "file": "v2/vo/V09.mp3",
+   "duration": 4.68,
+   "words": [
+    {
+     "text": "There's",
+     "start": 0.06,
+     "end": 0.34
+    },
+    {
+     "text": "no",
+     "start": 0.4,
+     "end": 0.68
+    },
+    {
+     "text": "seed",
+     "start": 0.74,
+     "end": 0.94
+    },
+    {
+     "text": "phrase",
+     "start": 1,
+     "end": 1.3
+    },
+    {
+     "text": "to",
+     "start": 1.34,
+     "end": 1.42
+    },
+    {
+     "text": "copy.",
+     "start": 1.46,
+     "end": 1.88
+    },
+    {
+     "text": "The",
+     "start": 2.38,
+     "end": 2.46
+    },
+    {
+     "text": "contract",
+     "start": 2.5,
+     "end": 2.96
+    },
+    {
+     "text": "signs",
+     "start": 3.08,
+     "end": 3.52
+    },
+    {
+     "text": "only",
+     "start": 3.58,
+     "end": 3.9
+    },
+    {
+     "text": "for",
+     "start": 3.94,
+     "end": 4.04
+    },
+    {
+     "text": "the",
+     "start": 4.08,
+     "end": 4.12
+    },
+    {
+     "text": "holder.",
+     "start": 4.18,
+     "end": 4.6
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "There's no seed phrase to copy. The contract signs only for the holder"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V10",
+   "scene": "P5",
+   "text": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+   "say": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+   "file": "v2/vo/V10.mp3",
+   "duration": 6.05,
+   "words": [
+    {
+     "text": "Give",
+     "start": 0.1,
+     "end": 0.2
+    },
+    {
+     "text": "it",
+     "start": 0.24,
+     "end": 0.32
+    },
+    {
+     "text": "to",
+     "start": 0.38,
+     "end": 0.48
+    },
+    {
+     "text": "a",
+     "start": 0.52,
+     "end": 0.62
+    },
+    {
+     "text": "friend,",
+     "start": 0.66,
+     "end": 1.06
+    },
+    {
+     "text": "and",
+     "start": 1.26,
+     "end": 1.36
+    },
+    {
+     "text": "everything",
+     "start": 1.58,
+     "end": 2
+    },
+    {
+     "text": "inside",
+     "start": 2.04,
+     "end": 2.6
+    },
+    {
+     "text": "goes",
+     "start": 2.64,
+     "end": 2.9
+    },
+    {
+     "text": "with",
+     "start": 2.94,
+     "end": 3.1
+    },
+    {
+     "text": "it.",
+     "start": 3.16,
+     "end": 3.32
+    },
+    {
+     "text": "No",
+     "start": 3.82,
+     "end": 3.94
+    },
+    {
+     "text": "bridge.",
+     "start": 4.04,
+     "end": 4.42
+    },
+    {
+     "text": "No",
+     "start": 4.78,
+     "end": 4.94
+    },
+    {
+     "text": "wrapped",
+     "start": 5.02,
+     "end": 5.4
+    },
+    {
+     "text": "tokens.",
+     "start": 5.44,
+     "end": 5.98
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Give it to a friend and everything inside goes with it. No bridge, no wrapped tokens"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V11",
+   "scene": "P6",
+   "text": "Gift a funded wallet.",
+   "say": "Gift a funded wallet.",
+   "file": "v2/vo/V11.mp3",
+   "duration": 1.54,
+   "words": [
+    {
+     "text": "Gift",
+     "start": 0.1,
+     "end": 0.34
+    },
+    {
+     "text": "a",
+     "start": 0.4,
+     "end": 0.42
+    },
+    {
+     "text": "funded",
+     "start": 0.6,
+     "end": 0.92
+    },
+    {
+     "text": "wallet.",
+     "start": 1.02,
+     "end": 1.48
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Gift a funded wallet"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V12",
+   "scene": "P6",
+   "text": "Sell a whole position in one trade.",
+   "say": "Sell a whole position in one trade.",
+   "file": "v2/vo/V12.mp3",
+   "duration": 2.59,
+   "words": [
+    {
+     "text": "Sell",
+     "start": 0.12,
+     "end": 0.32
+    },
+    {
+     "text": "a",
+     "start": 0.4,
+     "end": 0.5
+    },
+    {
+     "text": "whole",
+     "start": 0.56,
+     "end": 0.74
+    },
+    {
+     "text": "position",
+     "start": 0.84,
+     "end": 1.36
+    },
+    {
+     "text": "in",
+     "start": 1.5,
+     "end": 1.64
+    },
+    {
+     "text": "one",
+     "start": 1.76,
+     "end": 1.96
+    },
+    {
+     "text": "trade.",
+     "start": 2.08,
+     "end": 2.5
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Sell a whole position in one trade"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V13",
+   "scene": "P6",
+   "text": "Hand a treasury to the next team.",
+   "say": "Hand a treasury to the next team.",
+   "file": "v2/vo/V13.mp3",
+   "duration": 2.03,
+   "words": [
+    {
+     "text": "Hand",
+     "start": 0.1,
+     "end": 0.3
+    },
+    {
+     "text": "a",
+     "start": 0.36,
+     "end": 0.42
+    },
+    {
+     "text": "treasury",
+     "start": 0.48,
+     "end": 1
+    },
+    {
+     "text": "to",
+     "start": 1.04,
+     "end": 1.12
+    },
+    {
+     "text": "the",
+     "start": 1.16,
+     "end": 1.24
+    },
+    {
+     "text": "next",
+     "start": 1.28,
+     "end": 1.54
+    },
+    {
+     "text": "team.",
+     "start": 1.58,
+     "end": 1.96
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Hand a treasury to the next team"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V14",
+   "scene": "C1",
+   "text": "But there's a catch.",
+   "say": "But there's a catch.",
+   "file": "v2/vo/V14.mp3",
+   "duration": 1.21,
+   "words": [
+    {
+     "text": "But",
+     "start": 0.08,
+     "end": 0.2
+    },
+    {
+     "text": "there's",
+     "start": 0.24,
+     "end": 0.44
+    },
+    {
+     "text": "a",
+     "start": 0.5,
+     "end": 0.56
+    },
+    {
+     "text": "catch.",
+     "start": 0.64,
+     "end": 1.1
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "But there's a catch"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V15",
+   "scene": "C1",
+   "text": "A signature made before the sale can still be used after it.",
+   "say": "A signature made before the sale can still be used after it.",
+   "file": "v2/vo/V15.mp3",
+   "duration": 4.06,
+   "words": [
+    {
+     "text": "A",
+     "start": 0.08,
+     "end": 0.14
+    },
+    {
+     "text": "signature",
+     "start": 0.22,
+     "end": 0.66
+    },
+    {
+     "text": "made",
+     "start": 0.76,
+     "end": 0.98
+    },
+    {
+     "text": "before",
+     "start": 1.02,
+     "end": 1.48
+    },
+    {
+     "text": "the",
+     "start": 1.52,
+     "end": 1.64
+    },
+    {
+     "text": "sale",
+     "start": 1.7,
+     "end": 1.98
+    },
+    {
+     "text": "can",
+     "start": 2.14,
+     "end": 2.32
+    },
+    {
+     "text": "still",
+     "start": 2.44,
+     "end": 2.64
+    },
+    {
+     "text": "be",
+     "start": 2.68,
+     "end": 2.82
+    },
+    {
+     "text": "used",
+     "start": 2.92,
+     "end": 3.2
+    },
+    {
+     "text": "after",
+     "start": 3.34,
+     "end": 3.62
+    },
+    {
+     "text": "it.",
+     "start": 3.7,
+     "end": 3.84
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "A signature made before the sale can still be used after it"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V16",
+   "scene": "C1",
+   "text": "So how does a buyer know it's clean?",
+   "say": "So how does a buyer know it's clean?",
+   "file": "v2/vo/V16.mp3",
+   "duration": 2.24,
+   "words": [
+    {
+     "text": "So",
+     "start": 0.12,
+     "end": 0.34
+    },
+    {
+     "text": "how",
+     "start": 0.46,
+     "end": 0.6
+    },
+    {
+     "text": "does",
+     "start": 0.64,
+     "end": 0.76
+    },
+    {
+     "text": "a",
+     "start": 0.82,
+     "end": 0.92
+    },
+    {
+     "text": "buyer",
+     "start": 0.94,
+     "end": 1.22
+    },
+    {
+     "text": "know",
+     "start": 1.32,
+     "end": 1.46
+    },
+    {
+     "text": "it's",
+     "start": 1.5,
+     "end": 1.68
+    },
+    {
+     "text": "clean?",
+     "start": 1.74,
+     "end": 2.14
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "So how does a buyer know it's clean?"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V17",
+   "scene": "T0",
+   "text": "Satchel keeps the receipts.",
+   "say": "Satchel keeps the receipts.",
+   "file": "v2/vo/V17.mp3",
+   "duration": 1.7,
+   "words": [
+    {
+     "text": "Satchel",
+     "start": 0.14,
+     "end": 0.48
+    },
+    {
+     "text": "keeps",
+     "start": 0.62,
+     "end": 0.86
+    },
+    {
+     "text": "the",
+     "start": 0.9,
+     "end": 0.98
+    },
+    {
+     "text": "receipts.",
+     "start": 1.02,
+     "end": 1.6
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Satchel keeps the receipts"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V18",
+   "scene": "T1",
+   "text": "Every signature goes on the record, on NEAR, before NEAR's signer network makes it.",
+   "say": "Every signature goes on the record, on Near, before Near's signer network makes it.",
+   "file": "v2/vo/V18.mp3",
+   "duration": 5.75,
+   "words": [
+    {
+     "text": "Every",
+     "start": 0.1,
+     "end": 0.36
+    },
+    {
+     "text": "signature",
+     "start": 0.46,
+     "end": 0.96
+    },
+    {
+     "text": "goes",
+     "start": 1.1,
+     "end": 1.34
+    },
+    {
+     "text": "on",
+     "start": 1.38,
+     "end": 1.48
+    },
+    {
+     "text": "the",
+     "start": 1.52,
+     "end": 1.62
+    },
+    {
+     "text": "record,",
+     "start": 1.66,
+     "end": 2.08
+    },
+    {
+     "text": "on",
+     "start": 2.52,
+     "end": 2.68
+    },
+    {
+     "text": "NEAR,",
+     "start": 2.74,
+     "end": 3.08
+    },
+    {
+     "text": "before",
+     "start": 3.54,
+     "end": 3.92
+    },
+    {
+     "text": "NEAR's",
+     "start": 4.04,
+     "end": 4.36
+    },
+    {
+     "text": "signer",
+     "start": 4.44,
+     "end": 4.72
+    },
+    {
+     "text": "network",
+     "start": 4.8,
+     "end": 5.18
+    },
+    {
+     "text": "makes",
+     "start": 5.22,
+     "end": 5.48
+    },
+    {
+     "text": "it.",
+     "start": 5.54,
+     "end": 5.7
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Every signature goes on the record on NEAR before NEAR's signer network makes it"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V19",
+   "scene": "T2",
+   "text": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+   "say": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
+   "file": "v2/vo/V19.mp3",
+   "duration": 5.63,
+   "words": [
+    {
+     "text": "And",
+     "start": 0.06,
+     "end": 0.14
+    },
+    {
+     "text": "there's",
+     "start": 0.18,
+     "end": 0.42
+    },
+    {
+     "text": "no",
+     "start": 0.5,
+     "end": 0.78
+    },
+    {
+     "text": "admin",
+     "start": 0.9,
+     "end": 1.26
+    },
+    {
+     "text": "key.",
+     "start": 1.32,
+     "end": 1.6
+    },
+    {
+     "text": "Not",
+     "start": 2.02,
+     "end": 2.18
+    },
+    {
+     "text": "even",
+     "start": 2.22,
+     "end": 2.4
+    },
+    {
+     "text": "ours.",
+     "start": 2.5,
+     "end": 2.86
+    },
+    {
+     "text": "So",
+     "start": 3.3,
+     "end": 3.4
+    },
+    {
+     "text": "it",
+     "start": 3.46,
+     "end": 3.54
+    },
+    {
+     "text": "can't",
+     "start": 3.62,
+     "end": 3.9
+    },
+    {
+     "text": "sign",
+     "start": 3.96,
+     "end": 4.3
+    },
+    {
+     "text": "anything",
+     "start": 4.38,
+     "end": 4.8
+    },
+    {
+     "text": "off",
+     "start": 4.88,
+     "end": 5
+    },
+    {
+     "text": "the",
+     "start": 5.04,
+     "end": 5.12
+    },
+    {
+     "text": "record.",
+     "start": 5.16,
+     "end": 5.58
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "And there's no admin key, not even ours, so it can't sign anything off the record"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V20",
+   "scene": "T3",
+   "text": "It only signs plain transfers it can read, so each one can be checked later.",
+   "say": "It only signs plain transfers it can read, so each one can be checked later.",
+   "file": "v2/vo/V20.mp3",
+   "duration": 4.97,
+   "words": [
+    {
+     "text": "It",
+     "start": 0.06,
+     "end": 0.2
+    },
+    {
+     "text": "only",
+     "start": 0.28,
+     "end": 0.54
+    },
+    {
+     "text": "signs",
+     "start": 0.6,
+     "end": 1
+    },
+    {
+     "text": "plain",
+     "start": 1.06,
+     "end": 1.38
+    },
+    {
+     "text": "transfers",
+     "start": 1.42,
+     "end": 1.94
+    },
+    {
+     "text": "it",
+     "start": 1.98,
+     "end": 2.06
+    },
+    {
+     "text": "can",
+     "start": 2.08,
+     "end": 2.24
+    },
+    {
+     "text": "read,",
+     "start": 2.32,
+     "end": 2.64
+    },
+    {
+     "text": "so",
+     "start": 3.04,
+     "end": 3.24
+    },
+    {
+     "text": "each",
+     "start": 3.32,
+     "end": 3.54
+    },
+    {
+     "text": "one",
+     "start": 3.66,
+     "end": 3.86
+    },
+    {
+     "text": "can",
+     "start": 3.9,
+     "end": 4.019
+    },
+    {
+     "text": "be",
+     "start": 4.059,
+     "end": 4.16
+    },
+    {
+     "text": "checked",
+     "start": 4.22,
+     "end": 4.46
+    },
+    {
+     "text": "later.",
+     "start": 4.52,
+     "end": 4.9
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": false,
+      "exact": false,
+      "heard": "It only signs plane transfers it can read, so each one can be checked later."
+     },
+     {
+      "attempt": 1,
+      "ok": true,
+      "exact": true,
+      "heard": "It only signs plain transfers it can read, so each one can be checked later"
+     }
+    ],
+    "chosen": 1
+   }
+  },
+  {
+   "id": "V21",
+   "scene": "T4",
+   "text": "List it, and signing pauses. The history stops growing.",
+   "say": "List it, and signing pauses. The history stops growing.",
+   "file": "v2/vo/V21.mp3",
+   "duration": 4.42,
+   "words": [
+    {
+     "text": "List",
+     "start": 0.08,
+     "end": 0.34
+    },
+    {
+     "text": "it,",
+     "start": 0.4,
+     "end": 0.56
+    },
+    {
+     "text": "and",
+     "start": 0.88,
+     "end": 0.98
+    },
+    {
+     "text": "signing",
+     "start": 1.12,
+     "end": 1.46
+    },
+    {
+     "text": "pauses.",
+     "start": 1.58,
+     "end": 2.14
+    },
+    {
+     "text": "The",
+     "start": 2.64,
+     "end": 2.72
+    },
+    {
+     "text": "history",
+     "start": 2.78,
+     "end": 3.2
+    },
+    {
+     "text": "stops",
+     "start": 3.34,
+     "end": 3.62
+    },
+    {
+     "text": "growing.",
+     "start": 3.72,
+     "end": 4.16
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "List it and signing pauses. The history stops growing"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V22",
+   "scene": "T5",
+   "text": "Then the buyer's browser checks every record against each chain.",
+   "say": "Then the buyer's browser checks every record against each chain.",
+   "file": "v2/vo/V22.mp3",
+   "duration": 3.97,
+   "words": [
+    {
+     "text": "Then",
+     "start": 0.1,
+     "end": 0.28
+    },
+    {
+     "text": "the",
+     "start": 0.32,
+     "end": 0.38
+    },
+    {
+     "text": "buyer's",
+     "start": 0.46,
+     "end": 0.82
+    },
+    {
+     "text": "browser",
+     "start": 0.9,
+     "end": 1.34
+    },
+    {
+     "text": "checks",
+     "start": 1.5,
+     "end": 1.88
+    },
+    {
+     "text": "every",
+     "start": 1.96,
+     "end": 2.2
+    },
+    {
+     "text": "record",
+     "start": 2.3,
+     "end": 2.7
+    },
+    {
+     "text": "against",
+     "start": 2.74,
+     "end": 3.14
+    },
+    {
+     "text": "each",
+     "start": 3.2,
+     "end": 3.46
+    },
+    {
+     "text": "chain.",
+     "start": 3.52,
+     "end": 3.9
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Then the buyer's browser checks every record against each chain"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V23",
+   "scene": "T5",
+   "text": "Nonce used. Coin spent. Blockhash expired.",
+   "say": "Nonce used. Coin spent. Blockhash expired.",
+   "file": "v2/vo/V23.mp3",
+   "duration": 4.49,
+   "words": [
+    {
+     "text": "Nonce",
+     "start": 0.12,
+     "end": 0.44
+    },
+    {
+     "text": "used.",
+     "start": 0.64,
+     "end": 1
+    },
+    {
+     "text": "Coin",
+     "start": 1.58,
+     "end": 1.86
+    },
+    {
+     "text": "spent.",
+     "start": 2.08,
+     "end": 2.42
+    },
+    {
+     "text": "Blockhash",
+     "start": 3.12,
+     "end": 3.7
+    },
+    {
+     "text": "expired.",
+     "start": 3.8,
+     "end": 4.42
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "period": 1.5,
+   "phraseGrid": [
+    0,
+    1.5,
+    3
+   ],
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": false,
+      "exact": false,
+      "heard": "Nonce used. Coins spent. Block hash expired"
+     },
+     {
+      "attempt": 1,
+      "ok": false,
+      "exact": false,
+      "heard": "Nonce used. Coins spent. Block hash expired"
+     },
+     {
+      "attempt": 2,
+      "ok": false,
+      "exact": false,
+      "heard": "Nonce used. Coins spent. Block hash expired"
+     }
+    ],
+    "chosen": 2
+   }
+  },
+  {
+   "id": "V24",
+   "scene": "T6",
+   "text": "If one old signature could still move coins, Buy stays off.",
+   "say": "If one old signature could still move coins, Buy stays off.",
+   "file": "v2/vo/V24.mp3",
+   "duration": 4.32,
+   "words": [
+    {
+     "text": "If",
+     "start": 0.08,
+     "end": 0.28
+    },
+    {
+     "text": "one",
+     "start": 0.38,
+     "end": 0.5
+    },
+    {
+     "text": "old",
+     "start": 0.66,
+     "end": 0.82
+    },
+    {
+     "text": "signature",
+     "start": 0.92,
+     "end": 1.38
+    },
+    {
+     "text": "could",
+     "start": 1.48,
+     "end": 1.66
+    },
+    {
+     "text": "still",
+     "start": 1.8,
+     "end": 2.02
+    },
+    {
+     "text": "move",
+     "start": 2.08,
+     "end": 2.26
+    },
+    {
+     "text": "coins,",
+     "start": 2.36,
+     "end": 2.84
+    },
+    {
+     "text": "Buy",
+     "start": 3.24,
+     "end": 3.46
+    },
+    {
+     "text": "stays",
+     "start": 3.6,
+     "end": 3.86
+    },
+    {
+     "text": "off.",
+     "start": 3.96,
+     "end": 4.24
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "If one old signature could still move coins, buy stays off"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V25",
+   "scene": "T7",
+   "text": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+   "say": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+   "file": "v2/vo/V25.mp3",
+   "duration": 5.63,
+   "words": [
+    {
+     "text": "When",
+     "start": 0.08,
+     "end": 0.18
+    },
+    {
+     "text": "it's",
+     "start": 0.22,
+     "end": 0.4
+    },
+    {
+     "text": "clean,",
+     "start": 0.46,
+     "end": 0.86
+    },
+    {
+     "text": "one",
+     "start": 1.28,
+     "end": 1.44
+    },
+    {
+     "text": "transaction,",
+     "start": 1.54,
+     "end": 2.34
+    },
+    {
+     "text": "bound",
+     "start": 2.64,
+     "end": 2.9
+    },
+    {
+     "text": "to",
+     "start": 2.94,
+     "end": 3.04
+    },
+    {
+     "text": "that",
+     "start": 3.08,
+     "end": 3.22
+    },
+    {
+     "text": "exact",
+     "start": 3.26,
+     "end": 3.76
+    },
+    {
+     "text": "history,",
+     "start": 3.8,
+     "end": 4.28
+    },
+    {
+     "text": "pays",
+     "start": 4.7,
+     "end": 4.96
+    },
+    {
+     "text": "the",
+     "start": 5.02,
+     "end": 5.12
+    },
+    {
+     "text": "seller,",
+     "start": 5.18,
+     "end": 5.52
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "When it's clean, one transaction bound to that exact history pays the seller"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V26",
+   "scene": "T7",
+   "text": "and the buyer gets everything inside.",
+   "say": "and the buyer gets everything inside.",
+   "file": "v2/vo/V26.mp3",
+   "duration": 2.42,
+   "words": [
+    {
+     "text": "and",
+     "start": 0.06,
+     "end": 0.16
+    },
+    {
+     "text": "the",
+     "start": 0.2,
+     "end": 0.32
+    },
+    {
+     "text": "buyer",
+     "start": 0.36,
+     "end": 0.7
+    },
+    {
+     "text": "gets",
+     "start": 0.82,
+     "end": 1.18
+    },
+    {
+     "text": "everything",
+     "start": 1.26,
+     "end": 1.7
+    },
+    {
+     "text": "inside.",
+     "start": 1.76,
+     "end": 2.34
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "And the buyer gets everything inside"
+     }
+    ],
+    "chosen": 0
+   }
+  },
+  {
+   "id": "V27",
+   "scene": "E1",
+   "text": "Satchel. Stick it on. Hand it over.",
+   "say": "Satchel. Stick it on. Hand it over.",
+   "file": "v2/vo/V27.mp3",
+   "duration": 3.12,
+   "words": [
+    {
+     "text": "Satchel.",
+     "start": 0.12,
+     "end": 0.6
+    },
+    {
+     "text": "Stick",
+     "start": 1.24,
+     "end": 1.4
+    },
+    {
+     "text": "it",
+     "start": 1.44,
+     "end": 1.52
+    },
+    {
+     "text": "on.",
+     "start": 1.62,
+     "end": 1.9
+    },
+    {
+     "text": "Hand",
+     "start": 2.32,
+     "end": 2.5
+    },
+    {
+     "text": "it",
+     "start": 2.54,
+     "end": 2.62
+    },
+    {
+     "text": "over.",
+     "start": 2.72,
+     "end": 3.04
+    }
+   ],
+   "wordSource": "forced-alignment",
+   "qa": {
+    "takes": [
+     {
+      "attempt": 0,
+      "ok": true,
+      "exact": true,
+      "heard": "Satchel. Stick it on. Hand it over"
+     }
+    ],
+    "chosen": 0
+   }
+  }
+ ]
+}

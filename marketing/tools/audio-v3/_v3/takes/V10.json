@@ -1,0 +1,116 @@
+{
+ "key": "1379be4072882d3a",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+ "prev": "There's no seed phrase to copy. The contract signs only for the holder.",
+ "next": "Gift a funded wallet.",
+ "final": {
+  "id": "V10",
+  "scene": "P5",
+  "text": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+  "say": "Give it to a friend, and everything inside goes with it. No bridge. No wrapped tokens.",
+  "file": "v2/vo/V10.mp3",
+  "duration": 6.05,
+  "words": [
+   {
+    "text": "Give",
+    "start": 0.1,
+    "end": 0.2
+   },
+   {
+    "text": "it",
+    "start": 0.24,
+    "end": 0.32
+   },
+   {
+    "text": "to",
+    "start": 0.38,
+    "end": 0.48
+   },
+   {
+    "text": "a",
+    "start": 0.52,
+    "end": 0.62
+   },
+   {
+    "text": "friend,",
+    "start": 0.66,
+    "end": 1.06
+   },
+   {
+    "text": "and",
+    "start": 1.26,
+    "end": 1.36
+   },
+   {
+    "text": "everything",
+    "start": 1.58,
+    "end": 2
+   },
+   {
+    "text": "inside",
+    "start": 2.04,
+    "end": 2.6
+   },
+   {
+    "text": "goes",
+    "start": 2.64,
+    "end": 2.9
+   },
+   {
+    "text": "with",
+    "start": 2.94,
+    "end": 3.1
+   },
+   {
+    "text": "it.",
+    "start": 3.16,
+    "end": 3.32
+   },
+   {
+    "text": "No",
+    "start": 3.82,
+    "end": 3.94
+   },
+   {
+    "text": "bridge.",
+    "start": 4.04,
+    "end": 4.42
+   },
+   {
+    "text": "No",
+    "start": 4.78,
+    "end": 4.94
+   },
+   {
+    "text": "wrapped",
+    "start": 5.02,
+    "end": 5.4
+   },
+   {
+    "text": "tokens.",
+    "start": 5.44,
+    "end": 5.98
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "Give it to a friend and everything inside goes with it. No bridge, no wrapped tokens"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}
