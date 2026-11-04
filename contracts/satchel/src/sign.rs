@@ -42,7 +42,9 @@ impl Contract {
     /// `sign × n` (separate single-action receipts joined with `.and()`) `.then(on_signed)`.
     /// Attach `min(300, 60 + 20·n)` Tgas (floor `30 + 18·n`) and `0.005 NEAR × n` (excess refunded).
     /// The tx result is `on_signed`'s return value (set with `promise_return`).
+    /// Unknown top-level arguments are refused, like unknown fields inside `request` (review R3-I-1).
     #[payable]
+    #[deny_unknown_arguments]
     pub fn sign_for(&mut self, token_id: TokenId, request: SignRequest, mpc_deposit: Option<U128>) {
         // 1. the owner, or a delegate with a live allowance (INV-01; C5 docs/specs/C5.md)
         let signer = self.authorize_signer(&token_id, &env::predecessor_account_id(), &request).unwrap_or_else(|r| r.fail());

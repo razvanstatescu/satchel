@@ -401,15 +401,34 @@ fn review3_q6_worst_case_logs_and_mpc_args_fit() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-// R3-I-1: `SignRequest` silently ignores unknown fields (FtMsg refuses them, Q-04). Demonstration.
+// R3-I-1 (fixed): `SignRequest` refuses unknown fields, like FtMsg (Q-04). `sign_for` also carries
+// `#[deny_unknown_arguments]`, which applies at the wasm JSON entry point (not reachable from a unit test).
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 #[test]
-fn review3_i1_sign_request_ignores_unknown_fields() {
+fn review3_i1_sign_request_refuses_unknown_fields() {
     let decoy = json!({"evm": {"unsigned_tx": evm::tests::KB31_TX, "to": "0x000000000000000000000000000000000000a11c", "value": "0.000001 ETH", "note": "refund to alice"}});
-    let parsed: SignRequest = serde_json::from_value(decoy).expect("accepted: the decoy fields are dropped silently");
-    assert!(matches!(parsed, SignRequest::Evm { ref unsigned_tx } if unsigned_tx == evm::tests::KB31_TX));
-    // for comparison: FtMsg is strict (types.rs, Q-04)
+    let err = serde_json::from_value::<SignRequest>(decoy).expect_err("a decoy field next to the signed bytes is refused");
+    assert!(err.to_string().contains("unknown field"), "{err}");
+    // every variant is strict, and the exact shapes the clients build still parse
+    for bad in [
+        json!({"btc": {"preimages": [], "outputs": "00", "fee": "1 sat"}}),
+        json!({"sol": {"message": "00", "to": "alice"}}),
+        json!({"evm_message": {"message": "6869", "display": "hi"}}),
+        json!({"sol_message": {"message": "6869", "display": "hi"}}),
+    ] {
+        assert!(serde_json::from_value::<SignRequest>(bad.clone()).is_err(), "{bad}");
+    }
+    for good in [
+        json!({"evm": {"unsigned_tx": evm::tests::KB31_TX}}),
+        json!({"btc": {"preimages": ["00"], "outputs": "00"}}),
+        json!({"sol": {"message": "00"}}),
+        json!({"evm_message": {"message": "6869"}}),
+        json!({"sol_message": {"message": "6869"}}),
+    ] {
+        assert!(serde_json::from_value::<SignRequest>(good.clone()).is_ok(), "{good}");
+    }
+    // for comparison: FtMsg is strict too (types.rs, Q-04)
     assert!(serde_json::from_value::<FtMsg>(json!({"deposit": "3", "extra": 1})).is_err());
     // a second variant key is refused, a duplicate field is refused
     assert!(serde_json::from_str::<SignRequest>(r#"{"evm":{"unsigned_tx":"02"},"sol":{"message":"00"}}"#).is_err());

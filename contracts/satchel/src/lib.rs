@@ -315,8 +315,17 @@ impl NonFungibleTokenEnumeration for Contract {
         self.tokens.nft_total_supply()
     }
 
+    /// Paged by numeric id (review R3-X-1, R3-X-2). Ids are dense: the counter mints `1..next_token_id` and nothing
+    /// burns, so index `i` is token `i + 1`, and a page is `limit` O(1) lookups at any depth, in mint order.
+    /// near-contract-standards' version skipped through the legacy TreeMap with one tree search per skipped token (deep
+    /// pages went over the view gas limit) and paged in string order (1, 10, 11, …, 2, …). Same refusals as theirs.
     fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<Token> {
-        self.tokens.nft_tokens(from_index, page_limit(limit))
+        let start = from_index.map_or(0, |i| i.0);
+        near_sdk::require!(self.tokens.owner_by_id.len() as u128 >= start, "Out of bounds, please use a smaller from_index.");
+        let limit = page_limit(limit).unwrap_or(MAX_PAGE as u64);
+        near_sdk::require!(limit != 0, "Cannot provide limit of 0.");
+        let end = (self.next_token_id as u128).min(start.saturating_add(1).saturating_add(limit as u128));
+        (start.saturating_add(1)..end).filter_map(|id| self.tokens.nft_token(id.to_string())).collect()
     }
 
     fn nft_supply_for_owner(&self, account_id: AccountId) -> U128 {

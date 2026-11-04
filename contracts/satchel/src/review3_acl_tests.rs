@@ -1,6 +1,6 @@
-//! Review 3 (access control, state machine, external griefing, platform layer). Proof tests for the R3-X-n findings
-//! (`#[ignore]`d: they assert the fixed behaviour and fail today; run with `--include-ignored`) and demonstrating /
-//! soundness tests (they pass and pin what was checked). The mocked chain does not roll back state on a panic, and the
+//! Review 3 (access control, state machine, external griefing, platform layer). Guards for the fixed R3-X-1/R3-X-2
+//! findings (`nft_tokens` pages by numeric id), a demonstration of R3-X-3 (web side), and soundness tests that pin what
+//! was checked. Slow tests are `#[ignore]`d; run them with `--include-ignored`. The mocked chain does not roll back state on a panic, and the
 //! gas it reports (`env::used_gas`) counts host functions only (storage reads, hashing, logs), not wasm instructions,
 //! so every gas figure here is a LOWER bound of the on-chain cost.
 
@@ -138,85 +138,76 @@ fn mint_many(n: usize) -> Contract {
     c
 }
 
-/// Demonstration (passes): the skip in near-contract-standards' `nft_tokens` walks the legacy TreeMap one
-/// `higher(key)` search per skipped token, so the same 50-token page costs more the deeper it is.
+/// GUARD (R3-X-1, fixed): a deep `nft_tokens` page costs about what the first one does. near-contract-standards' own
+/// version (still reachable as `c.tokens.nft_tokens`, measured alongside so the test proves it can tell them apart)
+/// skips through the legacy TreeMap with one `higher(key)` search per skipped token, so its deep page costs several
+/// times its first; at 1,000 tokens its page at 950 needed ≥ 710 Tgas of host gas, over the 300 Tgas view limit.
 #[test]
-#[ignore = "slow demonstration (1,000 mints, ≈ 18 s); run with --include-ignored"]
-fn r3x1_demo_nft_tokens_page_cost_grows_with_from_index() {
-    let c = mint_many(N_TOKENS);
-    let mut rows = vec![];
-    for from in [0usize, 250, 500, 750, N_TOKENS - 50] {
-        let (tgas, page) = view_tgas(|| c.nft_tokens(Some(U128(from as u128)), Some(50)));
-        assert_eq!(page.len(), 50);
-        rows.push((from, tgas));
-    }
-    println!("R3-X-1 nft_tokens(from_index, 50) host gas with {N_TOKENS} tokens (lower bound): {rows:?}");
-    let first = rows[0].1;
-    let last = rows[rows.len() - 1].1;
-    assert!(last > 10.0 * first, "the deep page should cost far more than the first ({first} vs {last} Tgas)");
-    // the per-owner and Satchel views stay flat with depth (O(1) skip)
-    let (a, _) = view_tgas(|| c.nft_tokens_for_owner(spammer(), Some(U128(0)), Some(50)));
-    let (b, _) = view_tgas(|| c.nft_tokens_for_owner(spammer(), Some(U128((N_TOKENS - 50) as u128)), Some(50)));
-    println!("R3-X-1 nft_tokens_for_owner(from 0 / from {}) host gas: {a} / {b} Tgas", N_TOKENS - 50);
-    assert!(b < 2.0 * a + 1.0, "nft_tokens_for_owner skip is O(1) (legacy Vector::nth)");
+fn r3x1_guard_deep_nft_tokens_page_costs_like_the_first() {
+    let c = mint_many(200);
+    let (a, p0) = view_tgas(|| c.nft_tokens(Some(U128(0)), Some(50)));
+    let (b, p1) = view_tgas(|| c.nft_tokens(Some(U128(150)), Some(50)));
+    let (la, _) = view_tgas(|| c.tokens.nft_tokens(Some(U128(0)), Some(50)));
+    let (lb, _) = view_tgas(|| c.tokens.nft_tokens(Some(U128(150)), Some(50)));
+    println!("R3-X-1 nft_tokens host gas, 200 tokens, from 0 / from 150: Satchel {a} / {b} Tgas; library {la} / {lb} Tgas");
+    assert_eq!(p0.len(), 50);
+    assert_eq!(ids(&p1), (151..=200).map(|i| i.to_string()).collect::<Vec<_>>());
+    assert!(lb > 3.0 * la, "the library's deep page should cost several times its first ({la} vs {lb} Tgas)");
+    assert!(b < 1.5 * a + 1.0, "the deep page costs {b} Tgas against {a} Tgas for the first");
+    // the per-owner view was always flat (legacy Vector::nth is O(1))
+    let (x, _) = view_tgas(|| c.nft_tokens_for_owner(spammer(), Some(U128(0)), Some(50)));
+    let (y, _) = view_tgas(|| c.nft_tokens_for_owner(spammer(), Some(U128(150)), Some(50)));
+    assert!(y < 2.0 * x + 1.0, "nft_tokens_for_owner skip is O(1) (legacy Vector::nth)");
 }
 
-/// PROOF (fails today): every NEP-181 page must fit a view call. With 1,000 tokens (≈ 4.9 NEAR of mint storage, or
-/// ordinary growth) the last page of `nft_tokens` already needs more host gas than the 300 Tgas view limit.
+/// PROOF (failed before the fix, passes now): every NEP-181 page fits a view call, also with 1,000 tokens (≈ 4.9 NEAR
+/// of mint storage, or ordinary growth).
 #[test]
-#[ignore = "proof of R3-X-1: fails until nft_tokens pages by numeric id"]
+#[ignore = "slow (1,000 mints, ≈ 18 s); the fast guard above covers the same regression"]
 fn r3x1_proof_every_nft_tokens_page_fits_a_view_call() {
     let c = mint_many(N_TOKENS);
-    let (tgas, _) = view_tgas(|| c.nft_tokens(Some(U128((N_TOKENS - 50) as u128)), Some(50)));
+    let (tgas, page) = view_tgas(|| c.nft_tokens(Some(U128((N_TOKENS - 50) as u128)), Some(50)));
+    println!("R3-X-1 nft_tokens(from_index = {}, limit = 50) with {N_TOKENS} tokens: {tgas} Tgas of host gas", N_TOKENS - 50);
+    assert_eq!(ids(&page), ((N_TOKENS - 49)..=N_TOKENS).map(|i| i.to_string()).collect::<Vec<_>>());
     assert!(tgas < VIEW_LIMIT_TGAS as f64, "nft_tokens(from_index = {}, limit = 50) burns ≥ {tgas} Tgas of host gas alone (view limit {VIEW_LIMIT_TGAS})", N_TOKENS - 50);
 }
 
-/// The proposed fix, evaluated (passes): ids are dense (`1..next_token_id`, no burn exists), so a page by numeric id is
-/// `limit` O(1) lookups (`TreeMap::get` reads the 'v' LookupMap directly), flat at any depth.
-#[test]
-#[ignore = "slow demonstration (1,000 mints, ≈ 19 s); run with --include-ignored"]
-fn r3x1_demo_numeric_id_paging_is_flat() {
-    let c = mint_many(N_TOKENS);
-    let page = |from: u64| -> Vec<near_contract_standards::non_fungible_token::Token> {
-        (from + 1..c.next_token_id).take(MAX_PAGE as usize).filter_map(|i| c.tokens.nft_token(i.to_string())).collect()
-    };
-    let (a, p0) = view_tgas(|| page(0));
-    let (b, p1) = view_tgas(|| page((N_TOKENS - 50) as u64));
-    println!("R3-X-1 numeric-id paging host gas: from 0 = {a} Tgas, from {} = {b} Tgas", N_TOKENS - 50);
-    assert_eq!(p0.len(), 50);
-    assert_eq!(ids(&p1), ((N_TOKENS - 49)..=N_TOKENS).map(|i| i.to_string()).collect::<Vec<_>>());
-    assert!(b < 2.0 * a + 1.0 && b < 20.0);
-}
+// ── R3-X-2: `nft_tokens` used to page in lexicographic order of the string ids (fixed) ──────────────────
 
-// ── R3-X-2: `nft_tokens` pages in lexicographic order of the string ids ─────────────────────────────────
-
-/// Demonstration (passes): with 60 tokens, the first page (what `getUnlistedMarket` reads, apps/web server.ts:218)
-/// is `1, 10…19, 2, 20…29, …, 5, 50…54`. Tokens 6–9 (genesis tokens of the Day-10 birth) and 55–60 are not on it.
+/// GUARD (R3-X-2, fixed): pages follow mint order, so the first page (what `getUnlistedMarket` reads, apps/web
+/// server.ts:218) holds tokens 1–50 and the next one 51–60. The library paged in string order (`1, 10…19, 2, …`), which
+/// left the genesis tokens 6–9 and every id ≥ 55 off page 0.
 #[test]
-fn r3x2_demo_first_nft_tokens_page_is_lexicographic() {
+fn r3x2_guard_pages_follow_mint_order() {
     let mut c = setup();
     for _ in 0..60 {
         mint_to(&mut c, alice());
     }
-    let page = ids(&c.nft_tokens(Some(U128(0)), Some(50)));
-    println!("R3-X-2 nft_tokens(0, 50) with 60 tokens: {page:?}");
-    for missing in ["6", "7", "8", "9", "55", "60"] {
-        assert!(!page.contains(&missing.to_string()), "token {missing} unexpectedly on page 0");
-    }
-    assert_eq!(&page[..4], &["1", "10", "11", "12"]);
+    let want = |r: std::ops::RangeInclusive<u32>| r.map(|i| i.to_string()).collect::<Vec<_>>();
+    assert_eq!(ids(&c.nft_tokens(Some(U128(0)), Some(50))), want(1..=50));
+    assert_eq!(ids(&c.nft_tokens(Some(U128(50)), Some(50))), want(51..=60));
+    assert_eq!(ids(&c.nft_tokens(None, None)), want(1..=50), "defaults: from 0, limit 50");
+    assert_eq!(ids(&c.nft_tokens(Some(U128(58)), Some(5))), want(59..=60));
+    assert!(c.nft_tokens(Some(U128(60)), Some(5)).is_empty(), "from_index == supply is an empty page");
+    assert_eq!(ids(&c.nft_tokens(Some(U128(0)), Some(1_000))).len(), MAX_PAGE as usize, "limit is capped at 50 (S-05)");
+    // the library's order, for the record
+    assert_eq!(&ids(&c.tokens.nft_tokens(Some(U128(0)), Some(50)))[..4], &["1", "10", "11", "12"]);
 }
 
-/// PROOF (fails today): a client that reads the first page expects the first-minted tokens.
+/// GUARD: the override keeps near-contract-standards' refusals (`audit.rs::audit02_other_paged_views_handle_huge_offsets`
+/// relies on the out-of-bounds one) and returns exactly the library's `Token` shape.
 #[test]
-#[ignore = "proof of R3-X-2: fails until nft_tokens pages by numeric id"]
-fn r3x2_proof_first_page_holds_the_first_minted_tokens() {
+fn r3x_guard_nft_tokens_refusals_and_shape_match_the_library() {
     let mut c = setup();
-    for _ in 0..60 {
+    for _ in 0..3 {
         mint_to(&mut c, alice());
     }
-    let page = ids(&c.nft_tokens(Some(U128(0)), Some(50)));
-    let want: Vec<String> = (1..=50).map(|i| i.to_string()).collect();
-    assert_eq!(page, want, "page 0 is not tokens 1..50");
+    expect_prefix("Out of bounds, please use a smaller from_index.", "from_index past the supply", || c.nft_tokens(Some(U128(4)), Some(1)));
+    expect_prefix("Out of bounds", "a huge from_index", || c.nft_tokens(Some(U128(u128::MAX)), Some(1)));
+    expect_prefix("Cannot provide limit of 0.", "limit 0", || c.nft_tokens(Some(U128(0)), Some(0)));
+    let ours = near_sdk::serde_json::to_value(c.nft_tokens(None, None)).unwrap();
+    let theirs = near_sdk::serde_json::to_value(c.tokens.nft_tokens(None, None)).unwrap();
+    assert_eq!(ours, theirs, "ids 1–3 sort the same either way, so the pages must be identical, metadata included");
 }
 
 // ── R3-X-3: spam mints push a holder's newly received Satchel off `nft_tokens_for_owner(…, 0, 50)` ──────────

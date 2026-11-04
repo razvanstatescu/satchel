@@ -33,8 +33,10 @@ impl Chain {
 /// What the caller asks the contract to sign. Externally tagged JSON:
 /// `{"evm":{"unsigned_tx":"02…"}}`, `{"btc":{"preimages":["…"],"outputs":"…"}}`, `{"sol":{"message":"…"}}`,
 /// and (C7) `{"evm_message":{"message":"<hex of the UTF-8 body>"}}`, `{"sol_message":{"message":"<hex>"}}`.
+/// Strict like `FtMsg` (review R3-I-1): an unknown field refuses the call, so a dapp can't add decoy fields
+/// (`"to"`, `"value"`, …) that a wallet would show next to the bytes that are really signed.
 #[near(serializers = [json])]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", deny_unknown_fields)]
 #[derive(Clone, Debug)]
 pub enum SignRequest {
     Evm { unsigned_tx: String },

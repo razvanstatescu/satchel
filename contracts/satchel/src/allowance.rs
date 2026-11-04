@@ -580,6 +580,9 @@ impl Contract {
             fail_with(ERR_ALLOWANCE_EXPIRY, "expires_at_ms must be in the future");
         }
         let mut set = live_set(&token_id, &owner).unwrap_or(TokenAllowances { owner: owner.clone(), list: vec![] });
+        // Other delegates' expired allowances are dropped here (spec §2 step 7); they get an event (review R3-A-3).
+        let dropped: Vec<AccountId> =
+            set.list.iter().filter(|a| a.delegate != delegate && a.is_expired(now)).map(|a| a.delegate.clone()).collect();
         set.list.retain(|a| a.delegate == delegate || !a.is_expired(now));
         match set.list.iter().position(|a| a.delegate == delegate) {
             Some(i) => {
@@ -607,6 +610,10 @@ impl Contract {
         let s0 = env::storage_usage();
         store().insert(&token_id, &set);
         charge_storage(s0, 0, 1);
+        // events only after the last check that can refuse (AUDIT-04): the drop first, then the set
+        if !dropped.is_empty() {
+            AllowanceEvent::AllowancesCleared { token_id: token_id.clone(), delegate_ids: dropped, reason: "expired".to_string() }.emit();
+        }
         AllowanceEvent::AllowanceSet { token_id, owner_id: owner, delegate_id: delegate, caps: caps_now, expires_at_ms }.emit();
     }
 

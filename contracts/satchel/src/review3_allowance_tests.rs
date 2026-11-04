@@ -236,21 +236,38 @@ fn r3a2_zero_debit_requests_stale_offers_and_restart_the_quiet_period() {
     );
 }
 
-// ── R3-A-3: silent drop of expired allowances ───────────────────────────────────────────────────────────────────
+// ── R3-A-3: dropping expired allowances is announced (fixed) ────────────────────────────────────────────────────
 
-/// `set_allowance` for a new delegate drops every other expired allowance (spec §2 step 7) without any
-/// `allowance_revoked` / `allowances_cleared` event: an indexer that follows only events keeps showing the dropped one.
+/// GUARD (R3-A-3, fixed): `set_allowance` for a new delegate drops every other expired allowance (spec §2 step 7) and
+/// says so with `allowances_cleared {reason: "expired"}`, logged before `allowance_set`, so an indexer that follows
+/// only events removes the dropped delegate too. The delegate being set is never in the list, and nothing is logged
+/// when nothing expired.
 #[test]
-fn r3a3_set_allowance_drops_expired_allowances_without_an_event() {
+fn r3a3_set_allowance_announces_dropped_expired_allowances() {
     let mut c = setup();
     set(&mut c, bot(), vec![cap(Asset::Btc, 1)], Some(T0 + 10), T0);
+    assert!(events("allowances_cleared").is_empty(), "nothing expired yet");
     set(&mut c, carol(), vec![cap(Asset::Btc, 1)], None, T0 + 20);
     let names: Vec<AccountId> = c.allowances_of("1".into()).into_iter().map(|v| v.delegate).collect();
     assert_eq!(names, vec![carol()], "bot's expired allowance is gone");
+    let cleared = events("allowances_cleared");
+    assert_eq!(cleared.len(), 1);
+    assert_eq!(cleared[0]["data"]["delegate_ids"], serde_json::json!(["bot.testnet"]));
+    assert_eq!(cleared[0]["data"]["reason"], "expired");
     assert_eq!(events("allowance_set").len(), 1);
-    assert!(events("allowance_revoked").is_empty() && events("allowances_cleared").is_empty(), "no event says bot was removed");
-    // and the owner can no longer revoke it explicitly
-    ctx(alice(), 1, T0 + 30);
+    let order: Vec<String> = get_logs()
+        .iter()
+        .filter_map(|l| l.strip_prefix("EVENT_JSON:"))
+        .filter_map(|j| serde_json::from_str::<Value>(j).ok())
+        .map(|v| v["event"].as_str().unwrap_or_default().to_string())
+        .collect();
+    assert_eq!(order, ["allowances_cleared", "allowance_set"]);
+    // re-setting an expired delegate itself replaces it: no "expired" event for that one
+    set(&mut c, carol(), vec![cap(Asset::Btc, 2)], Some(T0 + 100), T0 + 30);
+    set(&mut c, carol(), vec![cap(Asset::Btc, 3)], None, T0 + 200);
+    assert!(events("allowances_cleared").is_empty(), "re-setting the expired delegate is not a drop");
+    // a dropped allowance is gone for good, so an explicit revoke has nothing to remove
+    ctx(alice(), 1, T0 + 300);
     expect_err(ERR_ALLOWANCE_NOT_FOUND, || c.revoke_allowance("1".into(), bot()));
 }
 
