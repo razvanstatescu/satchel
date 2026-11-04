@@ -74,8 +74,10 @@ export interface EvmChainBalance {
   usdc: string | null;
 }
 
-/** `message` (C7): a signed message. It can't move coins and never blocks Buy (core clean-history gate.ts). */
-export type ItemStatus = "spent" | "expired" | "unfunded" | "foreign" | "message" | "settling" | "unused" | "unknown";
+/** `message` (C7): a signed message. It can't move coins and never blocks Buy (core clean-history gate.ts).
+ * `inactive` (BTC, review R3-S-1): only on a long BTC history; the coin it spends isn't in the Satchel now, so it can't
+ * move what's being bought. Never blocks Buy. */
+export type ItemStatus = "spent" | "expired" | "unfunded" | "foreign" | "inactive" | "message" | "settling" | "unused" | "unknown";
 export type Aggregate = "checking" | "empty" | "clean" | "settling" | "blocked" | "unknown" | "unsafe";
 
 export interface CleanItem {

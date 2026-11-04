@@ -309,6 +309,7 @@ const ITEM: Record<ItemStatus | "checking", { word: string; icon: LucideIcon; to
   expired: { word: copy.clean.item.expired, icon: Clock, tone: "success" },
   unfunded: { word: copy.clean.item.unfunded, icon: Info, tone: "muted" },
   foreign: { word: copy.clean.item.foreign, icon: Info, tone: "muted" },
+  inactive: { word: copy.clean.item.inactive, icon: Info, tone: "muted" },
   message: { word: copy.record.messageWord, icon: MessageSquareText, tone: "muted" },
   settling: { word: copy.clean.item.settling, icon: Hourglass, tone: "frozen" },
   unused: { word: copy.clean.item.unused, icon: TriangleAlert, tone: "danger" },
@@ -316,7 +317,7 @@ const ITEM: Record<ItemStatus | "checking", { word: string; icon: LucideIcon; to
   checking: { word: copy.clean.item.checking, icon: LoaderCircle, tone: "frozen", spin: true },
 };
 
-/** A clean-history item: Used, Expired, Unfunded, Not its coin, Confirming, Unused, Can't verify or Checking…
+/** A clean-history item: Used, Expired, Unfunded, Not its coin, Not a current coin, Confirming, Unused, Can't verify or Checking…
  * (`data-item-status`). */
 export function ItemPill({ status, className }: { status: ItemStatus | "checking"; className?: string }) {
   const p = ITEM[status];

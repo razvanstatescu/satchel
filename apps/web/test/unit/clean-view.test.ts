@@ -10,8 +10,10 @@ import {
   checkedAgo,
   gateModel,
   hintModel,
+  isDead,
   itemPhrase,
   listedAgo,
+  needsAttention,
   marketOrder,
   recordRows,
   revealSchedule,
@@ -145,6 +147,15 @@ describe("the strip", () => {
     expect(stripModel(mixed, "clean")?.label).toBe("4 of 4 can't move coins");
     expect(stripModel([...mixed, { seq: 4, status: "unused" }], "blocked")?.label).toBe("1 of 5 could still move coins");
     expect(stripModel([...mixed, { seq: 4, status: "settling" }], "settling")?.label).toBe("1 confirming");
+  });
+  it("an inactive BTC record (core, review R3-S-1: its coin isn't in the Satchel now) can't move coins and never blocks", () => {
+    expect(isDead("inactive")).toBe(true);
+    expect(needsAttention("inactive")).toBe(false);
+    const rows: { seq: number; status: MarkStatus }[] = [
+      { seq: 0, status: "inactive" },
+      { seq: 1, status: "spent" },
+    ];
+    expect(stripModel(rows, "clean")?.label).toBe("2 of 2 can't move coins");
   });
 });
 

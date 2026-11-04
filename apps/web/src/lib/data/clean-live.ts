@@ -123,6 +123,8 @@ function evidenceLine(it: CoreReport["items"][number]): string {
       return copy.clean.item.unfundedBody;
     case "prevout_not_ours":
       return copy.clean.item.foreignBody;
+    case "not_a_current_coin":
+      return copy.clean.item.inactiveBody;
     case "young":
     case "blockhash_valid":
       return "Blockhash still valid";

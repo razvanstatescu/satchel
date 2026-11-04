@@ -30,6 +30,7 @@ describe("outstandingSigs", () => {
       item(6, "bob.testnet", "foreign"),
       item(7, "bob.testnet", "message"),
       item(8, "alice.testnet", "unused"),
+      item(9, "bob.testnet", "inactive"), // R3-S-1: its coin isn't in the Satchel now, so it can't move coins
     ];
     expect(outstandingSigs(items, "bob.testnet").map((i) => i.seq)).toEqual([0, 1, 2]);
     expect(outstandingSigs(items, "carol.testnet")).toEqual([]);

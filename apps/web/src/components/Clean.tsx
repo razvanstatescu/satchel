@@ -61,6 +61,7 @@ export const MARK: Record<MarkStatus, { icon: LucideIcon; tone: Tone; spin?: boo
   expired: { icon: Check, tone: "success" },
   unfunded: { icon: Check, tone: "muted" },
   foreign: { icon: Check, tone: "muted" },
+  inactive: { icon: Check, tone: "muted" },
   message: { icon: MessageSquareText, tone: "muted" },
   settling: { icon: Hourglass, tone: "frozen" },
   unused: { icon: TriangleAlert, tone: "danger", problem: true },
@@ -73,6 +74,7 @@ const ITEM_WORD: Record<MarkStatus, string> = {
   expired: copy.clean.item.expired,
   unfunded: copy.clean.item.unfunded,
   foreign: copy.clean.item.foreign,
+  inactive: copy.clean.item.inactive,
   message: copy.record.messageWord,
   settling: copy.clean.item.settling,
   unused: copy.clean.item.unused,
@@ -81,7 +83,7 @@ const ITEM_WORD: Record<MarkStatus, string> = {
 };
 
 /** Statuses that can never move coins (kb/90 §7.2–7.3): they never block Buy. */
-export const isDead = (s: MarkStatus) => s === "spent" || s === "expired" || s === "unfunded" || s === "foreign";
+export const isDead = (s: MarkStatus) => s === "spent" || s === "expired" || s === "unfunded" || s === "foreign" || s === "inactive";
 /** Statuses that block Buy (or haven't been checked yet). */
 export const needsAttention = (s: MarkStatus) => s === "unused" || s === "settling" || s === "unknown";
 /** C7: a signed message. It can't move coins and never blocks Buy; the record lists it in its own group. */
@@ -513,9 +515,11 @@ function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: st
         ? copy.clean.item.unfundedBody
         : item.status === "foreign"
           ? copy.clean.item.foreignBody
-          : item.message
-            ? messageLine(item.message)
-            : rowEvidence(item.key, item.evidence);
+          : item.status === "inactive"
+            ? copy.clean.item.inactiveBody
+            : item.message
+              ? messageLine(item.message)
+              : rowEvidence(item.key, item.evidence);
   return (
     <li
       id={`sig-${tokenId}-${item.seq}`}
@@ -533,7 +537,7 @@ function RecordItem({ item, tokenId, clearHref }: { item: RecordRow; tokenId: st
       {item.wouldPay ? <span className="col-start-2 font-sans text-body-sm text-ink-muted t-num">{item.wouldPay}</span> : null}
       {body ? (
         <span className={cx("col-start-2 font-sans text-body-sm text-ink-muted", item.message && "wrap-anywhere whitespace-pre-wrap")} data-message-text={item.message ? "" : undefined}>
-          {item.evidenceUrl && item.status !== "unfunded" && item.status !== "foreign" ? <ExternalLink href={item.evidenceUrl}>{body}</ExternalLink> : body}
+          {item.evidenceUrl && item.status !== "unfunded" && item.status !== "foreign" && item.status !== "inactive" ? <ExternalLink href={item.evidenceUrl}>{body}</ExternalLink> : body}
         </span>
       ) : null}
       {item.message ? <MessageBytes text={item.message.text} /> : null}

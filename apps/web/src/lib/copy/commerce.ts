@@ -231,6 +231,7 @@ export const commerce = {
       expired: "Expired",
       unfunded: "Unfunded",
       foreign: "Not its coin",
+      inactive: "Not a current coin",
       settling: "Confirming",
       unused: "Unused",
       unknown: "Can't verify",
@@ -239,6 +240,8 @@ export const commerce = {
       unfundedBody: "Spends coins that don't exist. If they ever appear at this address, the previous owner could move them; they're excluded from what you buy.",
       /** kb/90 §7.2 `foreign` (review S-07): the record's coin exists but isn't at this Satchel's address. */
       foreignBody: "Points at a coin this Satchel can't spend. It can't move the coins you're buying.",
+      /** core `inactive` (review R3-S-1): only on a long BTC history; the record's coin isn't at the address now. */
+      inactiveBody: "Spends a coin that isn't in this Satchel now. It can't move the coins you're buying; if that coin ever comes back, it's excluded from what you buy.",
     },
     /** NEW (app-screens §5.1): the record's heading and lead on the buy page and What buyers see. */
     recordTitle: "The record",
