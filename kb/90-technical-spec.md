@@ -1,10 +1,33 @@
 # 90 · Satchel v1 — definitive technical specification
 
+> **What this is.** The design that the code in this repo implements: contract interface, invariants (INV-xx), the
+> clean-history protocol, the web app and its route handlers, pinned versions, repo layout and tests. It is the
+> **source of truth**; the research notes kb/00–82 are evidence and lose to it wherever they differ (§13 Errata).
+> The feature-sprint specs `docs/specs/C1-C2-C3-C7.md`, `docs/specs/C4-C6.md` and `docs/specs/C5.md` extend it and win
+> over it for C1–C7 (index: §5.17 and §6.1). IDs such as D-xx, H-xx, E-xx and SAT-xxx are listed in `docs/GLOSSARY.md`.
+>
+> **Status as of 2026-11-04.** Written 2026-10-21 as a plan, then kept in step with the code: the contract is built
+> and audited (`docs/security/`), the sprint features are merged, and the app runs at `https://usesatchel.xyz`
+> against `dev2.satchelhq.testnet`. Contract freeze is Nov 9; the keyless birth of `satchel.satchelhq.testnet`
+> (§5.16) is planned for Nov 10 and has **not** happened yet. Phrases such as "on Nov 1" or "after Nov 1" are the
+> Phase-0 schedule: implementation actually began on 2026-10-21 (D-39), and the hackathon counts code from 2026-10-19
+> (D-47). How each part was built and tested: `docs/handoff/*.md` and `docs/testing/README.md`.
+>
+> **Contents.** §1 TL;DR (the facts not to get wrong) · §2 Scope · §3 System overview · §4 Trust model ·
+> §5 Contract (5.1 accounts, 5.2 crate, 5.3 types, 5.4 storage, 5.5 constants, 5.6 interface, 5.7 methods,
+> 5.8 `sign_for`, 5.9 payload classifiers, 5.10 state machine, 5.11 ownership changes, 5.12 sale, 5.13 events,
+> 5.14 views, 5.15 error codes, 5.16 keyless birth, 5.17 sprint additions) · §6 Invariants · §7 Clean-history
+> protocol · §8 Frontend · §9 Backend · §10 Pinned versions · §11 Repository layout · §12 Testing · §13 Errata
+> (which KB value wins) · §14 `[ASSUMED]` register · Appendix A (designs kept out of v1).
+>
+> `near_hackathon.md`, cited below as the original plan, is the team's pre-research plan. It is **not in this repo**
+> (gitignored); where it is cited, this document already states the outcome.
+
 > Owner: lead architect · Written: 2026-10-21 (Phase 0) · Status: **source of truth for v1**. It supersedes `near_hackathon.md` §B5 (architecture, interface, data model) and every interface sketch in kb/10, kb/20, kb/30, kb/40, kb/50, kb/51 and kb/70 wherever they differ (differences are listed in §13 Errata).
 > Rationale for each choice: `plan/decisions.md` (D-xx). Build order, owners and hours: `plan/implementation-plan.md` (SAT-xxx). Pre-Nov-1 actions: `plan/phase0-checklist.md`.
 > **Revision 2 (2026-10-21, post-review).** Applies the independent review `plan/review.md` (R-01…R-41) and the orchestrator's calls. The main changes: keyless birth of the final contract, no post-listing buy cooldown, a BTC txid-collision check, a gate mode per contract role, blocking judge pages, and FastNEAR as the canonical NEAR proof. The changelog, with a status for every R-xx, is at the top of `plan/decisions.md`.
 > **Security fix pass (2026-10-23).** Brings §1, §5.3–§5.7, §5.11, §5.14–§5.16, §6 and §13 in line with the fixes for `docs/security/contract-review.md` S-01…S-13 (wasm 290,504 B, sha256 `aea0b2e9…451bd6`): `list` reserves the seller's proceeds slot; `on_payout` gets 10 Tgas and needs exactly one promise result; `delist` / `withdraw_proceeds` take exactly 1 yocto; the receiver guard also refuses the USDC contract and applies to `nft_mint`; NEP-181 views are paged at 50; the EVM nonce-gap rule INV-10 is restored (D-43, reverses D-21); birth funding is 20 NEAR (final) / 10 NEAR (rc) (D-34). Interface summary: `docs/handoff/contract.md` §7.
-> **No product code before 2026-11-01.** This document contains interface signatures, data layouts, state machines, constants, command lines and pseudo-code only. Spike code under `research/spikes/` is evidence, never a source to copy.
+> **No product code before 2026-11-01** (Phase-0 rule, superseded on 2026-10-21 by D-39: implementation started that day). This document contains interface signatures, data layouts, state machines, constants, command lines and pseudo-code only. Spike code under `research/spikes/` is evidence, never a source to copy.
 > **Sprint update (2026-10-29).** Seven contract features merged into `main` on top of the security fix pass: a
 > history-hashing view, USDC transfers on EVM, three more EVM testnets with a per-chain nonce rule, and message
 > signing (`docs/specs/C1-C2-C3-C7.md`); delegated spending allowances (`docs/specs/C5.md`); and offers plus
@@ -38,6 +61,9 @@
     - `nft_transfer_call` is disabled.
     - EVM is Sepolia-only; Solana accepts legacy messages only.
     - Only two code paths change ownership: `nft_transfer` (owner only; refuses the contract itself, the MPC account and the configured USDC contract as receivers, as `nft_mint` does) and the internal sale transfer (D-07, D-13, D-15; review S-06, S-09).
+    - **(sprint 2026-10-29)** This item is the original v1 scope. Since the sprint: capped delegates (C5), USDC
+      ERC-20 on EVM (C2), four EVM testnets (C3), message signing (C7), and a third ownership path, `accept_offer`
+      (C4). See §2's note, §5.17 and `docs/specs/*.md`.
 11. **Clean history runs in the buyer's browser.** It reads `sig_records` from two NEAR RPCs and checks every record:
     - EVM: nonce consumed, checked on two providers;
     - BTC: outpoint spent at depth K, checked on two providers, one query per distinct txid;
@@ -67,7 +93,8 @@
 
 **(sprint 2026-10-29).** This table is the original v1 scope and is kept verbatim for history. The merged `main`
 moved several "Out of v1" cells into scope: EVM now covers four testnets (not Sepolia only) and USDC ERC-20
-transfers (not native-only); Signing now has delegates (C5, capped and rolling-window, not unbounded); Sale gains
+transfers (not native-only); Signing now has delegates (C5, capped and rolling-window, not unbounded) and message
+signing (C7: EIP-191 `personal_sign` and Solana off-chain message v0, never raw hashes); Sale gains
 offers (C4) and a NEAR/FT balance held inside the token (C6). P2TR, SPL tokens and other EVM chains are still out.
 See §5.17 for the full index and `docs/specs/*.md` for the normative detail.
 
@@ -744,6 +771,8 @@ kb/80's "Listed · cooling down" pill and the buyer-side "Safe to buy in {n} blo
 - The accomplice-approval attack from kb/70 §(i) and the `nft_key` hook bug from kb/01 §Gotchas 3 therefore cannot happen.
 - **Receiver guard (R-18; review S-06, S-09).** NEP-171 accepts any valid account id. A Satchel owned by the contract itself, the MPC account or the configured USDC contract would have its funds stranded forever (none of them can ever call `sign_for`), so the contract refuses all three with `ERR_BAD_RECEIVER`. The same guard runs first in **`nft_mint`**, so a token cannot be *born* stranded either, and (Q-03, 2026-10-31) on every other receiver a caller picks: the `withdraw_near` / `withdraw_ft` receiver, the `prepay_storage` account and the offerer (C4-C6.md §2.2, §3.1). Payouts whose receiver the contract fixes (seller, offerer refund, the caller of `withdraw_proceeds` / `withdraw_storage_credit`) need no check. Code (`lib.rs` `ensure_receiver`): `*receiver_id != env::current_account_id() && *receiver_id != self.mpc && Some(receiver_id) != self.usdc.as_ref()`. With `usdc: None` the USDC id is an ordinary receiver. Nonexistent receivers and the token's own derived NEAR implicit accounts (hex SOL pk, the EVM key's eth-implicit id) stay UI checks: the UI blocks the three ids above, requires the receiver to exist (`view_account`) and refuses this token's derived accounts.
 - Phase-3 re-enable design: Appendix A.
+- **(sprint 2026-10-29)** C4 adds a third path, `accept_offer`, with its own guards (`docs/specs/C4-C6.md` §3.2).
+  Every ownership change, including it, clears the token's allowances (INV-35, §6.1).
 
 ### 5.12 Sale flow
 
@@ -1013,7 +1042,7 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 | INV-30 | `nft_mint` and `nft_transfer` to the contract itself, the MPC account or the configured USDC contract fail `ERR_BAD_RECEIVER` and change nothing (R-18, S-06, S-09); since Q-03 the same for `withdraw_near` / `withdraw_ft` receivers and `prepay_storage(account_id)` (unit `q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc`, sandbox `round2.rs::q03_*`); with `usdc: None` that id is an ordinary receiver. NEP-181 `nft_tokens` / `nft_tokens_for_owner` return at most 50 tokens, and 50 when `limit` is missing (S-05) | `transfer.rs::bad_receivers`, `security.rs::fix_s06_s09_receiver_guard`, `security.rs::fix_s05_nep181_views_are_paged`, unit `fix_s06_s09_receiver_guard_in_mint_and_transfer`, `fix_s09_usdc_is_ordinary_when_usdc_is_disabled`, `fix_s05_nep181_paging_still_works_below_the_cap` | S-4 |
 | INV-31 | **Keyless birth** (sandbox, near-workspaces batch API). One tx from a parent with CreateAccount + Transfer + DeployContract + `new` + `nft_mint` ×7 and no AddKey yields: `view_access_key_list == []`; tokens 1–7 owned by the receiver; a second `new` fails. A batch with a failing action leaves **no account** (R-04) | `release.rs::keyless_birth_batch`, `release.rs::failed_birth_leaves_nothing` | S-13 |
 | INV-32 | (TS) The BTC builder never returns a tx whose txid appears among the txids referenced by the sending token's records, or by the receiving Satchel's records when paying another Satchel. On a collision it perturbs (fee +1 sat, or nSequence `fffffffd`↔`fffffffe`) and re-checks; output order is randomized by default (R-05) | `apps/web/src/lib/chains/btc/builder.test.ts::avoids_logged_txids` | S-15 |
-| INV-33 | (TS) Gate mode: with `CONTRACT_ROLE=dev`, lock or code-hash failures yield a visible warning while every other check still gates Buy; with `rc`/`final` they yield `unsafe` (R-06) | `apps/web/src/lib/clean-history/gate.test.ts` | S-9 |
+| INV-33 | (TS) Gate mode: with `CONTRACT_ROLE=dev`, lock or code-hash failures yield a visible warning while every other check still gates Buy; with `rc`/`final` they yield `unsafe` (R-06) | `apps/web/src/lib/clean-history/gate.test.ts` (as built: `packages/core/test/gate.test.ts`) | S-9 |
 
 ---
 
@@ -1129,7 +1158,7 @@ The quiet period (250 blocks ≈ 140 s) means every SOL record is already older 
 
 ### 7.5 Where the checker runs, providers, limits
 
-`apps/web/src/lib/clean-history/` is isomorphic (browser and Node; **owner S2**, SAT-072). It runs in three places:
+`apps/web/src/lib/clean-history/` is isomorphic (browser and Node; **owner S2**, SAT-072). As built, this module lives in `packages/core/src/clean-history/` (`@satchel/core`). It runs in three places:
 1. **In the buyer's browser**, on the Buy tab: every 10 s, and again synchronously right before the Buy button sends the tx.
 2. **On the server**, in `GET /api/clean-history/[id]` and in the blocking SSR of `/s/[id]/sale` and `/market` (cached 15 s). This is a hint only, so AI judges can read the verdict in HTML.
 3. **In `tools/e2e/clean-history.ts`**, the scripted rc scenario (SAT-085, R-09).
@@ -1471,6 +1500,22 @@ Secrets: `FASTNEAR_API_KEY` is set only as a Vercel env var. Nothing is committe
 ---
 
 ## 11. Repository layout for Nov 1 and bootstrap commands
+
+> **As built (checked against `git ls-files` on 2026-11-04).** The tree below is the Phase-0 plan. The repo itself is
+> `github.com/razvanstatescu/satchel` (private, created 2026-10-29, so the "on/after 2026-11-01" note is stale), and
+> it differs from the plan as follows:
+> - **Added:** `packages/core/` (`@satchel/core`: derivation, per-chain builders, the TS policy mirror of §5.9, and
+>   the clean-history checker that §7.5 places in `apps/web/src/lib/clean-history/`); `tools/lib/`, `tools/test/`
+>   (unit tests for the scripts) and `tools/fuzz/` (parser fuzz corpus, `docs/security/fuzzing.md`);
+>   `vectors/{history,msg,allowance}.json` (sprint); `docs/specs/` (C1–C7), `docs/handoff/`, `docs/security/`,
+>   `docs/testing/`, `docs/design/`; and the planning and research folders `kb/`, `plan/`, `brand/`, `marketing/`
+>   and `research/` (Phase-0 spikes, kept as evidence and never imported, so the `.gitignore` rule for `research/`
+>   below was not applied).
+> - **Renamed or split:** `tools/e2e/sale.ts` became `sale-near.ts` and `sale-usdc.ts`; the sprint added
+>   `allowance.ts`, `market.ts`, `message.ts`, `history.ts` and others. Signing without funds is `tools/e2e/{evm,btc,sol}.ts
+>   --sign-only`; there is no `tools/smoke/`.
+> - **Not present:** `SECURITY.md` (the security model is in the README and `docs/security/`); `docs/evidence/` (planned
+>   for the proof JSON of §5.16 step 7 and §8.8, not yet created); `apps/web/public/fonts/`; `tools/smoke/`.
 
 ```
 satchel/                              (new private GitHub repo created on/after 2026-11-01T00:00Z; never import research/)

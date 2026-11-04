@@ -1,4 +1,8 @@
 # EVM on Sepolia (send ETH from a Satchel)
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: chains · Checked: 2026-10-21 · Confidence: high for signing/RPC/APIs (verified live); a funded end-to-end transfer is still pending a human faucet step
 > Primary sources: live Sepolia RPCs (probe in `research/spikes/chains/RESULTS.md` §4); viem 2.57.7; go-ethereum [`core/txpool/legacypool/legacypool.go@5f62e55`](https://github.com/ethereum/go-ethereum/blob/5f62e55c950ce2f932821e0b14c504e234f3d236/core/txpool/legacypool/legacypool.go); [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) (Final); `https://api.etherscan.io/v2/chainlist`; Blockscout `eth-sepolia.blockscout.com/api/v2`; [Sepolia sunset thread (parithosh, 2026-05-27)](https://ethereum-magicians.org/t/sepolia-testnet-replacement-sunsetting/28647); [dallaspu/sepolia-faucets-2026 (2026-09-24)](https://github.com/dallaspu/sepolia-faucets-2026).
 

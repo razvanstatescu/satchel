@@ -1,5 +1,7 @@
 # Satchel — Phase 0 checklist (Oct 21 → Oct 31, 2026)
 
+> **Status (2026-11-04): historical, Phase 0 (Oct 21–31).** Kept as the record of the P0-xx items. Two rules below no longer apply: "No product code before 2026-11-01" (superseded on 2026-10-21 by D-39; the hackathon counts code from 2026-10-19, D-47) and the per-step approval for testnet transactions (superseded by D-48 on 2026-10-29). Some outputs it names were never written as files (for example `plan/readme-verify-draft.md`; the README's "Verify on-chain" section covers it). Open human steps now live in `plan/launch-checklist.md` and `plan/human-actions-ready.md`.
+
 > Owner: lead architect · Written 2026-10-21 · **Revision 2** (post-review; changelog in `plan/decisions.md`); §6 **Revision 3** (brand consolidated, D-36) · **No product code before 2026-11-01.** Everything below is accounts, keys, funding, decisions, research re-runs or written plans. Spike code may be *run* for research; it must never be copied into the product (`research/README.md`).
 > References: `kb/90-technical-spec.md` (spec), `plan/decisions.md` (D-xx, H-xx), `plan/implementation-plan.md`. Citation legend as in the spec (`kb/30 §TL;DR 8` = `kb/30-bitcoin-testnet4.md`, TL;DR item 8).
 > Today is Wed Oct 21. Bucharest switches to EET (UTC+2) on Sun Oct 25.

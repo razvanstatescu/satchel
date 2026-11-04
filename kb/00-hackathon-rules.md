@@ -1,5 +1,9 @@
 # NEAR HACKATHON: rules, submission API, judging, and what judges can actually do
 
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+> The rules changed on 2026-10-29 (D-47 in `plan/decisions.md`: code counts from 2026-10-19, AI screening, demo up to Nov 25). Re-read the live HACKATHON.md (`research/spikes/hackathon/check_rules.sh`) before relying on anything below.
+
 > Owner: hackathon · Checked: 2026-10-21 (11:20–12:00 UTC) · Confidence: high for published rules and API behaviour; medium for judging mechanics (only partly published, the rest is inferred and tagged [ASSUMED])
 > Primary sources:
 > - `https://nearhackathon.com/HACKATHON.md` (raw, 12,588 bytes, sha256 `39fd3939…e33bb`), snapshot in `research/spikes/hackathon/HACKATHON.snapshot.md`

@@ -1,4 +1,8 @@
 # MPC signer (Chain Signatures): interface, derivation, contract-initiated signing
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: mpc · Checked: 2026-10-21 · Confidence: **high** (interface read from the pinned source; deployed code byte-matched to the release; everything below ran live on testnet unless tagged otherwise)
 > Primary sources: near/mpc tag **3.17.0** = commit `d0fc87b19e2643299e7becdd7d9611afcd5d5a78` (deployed on testnet **and** mainnet), cross-checked against `main` @ `13f42bf4b250c8d4d812185ed7b6e4724b24a411` (2026-10-21). Files: `crates/contract/src/api/{sign,common,keys}.rs`, `crates/contract/src/{config,errors,pending_requests}.rs`, `crates/contract/src/crypto_shared/kdf.rs`, `crates/near-mpc-crypto-types/src/{sign,primitives,kdf}.rs`, `crates/near-mpc-contract-interface/src/{deposits,method_names}.rs`, `crates/node/src/requests/queue.rs`. Release wasm: https://github.com/near/mpc/releases/download/3.17.0/mpc-contract-v3.17.0.tar.gz. Docs: https://docs.near.org/smart-contracts/anatomy/yield-resume. Raw data, tx hashes and spike code: `research/spikes/mpc/RESULTS.md`.
 

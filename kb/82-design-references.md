@@ -1,4 +1,7 @@
 # Satchel design references: the R2 reference library (structure and behaviour; R3 note below)
+
+> **Phase-0 design reference library (2026-10-21, R2, with an R3 note below).** Kept as evidence for structure and behaviour only; visuals come from `brand/` and kb/81. Where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+
 > Owner: design (R2 synthesis) · Checked: 2026-10-21 (Phase 0) · Source: Mobbin, through the four research files in `research/spikes/ux-refs/` (118 searches, about 350 screens read from the returned images) · Companion to `80-ux-spec.md` R2 and `81-design-tokens.md` R2.
 > **Link rule.** Every Mobbin link below was copied from a research file. No ID was invented or edited, and a script checks this (§7). Links go to Mobbin pages; no images are stored in the repo.
 > **Research IDs.** `WC-` = `wallet-core.md` (C1–C20, T1–T6) · `NM-` = `nft-market.md` §5 (1–30) · `TS-` = `trust-signing.md` (T1–T20, K1–K5) · `VL-` = `visual-language.md` (C1–C27).

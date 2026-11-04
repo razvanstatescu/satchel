@@ -1,5 +1,7 @@
 # Human actions, ready to run (prepared 2026-10-21)
 
+> **Status (2026-11-04): working list, updated as items are done** (items 1 and 7 are marked DONE). Prepared 2026-10-21, before D-48 (2026-10-29) let agents create testnet accounts and sign testnet transactions, so some items here can now be done by an agent. The ordered launch plan is `plan/launch-checklist.md`.
+
 Every item below is prepared so that it takes a few minutes. It is either a command to paste, a message to send, or a decision already taken for you (D-38). Items stay here only when something prevents an agent from doing them: HACKATHON.md reserves them for a human, they need your login or a captcha, or this session's auto-mode classifier blocked the testnet transaction.
 
 ## 1. Create the team account `satchelhq.testnet` (**DONE 2026-10-29 by Claude, D-48**)

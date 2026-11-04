@@ -1,5 +1,8 @@
 # 41 · Web stack: versions to pin, RPC providers, polyfills, reading NFT state, judge/demo access
 
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: web · Checked: 2026-10-21 · Confidence: high for versions, bundling and RPC behaviour (all measured today); medium for provider rate limits (unpublished, and measured from one IP that the whole research team shares)
 > Primary sources: npm registry (live, 2026-10-21); `create-next-app@16.4.2` scaffold output; Next.js docs bundled in `next@16.4.2` (`node_modules/next/dist/docs/`); `near/docs` @ `117e742` (`api/rpc/providers.mdx`, `api/rpc/transactions.mdx`); `docs.fastnear.com` (`/rpc.md`, `/auth.md`, `/auth/browser-keys.md`, `/api.md`); `vercel.com/docs/functions/limitations` (last_updated 2026-08-24); `near/near-api-js` @ `2546c85` (7.3.1); `chainsig.js@1.1.16` (npm tarball).
 > Spikes: `research/spikes/web/next-polyfill-probe/` (Next 16 build plus chain libs), `research/spikes/web/browser-runner/` (system Chrome via playwright-core), `research/spikes/web/rpc-lifecycle/` (RPC probes). Raw output is in `research/spikes/web/RESULTS.md`.

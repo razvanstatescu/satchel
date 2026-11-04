@@ -1,5 +1,7 @@
 # Satchel launch checklist: getting live on testnet and submitting
 
+> **Status (2026-11-04): the working launch list, partly out of date.** Written 2026-10-27, with later updates (2026-10-29). The "Where we stand" table is as of 2026-10-27; since then the private repo exists (2026-10-29), `satchelhq.testnet` and `dev1` (D-48) and `dev2` exist, the app is live at `https://usesatchel.xyz` against `dev2.satchelhq.testnet` (D-49), and the feature sprint merged (`plan/progress/feature-sprint.md`). Sections D–H (rc and freeze Nov 9, keyless birth Nov 10, submission Nov 13) are still ahead. Check each item's state before acting on it.
+
 > Written 2026-10-27 from a scan of the repo, `plan/`, `docs/handoff/*`, `docs/security/*`, `tools/`, `README.md` and `marketing/`.
 > Owners: **You** = Razvan (human-only or human-decided), **Claude** = the agent team (each step needs your approval, see A-03),
 > **Both** = you act while Claude watches and verifies.

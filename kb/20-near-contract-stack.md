@@ -1,4 +1,8 @@
 # NEAR contract stack: near-sdk 5.29, NFT standards, cargo-near, cross-contract patterns
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: sdk · Checked: 2026-10-21 · Confidence: high (everything marked [VERIFIED] was run on this date)
 > Primary sources: near-sdk-rs tag `near-sdk-v5.29.1` (commit `421ffb42`), cargo-near tag `cargo-near-v0.22.0` (`108a48d5`),
 > near-workspaces-rs `near-workspaces-v0.23.0` (`534eebad`), near-sandbox-rs `v0.3.16` (`8b1dcf9f`), nearcore `2.14.0-rc.5` (`b7b4737c`),

@@ -1,4 +1,8 @@
 # Testing: near-workspaces sandbox, mock MPC signer (yield/resume + timeout), unit tests, CI
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: sdk · Checked: 2026-10-21 · Confidence: high
 > Primary sources: near-workspaces-rs `near-workspaces-v0.23.0` (`534eebad`): `workspaces/src/{operations.rs,network/sandbox.rs,rpc/client.rs}`, `build.rs`;
 > near-sandbox-rs `v0.3.16` (`8b1dcf9f`): `src/runner/mod.rs`, `src/lib.rs`; near-sdk-rs `examples/mpc-contract` @ `near-sdk-v5.29.1`;

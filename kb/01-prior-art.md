@@ -1,5 +1,8 @@
 # Prior art and novelty: NFTs that control keys, and where Satchel stands
 
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: hackathon · Checked: 2026-10-21 · Confidence: high for the source-code findings; medium for "no direct NEAR competitor found" (search-based, so absence of evidence only)
 > Primary sources (pinned):
 > - `near/multichain-gas-station-contract` @ `2d43bf0129a81bfe0ca66814cdf696545fe03b9d` (2024-10-02): `nft_key/src/lib.rs`, `nft_key/README.md`, `lib/src/chain_key.rs`; live deployment `v2.nft.kagi.testnet`

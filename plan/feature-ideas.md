@@ -1,5 +1,7 @@
 # What else Satchel could do (research, 2026-10-29)
 
+> **Status (2026-11-04): historical research note (2026-10-29), the input to the feature sprint.** Razvan picked A1–A4 and C1–C7; A4 was built and then removed on 2026-10-30, and the other ideas were not built. What shipped and where it is specified: `plan/progress/feature-sprint.md` and `docs/specs/*.md`.
+
 > **For:** Razvan, to pick what to build in the time left.
 > **Inputs:** the current contract and app, `kb/`, the README "What's next", and a scan of comparable products:
 > ERC-6551 token-bound accounts, Lit PKPs (signing policies, spending limits, session keys), and NEAR's own

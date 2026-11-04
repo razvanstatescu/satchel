@@ -1,5 +1,7 @@
 # Satchel — implementation plan, Nov 1–14, 2026
 
+> **Status (2026-11-04): historical plan, written 2026-10-21 for Nov 1–14.** Implementation actually began on 2026-10-21 (D-39), the private repo was created on 2026-10-29, and a feature sprint (C1–C7, A1–A3; `plan/progress/feature-sprint.md`) was added on 2026-10-29. Many Day-N tasks therefore finished early or changed shape. Still current: the release dates (rc rehearsal and contract freeze Day 9 = Nov 9; keyless birth Day 10 = Nov 10, not done yet; submission target Nov 13, 18:00 UTC) and the runbooks in §6–§7. The agent rules quoted below were widened later (D-48; `CLAUDE.md` has the current ones). Some planned paths were never created (`docs/evidence/`, `tools/smoke/`, `docs/day1-checks.md`, `docs/demo-state.md`, `docs/funding.md`). Current status: `plan/launch-checklist.md` and `plan/progress/feature-sprint.md`.
+
 > Owner: lead architect · Written 2026-10-21 (Phase 0) · **Revision 2** (post-review; changelog at the top of `plan/decisions.md`) · Design: `kb/90-technical-spec.md` ("spec §x") · Decisions: `plan/decisions.md` (D-xx, H-xx) · Pre-Nov-1 work: `plan/phase0-checklist.md`.
 > **Lanes:**
 > - **S1:** Rust, contract, MPC, release.

@@ -1,5 +1,7 @@
 # DAO ownership and Heirloom (inheritance): research and implementation plan (2026-11-04)
 
+> **Status (2026-11-04): open proposal, not a decision.** Nothing here is built or approved. The H-27…H-34 and D-53/D-54 numbers are proposed only: `plan/1click-convert-fund.md` proposes different questions under the same H numbers, and `plan/decisions.md` ends at D-52 and H-26.
+
 > **Status:** proposal for Razvan. Nothing is implemented. The decisions needed are in §9 (proposed H-27 to H-34).
 > **Scope:** exactly two features, which also work together:
 > 1. **DAO ownership:** a Satchel owned by an entity (a Sputnik DAO, or any NEAR account that can make contract calls)

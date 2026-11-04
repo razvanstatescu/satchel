@@ -1,4 +1,8 @@
 # Deploy & lock: immutable testnet contract, storage staking, reproducible build & source verification
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: sdk · Checked: 2026-10-21 · Confidence: high
 > Primary sources: testnet rehearsal on `lock1.satchel-spk-sdk-e9ea1a.testnet` and `hello.satchel-spk-sdk-e9ea1a.testnet`
 > (`research/spikes/sdk/RESULTS.md` §5–6, logs in `research/spikes/sdk/logs/`); cargo-near `cargo-near-v0.22.0` README;

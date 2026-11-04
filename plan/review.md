@@ -1,5 +1,7 @@
 # Satchel: independent adversarial review of the Phase-0 design and plan
 
+> **Status (2026-11-04): historical.** The independent review of the Phase-0 design (2026-10-21), before any product code. The status of every R-xx finding is in the revision-2 changelog at the top of `plan/decisions.md`, and the fixes are folded into `kb/90-technical-spec.md`. `near_hackathon.md`, cited below, is the team's original plan and is not in this repo. The code security reviews are in `docs/security/`.
+
 > Reviewer: independent; took no part in Phase 0. Written 2026-10-21.
 > Reviewed (not edited): `kb/90-technical-spec.md` ("spec"), `plan/decisions.md` (D-xx, H-xx), `plan/implementation-plan.md` (SAT-xxx), `plan/phase0-checklist.md` (P0-xx), `kb/README.md`.
 > Checked against: `near_hackathon.md`, `kb/00`–`kb/81`, `research/spikes/*/RESULTS.md`, `research/spikes/hackathon/HACKATHON.snapshot.md`, and the near-sdk **5.29.1** source vendored at tag `near-sdk-v5.29.1` in `research/spikes/sdk/vendor/near-sdk-rs`.

@@ -1,5 +1,7 @@
 # 1Click inside Satchel: Convert and Add coins from any coin (research and implementation plan, 2026-11-04)
 
+> **Status (2026-11-04): open proposal, not a decision.** Nothing here is built or approved. The H-27…H-34 numbers in §9 are proposed only: `plan/dao-and-heirloom.md` proposes different questions under the same numbers, and `plan/decisions.md` ends at H-26.
+
 > **Status:** proposal for Razvan. Nothing is implemented. Decisions needed are listed in §9 (proposed H-27 to H-34).
 > This replaces the earlier draft that paired Convert with Autopilot (#5); Razvan meant #4.
 >

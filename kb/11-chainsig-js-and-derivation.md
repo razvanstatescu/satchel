@@ -1,4 +1,8 @@
 # chainsig.js and MPC key derivation (client side)
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: chains · Checked: 2026-10-21 · Confidence: high (all P0 items verified live; transfers wait on faucet funding)
 > Primary sources: npm `chainsig.js@1.1.16` (published 2026-05-12) = GitHub [NearDeFi/chainsig.js@17aec4f](https://github.com/NearDeFi/chainsig.js/tree/17aec4f932ec5ca49a4a52a167dbb31a2b77710e); near/mpc [@13f42bf](https://github.com/near/mpc/tree/13f42bf4b250c8d4d812185ed7b6e4724b24a411) (`crates/contract/src/api/{sign,keys}.rs`, `crates/near-mpc-crypto-types/src/{kdf,primitives,sign}.rs`); live `v1.signer-prod.testnet` (contract `version()` = 3.17.0); [near-examples/near-multichain@7e1c9f1](https://github.com/near-examples/near-multichain/tree/7e1c9f1a8f8cf641685076810a155f5fdfe05d92). Spike: `research/spikes/chains/` (`RESULTS.md`).
 

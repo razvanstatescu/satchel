@@ -1,4 +1,8 @@
 # Solana devnet (send SOL from a Satchel)
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: chains · Checked: 2026-10-21 · Confidence: high for signing/timing/rent/nonce rules (verified live); a confirmed devnet transfer is still pending a human faucet step
 > Primary sources: live `api.devnet.solana.com` / `api.testnet.solana.com` / `api.mainnet-beta.solana.com` (read-only); `@solana/web3.js@1.99.0` (`lib/index.cjs.js`); chainsig.js@1.1.16 `src/chain-adapters/Solana/Solana.ts` (git 17aec4f); near/mpc@13f42bf `crates/near-mpc-crypto-types/src/primitives.rs` (`EDDSA_PAYLOAD_SIZE_UPPER_BOUND_BYTES = 1232`); [Solana durable nonces](https://solana.com/docs/core/transactions/durable-nonces); [Solana clusters](https://solana.com/docs/references/clusters); [solana-labs/solana PR #25035](https://github.com/solana-labs/solana/pull/25035); [faucet.solana.com](https://faucet.solana.com/). Spike: `research/spikes/chains/` (`sol_sign.ts`, `sol_facts.mjs`, `sol_rent_sim.mjs`, `sol_nonce_detect.ts`).
 

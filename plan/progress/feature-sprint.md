@@ -1,5 +1,7 @@
 # Feature sprint tracker (started 2026-10-29)
 
+> **Status (2026-11-04): sprint tracker, current.** The feature sprint ran 2026-10-29 → about 11-02. Every chosen feature is merged and pushed (C1–C7, A1–A3); A4 was removed on 2026-10-30. The interface specs are `docs/specs/*.md`; the security review of the sprint diff is `docs/security/sprint-review.md`. Commit ids below are as of the sprint.
+
 > **Scope:** Razvan chose A1, A2, A3, A4 and C1–C7 from `plan/feature-ideas.md` (not A5, A6 or A7).
 > **Live log:** `plan/progress/sprint-log.md`. Every agent appends a line per milestone.
 > **Status:** the orchestrator updates the table below as work lands.

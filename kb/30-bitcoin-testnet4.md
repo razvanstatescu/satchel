@@ -1,4 +1,8 @@
 # Bitcoin testnet4 end-to-end (P2WPKH via NEAR Chain Signatures)
+
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: btc · Checked: 2026-10-21 · Confidence: high for MPC, contract and tx building (run live today); medium for testnet4 confirmation timing and faucets (they change day to day)
 > Primary sources: near/mpc tag `3.17.0` (`d0fc87b`; deployed `v1.signer-prod.testnet` reports `version() = "3.17.0"`): `crates/contract/src/api/sign.rs`, `crates/near-mpc-signature-verifier/src/lib.rs`, `crates/node/src/indexer/handler.rs`. near/mpc `main` @ `13f42bf` (2026-10-21). chainsig.js v1.1.16 (`17aec4f`): `src/chain-adapters/Bitcoin/*`. bitcoinjs-lib 7.0.4 (npm, 2026-10-13). BIP143 / BIP125 / BIP94. Live mempool.space testnet4 API. Spike log: `research/spikes/btc/RESULTS.md` (every tx hash and raw output referenced below).
 

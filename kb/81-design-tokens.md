@@ -1,5 +1,7 @@
 # Satchel design tokens: Satchel 2.0 (Revision 4)
 
+> **Design tokens, Revision 4 (2026-10-26).** The live values are in `apps/web/src/app/globals.css`, which wins over this file; [kb/90](90-technical-spec.md) wins on product facts (§13 Errata).
+
 > **R4 (2026-10-26, D-44, Razvan):** the "Sticker S" brand replaces brand 1.0. This revision supersedes R3 and R3.1.
 > - R3 is archived at `kb/archive/81-design-tokens-R3.md`, and brand 1.0 is in `brand/archive/v1/`.
 > - **The live source of every value below** is `apps/web/src/app/globals.css`. If they differ, the CSS wins, and this

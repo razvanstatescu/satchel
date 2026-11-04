@@ -1,5 +1,7 @@
 # Satchel — decisions log (ADR-lite)
 
+> **Status (2026-11-04): live, append-only decision log.** Entries D-01…D-52 and H-01…H-26; the newest is D-52 (2026-11-03). Early entries are Phase 0 (2026-10-21); later ones supersede them where they say so (for example D-39 starts implementation on 2026-10-21, against the old "no code before Nov 1" rule; D-43 reverses D-21; D-48 lets agents sign testnet transactions). Entries are never rewritten. The normative design is `kb/90-technical-spec.md` plus `docs/specs/*.md` (sprint features C1–C7); open human decisions are in the last section.
+
 > Owner: lead architect · Written 2026-10-21 (Phase 0) · **Revision 2** (same day, after the independent review `plan/review.md` and the orchestrator's calls) · Each decision is final for v1 unless it is marked **Needs human**. The normative design is `kb/90-technical-spec.md`; this file records *why*.
 > Citation legend: `kb/10 §TL;DR 6` = `kb/10-mpc-signer.md`, section TL;DR, item 6 (file index in `kb/README.md`); `spike/btc` = `research/spikes/btc/RESULTS.md`; "lean" = the orchestrator's leaning stated in the Phase-0 brief; `R-xx` = finding xx of `plan/review.md`.
 > Status values: **Decided** (engineering call, no human needed) · **Decided, human confirm** (default chosen; a human should say yes by the date shown) · **Needs human** (no default may be assumed, per HACKATHON.md "What the human decides").

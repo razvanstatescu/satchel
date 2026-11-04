@@ -1,4 +1,7 @@
 # Satchel UX spec: routes, states, components, copy, motion (Revision 3, brand consolidated)
+
+> **Design spec, Revision 3 (2026-10-21), with later notes (R4 2026-10-26, D-52 2026-11-03).** Not fully maintained: the Satchel 2.0 specs in `docs/design/satchel-2.0/` win on visuals and vocabulary, and [kb/90](90-technical-spec.md) wins on product facts (§13 Errata). The shipped app is `apps/web`.
+
 > Owner: ux · Checked: 2026-10-21 · **Revision 3 "Brand consolidated", supersedes R2** · Confidence: medium-high.
 > - **High confidence:** structure, behaviour and copy (R2, reference-backed), tokens and contrast (computed in kb/81 R3).
 > - **Medium:** the derived sizes and the per-token accent strength (design-lead decisions by Oct 31).

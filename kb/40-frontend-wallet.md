@@ -1,5 +1,8 @@
 # 40 · Frontend wallet connection and the long-running transaction lifecycle
 
+> **Phase-0 research note (2026-10-21).** Kept as evidence and not maintained; where it disagrees with [kb/90](90-technical-spec.md), kb/90 wins (§13 Errata).
+> "Plan" below means `near_hackathon.md`, the team's original plan, which is not in this repo. "Nov 1" dates are the Phase-0 schedule; implementation began 2026-10-21 (D-39).
+
 > Owner: web · Checked: 2026-10-21 · Confidence: high for RPC behaviour and library APIs (measured on live testnet, read at pinned commits); medium for per-wallet timing (Intear/MNW/Ledger/NEAR-CLI from source, NEAR-CLI also driven in a real browser, Meteor closed-source)
 > Primary sources: `hot-dao/near-selector` @ `6766ea5` (2026-10-14), which is `@hot-labs/near-connect`, plus the live manifest v1.1.0; `matiasbenary/near-connect-hooks` @ `ae7fdab` (= npm 1.1.6); `near/near-api-js` @ `2546c85` (= 7.3.1); `near/nearcore` master @ `1441cd3` and `b7b4737c` (2.14.0-rc.5, the build serving testnet RPC today); `near/mpc` @ `13f42bf` (contract 3.17.0 live on `v1.signer-prod.testnet`); `near/docs` @ `117e742` (2026-10-20); `INTEARnear/wallet` @ `7e31411`; `near/near-connect-ledger` main; `near/create-near-app` @ `ff0fedd` (9.0.2); `near/wallet-selector` @ `b532bcd`.
 > Spike code and raw logs: `research/spikes/web/` (`RESULTS.md`). Every tx hash below is a testnet tx (`https://testnet.nearblocks.io/txns/<hash>`).
