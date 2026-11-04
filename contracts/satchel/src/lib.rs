@@ -353,3 +353,5 @@ mod review3_allowance_tests;
 mod review3_acl_tests;
 #[cfg(test)]
 mod review3_sign_tests;
+#[cfg(test)]
+mod review3_money_tests;

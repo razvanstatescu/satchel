@@ -141,6 +141,7 @@ fn mint_many(n: usize) -> Contract {
 /// Demonstration (passes): the skip in near-contract-standards' `nft_tokens` walks the legacy TreeMap one
 /// `higher(key)` search per skipped token, so the same 50-token page costs more the deeper it is.
 #[test]
+#[ignore = "slow demonstration (1,000 mints, ≈ 18 s); run with --include-ignored"]
 fn r3x1_demo_nft_tokens_page_cost_grows_with_from_index() {
     let c = mint_many(N_TOKENS);
     let mut rows = vec![];
@@ -173,6 +174,7 @@ fn r3x1_proof_every_nft_tokens_page_fits_a_view_call() {
 /// The proposed fix, evaluated (passes): ids are dense (`1..next_token_id`, no burn exists), so a page by numeric id is
 /// `limit` O(1) lookups (`TreeMap::get` reads the 'v' LookupMap directly), flat at any depth.
 #[test]
+#[ignore = "slow demonstration (1,000 mints, ≈ 19 s); run with --include-ignored"]
 fn r3x1_demo_numeric_id_paging_is_flat() {
     let c = mint_many(N_TOKENS);
     let page = |from: u64| -> Vec<near_contract_standards::non_fungible_token::Token> {

@@ -31,6 +31,7 @@ The sandbox suite that drives all three lives in `tests/` (see `tests/README.md`
 | `events.rs` | NEP-297 events (`standard: "satchel"`) |
 | `errors.rs` | Stable error codes (`ERR_X: sentence`) |
 | `tests.rs`, `security_tests.rs`, `allowance_tests.rs`, `market_tests.rs`, `feature_tests.rs` | Unit tests (`#[cfg(test)]`, near-sdk mocked chain) |
+| `review3_{allowance,acl,sign,money}_tests.rs`, `parse/review3_parse_tests.rs` | Round-three review proofs (`docs/security/review-round-3.md`); slow demos and the conservation fuzz are `#[ignore]`d, run them with `--include-ignored` |
 
 ## Where the design lives
 

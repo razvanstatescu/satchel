@@ -62,6 +62,7 @@ Start at [`README.md`](../README.md) for the product, and at [`docs/README.md`](
 | **F-NN** (fuzzing) | Finding of the parser fuzzing campaign | [`docs/security/fuzzing.md`](security/fuzzing.md) |
 | **M-NN, L-NN, I-NN** (`[SR-NN]`) | Medium, Low and Info findings of the sprint security review; `SR-NN` is the reviewer's raw number | [`docs/security/sprint-review.md`](security/sprint-review.md) |
 | **AUDIT-01…04** | Bugs found by the contract test audit, all fixed | [`docs/testing/contract.md`](testing/contract.md) |
+| **R3-A/S/X/I/D/N-N** | Findings of the round-three contract review: A allowances, S signing and the checker, X access control and views, I interface, D deploy, N notes (tests `review3_*`). Not the Phase-0 R-NN | [`docs/security/review-round-3.md`](security/review-round-3.md) |
 | **R-NN** | Finding of the independent review of the Phase-0 design | [`plan/review.md`](../plan/review.md) |
 | **SAT-NNN** | A task in the implementation plan | [`plan/implementation-plan.md`](../plan/implementation-plan.md) |
 | **G0–G12** | A gate (go / no-go checkpoint) of the implementation plan | `plan/implementation-plan.md` |
