@@ -65,7 +65,10 @@ export const CAM = {
   wordsOut: T.wSol + 29, // "Solana." has been read (≈1 s): the three name stickers come unstuck and drop away
   pullBack: T.wSol + 27, // the camera pulls back to the whole card (16 f, pan) for "One NFT." (lands on "NFT.")
   pullDur: 16,
-  oneOut: T.wNft + 31, // "One NFT." holds ≈1 s (the VO has said it too), then peels off as the frame makes room
-  reframe: T.wNft + 29, // the frame makes room for the promise (16 f, pan): the card has cleared the line before "Whoever"
+  // V04 follows "NFT." by ≈1.1 s (v4): the frame makes room first (16 f, pan) so the card has cleared the line's place
+  // before "Whoever"; "One NFT." stays up through the reframe (it doesn't overlap the line) and peels off once the
+  // line has landed, gone before the lockup slaps on "Satchel".
+  reframe: T.wWhoever - 20,
   reframeDur: 16,
+  oneOut: T.wWhoever + 10,
 } as const;

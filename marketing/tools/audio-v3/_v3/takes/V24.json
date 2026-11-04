@@ -1,0 +1,91 @@
+{
+ "key": "b93987049f1a0329",
+ "masterKey": "49e3af59f94cd5f8",
+ "voice": "EXAVITQu4vr4xnSDxMaL",
+ "model": "eleven_v4",
+ "format": "mp3_44100_128",
+ "settings": {
+  "stability": 0.45,
+  "similarity_boost": 0.8
+ },
+ "say": "If one old signature could still move coins, Buy stays off.",
+ "prev": "Nonce used. Coin spent. Blockhash expired.",
+ "next": "When it's clean, one transaction, bound to that exact history, pays the seller,",
+ "final": {
+  "id": "V24",
+  "scene": "T6",
+  "text": "If one old signature could still move coins, Buy stays off.",
+  "say": "If one old signature could still move coins, Buy stays off.",
+  "file": "v2/vo/V24.mp3",
+  "duration": 4.32,
+  "words": [
+   {
+    "text": "If",
+    "start": 0.08,
+    "end": 0.28
+   },
+   {
+    "text": "one",
+    "start": 0.38,
+    "end": 0.5
+   },
+   {
+    "text": "old",
+    "start": 0.66,
+    "end": 0.82
+   },
+   {
+    "text": "signature",
+    "start": 0.92,
+    "end": 1.38
+   },
+   {
+    "text": "could",
+    "start": 1.48,
+    "end": 1.66
+   },
+   {
+    "text": "still",
+    "start": 1.8,
+    "end": 2.02
+   },
+   {
+    "text": "move",
+    "start": 2.08,
+    "end": 2.26
+   },
+   {
+    "text": "coins,",
+    "start": 2.36,
+    "end": 2.84
+   },
+   {
+    "text": "Buy",
+    "start": 3.24,
+    "end": 3.46
+   },
+   {
+    "text": "stays",
+    "start": 3.6,
+    "end": 3.86
+   },
+   {
+    "text": "off.",
+    "start": 3.96,
+    "end": 4.24
+   }
+  ],
+  "wordSource": "forced-alignment",
+  "qa": {
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "exact": true,
+     "heard": "If one old signature could still move coins, buy stays off"
+    }
+   ],
+   "chosen": 0
+  }
+ }
+}

@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Check, CircleCheck, Lock, Snowflake, TriangleAlert } from "lucide-react";
 import { C, display, mono, sans } from "../../brand/tokens";
-import { ADDR7, AMOUNTS, HISTORY_7, truncate } from "./data";
+import { CoinIcon, COINS_7, SatchelCard } from "../Sticker";
+import { ADDR7, AMOUNTS, coinsOf, HISTORY_7, SATCHEL4, truncate } from "./data";
+import { AllowanceCard, ClaimLinkCard, NetworksCard, OfferCard } from "./feature-cards";
 import { GiveSheet } from "./GiveSheet";
 import { AddressText, Avatar, CoinFace, NewBadge, PausedBanner, Scaled, StatusPill, Steps, Toast, UiButton } from "./kit";
 import { ListSheet } from "./ListSheet";
@@ -21,7 +23,7 @@ import { SentToast, SigningScreen, SigningTracker } from "./SigningTracker";
  * Frames here are simple stand-ins; the real PhoneFrame / BrowserFrame live in src2/illustration/characters.
  */
 
-export const UI_GALLERY = { width: 1920, height: 1080, fps: 30, framesPerPage: 60, pages: 5, durationInFrames: 300 } as const;
+export const UI_GALLERY = { width: 1920, height: 1080, fps: 30, framesPerPage: 60, pages: 6, durationInFrames: 360 } as const;
 
 const PHONE_S = 0.53;
 const BROWSER_S = 0.55;
@@ -31,7 +33,7 @@ export function UiGallery() {
   const page = Math.min(UI_GALLERY.pages - 1, Math.floor(frame / UI_GALLERY.framesPerPage));
   const f = frame % UI_GALLERY.framesPerPage;
   const live = { pulse: (f % 30) / 30, spin: (f % 24) / 24 };
-  const titles = ["Mint · Fund · Send", "Sent · Satchel page · Give · List", "Sale page (carol.near): the check", "Sale page: buy, hand-off, blocked", "Building blocks"];
+  const titles = ["Mint · Fund · Send", "Sent · Satchel page · Give · List", "Sale page (carol.near): the check", "Sale page: buy, hand-off, blocked", "Building blocks", "SCRIPT-v4: the value card · feature stickers"];
   return (
     <AbsoluteFill style={{ background: "#e9e6f3", color: C.ink, ...sans(400) }}>
       <div style={{ height: 64, display: "flex", alignItems: "center", gap: 16, padding: "0 56px" }}>
@@ -41,7 +43,7 @@ export function UiGallery() {
           page {page + 1}/{UI_GALLERY.pages} · src2/components/ui
         </span>
       </div>
-      {page === 0 ? <PageOne {...live} /> : page === 1 ? <PageTwo {...live} /> : page === 2 ? <PageThree {...live} f={f} /> : page === 3 ? <PageFour {...live} /> : <PageFive {...live} f={f} />}
+      {page === 0 ? <PageOne {...live} /> : page === 1 ? <PageTwo {...live} /> : page === 2 ? <PageThree {...live} f={f} /> : page === 3 ? <PageFour {...live} /> : page === 4 ? <PageFive {...live} f={f} /> : <PageSix f={f} />}
     </AbsoluteFill>
   );
 }
@@ -223,7 +225,7 @@ function PageFive({ pulse, spin, f }: Live & { f: number }) {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
             <UiButton label="Mint a Satchel" press={press} />
             <UiButton label="Approve in your wallet…" busy spin={spin} />
-            <UiButton label="Buy for 4,750.00 USDC" disabled />
+            <UiButton label="Buy for 2,000 NEAR" disabled />
             <UiButton label="Give" kind="secondary" />
             <UiButton label="Approve" kind="neutral" press={press} />
             <UiButton label="Reject" kind="neutralSecondary" />
@@ -247,7 +249,7 @@ function PageFive({ pulse, spin, f }: Live & { f: number }) {
             <SentToast chain="btc" />
             <SentToast chain="evm" />
             <SentToast chain="sol" />
-            <Toast title="Listed for 4,750.00 USDC" sub="Signing paused" tone="frozen" icon={Snowflake} />
+            <Toast title="Listed for 2,000 NEAR" sub="Signing paused" tone="frozen" icon={Snowflake} />
           </div>
         </Block>
         <Block title="PausedBanner · Steps (pulse)">
@@ -303,6 +305,78 @@ function PageFive({ pulse, spin, f }: Live & { f: number }) {
         <Block title="SigningTracker (sent: the receipt)">
           <SigningTracker stage="sent" />
         </Block>
+      </div>
+    </div>
+  );
+}
+
+/* ───────────── page 6: SCRIPT-v4 value card and feature stickers ───────────── */
+
+function PageSix({ f }: { f: number }) {
+  const t = Math.min(1, f / 45);
+  // P2: the fill counts up to ≈ $9,025.00; C1: the drain rolls ETH to 0% (order "given" keeps the legend still)
+  const fill = coinsOf(AMOUNTS.fill).map((c) => ({ ...c, amount: c.amount * t }));
+  const drained = COINS_7.map((c) => (c.coin === "ETH" ? { ...c, amount: 0.8 * (1 - t) } : c));
+  const label = (s: string) => <div style={{ ...mono(450), fontSize: 12, color: C.inkMuted, marginTop: 10 }}>{s}</div>;
+  return (
+    <div style={{ padding: "6px 56px 0", display: "flex", flexDirection: "column", gap: 26 }}>
+      <div style={{ display: "flex", gap: 30, alignItems: "flex-start" }}>
+        <div>
+          <SatchelCard width={400} yours pill="active" />
+          {label("default (#7) yours pill=active · ≈ $8,000.00")}
+        </div>
+        <div>
+          <SatchelCard width={400} yours coins={fill} pill="active" />
+          {label("coins={fill × t} (P2 count-up → ≈ $9,025.00)")}
+        </div>
+        <div style={{ background: "#120c26", padding: 16, borderRadius: 22, marginTop: -16 }}>
+          <SatchelCard width={400} night order="given" coins={drained} pill="paused" />
+          <div style={{ ...mono(450), fontSize: 12, color: "#b7b0d1", marginTop: 10 }}>night order=&quot;given&quot; (C1 drain → ≈ $6,000.00)</div>
+        </div>
+        <div>
+          <SatchelCard width={400} id="4" coins={coinsOf(SATCHEL4.balances)} pill="paused" />
+          {label("#4 · ≈ $2,880.00 · pill=paused")}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 30, alignItems: "flex-start" }}>
+        <div>
+          <SatchelCard width={300} yours chips={[]} pill="active" />
+          {label("empty → Nothing inside yet")}
+        </div>
+        <div>
+          <SatchelCard width={300} preview />
+          {label("preview (mint)")}
+        </div>
+        <div>
+          <SatchelCard width={300} id="30" coins={[{ coin: "BTC", amount: 1.2 }, { coin: "ETH", amount: 18 }, { coin: "SOL", amount: 300 }]} />
+          {label("#30 OTC · ≈ $171,000.00")}
+        </div>
+        <div style={{ display: "flex", gap: 14, alignItems: "center", marginTop: 20 }}>
+          <CoinIcon coin="BTC" size={44} />
+          <CoinIcon coin="ETH" size={44} />
+          <CoinIcon coin="SOL" size={44} />
+          <CoinIcon coin="USDC" size={44} network="base" />
+          <CoinIcon coin="USDC" size={44} network="arbitrum" />
+          <CoinIcon coin="ETH" size={44} sad />
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 40, alignItems: "flex-start" }}>
+        <div>
+          <AllowanceCard width={300} left={0.25 - 0.05 * t} account="sam.near" />
+          {label("AllowanceCard left 0.25 → 0.20")}
+        </div>
+        <div>
+          <OfferCard width={300} tilt={2} typed={Math.min(1, f / 20)} accepted={f >= 30} acceptPop={Math.min(1, (f - 30) / 10)} />
+          {label("OfferCard typed · accepted + acceptPop")}
+        </div>
+        <div>
+          <ClaimLinkCard width={300} tilt={-2} press={f >= 10 && f < 16 ? 1 : 0} copied={f >= 16} claimed={f >= 34} claimedPop={Math.min(1, (f - 34) / 10)} />
+          {label("ClaimLinkCard press · copied · claimed")}
+        </div>
+        <div>
+          <NetworksCard width={300} highlight="base" reveal={t} />
+          {label("NetworksCard highlight=base reveal")}
+        </div>
       </div>
     </div>
   );

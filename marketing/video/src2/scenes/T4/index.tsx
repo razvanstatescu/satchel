@@ -2,7 +2,7 @@ import { Snowflake } from "lucide-react";
 import type { ReactNode } from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, F, sans } from "../../brand/tokens";
-import { ListSheet, PHONE } from "../../components/ui";
+import { ListSheet, PHONE, PRICE } from "../../components/ui";
 import { CardBack, type CharmFace, charmBlink, charmKick, CardWithCharms, Hand, type HandProps } from "../../illustration/characters";
 import { FrostLaminate, PriceTag, priceTagSize, RequestSticker, requestSize, textWidth } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
@@ -12,9 +12,9 @@ import { T2_RECORDS } from "../T2";
 import { At, Caption, onBeat, sceneBeats, voF } from "../T2/kit";
 
 /**
- * T4 · Paused for sale (94.5–99.5 s; V21 "List it, and signing pauses. The history stops growing.")
+ * T4 · Paused for sale (v4: 96.0–101.0 s; V21 "List it, and signing pauses. The history stops growing.")
  * Satchel #7, still showing its history. A tiny list sheet says "Ready to list ✓" while bob's hand slaps the lemon
- * price tag "4,750.00 USDC" onto the card's corner. A frost laminate squeegees across with the "Paused for sale" pill
+ * price tag "2,000 NEAR" onto the card's corner. A frost laminate squeegees across with the "Paused for sale" pill
  * (snowflake turns 60°). bob tries to stick a new "Send" onto the history: it skids on the frost and drops away (the
  * film's one deliberate glide). The history header frosts over at "3 signatures". No countdown, no timer, ever.
  */
@@ -30,8 +30,8 @@ const TAG_S = 2.0; // price tag scale: the amount is ≈ 52 px
 const TAG_TILT = 15;
 const HOLE = { x: CARD_X + CARD_W - 30, y: CARD_Y + 128 }; // the tag's hole: just inside the top-right corner, below the S
 const SHEET_S = 1.34; // the tiny list sheet
-const SHEET_TOP = 330; // where the ListSheet's sheet starts inside its 390 × 844 phone box (measured)
-const SHEET_H = 272; // UI px shown: title, "Ready to list ✓", the price
+const SHEET_TOP = 308; // where the ListSheet's sheet starts inside its 390 × 844 phone box (measured, v4)
+const SHEET_H = 276; // UI px shown: title, "Ready to list ✓", the price
 const SHEET_X = 58;
 const SHEET_Y = 420;
 
@@ -56,7 +56,7 @@ export default function T4() {
   const sheetFall = interpolate(f, [sheetOut, sheetOut + 9], [0, 1], { ...clamp, easing: EASE2.fall });
 
   // ── bob's hand brings the price tag and slaps it on ───────────────────────────────────────────────────────────
-  const tagSize = priceTagSize();
+  const tagSize = priceTagSize(PRICE); // v4: "2,000 NEAR"
   const tagW = tagSize.w * TAG_S;
   const tagH = tagSize.h * TAG_S;
   // the tag's root box is the body; the hole is at (17, h/2) UI. Place the box so the hole lands on HOLE.
@@ -167,7 +167,7 @@ export default function T4() {
         {/* the price tag, slapped on by bob */}
         {f >= tagAt - 16 ? (
           <div style={{ position: "absolute", left: tagX, top: tagY, scale: `${tagScale} ${f < tagAt - 4 ? tagScale : slap.sy}`, transformOrigin: `${17 * TAG_S}px 50%` }}>
-            <PriceTag scale={TAG_S} tilt={TAG_TILT} drop={tagDrop} swing={tagSwing} />
+            <PriceTag text={PRICE} scale={TAG_S} tilt={TAG_TILT} drop={tagDrop} swing={tagSwing} />
           </div>
         ) : null}
         {bob1Visible ? <Hand {...bob1} x={grip.x + 260 * handAway} y={grip.y - 420 * handAway} pinch={release} squash={interpolate(f, [tagAt, tagAt + 1, tagAt + 4], [1, 1, 0], clamp)} tagTilt={-2} /> : null}

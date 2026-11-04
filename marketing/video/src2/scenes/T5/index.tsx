@@ -1,7 +1,6 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { type CharmFace, charmKick } from "../../brand/Charm";
 import { C, type Chain } from "../../brand/tokens";
-import { AMOUNTS, holdings, PRICE } from "../../components/ui";
 import { Sfx } from "../../lib/Sfx";
 import { getScene } from "../../lib/timeline";
 import { FPS } from "../../lib/time";
@@ -61,17 +60,20 @@ const T = {
   scanA: T5.checks + 3,
   scanB: T5.v22End - 6,
   camIn: [T5.contact[1] - 31, T5.contact[1] - 12] as const, // land before ETH's wind-up
-  camOut: [T5.contact[2] + 19, T5.contact[2] + 35] as const,
-  verdict: T5.contact[2] + 37,
-  capClean: T5.contact[2] + 41,
-  wake: T5.contact[2] + 53,
-  cheer: T5.contact[2] + 56,
+  // v4: the scene is 9.5 s, so the pull-back starts as SOL's stamp settles and the verdict lands with the camera
+  camOut: [T5.contact[2] + 5, T5.contact[2] + 19] as const,
+  verdict: T5.contact[2] + 15,
+  capClean: T5.contact[2] + 17,
+  wake: T5.contact[2] + 29,
+  cheer: T5.contact[2] + 32,
 };
 
 /** CU: the history panel (header, verdict, three records and their charms) fills the frame. */
 const CAM_CU: Cam = { x: 900, y: 402, z: 2.55 };
 
-export const PAGE7 = { id: "7" as const, price: PRICE, seller: "bob.near", balances: holdings(AMOUNTS.after) };
+/** SCRIPT-v4 numbers: #7 is listed for 2,000 NEAR and holds 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC. */
+export const PRICE_7 = "2,000 NEAR";
+export const PAGE7 = { id: "7" as const, price: PRICE_7, seller: "bob.near", balances: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC" };
 export const TABS = [{ title: "Satchel #7" }, { title: "Satchel #4" }];
 
 /** The Buy wake's lemon glints, on the button's flanks (page px) so they never cover a word. */

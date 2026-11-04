@@ -20,29 +20,31 @@ const K = {
   hookGap: 0.05, // V01 -> V02 -> V03: the frame-by-frame opening (concepts-v2 §4.4)
   tail: 0.15, // min music after a scene's last line before its cut (the next line still keeps K.gap)
   offBarPenalty: 0.4, // cost of a scene boundary on a beat instead of a bar
-  total: { min: 130, max: 135, weight: 3 },
+  total: { min: 129, max: 133, weight: 3 }, // v4 target ≈ 131 s
 };
 
-// SCRIPT-v3 scene order and targets (s). barStart: the scene must start on a bar (a music event lands on its cut).
+// SCRIPT-v4 scene order and targets (s). barStart: the scene must start on a bar (a music event lands on its cut).
+// v4 vs v3: H2 8.5 (V04 0.5 s earlier), P2 7, P3 8.5, P4 8, P5 9, P6 8 (V11 cut), C1 12.5 (drain gap 1.5 s shorter;
+// its hard stop may sit on a beat so that the flip and the drop stay on bars), T3 6.5, T6 6, T7 10, E1 6.5.
 const SCENES = [
   { id: 'H1', fixed: true },
-  { id: 'H2', lines: ['V03', 'V04'], target: 6.6, leads: [0] },
+  { id: 'H2', lines: ['V03', 'V04'], target: 8.5, leads: [0], gaps: { V04: 0.35 } },
   { id: 'P1', lines: ['V05'], target: 6 },
-  { id: 'P2', lines: ['V06'], target: 6 },
-  { id: 'P3', lines: ['V07', 'V08'], target: 10 },
-  { id: 'P4', lines: ['V09'], target: 6 },
-  { id: 'P5', lines: ['V10'], target: 8 },
-  { id: 'P6', lines: ['V11', 'V12', 'V13'], target: 12, barStart: true, downbeats: 4 }, // three 4 s vignettes
-  { id: 'C1', lines: ['V14', 'V15', 'V16'], target: 14, barStart: true, kind: 'catch' }, // musicStop on the cut
+  { id: 'P2', lines: ['V06'], target: 7 },
+  { id: 'P3', lines: ['V07', 'V08'], target: 8.5 },
+  { id: 'P4', lines: ['V09'], target: 8 },
+  { id: 'P5', lines: ['V10'], target: 9 },
+  { id: 'P6', lines: ['V12', 'V13'], target: 8, barStart: true, downbeats: 4 }, // two 4 s vignettes
+  { id: 'C1', lines: ['V14', 'V15', 'V16'], target: 12.5, kind: 'catch' }, // musicStop on the cut
   { id: 'T0', lines: ['V17'], target: 4, barStart: true, kind: 'flip' }, // 2-bar riser
   { id: 'T1', lines: ['V18'], target: 6, barStart: true }, // the drop on the cut
   { id: 'T2', lines: ['V19'], target: 6.5 },
-  { id: 'T3', lines: ['V20'], target: 6 },
-  { id: 'T4', lines: ['V21'], target: 4 },
-  { id: 'T5', lines: ['V22', 'V23'], target: 11 },
-  { id: 'T6', lines: ['V24'], target: 5, barStart: true }, // the band drops to bass + tick for 2 bars
-  { id: 'T7', lines: ['V25', 'V26'], target: 10, barStart: true, kind: 'handoff' },
-  { id: 'E1', lines: ['V27'], target: 8, kind: 'end' },
+  { id: 'T3', lines: ['V20'], target: 6.5 },
+  { id: 'T4', lines: ['V21'], target: 5 },
+  { id: 'T5', lines: ['V22', 'V23'], target: 10.5 },
+  { id: 'T6', lines: ['V24'], target: 6 }, // the band drops to bass + tick for 2 bars (v4: may start on a beat)
+  { id: 'T7', lines: ['V25', 'V26'], target: 10, kind: 'handoff' }, // the landing itself is always on a bar
+  { id: 'E1', lines: ['V27'], target: 6.5, kind: 'end' },
 ];
 
 /** H1 is drawn frame by frame (concepts-v2 §4.4): V01 ≈ 0.9 s, V02 ≈ 2.1 s, the swing lands at ≈ 2.6 s, V03 at ≈ 3.1 s. */
@@ -61,9 +63,10 @@ function layout(sc, t0, lead, vo, prevEnd) {
   if (sc.kind === 'catch') {
     put('V14', startAt(t0 + Math.max(lead, 0.5)));
     put('V15', ceilTo(lastEnd + 0.75, BEAT));
-    // the slip is used (thud) and a sub hit lands, then "So how does a buyer know it's clean?"
-    const subHit = Math.max(t0 + 10, ceilTo(lastEnd + 2.5, BAR));
-    markers.musicStop = t0; markers.thud = subHit - 2; markers.subHit = subHit;
+    // the slip is used (thud) and a sub hit lands, then "So how does a buyer know it's clean?" (v4: the drain gap is
+    // 1.5 s shorter than v3's: V16 about 2.4 s after V15 ends)
+    const subHit = ceilTo(Math.max(t0 + 8.5, lastEnd + 1.9), BEAT);
+    markers.musicStop = t0; markers.thud = subHit - 1.5; markers.subHit = subHit;
     put('V16', subHit + 0.5);
     return { placed, need: lastEnd + 1.2, lastEnd, markers, barEnd: true };
   }
@@ -81,15 +84,17 @@ function layout(sc, t0, lead, vo, prevEnd) {
   }
   if (sc.kind === 'end') {
     put('V27', startAt(t0 + 0.5));
-    const endPress = ceilTo(lastEnd + 1.5, BAR); // the mark's button press on a downbeat
+    const endPress = ceilTo(lastEnd + 1.2, BEAT); // the mark's button press on a beat; ring-out, silent last 0.5 s
     markers.endPress = endPress;
-    return { placed, need: endPress + 2, lastEnd, markers, barEnd: true, exact: true };
+    return { placed, need: endPress + 1.5, lastEnd, markers, exact: true };
   }
   sc.lines.forEach((id, k) => {
     let start;
-    if (sc.downbeats) start = k === 0 ? ceilTo(Math.max(t0 + lead, lastEnd + K.gap), BAR) : Math.max(placed[k - 1].start + sc.downbeats, ceilTo(lastEnd + K.gap, BAR));
-    else if (k === 0) start = startAt(t0 + lead);
-    else start = ceilTo(lastEnd + K.gap, BEAT);
+    if (sc.downbeats) {
+      // on the vignette downbeats `downbeats` s apart; a long line pushes the next one to the following beat, not bar
+      start = k === 0 ? ceilTo(Math.max(t0 + lead, lastEnd + K.gap), BAR) : Math.max(placed[k - 1].start + sc.downbeats, ceilTo(lastEnd + K.gap, BEAT));
+    } else if (k === 0) start = startAt(t0 + lead);
+    else start = ceilTo(lastEnd + (sc.gaps?.[id] ?? K.gap), BEAT);
     put(id, start);
   });
   return { placed, need: lastEnd + K.tail, lastEnd, markers };
@@ -193,7 +198,7 @@ export function writeTimeline({ timeline, spans }) {
   const f = (x) => x.toFixed(2);
   const mmss = (x) => `${Math.floor(x / 60)}:${(x % 60).toFixed(1).padStart(4, '0')}`;
   const md = [
-    '# Satchel 2.0 film: master timeline (v3)',
+    '# Satchel 2.0 film: master timeline (v4)',
     '',
     `Generated by \`node tools/audio-v3/run.mjs\` from the voiced lines (do not edit by hand). ${timeline.bpm} BPM (beat ${timeline.beatSec} s, bar ${timeline.barSec} s), ${timeline.fps} fps.`,
     `**Total: ${f(timeline.durationSec)} s (${mmss(timeline.durationSec)}), ${timeline.durationInFrames} frames.** Voice: ${timeline.voice.name} (${timeline.voice.id}) / ${timeline.voice.model}.`,

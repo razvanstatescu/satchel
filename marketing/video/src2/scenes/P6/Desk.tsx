@@ -1,24 +1,26 @@
 import { AbsoluteFill, interpolate, spring } from "remotion";
 import { charmKick, Hand } from "../../illustration/characters";
-import { TradeDesk, UsdcStack, usdcStackSize } from "../../illustration/props";
+import { TradeDesk } from "../../illustration/props";
+import { CARD_H, OfferSticker } from "../P5/cards";
 import { clamp, EASE2, HANDOFF, SPRING2 } from "../../motion";
 import { CHAINS3, FPS, lerp, ramp, REACT_LAG, SwingCard, swingGeom, type SwingOpts } from "../P5/rig";
 import { HeavyFront, SLEEVE } from "./cast";
-import { CONTACT, CUT, LIFT } from "./timing";
+import { ACCEPT, CONTACT, CUT, LIFT } from "./timing";
 
 /**
- * P6b · one trade, whole position (amendment A2). Over an OTC desk the seller's hand holds a heavy Satchel #30
- * (1.20 BTC · 18 ETH · 300 SOL, set big on its face); the buyer's USDC stack (no number) waits on the desk. On the
- * swing the card goes right and the stack slides left along the desk; they cross mid-table on the apex (the desk's
- * centre pull marks it). The heavy card lands on the 52.0 s downbeat: a deeper squash, the buyer's hand dips 16 px.
+ * P6a · one trade, whole position, or take an offer (v4). Over an OTC desk the seller's hand holds the heavy
+ * Satchel #30 (1.20 BTC · 18 ETH · 300 SOL: the value card reads ≈ $171,000.00); the buyer's offer sticker ("Your
+ * offer · 42,000 NEAR · Expires in 7 days · ✓ Clean history") stands on the desk. On the swing the card goes right
+ * and the offer slides left along the desk; they cross mid-table on the apex. The heavy card lands on the 54.0 s
+ * downbeat (a deeper squash, the buyer's hand dips 16 px); on "offer" the sticker flips to "✓ Accepted".
  */
 
 const O: SwingOpts = { fromX: 610, toX: 1310, y: 430, width: 540 };
 const K = O.width / 400;
 const DESK = { left: 210, top: 936, width: 1500 }; // low: the card swings over the money, the charms ride across it
-const STACK_S = 1.0;
-const STACK = { w: usdcStackSize(3, 4).w * STACK_S, h: usdcStackSize(3, 4).h * STACK_S };
-const STACK_X = { from: 1370, to: 550 }; // centre x on the desk
+const OFFER_K = 1.55;
+const OFFER = { w: 230 * OFFER_K, h: 230 * OFFER_K * CARD_H.offer };
+const STACK_X = { from: 1380, to: 540 }; // the offer's centre x on the desk
 const GRIP = 9;
 
 export function DeskStage({ frame }: { frame: number }) {
@@ -32,7 +34,7 @@ export function DeskStage({ frame }: { frame: number }) {
   const recoil = interpolate(t, [2, 14], [0, 1], { ...clamp, easing: EASE2.out });
 
   // the buyer's hand (right) catches the heavy card: rises 6 px before, dips 16 px on contact
-  const buyerIn = spring({ frame: frame - (CUT.b + 2), fps: FPS, config: SPRING2.land });
+  const buyerIn = spring({ frame: frame - 2, fps: FPS, config: SPRING2.land });
   // the catch: the right edge just below the band (a thumb never covers the band's sticker S)
   const corner = swingGeom(Math.max(t, HANDOFF.contact), O).point(O.width - GRIP, 0.36 * O.width * (252 / 400));
   const rise6 = -6 * ramp(t, HANDOFF.contact - 4, HANDOFF.contact - 2);
@@ -52,7 +54,7 @@ export function DeskStage({ frame }: { frame: number }) {
     const chain = CHAINS3[i];
     const lag = REACT_LAG[i];
     // curious about the money first (looking right, down), then, after the trade, at the stack on the left
-    const atStack = ramp(frame, CUT.b + 8 + lag, CUT.b + 11 + lag) * (1 - ramp(t, -6, -3));
+    const atStack = ramp(frame, 8 + lag, 11 + lag) * (1 - ramp(t, -6, -3));
     const after = ramp(t, HANDOFF.contact + 6 + lag, HANDOFF.contact + 9 + lag) * (1 - ramp(t, HANDOFF.contact + 30 + lag, HANDOFF.contact + 34 + lag));
     const tilt = i === 1 ? 6 * atStack - 6 * after : 0;
     let angle = 0;
@@ -68,19 +70,7 @@ export function DeskStage({ frame }: { frame: number }) {
       <div style={{ position: "absolute", left: DESK.left, top: DESK.top + deskShake }}>
         <TradeDesk width={DESK.width} scale={2} legs={50} />
       </div>
-      <div
-        style={{
-          position: "absolute",
-          left: stackX - STACK.w / 2,
-          top: DESK.top - STACK.h + 6 - stackLift + deskShake,
-          width: STACK.w,
-          height: STACK.h,
-          scale: `${1 + arrive} ${1 - arrive}`,
-          transformOrigin: "50% 100%",
-        }}
-      >
-        <UsdcStack bricks={3} layers={4} scale={STACK_S} drop={1 + stackLift / 6} />
-      </div>
+      <Offer frame={frame} x={stackX} lift={stackLift} arrive={arrive} shake={deskShake} />
       <Hand pose="pinch" x={sellerAt.x - 22 * recoil} y={sellerAt.y + heave + 30 * recoil} k={K} angle={84} sleeve={SLEEVE.seller} tag={null} pinch={1 - release} layer="back" />
       <Hand pose="pinch" x={bx} y={by} k={K} angle={84} mirror sleeve={SLEEVE.buyer} tag={null} pinch={buyerPinch} layer="back" />
       <SwingCard
@@ -101,3 +91,24 @@ export function DeskStage({ frame }: { frame: number }) {
   );
 }
 
+
+/** The offer sticker standing on the desk: slides on the swing's clock, flips (2D, a scale-x turn) to Accepted. */
+function Offer({ frame, x, lift, arrive, shake }: { frame: number; x: number; lift: number; arrive: number; shake: number }) {
+  const turn = interpolate(frame, [ACCEPT - 3, ACCEPT, ACCEPT + 4], [1, 0, 1], { ...clamp, easing: EASE2.out });
+  const pop = frame >= ACCEPT ? 0.08 * (1 - spring({ frame: frame - ACCEPT, fps: FPS, config: SPRING2.pop })) : 0;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x - OFFER.w / 2,
+        top: DESK.top - OFFER.h - 4 - lift + shake,
+        width: OFFER.w,
+        scale: `${Math.max(0.02, turn) * (1 + arrive + pop)} ${(1 - arrive) * (1 + pop)}`,
+        transformOrigin: "50% 100%",
+        rotate: "-2deg",
+      }}
+    >
+      <OfferSticker k={OFFER_K} accepted={ramp(frame, ACCEPT, ACCEPT + 8)} />
+    </div>
+  );
+}

@@ -4,7 +4,8 @@ import { GiveSheet, SatchelScreen } from "../../components/ui";
 import { charmKick, Hand, handPoint, NameTag, PhoneFrame } from "../../illustration/characters";
 import { getScene } from "../../lib/timeline";
 import { Sfx } from "../../lib/Sfx";
-import { clamp, EASE2, HANDOFF, pressAt, SPRING2 } from "../../motion";
+import { clamp, EASE2, HANDOFF, pressAt, SLAP_CONTACT, slapAt, SPRING2 } from "../../motion";
+import { ClaimLinkSticker } from "./cards";
 import { Caption, CHAINS3, FPS, ramp, sec, SvgLayer, SwingCard, swingGeom, type SwingOpts, whip, WhipLayer } from "./rig";
 
 /**
@@ -17,26 +18,34 @@ import { Caption, CHAINS3, FPS, ramp, sec, SvgLayer, SwingCard, swingGeom, type 
 
 const SC = getScene("P5");
 const V10 = SC.line("V10");
-const starts = (V10.sentenceStarts as number[] | undefined) ?? [0, 3.82, 4.78];
+const starts = (V10.sentenceStarts as number[] | undefined) ?? [0, 3.92, 6.02, 6.94];
 const BEAT = 0.5;
 const BAR = 2;
 /** first beat / bar downbeat (scene frame) at or after a scene time */
 const onBeat = (t: number) => sec(Math.ceil((SC.start + t - 1e-6) / BEAT) * BEAT - SC.start);
 const onBar = (t: number) => sec(Math.ceil((SC.start + t - 1e-6) / BAR) * BAR - SC.start);
 
+// v4 V10: "Give it to a friend, | even one who isn't on NEAR yet. | Everything inside goes with it. | No bridge. | No wrapped tokens."
 const F = {
-  everything: sec(SC.wordAt("V10", "everything")),
-  bridge: sec(V10.start + starts[1]),
-  wrapped: sec(V10.start + starts[2]),
-  press: onBeat(SC.wordAt("V10", "friend")), // "Give it to bob.near" pressed on the beat after "friend" (40.0 s)
-  contact: onBar(SC.wordAt("V10", "inside")), // the swing lands on the bar downbeat after "inside" (42.0 s)
+  even: sec(SC.wordAt("V10", "even")),
+  yet: sec(SC.wordAt("V10", "yet")),
+  everything: sec(V10.start + starts[1]),
+  bridge: sec(V10.start + starts[2]),
+  wrapped: sec(V10.start + starts[3]),
+  press: onBeat(SC.wordAt("V10", "friend")), // "Give it to bob.near" pressed on the beat after "friend" (44.0 s)
+  contact: onBar(SC.wordAt("V10", "inside")), // the swing lands on the bar downbeat after "inside" (48.0 s)
   end: sec(SC.duration),
 };
 const LIFT = F.contact - HANDOFF.contact; // the hand-off clock's zero
 const CUT = F.press + 11; // whip out of the phone
-const TYPE0 = 6;
-const BOUNCE = onBeat(V10.end + 0.4); // the first beat after the VO has finished (45.5 s)
-const FOUND = TYPE0 + 22;
+const TYPE0 = 2; // v4: the press comes on 44.0 s, so bob.near types in faster
+const BOUNCE = onBeat(V10.end); // the first beat after the VO has finished (51.5 s)
+// the claim link: slaps in on "even one who isn't on NEAR yet" (once the whip has settled), "Claimed" on "yet", then
+// tucks into the top-right corner before the swing lifts and stays there beside it
+const CLAIM_IN = Math.max(F.even, CUT + 8);
+const CLAIMED = F.yet;
+const CLAIM_TUCK = Math.min(LIFT - 14, F.everything - 8);
+const FOUND = TYPE0 + 20;
 
 // stage: hero card, alice (left) → bob (right)
 const O: SwingOpts = { fromX: 625, toX: 1295, y: 440, width: 600 };
@@ -60,6 +69,8 @@ export default function P5() {
           <SwingStage frame={frame} />
         </WhipLayer>
       )}
+      <ClaimLink frame={frame} />
+      <Caption text="Even by link." at={Math.max(F.even, CUT + 4)} until={F.everything - 4} size={112} seed="p5-l" />
       <Caption text="Everything inside goes too." at={F.everything} until={F.bridge - 4} size={112} width={1000} seed="p5-a" />
       <Caption text="No bridge." at={F.bridge} size={112} seed="p5-b" />
       <Caption text="No wrapped tokens." at={F.wrapped} size={112} y={100 + 118} seed="p5-c" />
@@ -99,6 +110,26 @@ function PhoneStage({ frame }: { frame: number }) {
         </div>
       ) : null}
     </AbsoluteFill>
+  );
+}
+
+// ── 1b. give by link: the claim-link sticker beside the swing ────────────────────────────────────────────────────
+
+function ClaimLink({ frame }: { frame: number }) {
+  if (frame < CLAIM_IN - SLAP_CONTACT) return null;
+  const slap = slapAt(frame - (CLAIM_IN - SLAP_CONTACT), FPS, 0, { from: 1.2, squash: 0.06, drop: 0 });
+  const claimed = ramp(frame, CLAIMED, CLAIMED + 8); // the kit's badge pop runs on 0..1 progress
+  const tuck = interpolate(frame, [CLAIM_TUCK, CLAIM_TUCK + 14], [0, 1], { ...clamp, easing: EASE2.pan });
+  const K0 = 2.05;
+  const W = 236 * K0;
+  // in the gap between alice's card and bob's hand, then tucked to the top right at 55 %
+  const x = interpolate(tuck, [0, 1], [1232, 1702]);
+  const y = interpolate(tuck, [0, 1], [612, 196]);
+  const sc = interpolate(tuck, [0, 1], [1, 0.55]);
+  return (
+    <div style={{ position: "absolute", left: x - W / 2, top: y - 135, width: W, scale: `${sc * slap.sx} ${sc * slap.sy}`, opacity: slap.opacity, transformOrigin: "50% 50%", rotate: "-2deg" }}>
+      <ClaimLinkSticker k={K0} claimed={claimed} />
+    </div>
   );
 }
 
@@ -164,13 +195,13 @@ function SwingStage({ frame }: { frame: number }) {
             <Hand {...aliceProps} layer="back" />
           )}
           <SvgLayer>
-            <NameTag x={aliceTag.x} y={aliceTag.y} text="alice.near" k={2.6} tilt={-2} />
+            <NameTag x={Math.max(150 + camX, aliceTag.x)} y={aliceTag.y} text="alice.near" k={2.6} tilt={-2} />
           </SvgLayer>
         </div>
       ) : null}
       <Hand pose="pinch" x={bx} y={by} k={K} angle={84} mirror sleeve="bob" tag={null} pinch={bobPinch} layer="back" />
       <SvgLayer>
-        <NameTag x={bx + 330} y={by + 30} text="bob.near" k={2.6} tilt={2} />
+        <NameTag x={Math.min(1800 + camX, bx + 330)} y={by + (bx + 330 > 1800 + camX ? 62 : 30)} text="bob.near" k={2.6} tilt={2} />
       </SvgLayer>
       <SwingCard t={t} o={O} frame={frame} fx={fx} blinkSeed="p5" offsetY={bounce} />
       {raise <= 0 && aliceExit < 1 ? <Hand {...aliceProps} layer="front" /> : null}
@@ -190,6 +221,8 @@ function Sounds() {
       <Sfx name="pop" at={at(FOUND)} gainDb={-2} />
       <Sfx name="button-thock" at={at(F.press)} gainDb={-3} />
       <Sfx name="whoosh-zip" at={at(CUT)} align="peak" gainDb={0} />
+      <Sfx name="sticker-slap" at={at(CLAIM_IN)} gainDb={-6} />
+      <Sfx name="pop" at={at(CLAIMED)} gainDb={-3} />
       <Sfx name="swing-swish" at={at(LIFT + 10)} align="peak" gainDb={-1} />
       <Sfx name="charm-jingle" at={at(LIFT + HANDOFF.apex)} align="peak" gainDb={2} />
       <Sfx name="sticker-slap" at={at(F.contact)} gainDb={-4} />

@@ -1,12 +1,12 @@
 import { Landmark } from "lucide-react";
-import { C, CHAIN, display, sans } from "../../brand/tokens";
+import { C, sans } from "../../brand/tokens";
 import type { SleeveStyle } from "../../illustration/characters";
-import { SatchelCard } from "../../components/Sticker";
+import { type CardCoin, SatchelCard } from "../../components/Sticker";
 
 /**
  * P6's cast and the three cards' faces (bands always read "Satchel #N", amendment A4; no fiat; native amounts).
- *   #12  the gift (charms in party hats)          → sam.near
- *   #30  the OTC position: 1.20 BTC · 18 ETH · 300 SOL (A2), set big on the card's face
+ *   #30  the OTC position: 1.20 BTC · 18 ETH · 300 SOL (A2) → the value card, ≈ $171,000.00
+ *   (sam.near, the v2 gift's recipient, is now P4's teammate: his sleeve lives here)
  *   #21  the team treasury: "Team treasury" is a pennant on a pole OUTSIDE the card, never on the band
  */
 
@@ -19,36 +19,22 @@ export const SLEEVE = {
   newTeam: { fill: C.lemon, stripes: C.white, cuff: C.lemon } as SleeveStyle,
 };
 
-export const GIFT_CHIPS = [
-  { chain: "btc" as const, amount: "0.0050" },
-  { chain: "evm" as const, amount: "0.10" },
-  { chain: "sol" as const, amount: "2.50" },
-];
 export const TREASURY_CHIPS = [
   { chain: "btc" as const, amount: "0.6200" },
   { chain: "evm" as const, amount: "9.50" },
   { chain: "sol" as const, amount: "180" },
 ];
-export const HEAVY = [
-  { chain: "btc" as const, amount: "1.20" },
-  { chain: "evm" as const, amount: "18" },
-  { chain: "sol" as const, amount: "300" },
+
+/** #30, the OTC position (A2, SCRIPT-v4): 1.20 BTC · 18 ETH · 300 SOL → the value card reads ≈ $171,000.00. */
+export const COINS_30: CardCoin[] = [
+  { coin: "BTC", amount: 1.2 },
+  { coin: "ETH", amount: 18 },
+  { coin: "SOL", amount: 300 },
 ];
 
-/** The heavy card's face: the whole position set big (tabular), each with its chain dot. */
+/** The heavy card's face: the shared value card (≈ $171,000.00, the bar, the shares). */
 export function HeavyFront({ width, lift }: { width: number; lift: number }) {
-  const rows = (
-    <div style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 4 }}>
-      {HEAVY.map((r) => (
-        <div key={r.chain} style={{ display: "flex", alignItems: "center", gap: 10, height: 34 }}>
-          <span style={{ width: 12, height: 12, borderRadius: 99, background: CHAIN[r.chain].ui, flexShrink: 0 }} />
-          <span style={{ ...display(800), fontSize: 31, lineHeight: "34px", letterSpacing: "-0.03em", color: C.ink, fontVariantNumeric: "tabular-nums" }}>{r.amount}</span>
-          <span style={{ ...sans(700), fontSize: 20, lineHeight: "34px", color: C.inkMuted, paddingTop: 3 }}>{CHAIN[r.chain].ticker}</span>
-        </div>
-      ))}
-    </div>
-  );
-  return <SatchelCard id="30" width={width} lift={lift} label="Inside" chips={[]} total={rows} />;
+  return <SatchelCard id="30" width={width} lift={lift} coins={COINS_30} />;
 }
 
 /**

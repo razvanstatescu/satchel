@@ -1,15 +1,15 @@
 import { AbsoluteFill } from "remotion";
 import { Hand, NameTag, type SleeveStyle } from "../../illustration/characters";
 import { CARD_RATIO, CardRig, type CardLook, RIDE_LAG, ramp, SvgLayer } from "../P5/rig";
-import { GIFT_CHIPS, HeavyFront, SLEEVE, TREASURY_CHIPS, TreasuryPennant } from "./cast";
+import { HeavyFront, SLEEVE, TREASURY_CHIPS, TreasuryPennant } from "./cast";
 import { FINALE } from "./timing";
 
 /**
- * P6 finale: the three new holders hold up their Satchels and the three cards swing in sync, one extreme per beat,
- * the charms riding at 1.5× with their eyes closed in joy, up to the music stop at 58.0 s (C1's Night falls on it).
- * Staged in depth so the frame keeps ONE dominant coral (brand rule; the bible lets a second band share a frame
- * only small and away from the focus): #12 in its party hats is the hero up front, #21 (under its pennant) and the
- * heavy #30 hang smaller, further back.
+ * P6 finale (v4): the two new holders hold up their Satchels and the two cards swing in sync, one extreme per beat,
+ * the charms riding at 1.5× with their eyes closed in joy, up to the music stop at 59.0 s (C1's Night falls on it).
+ * Staged in depth so the frame keeps ONE dominant coral (brand rule; the bible lets a second band share a frame only
+ * small and away from the focus): #21, just handed over under its pennant, is the hero up front; the heavy #30 hangs
+ * smaller, further back.
  */
 
 const SYNC = FINALE + 15; // first in-sync extreme (on a beat)
@@ -31,9 +31,17 @@ interface Holder {
 // back row first (drawn under the hero)
 const HOLDERS: Holder[] = [
   {
-    x: 455,
+    x: 1390,
     top: 372,
-    w: 300,
+    w: 320,
+    sleeve: SLEEVE.buyer,
+    tag: null,
+    look: (_f, _k, w) => ({ id: "30", blinkSeed: "fin30", front: (lift) => <HeavyFront width={w} lift={lift} />, fx: () => ({ face: { smile: 1.5 } }) }),
+  },
+  {
+    x: 860,
+    top: 470,
+    w: 520,
     sleeve: SLEEVE.newTeam,
     tag: "new-team.near",
     look: (f, k) => ({
@@ -43,22 +51,6 @@ const HOLDERS: Holder[] = [
       fx: () => ({ face: { smile: 1.5 } }),
       children: <TreasuryPennant k={k} flutter={3 * Math.sin((2 * Math.PI * f) / 10) - 0.6 * syncAngle(f - 2)} />,
     }),
-  },
-  {
-    x: 1465,
-    top: 372,
-    w: 300,
-    sleeve: SLEEVE.buyer,
-    tag: null,
-    look: (_f, _k, w) => ({ id: "30", blinkSeed: "fin30", front: (lift) => <HeavyFront width={w} lift={lift} />, fx: () => ({ face: { smile: 1.5 } }) }),
-  },
-  {
-    x: 960,
-    top: 470,
-    w: 500,
-    sleeve: SLEEVE.sam,
-    tag: "sam.near",
-    look: () => ({ id: "12", chips: GIFT_CHIPS, blinkSeed: "fin12", fx: (i) => ({ hat: 1, hatSide: [-1, 1, 1][i], face: { grin: 0.6, smile: 1.5 } }) }),
   },
 ];
 

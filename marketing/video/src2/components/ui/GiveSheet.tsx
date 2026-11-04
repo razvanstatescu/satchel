@@ -75,6 +75,12 @@ export function GiveSheet({ open = 1, to = ACCOUNTS.bob, typed = 1, caret = 0, l
               {balances[c]} {CHAIN[c].ticker}
             </span>
           ))}
+          {balances.usdc ? (
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, ...sans(600), fontSize: 13, lineHeight: "18px", padding: "7px 9px", borderRadius: 12, background: C.surface, color: C.ink, whiteSpace: "nowrap", ...NUM }}>
+              <span style={{ width: 8, height: 8, borderRadius: 99, background: C.sky, boxShadow: `0 0 0 1.5px ${C.ink}` }} />
+              {balances.usdc} USDC
+            </span>
+          ) : null}
         </div>
         <div style={{ ...TY.caption, color: C.inkMuted, marginTop: 10 }}>Its addresses and its history go with it.</div>
       </div>

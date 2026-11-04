@@ -6,7 +6,7 @@ import { CoinSticker, ToastSticker } from "../../illustration/props";
 import { getScene } from "../../lib/timeline";
 import { Sfx } from "../../lib/Sfx";
 import { clamp, EASE2, flickAngle, pressAt, slapAt, SPRING2 } from "../../motion";
-import { P2_CAPTION_END, P2_CLOCK, P2T } from "../P2";
+import { Networks, P2_CAPTION_END, P2_CLOCK, P2T } from "../P2";
 import {
   CaptionAt,
   CHAINS3,
@@ -49,9 +49,15 @@ const W7 = (prefix: string) => fr(sc.wordAt("V07", prefix));
 const W8 = (prefix: string) => fr(sc.wordAt("V08", prefix));
 const P3_CLOCK = P2_CLOCK + P2T.end;
 
-const AFTER: Record<Chain, string> = { btc: "0.0412", evm: "0.85", sol: "12.4" };
-const FILL: Record<Chain, string> = { btc: "0.0513", evm: "0.90", sol: "13.65" };
-const SENT: Record<Chain, string> = { btc: "Sent 0.0100 BTC", evm: "Sent 0.05 ETH", sol: "Sent 1.25 SOL" };
+// SCRIPT-v4 numbers: fill 0.06 BTC · 0.85 ETH · 13 SOL (+ 800 USDC on Base) → sends 0.0100 · 0.05 · 1 → after
+// 0.05 · 0.80 · 12 (+ 800 USDC): the value card rolls ≈ $9,025.00 → ≈ $8,000.00.
+const AFTER: Record<Chain, string> = { btc: "0.05", evm: "0.80", sol: "12" };
+const FILL: Record<Chain, string> = { btc: "0.06", evm: "0.85", sol: "13" };
+const AFTER_N: Record<Chain, number> = { btc: 0.05, evm: 0.8, sol: 12 };
+const FILL_N: Record<Chain, number> = { btc: 0.06, evm: 0.85, sol: 13 };
+const SENT: Record<Chain, string> = { btc: "Sent 0.0100 BTC", evm: "Sent 0.05 ETH", sol: "Sent 1 SOL" };
+/** A coin's amount on the card: the fill until its coin launches, then rolls to the after-send amount in 10 f. */
+const cardAmount = (c: Chain, f: number) => interpolate(f, [launchOf(c), launchOf(c) + 10], [FILL_N[c], AFTER_N[c]], { ...clamp, easing: EASE2.out });
 
 export const P3T = (() => {
   const send = W7("send");
@@ -135,7 +141,7 @@ function P3World({ f }: { f: number }) {
   const charms = sendCharms(f);
   const tags: TagState[] = CHAINS3.map((c) => {
     const L = launchOf(c);
-    return { amount: f < L ? FILL[c] : AFTER[c], amountPop: f >= L ? 1 - sp(f, L, SPRING2.quick) : 0 };
+    return { amount: f < L ? FILL[c] : AFTER[c], amountPop: f >= L ? 1 - sp(f, L, SPRING2.quick) : 0, ...(c === "evm" ? { usdc: "800" } : {}) };
   });
   return (
     <AbsoluteFill>
@@ -145,10 +151,12 @@ function P3World({ f }: { f: number }) {
         </Phone>
         <SendHand f={f} />
       </AbsoluteFill>
-      <WorldCard charms={charms} chips={CHAINS3.map((c) => ({ chain: c, amount: f < launchOf(c) ? FILL[c] : AFTER[c] }))}>
+      <WorldCard charms={charms} coins={{ btc: cardAmount("btc", f), eth: cardAmount("evm", f), sol: cardAmount("sol", f), usdc: 800 }}>
         <YoursSticker />
       </WorldCard>
       <TagsLayer tags={tags} angles={charms.map((ch) => ch.angle ?? 0)} />
+      {/* P2's "One address on all four" sticker, held across the cut, then cleared off the right before the toasts */}
+      <Networks f={P2T.end + f} out={ease(f, T.send + 2, T.send + 11, 0, 1, EASE2.fall)} />
       <FlickedCoins f={f} />
       <Toasts f={f} />
     </AbsoluteFill>

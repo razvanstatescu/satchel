@@ -1,8 +1,10 @@
 import type { Chain } from "../../brand/tokens";
+import type { CardCoin } from "../Sticker";
 
 /**
- * Demo data for the Satchel 2.0 UI kit (SCRIPT-v3 "Numbers" + director's amendments A1, A4, A6).
- * Mainnet-style wording only: never "testnet", "Sepolia", "devnet"; no fiat anywhere; never "every chain".
+ * Demo data for the Satchel 2.0 UI kit (SCRIPT-v4 "Numbers" and presentation rules).
+ * Mainnet-style wording only: never "testnet", "Sepolia", "devnet"; never "every chain". Dollar figures appear only in
+ * the card's overview ("≈ $8,000.00", computed by SatchelCard); prices and offers are in NEAR.
  *
  * Every full address below is checksum-INVALID on purpose (verified offline: bech32 checksum fails, EIP-55 mixed case
  * fails, the Solana strings contain "l", which isn't base58), so a real wallet that scans a QR or reads a frame refuses
@@ -30,19 +32,29 @@ export const SEND_TO: Record<Chain, string> = {
   sol: "Hq4NjeHQMP4SF4xZcQBXjBl5LQKVjeb2CQu1UXnAvR2c",
 };
 
-/** SCRIPT-v3 numbers. Strings, so the exact precision of the script is kept. */
-export const AMOUNTS = {
-  fill: { btc: "0.0513", evm: "0.90", sol: "13.65" },
-  send: { btc: "0.0100", evm: "0.05", sol: "1.25" },
-  after: { btc: "0.0412", evm: "0.85", sol: "12.4" },
-} as const satisfies Record<string, Record<Chain, string>>;
+/** Per-chain amounts (strings keep the script's precision) plus the USDC Satchel #7 holds on Base. */
+export type Balances = Record<Chain, string> & { usdc?: string };
 
-export type Balances = Record<Chain, string>;
+/**
+ * SCRIPT-v4 numbers. fill = after P2 (0.06 BTC · 0.85 ETH · 13 SOL · 800 USDC on Base, ≈ $9,025.00); send = the three
+ * P3 sends; after = after the sends (0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC, ≈ $8,000.00). `afterSend` is the same
+ * after-balance at the send screen's precision ("Satchel #7 after 0.0500 BTC").
+ */
+export const AMOUNTS = {
+  fill: { btc: "0.06", evm: "0.85", sol: "13", usdc: "800" },
+  send: { btc: "0.0100", evm: "0.05", sol: "1" },
+  after: { btc: "0.05", evm: "0.80", sol: "12", usdc: "800" },
+  afterSend: { btc: "0.0500", evm: "0.80", sol: "12" },
+} as const satisfies Record<string, Balances>;
+
+/** USDC sits on Base (one address on Ethereum, Base, Arbitrum and Optimism). */
+export const USDC_NETWORK = "Base";
 
 /** The chain transaction each P3 send lands as (the tracker's "Broadcast to …" row and the history evidence agree). */
 export const SEND_TX: Record<Chain, string> = { btc: "4f1c…9a2e", evm: "0x51c2…a7d2", sol: "3kPq…Wm8f" };
 
-export const PRICE = "4,750.00 USDC";
+/** Satchel #7's listing price (T4–T7). Prices and offers are in NEAR only (D-51). */
+export const PRICE = "2,000 NEAR";
 export const NETWORK_FEE: Record<Chain, string> = { btc: "~282 sats", evm: "~0.00004 ETH", sol: "~0.000005 SOL" };
 export const NEAR_FEE = "≈ 0.004 NEAR";
 
@@ -50,8 +62,19 @@ export const CHAINS: Chain[] = ["btc", "evm", "sol"];
 export const TICKER: Record<Chain, string> = { btc: "BTC", evm: "ETH", sol: "SOL" };
 export const CHAIN_NAME: Record<Chain, string> = { btc: "Bitcoin", evm: "Ethereum", sol: "Solana" };
 
-/** "BTC 0.0412"-style holdings sentence: "0.0412 BTC · 0.85 ETH · 12.4 SOL". */
-export const holdings = (b: Balances, sep = " · ") => CHAINS.map((c) => `${b[c]} ${TICKER[c]}`).join(sep);
+/** The holdings sentence: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC" (USDC when the balances carry it). */
+export const holdings = (b: Balances, sep = " · ") => [...CHAINS.map((c) => `${b[c]} ${TICKER[c]}`), ...(b.usdc ? [`${b.usdc} USDC`] : [])].join(sep);
+
+/** Balances as the value card's coins (numbers; USDC on Base), e.g. <SatchelCard coins={coinsOf(AMOUNTS.after)} />. */
+export function coinsOf(b: Balances): CardCoin[] {
+  const n = (v: string) => Number.parseFloat(v.replace(/,/g, "")) || 0;
+  return [
+    { coin: "BTC", amount: n(b.btc) },
+    { coin: "ETH", amount: n(b.evm) },
+    { coin: "SOL", amount: n(b.sol) },
+    ...(b.usdc ? [{ coin: "USDC" as const, amount: n(b.usdc), network: "base" as const }] : []),
+  ];
+}
 
 /** Middle truncation as in the product: 6 + … + 4 for BTC/EVM ("bc1q9h…x4d7", "0x8f2a…41c9"), 4 + … + 4 for SOL. */
 export function truncate(addr: string, chain?: Chain) {
@@ -105,7 +128,7 @@ export const HISTORY_7: HistoryRecord[] = [
 
 /**
  * Satchel #4 (the honest blocked example, README "Demo token #4"): its only record is an Ethereum transaction signed
- * with a future nonce and never sent. Holdings and price for #4 are NOT in the script: placeholders, override per scene.
+ * with a future nonce and never sent. SCRIPT-v4: 0.015 BTC · 0.40 ETH · 6.8 SOL (≈ $2,880.00), listed for 720 NEAR.
  */
 export const HISTORY_4: HistoryRecord[] = [
   {
@@ -118,4 +141,4 @@ export const HISTORY_4: HistoryRecord[] = [
     status: "unused",
   },
 ];
-export const SATCHEL4 = { id: "4", balances: { btc: "0.0150", evm: "0.40", sol: "6.8" } as Balances, price: "1,480.00 USDC" };
+export const SATCHEL4 = { id: "4", balances: { btc: "0.015", evm: "0.40", sol: "6.8" } as Balances, price: "720 NEAR" };

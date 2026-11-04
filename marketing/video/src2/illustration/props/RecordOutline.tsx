@@ -17,10 +17,13 @@ import { StampMark, stampSize } from "./Stamp";
  *   stamped   stamp 0..1 is the Stamp impact on the right end (stampText defaults per chain: ETH "Nonce used",
  *             BTC "Coin spent", SOL "Blockhash expired")
  *   unused    variant="unused": danger dashes and label, " · Unused" appended, a warning badge at the right end
+ *   message   kind="message": a signed message (a message can never move coins). Default label "ETH · message",
+ *             a small message icon after it, and its stamp reads "Can't move coins". Combines with all states.
  *
  * Props
  *   chain     Chain    default "evm"
- *   label     string   default "ETH · nonce 1"
+ *   kind      "transfer" | "message"  default "transfer"
+ *   label     string   default "ETH · nonce 1" ("ETH · message" for kind="message"; use "SOL · message" on Solana)
  *   w, h      UI units default 340 × 46 (fits the card back at the card's own scale: card width/400)
  *   scale     number   default 2
  *   draw, type, signed, stamp  0..1 (see above); march: dash offset in UI units (marching dashes)
@@ -29,11 +32,13 @@ import { StampMark, stampSize } from "./Stamp";
  *   style     CSSProperties on the root <svg> (box = w × h)
  */
 export const STAMP_TEXT: Record<Chain, string> = { evm: "Nonce used", btc: "Coin spent", sol: "Blockhash expired" };
+export const MESSAGE_STAMP = "Can't move coins";
 const R = 14;
 const LABEL = mono(14, 500);
 
 export interface RecordOutlineProps {
   chain?: Chain;
+  kind?: "transfer" | "message";
   label?: string;
   w?: number;
   h?: number;
@@ -51,7 +56,8 @@ export interface RecordOutlineProps {
 
 export function RecordOutline({
   chain = "evm",
-  label = "ETH · nonce 1",
+  kind = "transfer",
+  label: labelProp,
   w = 340,
   h = 46,
   scale = K,
@@ -67,6 +73,8 @@ export function RecordOutline({
 }: RecordOutlineProps) {
   useBrandFonts();
   const uid = useUid("rec");
+  const msg = kind === "message";
+  const label = labelProp ?? (msg ? "ETH · message" : "ETH · nonce 1");
   const unused = variant === "unused";
   const color = unused ? C.danger : C.ink;
   const d = rrPath(DASH.width / 2, DASH.width / 2, w - DASH.width, h - DASH.width, R);
@@ -80,10 +88,12 @@ export function RecordOutline({
   const sw = textWidth(shown, LABEL);
   const sg = clamp(signed);
   const st = clamp(stamp);
-  const sText = stampText ?? (unused ? "Unused" : STAMP_TEXT[chain]);
+  const sText = stampText ?? (unused ? "Unused" : msg ? MESSAGE_STAMP : STAMP_TEXT[chain]);
   const ss = stampSize(sText, "rect");
   // the stamp sits in the free space right of the full label (it may overhang the right edge a little)
-  const labelEnd = lx + textWidth(label, LABEL) + (unused ? textWidth(" · Unused", mono(14, 700)) : 0);
+  const unusedW = unused ? textWidth(" · Unused", mono(14, 700)) : 0;
+  const iconX = lx + textWidth(label, LABEL) + unusedW + 15;
+  const labelEnd = lx + textWidth(label, LABEL) + unusedW + (msg ? 26 : 0);
   const room = w - labelEnd - 6;
   const sk = Math.max(0.6, Math.min(1, (h * 0.98) / ss.h, (room + 14) / ss.w));
   return (
@@ -113,6 +123,7 @@ export function RecordOutline({
             {shown}
           </Txt>
           {caret ? <rect x={lx + sw + 1.5} y={cy - 8.5} width={2} height={17} rx={1} fill={color} /> : null}
+          {msg && ty >= 1 ? <Icon name="message" x={iconX} y={cy + 0.5} size={17} color={color} sw={2.1} /> : null}
           {unused && ty >= 1 ? (
             <>
               <Txt x={lx + sw} cy={cy} spec={mono(14, 700)} fill={C.danger}>
@@ -131,7 +142,7 @@ export function RecordOutline({
             </clipPath>
           </defs>
           <g clipPath={`url(#${uid}-w)`}>
-            <RecordFillGroup chain={chain} label={label} w={w} h={h} uid={uid} />
+            <RecordFillGroup chain={chain} label={label} w={w} h={h} uid={uid} msg={msg} />
           </g>
         </g>
       ) : null}
@@ -144,7 +155,7 @@ export function RecordOutline({
   );
 }
 
-function RecordFillGroup({ chain, label, w, h, uid, drop = 1 }: { chain: Chain; label: string; w: number; h: number; uid: string; drop?: number }) {
+function RecordFillGroup({ chain, label, w, h, uid, drop = 1, msg = false }: { chain: Chain; label: string; w: number; h: number; uid: string; drop?: number; msg?: boolean }) {
   const inset = 5;
   const fw = w - inset * 2;
   const fh = h - inset * 2;
@@ -158,6 +169,7 @@ function RecordFillGroup({ chain, label, w, h, uid, drop = 1 }: { chain: Chain; 
       <Txt x={30} cy={cy} spec={LABEL} fill={C.ink}>
         {label}
       </Txt>
+      {msg ? <Icon name="message" x={30 + textWidth(label, LABEL) + 15} y={cy + 0.5} size={17} color={C.ink} sw={2.1} /> : null}
       <Icon name="pen" x={w - 16 - sW - 14} y={cy} size={16} color={C.ink} sw={2.2} />
       <Txt x={w - 16} cy={cy} spec={sTxt} anchor="end" fill={C.ink}>
         Signed
@@ -168,14 +180,15 @@ function RecordFillGroup({ chain, label, w, h, uid, drop = 1 }: { chain: Chain; 
 
 /**
  * RecordFill: the signature sticker on its own (same box as its RecordOutline), for the T1 beat where it peels out of
- * the outline and flies off to its chain. Props: chain, label, w, h, scale, drop (lift it: 1 → 3), style.
+ * the outline and flies off to its chain. Props: chain, kind, label, w, h, scale, drop (lift it: 1 → 3), style.
  */
-export function RecordFill({ chain = "evm", label = "ETH · nonce 1", w = 340, h = 46, scale = K, drop = 1, style }: { chain?: Chain; label?: string; w?: number; h?: number; scale?: number; drop?: number; style?: CSSProperties }) {
+export function RecordFill({ chain = "evm", kind = "transfer", label, w = 340, h = 46, scale = K, drop = 1, style }: { chain?: Chain; kind?: "transfer" | "message"; label?: string; w?: number; h?: number; scale?: number; drop?: number; style?: CSSProperties }) {
   useBrandFonts();
   const uid = useUid("recfill");
+  const msg = kind === "message";
   return (
     <PropSvg w={w} h={h} scale={scale} style={style}>
-      <RecordFillGroup chain={chain} label={label} w={w} h={h} uid={uid} drop={drop} />
+      <RecordFillGroup chain={chain} label={label ?? (msg ? "ETH · message" : "ETH · nonce 1")} w={w} h={h} uid={uid} drop={drop} msg={msg} />
     </PropSvg>
   );
 }

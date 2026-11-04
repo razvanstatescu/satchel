@@ -1,5 +1,5 @@
 {
- "key": "b93987049f1a0329",
+ "key": "1a6f5da007cff4f8",
  "masterKey": "49e3af59f94cd5f8",
  "voice": "EXAVITQu4vr4xnSDxMaL",
  "model": "eleven_v4",
@@ -8,31 +8,31 @@
   "stability": 0.45,
   "similarity_boost": 0.8
  },
- "say": "If one old signature could still move coins, Buy stays off.",
+ "say": "If one old signature could still move coins, Buy and offers stay off.",
  "prev": "Nonce used. Coin spent. Blockhash expired.",
  "next": "When it's clean, one transaction, bound to that exact history, pays the seller,",
  "final": {
   "id": "V24",
   "scene": "T6",
-  "text": "If one old signature could still move coins, Buy stays off.",
-  "say": "If one old signature could still move coins, Buy stays off.",
+  "text": "If one old signature could still move coins, Buy and offers stay off.",
+  "say": "If one old signature could still move coins, Buy and offers stay off.",
   "file": "v2/vo/V24.mp3",
-  "duration": 4.32,
+  "duration": 4.96,
   "words": [
    {
     "text": "If",
     "start": 0.08,
-    "end": 0.28
+    "end": 0.18
    },
    {
     "text": "one",
-    "start": 0.38,
+    "start": 0.32,
     "end": 0.5
    },
    {
     "text": "old",
     "start": 0.66,
-    "end": 0.82
+    "end": 0.8
    },
    {
     "text": "signature",
@@ -42,37 +42,47 @@
    {
     "text": "could",
     "start": 1.48,
-    "end": 1.66
+    "end": 1.68
    },
    {
     "text": "still",
-    "start": 1.8,
-    "end": 2.02
+    "start": 1.82,
+    "end": 2
    },
    {
     "text": "move",
-    "start": 2.08,
-    "end": 2.26
+    "start": 2.1,
+    "end": 2.28
    },
    {
     "text": "coins,",
-    "start": 2.36,
+    "start": 2.4,
     "end": 2.84
    },
    {
     "text": "Buy",
-    "start": 3.24,
-    "end": 3.46
+    "start": 3.34,
+    "end": 3.52
    },
    {
-    "text": "stays",
-    "start": 3.6,
-    "end": 3.86
+    "text": "and",
+    "start": 3.56,
+    "end": 3.66
+   },
+   {
+    "text": "offers",
+    "start": 3.74,
+    "end": 4.14
+   },
+   {
+    "text": "stay",
+    "start": 4.26,
+    "end": 4.48
    },
    {
     "text": "off.",
-    "start": 3.96,
-    "end": 4.24
+    "start": 4.58,
+    "end": 4.88
    }
   ],
   "wordSource": "forced-alignment",
@@ -80,12 +90,18 @@
    "takes": [
     {
      "attempt": 0,
+     "ok": false,
+     "exact": false,
+     "heard": "If one old signature could still move coins, Byan offers stay off"
+    },
+    {
+     "attempt": 1,
      "ok": true,
      "exact": true,
-     "heard": "If one old signature could still move coins, buy stays off"
+     "heard": "If one old signature could still move coins, buy and offers stay off"
     }
    ],
-   "chosen": 0
+   "chosen": 1
   }
  }
 }

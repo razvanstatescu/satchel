@@ -13,7 +13,7 @@ PRE="alimiter=limit=0.82:attack=3:release=60:level=disabled"
 
 cd "$ROOT/video"
 npx tsc --noEmit
-npx remotion render ${ENTRY:+"$ENTRY"} Main "$RAW" --codec=h264 --crf=16 --audio-bitrate=320k --concurrency=8
+npx remotion render ${ENTRY:+"$ENTRY"} Main "$RAW" --codec=h264 --crf=16 --audio-bitrate=320k --concurrency=8 --port="${PORT:-3490}"
 
 read -r I TP LRA TH OFF < <(ffmpeg -hide_banner -i "$RAW" -af "${PRE},loudnorm=I=-14:TP=-1:LRA=11:print_format=json" -f null - 2>&1 \
   | sed -n '/^{/,/^}/p' | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['input_i'],d['input_tp'],d['input_lra'],d['input_thresh'],d['target_offset'])")
