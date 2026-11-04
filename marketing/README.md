@@ -1,8 +1,14 @@
 # Satchel videos
 
+> **Not product code.** This folder holds the sources of the submission's demo video: script, Remotion scenes, audio
+> and image generators, and research notes. The product is in `contracts/`, `packages/` and `apps/`; start at the
+> root [`README.md`](../README.md). On-screen wording in the video is mainnet-style by design (see "Facts to keep
+> true" below); the product runs on testnet only. Rendered videos go to `out/`, which is not committed; the
+> published video is linked from the submission's X post.
+
 ## Current: Satchel 2.0 film "Hand it over" (brand 2.0, the sticker brand)
-`out/satchel-2-v2.mp4`: 134 s (2:14), 1920×1080, 30 fps, H.264 + AAC 320 kbps, −14 LUFS / −1 dBTP. Needs X Premium.
-Narrator: Sarah (ElevenLabs `eleven_v4`). Mainnet-style wording on screen. The Satchel card matches the app's 2.0 card
+`out/satchel-2-v2.mp4`: 134 s (2:14), 1920×1080, 30 fps, H.264 + AAC 320 kbps, −14 LUFS / −1 dBTP. At 2:14 it fits X's 2:20
+limit for accounts without Premium. Narrator: Sarah (ElevenLabs `eleven_v4`). Mainnet-style wording on screen. The Satchel card matches the app's 2.0 card
 (charm ledger, "Yours" sticker; D-44), and Night stickers use #8A82AE outlines.
 
 Structure: hook "Stick it on. Hand it over." (0:00) → one NFT, three chains (0:03) → mint (0:12) → add coins (0:18) →

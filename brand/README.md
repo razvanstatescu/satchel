@@ -6,8 +6,10 @@ as too serious for a wallet people collect, gift and trade". It is archived in `
 - **Brand canvas:** https://claude.ai/artifact/8QR3vCXmQAnrHBMzFkfUaL. Its boards are Main ("Stick it on. Hand it
   over."), Directions, Logo system, Colour and type, In context, and Web icons. Renders of them are in `canvas/*.png`.
 - **Design System "Satchel 2.0":** https://claude.ai/artifact/RazC4L6yh16jStycJutmsT (the README and `tokens.json`).
-- **Brand pack:** `satchel-brand-v2.zip` at the repo root. `logo/`, `illustration/`, `explorations/` and `web/` here are
-  verbatim copies of it.
+- **Brand pack:** `satchel-brand-v2.zip` (kept outside git). `logo/`, `illustration/`, `explorations/` and `web/` here are
+  verbatim copies of it, so the repo has every file you need.
+- The two claude.ai links above are the design team's working copies and may not be public. Everything they hold is
+  in this folder: `canvas/*.png` (the boards), `design-system.md` and `tokens.json`.
 
 ## Precedence
 | Topic | Source of truth |

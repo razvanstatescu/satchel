@@ -18,5 +18,5 @@ Look for:
 Prove each finding with a failing test where you can. Write the findings to `docs/security/`. Don't sign
 transactions and don't push.
 
-**Progress:** append to `/Users/razvanstatescu/Documents/Work/near/Satchel/plan/progress/sprint-log.md` with
+**Progress:** append to `"$(git rev-parse --path-format=absolute --git-common-dir)/../plan/progress/sprint-log.md"` with
 `echo "- $(date -u +%FT%RZ) [review] …" >>`.

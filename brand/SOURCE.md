@@ -1,6 +1,6 @@
 # Satchel 2.0 brand: where these files came from (copied 2026-10-26)
 
-- `logo/`, `illustration/`, `explorations/`, `web/`: verbatim from `satchel-brand-v2.zip` (repo root).
+- `logo/`, `illustration/`, `explorations/`, `web/`: verbatim from `satchel-brand-v2.zip` (kept outside git; `/*.zip` is ignored).
 - `design-system.md`, `tokens.json`: verbatim `project/README.md` and `project/tokens.json` of the Design System artifact
   https://claude.ai/artifact/RazC4L6yh16jStycJutmsT.
 - `canvas/*.png`: renders of the brand canvas boards https://claude.ai/artifact/8QR3vCXmQAnrHBMzFkfUaL (Main,

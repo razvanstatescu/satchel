@@ -1,14 +1,21 @@
 # Satchel: an NFT that is a wallet
 
 Satchel is a NEP-171 NFT contract on NEAR testnet. Each token controls its own native Bitcoin (testnet4), Ethereum
-(Sepolia) and Solana (devnet) addresses through NEAR Chain Signatures. Transfer or sell the NFT and you hand over the
+(Sepolia, plus Base, Arbitrum and OP Sepolia; one address on all four) and Solana (devnet) addresses through NEAR
+Chain Signatures. Transfer or sell the NFT and you hand over the
 wallet. No bridge, wrapped token or seed phrase changes hands.
 
 Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet only: the coins have no value.**
 
-> **Draft status (2026-10-22).** Values marked `[TBD: …]` do not exist yet. They are filled in after the keyless
-> birth of the final contract on Day 10 (Nov 10). Until then, every command below can be run against the
-> placeholders and reports `SKIP` or "account does not exist". Nothing in this file is invented.
+> **Status (2026-11-04).** The contract is complete, tested and security-reviewed. The app is live at
+> **https://usesatchel.xyz**, reading the development contract `dev2.satchelhq.testnet`. The final contract
+> `satchel.satchelhq.testnet` is born keyless on Nov 10; values marked `[TBD: …]` (its code hash **H**, birth
+> transaction, proof links) do not exist until then, and checks against it report `SKIP` or "account does not
+> exist". Nothing in this file is invented.
+>
+> **Reviewing this repo?** [`AGENTS.md`](AGENTS.md) gives the reading order and maps each claim to its code and
+> tests. [Repository map](#repository-map) below; IDs such as `D-43` or `INV-09` are decoded in
+> [`docs/GLOSSARY.md`](docs/GLOSSARY.md).
 
 **The problem**
 - A wallet's keys cannot be sold safely. Whoever held the seed phrase can keep a copy.
@@ -27,12 +34,16 @@ Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet
 
 ## Try it in 60 seconds (no wallet, no install)
 
+Until Nov 10 the hosted app reads `dev2.satchelhq.testnet`, so its owners and addresses differ from the final ones
+quoted below; every page and the JSON API already work. Example today:
+`curl -s https://usesatchel.xyz/api/satchels/1` returns `"contract":"dev2.satchelhq.testnet"` with live balances.
+
 | Do | See |
 |---|---|
-| Open `[TBD: app URL]/s/1` | The owner `alice.satchelhq.testnet`, three full addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd`), their balances `[TBD: balances at submission]`, the signature count and "Contract keys: none since birth". The page is server-rendered, so it reads the same with JavaScript off. |
-| `curl -s [TBD: app URL]/api/satchels/1` | The same facts as JSON: `owner`, `addresses{btc,evm,sol}`, `balances`, `sig_count`, `listing`, `status`. |
-| Open `[TBD: app URL]/contract` | The lock facts for `satchel.satchelhq.testnet`: "Account is locked (no access keys)", the birth tx `[TBD: birth tx hash]`, the code hash `[TBD: H]` = the expected hash, MPC version `3.17.0`. |
-| Open `[TBD: app URL]/market` | Listed Satchels, each with its clean-history verdict. #4 shows "Blocked: 1 unused signature" ([why](#demo-token-4-is-blocked-on-purpose)). |
+| Open `https://usesatchel.xyz/s/1` | The owner `alice.satchelhq.testnet`, three full addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd`), their balances `[TBD: balances at submission]`, the signature count and "Contract keys: none since birth". The page is server-rendered, so it reads the same with JavaScript off. |
+| `curl -s https://usesatchel.xyz/api/satchels/1` | The same facts as JSON: `owner`, `addresses{btc,evm,sol}`, `balances`, `sig_count`, `listing`, `status`. |
+| Open `https://usesatchel.xyz/contract` | The lock facts for `satchel.satchelhq.testnet`: "Account is locked (no access keys)", the birth tx `[TBD: birth tx hash]`, the code hash `[TBD: H]` = the expected hash, MPC version `3.17.0`. |
+| Open `https://usesatchel.xyz/market` | Listed Satchels, each with its clean-history verdict. #4 shows "Blocked: 1 unused signature" ([why](#demo-token-4-is-blocked-on-purpose)). |
 | With a testnet wallet (Meteor or Intear): open `/mint` and mint | A new Satchel #8+ appears with three fresh addresses. Fund one from a faucet (BTC: `mempool.space/testnet4/faucet`, ETH: a Sepolia faucet) and use Send. |
 
 The addresses above are derived from `satchel.satchelhq.testnet` and the paths `satchel/1/{btc,evm,sol}`. They were
@@ -135,7 +146,8 @@ Expected: `confirmed sats = [TBD: at submission]` and `wei = [TBD: at submission
 ### Proof transactions
 
 Each row gives an explorer link and an API form. NearBlocks testnet was 24 days behind on 2026-10-21, so the
-FastNEAR command is the proof for NEAR txs. `docs/evidence/*.json` holds offline copies.
+FastNEAR command is the proof for NEAR txs. Offline copies of each proof go into `docs/evidence/*.json` after the
+final birth (Day 10).
 
 | Chain | What it proves | Explorer | API |
 |---|---|---|---|
@@ -160,13 +172,13 @@ pnpm --filter web dev                        # http://localhost:3000, fixture da
 NEXT_PUBLIC_DATA_MODE=live pnpm --filter web dev   # live testnet reads; see .env.example for every variable
 ```
 
-Tests, all offline except where noted. These are the latest recorded results (Apple Silicon, 2026-10-27/29).
-Claude Code and Codex re-run these when screening (Q-017), so keep the table current at the release commit (`[TBD]`):
+Tests, all offline except where noted. These are the latest recorded results (Apple Silicon, 2026-10-27/29); they
+are re-recorded on the release commit `[TBD]`:
 
 | Command | Result |
 |---|---|
 | `cargo test -p satchel --lib` | `test result: ok. 86 passed` (includes the shared vectors in `vectors/*.json`) |
-| `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4, needs the wasm built) | 83 passed |
+| `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4; first build the three wasm files with `cargo near build non-reproducible-wasm --manifest-path contracts/{satchel,mock-signer,mock-ft}/Cargo.toml`) | 83 passed |
 | `pnpm --filter @satchel/core test` | 299 passed, plus the browser-bundle check |
 | `pnpm --filter @satchel/tools test` | 72 passed, plus the vectors freshness check (4 files ok) |
 | `pnpm --filter web test` / `test:e2e` (fixture mode) | 340 vitest / 133 Playwright passed |
@@ -215,16 +227,55 @@ They sign only with `--send` and a typed `yes`, using keys from `~/.near-credent
   EVM: the nonce is used, read 3 blocks back on two providers. BTC: the outpoint is spent in a confirmed tx, read on
   two Esplora providers. SOL: the blockhash is expired.
 
+## What a Satchel can do
+
+Every flow below works in the hosted app; the pages marked **SSR** render their facts in the server HTML (readable
+with `curl`). Contract methods are in [`contracts/satchel/src/`](contracts/satchel/src); the sprint features
+C1–C7 are specified in [`docs/specs/`](docs/specs/).
+
+| What | App route | Contract |
+|---|---|---|
+| See a Satchel: owner, addresses, balances, signature count (**SSR**) | `/s/{id}`, `/api/satchels/{id}` | `satchel`, `sig_records` |
+| Mint one | `/mint` | `nft_mint` |
+| Add coins (anyone can open the link) | `/s/{id}/receive`, `/fund/{id}` | none (addresses are derived) |
+| Send BTC, ETH, USDC or SOL; ETH and USDC on Sepolia, Base, Arbitrum and OP Sepolia (C2, C3) | `/s/{id}/send` | `sign_for` |
+| Sign a plain-text message: EIP-191 or Solana off-chain (C7) | `/s/{id}/sign` | `sign_for` |
+| Give it away, directly or by a claim link (A2) | `/s/{id}/transfer`, `/s/{id}/give-link`, `/claim` | `nft_transfer` |
+| Sell it for NEAR or USDC; buy one after the clean-history check (**SSR**) | `/s/{id}/sale`, `/market` | `list`, `delist`, `buy`, `ft_on_transfer`, `withdraw_proceeds` |
+| Make, accept or cancel an offer on any Satchel (C4) | `/s/{id}/offer` | `make_offer`, `accept_offer`, `cancel_offer` |
+| Let another account spend up to a daily cap (C5) | `/s/{id}/allowance` | `set_allowance`, `revoke_allowance` |
+| Hold NEAR, USDC or wNEAR inside the Satchel on NEAR itself (C6) | `/s/{id}/coin/{key}` | `deposit_near`, `ft_on_transfer`, `withdraw_near`, `withdraw_ft` |
+| Empty it: send everything to one address per chain (A3) | `/s/{id}/empty` | `sign_for` |
+| Read its history: signatures and contract events, coins in and out (C1 adds a digest) | `/s/{id}/activity`, `/s/{id}/transactions` | `sig_records`, `history_digest` |
+| Check the contract itself: lock, code hash, MPC version (**SSR**) | `/contract`, `/api/contract` | `config` |
+
 ## NEAR technologies used (against the track hints)
 
 | Hint | How Satchel uses it |
 |---|---|
 | `nfts` · **NEP-171** | Standard `nft_transfer` / `nft_token`; NEP-177 metadata, NEP-181 enumeration, NEP-297 events. Any NEAR wallet can hold a Satchel |
-| `nfts` · **DYNAMIC NFTS** | The token's `media` is `[TBD: app URL]/api/card/{id}.svg`, rendered from contract state: status (active, listed, frozen) and the number of signatures issued |
+| `nfts` · **DYNAMIC NFTS** | The token's `media` is `https://usesatchel.xyz/api/card/{id}.svg`, rendered from contract state: status (active, listed, frozen) and the number of signatures issued |
 | `nfts` · **SUB-ACCOUNTS** | The contract is the named sub-account `satchel.satchelhq.testnet`, born keyless from `satchelhq.testnet` in one transaction ([tools/deploy/keyless-birth.md](tools/deploy/keyless-birth.md)) |
 | `open` · **CHAIN ABSTRACTION** | NEAR Chain Signatures (MPC `v1.signer-prod.testnet`, secp256k1 and ed25519 domains) sign native BTC, ETH and SOL transactions from one NEAR contract |
 | `open` · **EXPERIMENTAL** | The clean-history protocol: request-time signature records, freeze-on-list, a state-bound buy and a browser verifier |
 | also | NEP-141 `ft_transfer_call` for USDC purchases (Circle testnet USDC); NEP-330 source metadata; FastNEAR RPC and tx API; near-api-js 7.3.1; near-connect 0.11.4 wallets; near-workspaces sandbox tests |
+
+## Repository map
+
+| Path | What it is | Start with |
+|---|---|---|
+| [`contracts/`](contracts/README.md) | The NEP-171 contract (`satchel`) and two sandbox-only test doubles | `contracts/satchel/src/lib.rs`, `sign.rs` |
+| [`packages/core/`](packages/core/README.md) | Shared TypeScript: derivation, transaction builders, the TS mirror of the contract's rules, the clean-history checker | `src/clean-history/`, `src/policy/` |
+| [`apps/web/`](apps/web/README.md) | The Next.js app at https://usesatchel.xyz | `src/app/` (routes), `src/lib/` |
+| [`tests/`](tests/README.md) | Sandbox integration tests (near-workspaces, mock MPC signer and mock FT) | `tests/tests/sign.rs`, `tests/tests/sale.rs` |
+| [`vectors/`](vectors/README.md) | Shared vectors that the Rust contract and the TS library both run | |
+| [`tools/`](tools/README.md) | Testnet scripts (dry run by default), the keyless-birth runbook, vector generator, fuzzing, judge checks | `judge-snippets.sh` |
+| [`docs/`](docs/README.md) | Feature specs, engineering handoffs, security reviews, test audits, UI design | [`docs/README.md`](docs/README.md) |
+| [`kb/`](kb/README.md) | The technical specification ([`kb/90`](kb/90-technical-spec.md), source of truth) and the research notes behind it | `kb/90` §3, §5, §7 |
+| [`plan/`](plan/README.md) | Internal planning: decisions log (why), task plan, checklists, sprint log | `plan/decisions.md` |
+| [`brand/`](brand/README.md) | Visual identity (Satchel 2.0) | |
+| [`research/`](research/README.md) | Throwaway Phase-0 spikes and their results; not product code | |
+| [`marketing/`](marketing/README.md) | Sources of the demo video; not product code | |
 
 ## Security model and trust assumptions
 
@@ -334,11 +385,13 @@ How it differs:
 
 All of this falls inside the hackathon window, which counts code from the announcement on 2026-10-19 (HACKATHON.md
 Q-001). Nothing predates it, so there is no baseline.
-- **Oct 20–21, 2026: research and design.** This covered research notes, throwaway testnet spikes (not in this
-  repository), the technical specification, and the Satchel brand, logo and design system.
+- **Oct 20–21, 2026: research and design.** This covered research notes, throwaway testnet spikes (kept in
+  [`research/`](research/README.md) as evidence; no product code imports them), the technical specification, and the
+  Satchel brand, logo and design system.
 - **From Oct 21, 2026: implementation** of the code in this repository, written from the specification. No spike file
   was copied.
-- The repository was created on `[TBD: date]`, so its history starts then.
+- The repository was created on 2026-10-29, so its history starts then. Work done before that date is described in
+  `plan/progress/` and `docs/handoff/`.
 
 ## Libraries, tools and AI (HACKATHON.md Q-005)
 

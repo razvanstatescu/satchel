@@ -34,5 +34,5 @@ Follow the house patterns:
 - Commit on your own worktree branch.
 
 **Progress:** after each milestone, append one line to the shared log with
-`echo "- $(date -u +%FT%RZ) [<your feature ids>] <status>: <what>" >> /Users/razvanstatescu/Documents/Work/near/Satchel/plan/progress/sprint-log.md`.
+`echo "- $(date -u +%FT%RZ) [<your feature ids>] <status>: <what>" >> "$(git rev-parse --path-format=absolute --git-common-dir)/../plan/progress/sprint-log.md"`.
 Only ever append to it; don't edit it any other way.

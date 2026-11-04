@@ -1,5 +1,9 @@
 # Satchel — instructions for Claude
 
+> **Reviewing or judging this project?** This file holds the build team's working rules. Start with
+> [`AGENTS.md`](AGENTS.md) (reviewer guide: reading order, claims and where they are tested, commands), then
+> [`README.md`](README.md). [`docs/GLOSSARY.md`](docs/GLOSSARY.md) decodes the IDs used below (D-xx, Q-xxx, H-xx, INV-xx).
+
 Satchel is "an NFT that is a wallet". It is a NEP-171 contract on NEAR testnet whose tokens each control native
 BTC (testnet4), EVM (Sepolia) and SOL (devnet) addresses through NEAR Chain Signatures (MPC signer
 `v1.signer-prod.testnet`). It is being built for NEAR HACKATHON (dev window 2026-11-01T00:00Z → 2026-11-14T23:59:00Z;
@@ -27,7 +31,7 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
   - `kb/82-design-references.md`: Mobbin references for structure and behaviour.
   - Build UI to these, never to stock shadcn/ui defaults. Product facts (kb/90, plan/decisions.md) override brand
     sample copy; `brand/README.md` lists the corrections.
-- `near_hackathon.md`: the original plan. Where it disagrees with the spec, the spec wins.
+- `near_hackathon.md` (local only, gitignored, not in the repo): the original plan. Where it disagrees with the spec, the spec wins.
 - Team account: `<team>` = **`satchelhq`** (D-38). Addresses are in `research/final-addresses.md`, and the open human steps are in
   `plan/human-actions-ready.md`. `satchelhq.testnet`, `dev1` (the contract is live), `alice`, `bob` and `carol` exist since
   2026-10-29 (D-48).
