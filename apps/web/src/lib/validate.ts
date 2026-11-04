@@ -2,8 +2,9 @@ import { toChecksumAddress } from "@satchel/core/derive";
 import { copy } from "@/lib/copy";
 
 /**
- * Recipient validation (kb/80 R3 §Recipient validation). Tiers: error (blocks Review), warning (needs "I checked this
- * address"), info. BTC is validated with the same call that builds the output script (lazy-loaded with the Send flow).
+ * Recipient validation (kb/80 R3 §AmountInput · RecipientInput · AccountInput, "Recipient validation"). Tiers: error
+ * (blocks Review), warning (needs "I checked this address"), info. BTC is validated with the same call that builds the
+ * output script (lazy-loaded with the Send flow).
  */
 
 export type Validation = { tier: "ok"; normalized: string } | { tier: "error"; message: string } | { tier: "warning"; message: string; normalized: string };

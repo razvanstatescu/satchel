@@ -61,7 +61,7 @@ export function formatAccount(id: string): string {
   return id.length <= 24 ? id : truncateMiddle(id, 12, 8);
 }
 
-/** 4-character groups (kb/81 R3 grouped addresses). Returns the groups; the component styles them. */
+/** 4-character groups (kb/81 R4 §Typography, grouped addresses). Returns the groups; the component styles them. */
 export function groupAddress(addr: string): string[] {
   const g: string[] = [];
   for (let i = 0; i < addr.length; i += 4) g.push(addr.slice(i, i + 4));

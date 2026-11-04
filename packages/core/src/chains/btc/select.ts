@@ -1,4 +1,4 @@
-/** Coin selection, vsize, fee and dust (kb/30 §6; spec §8.9). Largest-first: fewer inputs = fewer MPC signatures. */
+/** Coin selection, vsize, fee and dust (kb/30 §6; kb/90 §8.9). Largest-first: fewer inputs = fewer MPC signatures. */
 import { MAX_BTC_INPUTS } from '../../policy/btc'
 
 export type OutputType = 'p2wpkh' | 'p2tr' | 'p2wsh' | 'p2sh' | 'p2pkh'

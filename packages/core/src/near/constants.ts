@@ -1,6 +1,8 @@
 /**
- * Gas and deposit formulas mirrored from spec §5.5 (single source of truth = the contract's `config()`).
- * apps/web/src/lib/near/constants.ts re-exports these and tests them against the live `config()` (diffConfig).
+ * Gas and deposit formulas mirrored from kb/90 §5.5 (single source of truth = the contract's `config()`).
+ * `diffConfig` compares these with a `config()` view (test/near.test.ts; apps/web runs it on its fixture config in
+ * test/unit/contract-outcome-format.test.ts). apps/web/src/lib/near/constants.ts keeps its own copy of the
+ * call-side values (number Tgas, decimal strings) and does not import this file.
  * All gas values are bigint gas units; all deposits are bigint yoctoNEAR.
  */
 

@@ -1,6 +1,6 @@
 /**
  * The one path every tool uses to sign: print the plan → (dry run stops here) → fetch nonce + block hash → print the
- * tx hash → typed "yes" → sign → `send_tx` INCLUDED → long-poll `tx` (spec §12.4).
+ * tx hash → typed "yes" → sign → `send_tx` INCLUDED → long-poll `tx` (kb/90 §12.4).
  */
 import { realpathSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -84,7 +84,8 @@ export const fastnearProof = (api: string, h: string) =>
 
 /**
  * Print the plan; in dry-run return null. In send mode sign and send it, then return the tracked outcome.
- * `expectFailure` lets a script send a tx that must fail (e.g. the direct ft_on_transfer attack) without throwing.
+ * A failed tx is returned with `ok: false` (never thrown), so a script can send a tx that must fail (e.g. the direct
+ * ft_on_transfer attack) and check its error codes.
  */
 export async function executePlan(
   ctx: Ctx,

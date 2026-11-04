@@ -1,4 +1,7 @@
-/** SOL vectors (spec §12.2): legacy single System Transfer accepted; every refusal class of §5.9 (R-24 order). web3.js 1.99. */
+/**
+ * SOL vectors (kb/90 §12.2): legacy single System Transfer accepted; every refusal class of §5.9 (in the check order
+ * of R-24, plan/decisions.md). web3.js 1.99.
+ */
 import {
   ComputeBudgetProgram,
   Keypair,

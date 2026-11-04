@@ -1,20 +1,23 @@
 /**
- * The copy deck (kb/80 R3 §Copy deck; Satchel 2.0 voice, voice-copy.md), keyed so the design lead can edit strings
- * without touching components. Import `copy` (and `errorCopy`) from "@/lib/copy" everywhere.
+ * The copy deck (kb/80 R3 §Copy deck; Satchel 2.0 voice, docs/design/satchel-2.0/voice-copy.md), keyed so the design
+ * lead can edit strings without touching components. Import `copy` (and `errorCopy`) from "@/lib/copy" everywhere.
  *
  * Rules (voice-copy §1, enforced by test/unit/config-copy-theme.test.ts): sentence case; verb first, one verb per action
  * (Give → Giving… → Given; List for sale → Listing… → Listed, the state "Paused for sale"; Stop selling; Add coins);
- * no plumbing words, no cooldown, no fiat outside the labelled overview estimate (D-50: "≈ $X" + "at mainnet prices"); never "no signature exists"; icons carry the glyphs; a
- * no-break space before every ticker; straight apostrophes. Strings name Bitcoin, Ethereum and Solana through
- * `copy/chains.ts` (SOL_UI_ENABLED, on by default since D-46); the landing always names all three (D-45).
+ * no plumbing words, no cooldown, no fiat outside the labelled overview estimate (D-50 in plan/decisions.md: "≈ $X" +
+ * "at mainnet prices"); never "no signature exists"; icons carry the glyphs; a no-break space before every ticker;
+ * straight apostrophes. Strings name Bitcoin, Ethereum and Solana through `copy/chains.ts` (SOL_UI_ENABLED, on by
+ * default since D-46); the landing always names all three (D-45).
  *
- * Modules, one owner each (build-plan §2; edit only your own, and log it in build/SHARED-CHANGES.md):
+ * Modules (the Satchel 2.0 build gave each of its lanes one module; the letters name those lanes):
  * - this file (F): the shared constants, `pill`, `card`, the merge and `errorCopy`;
  * - copy/shell.ts (H): app, title, nav, connect, theme, role, footer, toast, home, mint, contract, errors, a11y;
  * - copy/satchel.ts (S): page, wallet, fund, act, facts, verify, how, proof;
  * - copy/flows.ts (X): send, sign, xfer;
  * - copy/commerce.ts (C): sell, freeze, buy, clean, market;
  * - copy/landing.ts (L): landing.
+ * Later features added their own modules next to these (copy/allowance, chains, market, multichain, onboarding,
+ * questions, wallet-ops).
  */
 
 import { NBSP, plural as n } from "@/lib/format";

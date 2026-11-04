@@ -10,8 +10,8 @@ import { EVM_IDS, evmNetworkName, evmRpcs, SEPOLIA } from "@/lib/evm-networks";
 import { safeMessage } from "@/lib/message";
 
 /**
- * The live clean-history check through @satchel/core/clean-history (spec §7): two NEAR sources (FastNEAR, dRPC),
- * two Sepolia RPCs, mempool.space + emzy, Solana devnet. Isomorphic: the browser result gates Buy; the server route
+ * The live clean-history check through @satchel/core/clean-history (kb/90 §7): two NEAR sources (FastNEAR, dRPC),
+ * two RPCs per EVM testnet (C3), mempool.space + emzy, Solana devnet. Isomorphic: the browser result gates Buy; the server route
  * returns the same report as a hint. The core report is mapped to the UI view model here.
  */
 
@@ -62,9 +62,9 @@ type CleanHistory = typeof import("@satchel/core/clean-history");
 type FetchLike = (url: string, init?: { method?: string; headers?: Record<string, string>; body?: string; signal?: AbortSignal }) => Promise<Response>;
 
 /**
- * The chain sources of the checker (kb/90 §7.5): 2 Sepolia RPCs, mempool.space + emzy, and Solana devnet. SOL MUST have
- * a source: without one the core checker reports the SOL account check as `unknown`, which blocks Buy for every
- * Satchel (docs/handoff/core.md §3.8). One SOL provider is enough by design (R-19).
+ * The chain sources of the checker (kb/90 §7.5): 2 RPCs per EVM testnet, mempool.space + emzy, and Solana devnet.
+ * SOL MUST have a source: without one the core checker reports the SOL account check as `unknown`, which blocks Buy
+ * for every Satchel (docs/handoff/core.md §3 item 8). One SOL provider is enough by design (R-19, plan/decisions.md).
  */
 export async function cleanSources(ch: CleanHistory, fetchImpl?: FetchLike) {
   const { MEMPOOL_TESTNET4, EMZY_TESTNET4 } = await import("@satchel/core/chains/btc");

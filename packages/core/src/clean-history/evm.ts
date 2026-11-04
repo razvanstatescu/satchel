@@ -1,5 +1,5 @@
 /**
- * EVM dead-signature rule (spec §7.2): `spent` if the nonce count at `latest − 3` exceeds the record's nonce;
+ * EVM dead-signature rule (kb/90 §7.2): `spent` if the nonce count at `latest − 3` exceeds the record's nonce;
  * `settling` if only `latest` does; else `unused`. Two providers must agree; both are queried at the SAME
  * block number (min head − 3) so their answers are comparable. O(1) per address. Account check: getCode == "0x".
  * C3: one run per chain id, on that chain's providers (`eth_chainId` guard); USDC transfers (C2) follow the same rule.

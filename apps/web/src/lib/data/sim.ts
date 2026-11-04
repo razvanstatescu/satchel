@@ -21,7 +21,7 @@ import type { AllowanceRecord, InsideView, NftToken, OfferView, SatchelView, Sig
  *
  * Knobs (localStorage, set by tests): "satchel:sim:mode" = "normal" | "timeout" | "broadcast-fail";
  * "satchel:sim:delay" = ms until the MPC "signs" (default 2500); "satchel:sim:payout" = "fail" makes the seller payout of
- * the next sale (and of a withdraw, "fail-always") fail, so the contract credits `proceeds` (spec §5.12, INV-25);
+ * the next sale (and of a withdraw, "fail-always") fail, so the contract credits `proceeds` (kb/90 §5.12, INV-25);
  * "satchel:sim:sollife" = blocks a fixture Solana blockhash stays valid (default 150 ≈ 36 s at 240 ms per block).
  */
 
@@ -151,7 +151,8 @@ export function simKnob(name: "mode" | "delay" | "payout" | "sollife"): string |
 
 const BLOCK_MS = 560;
 
-/** ≈ 0.0009 NEAR: the one-time storage a brand-new inside record or storage-credit slot costs (spec §1, §C4-C6 1.1). */
+/** ≈ 0.0009 NEAR: the one-time storage a brand-new inside record or storage-credit slot costs
+ * (docs/specs/C4-C6.md §1, §1.1). */
 const STORAGE_SLOT = 900_000_000_000_000_000_000n;
 
 /** Deterministic 32-byte hex "hash" for fixture payloads (NOT a cryptographic hash; fixture mode only). */
@@ -186,7 +187,7 @@ function allowanceRecordsOf(s: SimState, tokenId: string): AllowanceRecord[] {
   return s.allowances[tokenId] ?? FIXTURE_ALLOWANCES[tokenId] ?? [];
 }
 
-/** An `AllowanceRecord` → the contract's `AllowanceView` (spec §1.2), rolling the window forward to `nowMs`. */
+/** An `AllowanceRecord` → the contract's `AllowanceView` (C5 §1.2), rolling the window forward to `nowMs`. */
 function allowanceToView(tokenId: string, rec: AllowanceRecord, nowMs: number, listed: boolean): AllowanceView {
   const caps = rec.caps.map((c) => {
     const liveSpends = c.spends.filter((sp) => nowMs < sp.at_ms + ALLOWANCE_WINDOW_MS);
@@ -294,7 +295,7 @@ export function simOverlay() {
     storageCreditOf(accountId: string): string {
       return s.storageCredit[accountId] ?? "0";
     },
-    /** C5: at most MAX_DELEGATES rows, dropping a record whose owner no longer matches (the backstop rule, spec §4). */
+    /** C5: at most MAX_DELEGATES rows, dropping a record whose owner no longer matches (the backstop rule, C5 §4). */
     allowancesOf(id: string): AllowanceView[] {
       const o = owner(id);
       if (!o) return [];
@@ -346,7 +347,7 @@ export function simSignFor(args: { tokenId: string; requester: string; items: { 
 export function simTransfer(tokenId: string, to: string) {
   const s = read();
   s.owners[tokenId] = to;
-  s.allowances[tokenId] = []; // C5 reset rule (spec §4): every ownership change clears all allowances
+  s.allowances[tokenId] = []; // C5 reset rule (§4): every ownership change clears all allowances
   write(s);
 }
 
@@ -409,11 +410,11 @@ export function simBuy(tokenId: string, buyer: string, tx = fixtureHash(`${token
   const listing = simOverlay().satchel(tokenId)?.listing ?? null;
   const s = read();
   s.owners[tokenId] = buyer;
-  s.allowances[tokenId] = []; // C5 reset rule (spec §4): a sale clears all allowances too
+  s.allowances[tokenId] = []; // C5 reset rule (§4): a sale clears all allowances too
   delete s.listed[tokenId];
   if (!s.delisted.includes(tokenId)) s.delisted.push(tokenId);
   if (listing) {
-    // The payout is detached (spec §5.12): a failure never undoes the sale; on_payout credits proceeds instead.
+    // The payout is detached (kb/90 §5.12): a failure never undoes the sale; on_payout credits proceeds instead.
     const payoutOk = !/^fail/.test(simKnob("payout") ?? "");
     s.sales[tokenId] = { tokenId, listingId: listing.id, seller: listing.seller, buyer, price: listing.price, currency: listing.currency, tx, at: Date.now(), height, payoutOk };
     if (!payoutOk) credit(s, listing.seller, listing.currency, BigInt(listing.price));
@@ -462,11 +463,11 @@ function chargeCredit(s: SimState, accountId: string, needed: bigint): void {
 }
 
 /** `deposit` ft_on_transfer message: same storage rule, per (token, ft) slot. Storage credit is charged only when
- * this creates a slot (the token's first deposit of this FT, and the token's inside record if it had none, spec §1.2). */
+ * this creates a slot (the token's first deposit of this FT, and the token's inside record if it had none, C4-C6 §1.2). */
 export function simDepositFt(tokenId: string, ft: string, amount: bigint, senderId: string): void {
   const s = read();
   const cur = insideOfRaw(s, tokenId);
-  // A slot "exists" once it has ever been created, even emptied by a withdrawal (spec §2.1: kept forever). Fixture
+  // A slot "exists" once it has ever been created, even emptied by a withdrawal (C4-C6 §2.1: kept forever). Fixture
   // tokens never start with an FT slot (FIXTURE_INSIDE only seeds NEAR), so this is exactly `s.inside`'s own delta.
   const isNewSlot = !(ft in (s.inside[tokenId]?.fts ?? {}));
   if (isNewSlot) chargeCredit(s, senderId, FT_STORAGE.depositFirstSlot);
@@ -534,7 +535,7 @@ export interface OfferTermsSim {
   expiresAtMs: number;
 }
 
-/** `make_offer` / the `offer` ft_on_transfer message (spec §3.1). Returns the new offer id. */
+/** `make_offer` / the `offer` ft_on_transfer message (C4-C6 §3.1). Returns the new offer id. */
 export function simMakeOffer(tokenId: string, offererId: string, amount: bigint, currency: "near" | "usdc", t: OfferTermsSim): number {
   const s = read();
   const sat = simOverlayFromState(s).satchel(tokenId);
@@ -547,7 +548,7 @@ export function simMakeOffer(tokenId: string, offererId: string, amount: bigint,
   if (!offerExpiryValid(t.expiresAtMs, now) || t.expiresAtMs - now > MAX_OFFER_TTL_MS) throw new Error("ERR_OFFER_EXPIRY: expiry must be in the future and at most 90 days away");
   const open = Object.values(s.offers).filter((o) => o.offererId === offererId).length;
   if (open >= MAX_OFFERS_PER_ACCOUNT) throw new Error("ERR_TOO_MANY_OFFERS: you already have 20 open offers");
-  // USDC offers always charge the offerer's storage credit (spec §1.2); a NEAR offer pays its own storage from the
+  // USDC offers always charge the offerer's storage credit (C4-C6 §1.2); a NEAR offer pays its own storage from the
   // attached deposit instead (make_offer's `amount + storageExtra`), so nothing is charged here for that path.
   if (currency === "usdc") chargeCredit(s, offererId, FT_STORAGE.offer);
   const id = s.nextOfferId++;
@@ -603,7 +604,7 @@ function simOverlayFromState(s: SimState) {
 
 const allowancePanic = (code: string, detail?: string) => new Error(`Smart contract panicked: ${code}${detail ? `: ${detail}` : ""}`);
 
-/** `set_allowance` (spec §2 steps 2, 4–7): owner only; validates and normalizes caps like the contract. */
+/** `set_allowance` (C5 §2 steps 2, 4–7): owner only; validates and normalizes caps like the contract. */
 export function simSetAllowance(tokenId: string, caller: string, delegate: string, caps: readonly CapInput[], expiresAtMs: number | undefined, nowMs = Date.now()): void {
   const s = read();
   const owner = ownerOf(s, tokenId);
@@ -628,7 +629,7 @@ export function simSetAllowance(tokenId: string, caller: string, delegate: strin
   write(s);
 }
 
-/** `revoke_allowance` (spec §2): owner only; works on an expired allowance too (cleanup). */
+/** `revoke_allowance` (C5 §2): owner only; works on an expired allowance too (cleanup). */
 export function simRevokeAllowance(tokenId: string, caller: string, delegate: string): void {
   const s = read();
   const owner = ownerOf(s, tokenId);
@@ -641,7 +642,7 @@ export function simRevokeAllowance(tokenId: string, caller: string, delegate: st
 }
 
 /**
- * `sign_for` by a delegate (spec §2 step 1 and 4c): would it pass, and if so debit it. Mirrors the contract's order
+ * `sign_for` by a delegate (C5 §2 step 1 and 4c): would it pass, and if so debit it. Mirrors the contract's order
  * (expiry, `ERR_FROZEN`, the classifier via `allowanceDebits`, then the caps via `applyDebits`) using the same
  * `@satchel/core/policy` functions the real contract's behaviour is checked against.
  */

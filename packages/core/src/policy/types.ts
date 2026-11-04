@@ -1,4 +1,4 @@
-/** Shared types of the reference classifier (a TS mirror of the contract's `parse/*.rs`, spec §5.9). */
+/** Shared types of the reference classifier (a TS mirror of the contract's `parse/*.rs`, kb/90 §5.9). */
 
 export type PolicyError =
   | 'ERR_HEX'

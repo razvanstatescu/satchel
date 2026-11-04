@@ -1,5 +1,5 @@
 /**
- * Contract JSON shapes, kb/90 §5.3 / §5.14 (align with docs/handoff/contract.md once it exists).
+ * Contract JSON shapes, kb/90 §5.3 / §5.14 (also listed in docs/handoff/contract.md).
  * Rules: token amounts are U128 decimal strings; counters and heights are JSON numbers;
  * byte strings are lowercase hex without 0x; enum tags are snake_case.
  */
@@ -174,7 +174,7 @@ export type { Asset, AllowanceStatus, AllowanceView, CapInput } from "@satchel/c
  */
 export interface AllowanceRecord {
   delegate: string;
-  /** The owner who granted it (the backstop rule, spec §1.2 "Allowances of a previous owner never show"). */
+  /** The owner who granted it (the backstop rule, C5 §1.2 "Allowances of a previous owner never show"). */
   owner: string;
   set_at_ms: number;
   expires_at_ms: number | null;

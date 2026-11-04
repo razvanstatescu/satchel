@@ -147,7 +147,7 @@ export function fixtureCleanReport(tokenId: string, records: SigRecordView[], lo
   };
 }
 
-/** Live report placeholder until @satchel/core/clean-history lands: never "clean" (Buy stays disabled). */
+/** The server hint when the live check fails or passes its 8 s cap (`getCleanHint`): every item `unknown`, never "clean". */
 export function unavailableReport(tokenId: string, records: SigRecordView[], lock: LockFacts, listingId: number | null): CleanReport {
   const items: CleanItem[] = records.map((r) => ({
     seq: r.seq,

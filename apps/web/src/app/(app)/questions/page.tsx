@@ -7,8 +7,8 @@ import { copy } from "@/lib/copy";
 import { allFaqGroups, LANDING_SOL, splitLead } from "@/lib/faq";
 
 /**
- * /questions (less-labels): the long version of the homepage's Questions section, every answer in the server HTML
- * with no Suspense fallback (kb/90 §7-9 — judges see only server HTML). Reads the same grouped data as the unit
+ * /questions: the long version of the homepage's Questions section, every answer in the server HTML
+ * with no Suspense fallback (kb/90 §8.1: judges see only server HTML). Reads the same grouped data as the unit
  * tests (`allFaqGroups`), so the homepage's seven and this page's many more never drift apart. A jump list of groups
  * sits above the list; the one client island (`QuestionsSearch`) only filters what's already rendered, so it never
  * changes what JS-off or a judge's crawler sees.

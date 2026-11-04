@@ -1,5 +1,5 @@
 /**
- * MPC response decoding (spec §5.8 "Exact MPC response" and signature byte rules; kb/10 §Response; kb/11 snippet B).
+ * MPC response decoding (kb/90 §5.8 "Exact MPC response" and signature byte rules; kb/10 §Response; kb/11 snippet B).
  *
  *   {"scheme":"Secp256k1","big_r":{"affine_point":"02…"},"s":{"scalar":"…"},"recovery_id":1}
  *   {"scheme":"Ed25519","signature":[171,150,…]}           (64 numbers)

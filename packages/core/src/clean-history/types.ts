@@ -1,5 +1,5 @@
 /**
- * Clean-history types (spec §7; kb/70 §P3). Everything in a report is JSON-serializable (no bigint), so the
+ * Clean-history types (kb/90 §7; kb/70 §P3). Everything in a report is JSON-serializable (no bigint), so the
  * server route `/api/clean-history/[id]` can return the same object the browser computes.
  */
 import type { RecordSignatureView } from '../near/mpc'
@@ -7,8 +7,9 @@ import type { RecordSignatureView } from '../near/mpc'
 export type ContractRole = 'dev' | 'rc' | 'final'
 
 /**
- * Per-record verdict (spec §7.2/§7.3). `foreign` (BTC, review S-07): the prevout exists but its scriptPubKey is not one
- * this Satchel's key can satisfy, so the signature can never move the coins being bought. Non-blocking, like `unfunded`.
+ * Per-record verdict (spec §7.2/§7.3). `foreign` (BTC, S-07 in docs/security/contract-review.md): the prevout exists
+ * but its scriptPubKey is not one this Satchel's key can satisfy, so the signature can never move the coins being
+ * bought. Non-blocking, like `unfunded`.
  * `message` (C7): an EIP-191 or Solana off-chain message signature; it can't move coins, so it never blocks Buy, but
  * the Buy tab lists it with its text (docs/specs/C1-C2-C3-C7.md §7.2).
  */

@@ -1,5 +1,5 @@
 /**
- * Solana devnet (kb/32; spec §8.2 lib/chains/sol, P2). @solana/web3.js 1.99.0 (not 3.x).
+ * Solana devnet (kb/32; kb/90 §8.2 lib/chains/sol, P2). @solana/web3.js 1.99.0 (not 3.x).
  * A legacy single-transfer message, expiry rules, attach + ed25519 verify.
  * Durable nonces are never built (the contract refuses them, §5.9).
  */

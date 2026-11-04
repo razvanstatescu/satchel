@@ -1,4 +1,4 @@
-/** BTC P2WPKH / SIGHASH_ALL classifier (spec §5.9 BTC). One complete transaction per call. */
+/** BTC P2WPKH / SIGHASH_ALL classifier (kb/90 §5.9 BTC). One complete transaction per call. */
 import { sha256 } from '@noble/hashes/sha2.js'
 import { concatBytes, equalBytes, hexToBytesStrict, readU32le, readU64le, reverseBytes, toHex } from '../bytes'
 import { type BtcFields, type BtcOutputFields, type ClassifyResult, PolicyRefusal } from './types'

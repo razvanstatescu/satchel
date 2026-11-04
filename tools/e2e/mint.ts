@@ -1,5 +1,5 @@
 /**
- * Mint e2e (spec §12.4): `nft_mint` with 0.02 NEAR (measured storage kept, the rest refunded), then check the new
+ * Mint e2e (kb/90 §12.4): `nft_mint` with 0.02 NEAR (measured storage kept, the rest refunded), then check the new
  * token's owner and that its three addresses derive.
  *
  *   pnpm --filter @satchel/tools e2e:mint                       # dry run, payer alice, receiver alice

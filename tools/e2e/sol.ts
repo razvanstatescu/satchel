@@ -1,5 +1,5 @@
 /**
- * SOL e2e (spec §12.4, P2): a devnet System transfer from Satchel #N. The contract signs the legacy message bytes
+ * SOL e2e (kb/90 §12.4, P2): a devnet System transfer from Satchel #N. The contract signs the legacy message bytes
  * (Eddsa, domain 1). Devnet blockhashes live ≈ 36 s, so in send mode the script confirms once, then fetches a fresh
  * blockhash and signs immediately (the printed message differs only in `recent_blockhash`).
  *

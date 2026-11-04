@@ -1,5 +1,6 @@
 /**
- * BTC send builder with the txid collision check and random output order (spec §8.2 rule, §8.7, R-05, INV-32).
+ * BTC send builder with the txid collision check and random output order (kb/90 §8.2 rule, §8.7; R-05 in
+ * plan/decisions.md; INV-32 in kb/90 §6).
  *
  * Why: segwit txids exclude witnesses, so a deterministic builder lets a previous owner pre-sign a spend of a
  * predicted change outpoint. Satchel therefore never builds a tx whose txid is already referenced by a record of the

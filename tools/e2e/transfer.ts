@@ -1,6 +1,7 @@
 /**
- * Transfer e2e (spec §12.4, INV-02): `nft_transfer` (exactly 1 yocto) moves control of the wallet. Checks the new owner,
- * that `sig_count` and the records are unchanged (history belongs to the token), and that the addresses are the same.
+ * Transfer e2e (kb/90 §12.4, INV-02): `nft_transfer` (exactly 1 yocto) moves control of the wallet. Checks the new
+ * owner, that `sig_count` and the records are unchanged (history belongs to the token), and that the addresses are the
+ * same.
  *
  *   pnpm --filter @satchel/tools e2e:transfer --token 2               # dry run alice → bob
  *   pnpm --filter @satchel/tools e2e:transfer --token 2 --to bob --send

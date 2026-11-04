@@ -29,9 +29,10 @@ export const ATTACH_MARKET = {
 } as const
 
 /**
- * Storage charged from the sender's storage credit inside `ft_on_transfer` (spec §1.2), used by the UI to predict
- * whether `prepay_storage` is needed before a deposit or a USDC offer — the contract measures the real delta;
- * these are the same conservative estimates the spec quotes, and `sim.ts` charges exactly these in fixture mode.
+ * Storage charged from the sender's storage credit inside `ft_on_transfer` (docs/specs/C4-C6.md §1.2), used by the UI
+ * to predict whether `prepay_storage` is needed before a deposit or a USDC offer — the contract measures the real delta;
+ * these are the same conservative estimates the spec quotes, and apps/web's `lib/data/sim.ts` charges exactly these
+ * in fixture mode.
  */
 export const FT_STORAGE = {
   /** A token's first deposit of a given FT (creates the (token, ft) slot, and the inside record if absent). */

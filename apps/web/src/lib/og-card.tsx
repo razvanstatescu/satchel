@@ -38,7 +38,7 @@ function ogFonts() {
   ];
 }
 
-/** The mark (brand/Mark.tsx's coral tile + white S), inlined: satori only allows intrinsic elements as direct
+/** The mark (components/brand/Mark.tsx's coral tile + white S), inlined: satori only allows intrinsic elements as direct
  * children of `<svg>`, so it can't reuse Mark/SStrokes (which nest a custom component inside their `<svg>`). */
 function OgMark({ size }: { size: number }) {
   return (

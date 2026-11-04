@@ -2,7 +2,7 @@ import { KeyPair, KeyPairEd25519, keyToImplicitAddress, type KeyPairString } fro
 import { APP_URL } from "@/lib/config";
 
 /**
- * Give by link (A2, kb/80 §Give; plan/feature-ideas.md A2): a fresh ed25519 keypair is the claim. Its NEAR implicit
+ * Give by link (A2, kb/80's R4 note; plan/feature-ideas.md A2): a fresh ed25519 keypair is the claim. Its NEAR implicit
  * account id (the lowercase hex of the public key) is where the Satchel and a little NEAR go; the secret key is the
  * link's bearer token.
  *

@@ -1,6 +1,6 @@
 /**
- * Run `@satchel/core/clean-history` from Node exactly as the buyer's browser does (spec §7.5 place 3): two NEAR
- * sources (FastNEAR, dRPC), two Sepolia providers, mempool.space + emzy, devnet. Read-only.
+ * Run `@satchel/core/clean-history` from Node exactly as the buyer's browser does (kb/90 §7.5 place 3): two NEAR
+ * sources (FastNEAR, dRPC), two providers per EVM testnet (C3), mempool.space + emzy, devnet. Read-only.
  */
 import {
   checkCleanHistory,

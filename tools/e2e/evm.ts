@@ -1,5 +1,5 @@
 /**
- * EVM e2e (spec §12.4): build a Sepolia type-2 transfer from Satchel #N's derived address, `sign_for` it on NEAR
+ * EVM e2e (kb/90 §12.4): build a Sepolia type-2 transfer from Satchel #N's derived address, `sign_for` it on NEAR
  * (send_tx INCLUDED + long-poll), verify the MPC signature recovers to the Satchel address, broadcast, wait for the
  * receipt. `--fanout` (R-14) splits one balance across Satchel addresses, one sign_for per leg, sequential nonces.
  *

@@ -60,7 +60,7 @@ export function assetKey(a: Asset): string {
 
 export const sameAsset = (a: Asset, b: Asset): boolean => assetKey(a) === assetKey(b)
 
-// ── debits (spec §3) ─────────────────────────────────────────────────────────────────────────────
+// ── debits (C5 §3) ───────────────────────────────────────────────────────────────────────────────
 
 const kind = () => new AllowanceRefusal('ERR_ALLOWANCE_KIND', 'delegates may only sign plain transfers')
 const overflow = () => new AllowanceRefusal('ERR_ALLOWANCE_EXCEEDED', 'amount overflows u128')
@@ -124,7 +124,7 @@ export function btcDebit(fields: Pick<BtcFields, 'inputs' | 'outputs' | 'pkh'>):
 export type DebitsResult = { ok: true; debits: Debit[] } | { ok: false; error: PolicyError | AllowanceError }
 
 /**
- * What `sign_for` by a delegate would debit for `req` (spec §3): the stateless classifier first (its refusal wins, as
+ * What `sign_for` by a delegate would debit for `req` (C5 §3): the stateless classifier first (its refusal wins, as
  * in the contract), then the worst-case amounts.
  */
 export function allowanceDebits(req: SignRequest): DebitsResult {
@@ -154,7 +154,7 @@ export function allowanceDebits(req: SignRequest): DebitsResult {
   }
 }
 
-// ── window (spec §4) ─────────────────────────────────────────────────────────────────────────────
+// ── window (C5 §4) ───────────────────────────────────────────────────────────────────────────────
 
 export interface SpendState {
   at_ms: number
@@ -203,7 +203,7 @@ export function applyDebits(caps: readonly CapState[], debits: readonly Debit[],
   return { ok: true, caps: next }
 }
 
-// ── views (spec §1.2) ────────────────────────────────────────────────────────────────────────────
+// ── views (C5 §1.2) ──────────────────────────────────────────────────────────────────────────────
 
 export type AllowanceStatus = 'active' | 'paused' | 'expired'
 
@@ -291,7 +291,7 @@ export function checkDelegatedSign(view: AllowanceView, req: SignRequest, opts: 
   return { ok: true, debits: d.debits, remainingAfter: allowanceRemaining(after, nowMs) }
 }
 
-// ── set_allowance input validation (spec §2 step 5) ─────────────────────────────────────────────
+// ── set_allowance input validation (C5 §2 step 5) ────────────────────────────────────────────────
 
 export interface CapInput {
   asset: Asset

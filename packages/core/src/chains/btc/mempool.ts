@@ -1,5 +1,5 @@
 /**
- * mempool.space testnet4 (Esplora) client (kb/30 §1; spec §8.3).
+ * mempool.space testnet4 (Esplora) client (kb/30 §1; kb/90 §8.3).
  * Browser rules: simple requests only (preflight OPTIONS 404s): plain GETs, and POST bodies as a bare string
  * (fetch then sends text/plain). Never set Content-Type or custom headers.
  * Traps: `testnet4.mempool.space` is MAINNET; `/tx/:id/outspend/:v` and `/tx/:id/status` answer 200 for unknown txids,

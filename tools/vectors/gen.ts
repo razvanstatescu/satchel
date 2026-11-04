@@ -1,5 +1,6 @@
 /**
- * Generates the shared Rust/TS vectors (spec §12.2): vectors/{evm,btc,sol}.json and vectors/derive.json.
+ * Generates the shared Rust/TS vectors (kb/90 §12.2): vectors/{evm,btc,sol,msg}.json, plus history.json, derive.json
+ * and allowance.json (each in its own shape).
  *
  *   pnpm --filter @satchel/tools vectors          # write
  *   pnpm --filter @satchel/tools vectors:check    # fail if the committed files differ (CI)

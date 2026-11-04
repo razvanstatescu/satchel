@@ -1,7 +1,7 @@
 /**
- * SOL dead-signature rule (spec §7.2, R-19): `expired` if the record is ≥ 120 s old AND at least one provider reports
- * `isBlockhashValid(hash, processed) == false`. Dead by construction otherwise (durable nonces refused, quiet period
- * ≥ 138 s), so one provider suffices. Else `unused`. One query per distinct blockhash.
+ * SOL dead-signature rule (kb/90 §7.2; R-19 in plan/decisions.md): `expired` if the record is ≥ 120 s old AND at
+ * least one provider reports `isBlockhashValid(hash, processed) == false`. Dead by construction otherwise (durable
+ * nonces refused, quiet period ≥ 138 s), so one provider suffices. Else `unused`. One query per distinct blockhash.
  * Account check: absent, or owned by the System program with empty data.
  */
 import type { AccountReport, ItemReport, ItemStatus, Policy, SigRecordView, SolSource } from './types'

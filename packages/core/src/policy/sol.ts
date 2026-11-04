@@ -1,4 +1,4 @@
-/** Solana legacy single-signer System Transfer classifier (spec §5.9 SOL, R-24 check order). */
+/** Solana legacy single-signer System Transfer classifier (kb/90 §5.9 SOL; check order per R-24, plan/decisions.md). */
 import { sha256 } from '@noble/hashes/sha2.js'
 import { equalBytes, hexToBytesStrict, readU64le, toHex } from '../bytes'
 import { type ClassifyResult, PolicyRefusal, type SolFields } from './types'

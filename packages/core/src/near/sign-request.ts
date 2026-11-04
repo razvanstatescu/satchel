@@ -1,5 +1,5 @@
 /**
- * JSON encoders for the contract's `sign_for` (spec §5.3, §5.6). Pure: the wallet call lives in apps/web.
+ * JSON encoders for the contract's `sign_for` (kb/90 §5.3, §5.6). Pure: the wallet call lives in apps/web.
  *
  *   {"token_id":"1","request":{"evm":{"unsigned_tx":"02ee…80c0"}}}
  *   {"token_id":"1","request":{"btc":{"preimages":["0200…01000000"],"outputs":"409c…"}},"mpc_deposit":"1"}

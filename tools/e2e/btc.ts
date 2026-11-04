@@ -1,5 +1,5 @@
 /**
- * BTC e2e (spec §12.4): a 2-input testnet4 P2WPKH send from Satchel #N. One `sign_for` carries both BIP143
+ * BTC e2e (kb/90 §12.4): a 2-input testnet4 P2WPKH send from Satchel #N. One `sign_for` carries both BIP143
  * preimages; the contract fans out one MPC `sign` receipt per input (never two in one receipt). The script attaches
  * the signatures (strict low-S verify), checks the txid did not change, and broadcasts to mempool.space/testnet4.
  * The builder refuses any txid an existing record already references (R-05, INV-32).

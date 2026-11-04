@@ -1,10 +1,11 @@
 /**
- * The isomorphic clean-history checker (spec §7; kb/70 §P3). Pure orchestration over injected sources:
+ * The isomorphic clean-history checker (kb/90 §7; kb/70 §P3). Pure orchestration over injected sources:
  * the browser (Buy gate, every 10 s and right before Buy), the server route (hint only) and tools/e2e all call this.
  *
- *  1. NEAR (≥ 2 RPCs must agree): sig_count, every record seq 0..sig_count, contract keys + code hash, MPC keys
+ *  1. NEAR (≥ 2 RPCs must agree): sig_count, every record seq 0..sig_count−1, contract keys + code hash, MPC keys
  *  2. our own derivation of the three addresses (vs the UI's and vs the MPC's derived_public_key)
- *  3. per record → spent | expired | unfunded | foreign | settling | unused | unknown; per account → ok | unsafe | unknown
+ *  3. per record → spent | expired | unfunded | foreign | message | settling | unused | unknown;
+ *     per account → ok | unsafe | unknown (EVM runs once per chain id with records, C3)
  *  4. gate (role) → empty | unsafe | unknown | blocked | settling | clean
  */
 import { deriveEd25519, deriveSatchelAddresses, deriveSecp256k1, nearKeyString, tokenPath } from '../derive'

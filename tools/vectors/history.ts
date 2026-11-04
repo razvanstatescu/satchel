@@ -1,7 +1,8 @@
 /**
  * C1 history-digest vectors (docs/specs/C1-C2-C3-C7.md §5.1): `sig_records` rows (exactly as the view prints them)
  * → `{sig_count, digest_hex}`, plus the header and per-entry bytes for debugging. Rust (`feature_tests`) and TS
- * (`history.test.ts`) both reproduce every digest; the sandbox suite checks the live view against a third encoder.
+ * (packages/core/test/features-c1-c7.test.ts) both reproduce every digest; the sandbox suite checks the live view
+ * against a third encoder.
  * Records are built from accepted shared vectors, so payloads and details are the real classifier outputs.
  */
 import { encodeFunctionData, erc20Abi, serializeTransaction } from 'viem'

@@ -1,5 +1,5 @@
 /**
- * The scripted clean-history scenario (SAT-085, R-09; spec §12.4). Run it on rc with `--role rc` so the strict gate
+ * The scripted clean-history scenario (SAT-085, R-09; kb/90 §12.4). Run it on rc with `--role rc` so the strict gate
  * applies (set SATCHEL_EXPECTED_CODE_HASH):
  *   1. sign an EVM tx WITHOUT broadcasting it, wait out the quiet period, list → checker says `blocked`, Buy disabled
  *   2. delist, broadcast the logged signature ("Broadcast now", rebuilt from sig_records only), wait 3 confirmations,

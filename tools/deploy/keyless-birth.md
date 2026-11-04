@@ -1,9 +1,12 @@
-# Keyless birth runbook (spec §5.16, plan §6, SAT-082 / SAT-090)
+# Keyless birth runbook (kb/90 §5.16, plan/implementation-plan.md §6, SAT-082 / SAT-090)
 
 One transaction from `satchelhq.testnet` creates the contract account, funds it, deploys the wasm, runs `new` and
 mints ids 1–7 to `alice.satchelhq.testnet`. It has **no AddKey**, so the account never has a key. If any action
 fails, the whole receipt reverts and no account is left behind. A *successful* birth with a wrong argument is
 permanent, which is why rc is born first from the identical batch.
+
+IDs: D-, H- and R-xx are in `plan/decisions.md`, SAT-xxx in `plan/implementation-plan.md` §3, INV-xx in kb/90 §6,
+A-xx in kb/90 §14, S-02 in `docs/security/contract-review.md`.
 
 Tool: `tools/deploy/keyless-birth.ts` (near-api-js 7.3.1). near-cli-rs 0.30.1 cannot add actions after
 `deploy-contract`, so the CLI cannot build this batch. The sandbox test of the same batch is
@@ -33,7 +36,7 @@ Approvals:
   it is immutable after birth.
 - [ ] H-26 is decided: either USDC init (default) or `--no-usdc`. rc and final must use the **same** init args.
 - [ ] The parent balance covers the Transfer, 7 × 0.02 NEAR and the 10× gas hold. The tool prints the requirement:
-  about 5.31 NEAR for rc and 10.31 NEAR for final.
+  about 10.31 NEAR for rc and 20.31 NEAR for final (the Transfer plus about 0.31 NEAR of mint deposits and gas hold).
 - [ ] Final only: the tag `contract-v1.0.0` is on the rc1 commit (R-29) and **H** equals the rc's on-chain code hash.
 
 ## 1. Dry run and review (no key needed)
@@ -72,7 +75,7 @@ pnpm --filter @satchel/tools deploy:keyless-birth --child <child> --base-uri <ur
   to alice. It then writes `docs/evidence/birth-<child>.json`.
 - Record the tx hash and block **A** in the team channel.
 
-## 3. Proofs (spec §5.16 1–6; README "Verify on-chain")
+## 3. Proofs (kb/90 §5.16 1–6; README "Verify on-chain")
 
 The tool prints commands 1–4 with the hash filled in:
 1. `POST /v0/transactions {"tx_hashes":["<hash>"]}` lists CreateAccount, Transfer, DeployContract and FunctionCall ×8.
@@ -106,4 +109,4 @@ The tool prints commands 1–4 with the hash filled in:
   get a new "yes", send again.
 - **The tx was rejected before execution** (`NotEnoughBalance`): top up the parent and retry.
 - **The birth succeeded with a wrong argument:** this is permanent. Fall back to `satchel-v2.satchelhq.testnet` with new
-  addresses and new funding (plan §6.9). There is never a key on the account, so no trust window needs disclosing.
+  addresses and new funding (plan/implementation-plan.md §6 item 9). There is never a key on the account, so no trust window needs disclosing.

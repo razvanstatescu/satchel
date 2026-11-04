@@ -1,5 +1,5 @@
 /**
- * Reference classifier: a TS mirror of the contract's `sign_for` payload policy (spec §5.9).
+ * Reference classifier: a TS mirror of the contract's `sign_for` payload policy (kb/90 §5.9).
  * The contract is authoritative. This mirror generates and cross-checks `vectors/*.json` and lets the UI
  * refuse a request before the wallet opens. Check order: docs/handoff/core.md §1.
  */

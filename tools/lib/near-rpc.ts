@@ -1,6 +1,6 @@
 /**
  * Minimal NEAR JSON-RPC client for the release tools: FastNEAR → dRPC failover, views, `send_tx` with
- * `wait_until: INCLUDED`, and a long-poll `tx` tracker (spec §8.3, §12.4; kb/40 §TL;DR 7).
+ * `wait_until: INCLUDED`, and a long-poll `tx` tracker (kb/90 §8.3, §12.4; kb/40 §TL;DR 7).
  * Never talks to the deprecated near.org RPC (config.ts refuses it).
  */
 import { isForbiddenRpc } from './config'

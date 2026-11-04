@@ -1,5 +1,6 @@
 /**
- * Own MPC key derivation (kb/10 §Key derivation, kb/11 §KDF; spec §8.2 lib/derive). No chainsig.js (D-03).
+ * Own MPC key derivation (kb/10 §Key derivation, kb/11 §KDF; kb/90 §8.2 lib/derive). No chainsig.js (D-03,
+ * plan/decisions.md).
  *
  *   tweak     = sha3_256("near-mpc-recovery v0.1.0 epsilon derivation:" + predecessor + "," + path)
  *   secp256k1 = root + G · BE(tweak)            (domain 0: BTC and EVM)

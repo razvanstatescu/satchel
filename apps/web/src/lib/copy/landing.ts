@@ -318,7 +318,7 @@ export const landing = {
       activity: "Every signature a Satchel has issued", // /s/1/activity
       market: "Satchels for sale and their checks", // /market
       contract: "Contract facts and commands to verify them", // /contract
-      repo: "The source code and README", // REPO_URL (404s until Day 13, H-21)
+      repo: "The source code and README", // REPO_URL (private, so it 404s for visitors until it goes public on Day 13: H-21, plan/decisions.md)
     },
   },
 

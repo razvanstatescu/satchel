@@ -225,7 +225,8 @@ export const marketCalls = {
   acceptOffer: (offer_id: number, contractId = SATCHEL_CONTRACT) => fromMarketCall(acceptOfferCall(contractId, offer_id)),
 };
 
-/** Status pill derived from contract state (kb/90 §5.10, kb/81 R3 precedence). */
+/** Status pill derived from contract state (kb/90 §5.10). Precedence Listed > Needs attention > Signing > Active, from
+ * kb/archive/81-design-tokens-R3.md §States; kb/81 R4 §States keeps the states and words the pill "Paused for sale". */
 export type SatchelStatus = "active" | "signing" | "listed" | "needs_attention";
 
 export function deriveStatus(args: {

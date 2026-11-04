@@ -1,4 +1,4 @@
-/** Isomorphic clean-history checker (spec §7). Pure functions with injectable fetchers. */
+/** Isomorphic clean-history checker (kb/90 §7). Pure functions with injectable fetchers. */
 export * from './types'
 export { checkCleanHistory, mergeNearSnapshots, type NearMerge } from './checker'
 export { gate, roleBanner, BUY_ENABLED, type GateInput, type GateResult } from './gate'

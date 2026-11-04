@@ -8,7 +8,7 @@ import { copy } from "@/lib/copy";
 import { pickEvmChainId } from "@/lib/evm-networks";
 import { hasCoins, holdings } from "@/lib/holdings";
 
-/** /s/[id]/send?chain=btc|evm|sol (sol only with the P2 SOL send flag) — a client flow presented in the FlowShell over the server-rendered Satchel page. */
+/** /s/[id]/send?chain=btc|evm|sol (sol when SOL_SEND_ENABLED, which the default SOL UI implies, D-46) — a client flow presented in the FlowShell over the server-rendered Satchel page. */
 export const instant = false;
 
 /**

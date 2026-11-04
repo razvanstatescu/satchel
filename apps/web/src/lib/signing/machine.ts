@@ -164,7 +164,7 @@ export function trackerRows(stage: SigningStage): [RowState, RowState, RowState,
   }
 }
 
-/** The owner-visible "Needs attention" condition for the pill (kb/81 R3). */
+/** The owner-visible "Needs attention" condition for the pill (kb/81 R4 §States). */
 export function needsAttention(intent: PendingIntent): boolean {
   return intent.stage === "signed_not_sent";
 }

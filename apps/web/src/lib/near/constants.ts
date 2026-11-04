@@ -1,6 +1,7 @@
 /**
- * Gas and deposit formulas mirrored from kb/90 §5.5 (single source of truth: the contract's `config()`;
- * `constants.test.ts` compares these with the fixture/live config view).
+ * Gas and deposit formulas mirrored from kb/90 §5.5 (single source of truth: the contract's `config()`).
+ * test/unit/contract-outcome-format.test.ts pins these values and checks the fixture `config()` view with
+ * @satchel/core's `diffConfig`.
  * Every value handed to a wallet is a decimal string.
  */
 

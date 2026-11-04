@@ -1,7 +1,7 @@
 /**
  * History-digest e2e (C1, docs/specs/C1-C2-C3-C7.md §5.1), read-only: page every `sig_records` row of a token,
  * recompute `historyDigest(contract, token_id, records)` with `@satchel/core/clean-history` and compare it to the
- * on-chain `history_digest(token_id)` view. Equal digests mean equal histories (spec §5.1).
+ * on-chain `history_digest(token_id)` view. Equal digests mean equal histories (C1 spec §5.1).
  *
  *   pnpm --filter @satchel/tools e2e:history --token 1
  *   pnpm --filter @satchel/tools e2e:history --token 1 --contract rc.satchelhq.testnet

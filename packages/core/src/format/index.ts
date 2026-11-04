@@ -1,5 +1,5 @@
 /**
- * Amount and time formatting (kb/80 R3 §Formatting; spec §8.9).
+ * Amount and time formatting (kb/80 R3 §Formatting; kb/90 §8.9).
  * - BTC up to 8 decimals, ETH/SOL up to 6, NEAR up to 4, USDC exactly 2; crypto keeps ≥ 4 decimals, trailing zeros trimmed.
  * - Balances round DOWN (truncate); "Max" uses exact base units (never a formatted string).
  * - "−" (U+2212) for outgoing, "+" for incoming; a no-break space (U+00A0) before the ticker.

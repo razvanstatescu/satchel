@@ -6,8 +6,8 @@ import { balanceText, UI_CHAINS } from "@/lib/view";
  * The social card's data (A1; /s/[id]/opengraph-image, /s/[id]/twitter-image), pure and unit-tested so the JSX
  * renderer (og-card.tsx) stays a thin layout. Never fiat, never testnet balances dressed up as real money: native
  * units with tickers only (D-37), the "Testnet" badge, and the state word the Wallet tab and the NFT media already
- * use (kb/81 R4 precedence) — except a listed Satchel reads "For sale" here (`copy.buy.forSale`), the word a buyer
- * actually sees, rather than the owner-side "Paused for sale".
+ * use (the precedence of `deriveStatus` in lib/near/contract.ts) — except a listed Satchel reads "For sale" here
+ * (`copy.buy.forSale`), the word a buyer actually sees, rather than the owner-side "Paused for sale".
  *
  * The sig line only ever claims "Clean history" when sig_count is 0: that's true without checking anything live.
  * Any other count is shown as a plain number ("2 signatures") — a static image can't speak for a per-browser check.

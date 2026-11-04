@@ -1,5 +1,6 @@
 /**
- * Gate modes by CONTRACT_ROLE (spec §7.3, R-06, INV-33) and the aggregate verdict. Pure.
+ * Gate modes by CONTRACT_ROLE (kb/90 §7.3; R-06 in plan/decisions.md; INV-33 in kb/90 §6) and the aggregate
+ * verdict. Pure.
  *
  * | role  | lock or code-hash failure                                   | every other check |
  * | dev   | warning "dev_contract_checks_skipped" (+ the specific one)   | gates Buy         |
@@ -76,12 +77,12 @@ export function gate(g: GateInput): GateResult {
   } else if (g.sigCount === 0) {
     aggregate = 'empty'
   } else {
-    aggregate = 'clean' // every item spent, expired, unfunded or foreign
+    aggregate = 'clean' // every item spent, expired, unfunded, foreign or message
   }
   return { aggregate, buyEnabled: BUY_ENABLED.has(aggregate), warnings, reasons }
 }
 
-/** Banner per role (kb/80 R3 `role.dev` / `role.rc`, sentence case per E-46). */
+/** Banner per role (kb/80 R3 `role.dev` / `role.rc`, sentence case per erratum E-46, kb/90 §13). */
 export function roleBanner(role: ContractRole): string | null {
   if (role === 'dev') return 'Dev contract: lock and code checks skipped'
   if (role === 'rc') return 'Release candidate: testnet rehearsal'

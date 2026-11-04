@@ -2,7 +2,8 @@ import { EASE, rollTracks, stickOnTracks, type Track } from "@/lib/motion/play";
 
 /**
  * The hand-off, the brand's one signature motion (motion-spec §2; `handoffTimes` + `handoffStrap` from
- * proto/motion/motion-kit.js). Data and pure track builders only; `components/client/Handoff.tsx` plays them.
+ * docs/design/satchel-2.0/prototypes/motion/motion-kit.js). Data and pure track builders only;
+ * `components/client/Handoff.tsx` plays them.
  *
  * The card hangs on a 22 px stem from a strap between two owners. Its pivot is the stem's top (`transform-origin:
  * 50% 0`) and nothing lifts: the stem is carried along the strap with a gentle start and a firm stop, the card lags back

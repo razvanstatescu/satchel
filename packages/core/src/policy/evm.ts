@@ -1,5 +1,5 @@
 /**
- * EVM type-2 classifier (spec §5.9 EVM; docs/specs/C1-C2-C3-C7.md §3.1): a native ETH transfer, or exactly one ERC-20
+ * EVM type-2 classifier (kb/90 §5.9 EVM; docs/specs/C1-C2-C3-C7.md §3.1): a native ETH transfer, or exactly one ERC-20
  * `transfer(to, amount)` to the chain's Circle testnet USDC (C2), on one of four testnets (C3).
  */
 import { keccak_256 } from '@noble/hashes/sha3.js'

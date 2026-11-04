@@ -1,5 +1,5 @@
 /**
- * Accounts, endpoints and contract roles for the release tools (spec §5.1, §8.3, §8.4; D-38 `<team>` = satchelhq).
+ * Accounts, endpoints and contract roles for the release tools (kb/90 §5.1, §8.3, §8.4; D-38 `<team>` = satchelhq).
  * Every value can be overridden by an env var or a flag; nothing here is secret.
  */
 import { homedir } from 'node:os'

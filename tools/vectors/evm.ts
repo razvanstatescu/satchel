@@ -1,5 +1,5 @@
 /**
- * EVM vectors (spec §12.2): accepted type-2 native transfers on the four testnets (C3), USDC transfers (C2), and every
+ * EVM vectors (kb/90 §12.2): accepted type-2 native transfers on the four testnets (C3), USDC transfers (C2), and every
  * refusal class of §5.9 / docs/specs/C1-C2-C3-C7.md §3.1. Built with viem (an independent encoder).
  */
 import { encodeFunctionData, erc20Abi, keccak256, serializeTransaction, toHex as vHex, parseTransaction, type Hex } from 'viem'

@@ -1,5 +1,5 @@
 /**
- * BTC vectors (spec §12.2): accepted 1-, 2-, 4- and 10-input P2WPKH sets (incl. a tb1p recipient) and every refusal
+ * BTC vectors (kb/90 §12.2): accepted 1-, 2-, 4- and 10-input P2WPKH sets (incl. a tb1p recipient) and every refusal
  * class of §5.9. Preimages come from @satchel/core and are cross-checked against bitcoinjs-lib 7 `hashForWitnessV0`
  * and its txid for every accepted vector.
  */

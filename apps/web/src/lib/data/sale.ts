@@ -6,7 +6,7 @@ import { contractEvents, historyClient, type FastnearTx } from "@/lib/near/histo
 import type { Currency, ProceedsView } from "@/lib/near/types";
 
 /**
- * The seller's side of a sale (spec §5.12; kb/80 R3 Sale flows "Sold (seller)"):
+ * The seller's side of a sale (kb/90 §5.12; kb/80 R3 Sale flows "Sold (seller)"):
  * - the receipt comes from the `sold` event (`{token_id, listing_id, seller_id, buyer_id, price, currency}`) and the
  *   `payout` event of the SAME tx (`{account_id, currency, amount, ok}`; the payout is detached, so `ok:false` means the
  *   amount was credited to `proceeds` instead and the sale still stands);

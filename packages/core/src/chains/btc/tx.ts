@@ -1,5 +1,5 @@
 /**
- * Plain transaction model + BIP143 P2WPKH preimages + the outputs serializer the contract checks (spec §5.3, §5.9;
+ * Plain transaction model + BIP143 P2WPKH preimages + the outputs serializer the contract checks (kb/90 §5.3, §5.9;
  * kb/30 §3). Pure @noble code: no bitcoinjs, no Buffer, so the Review screen can compute txids cheaply.
  */
 import { classifyBtcBytes, encodeVarint, sha256d } from '../../policy/btc'

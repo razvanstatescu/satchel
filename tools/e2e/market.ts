@@ -67,7 +67,7 @@ export async function marketTotals(ctx: Ctx): Promise<MarketTotalsView> {
   return ctx.rpc.view<MarketTotalsView>(ctx.cfg.contract, 'market_totals', {})
 }
 
-/** I-M1: escrow_near ≤ balance − storage stake (spec §2.4, M-01). */
+/** I-M1: escrow_near ≤ balance − storage stake (docs/specs/C4-C6.md §2.4, M-01). */
 export async function checkSolvency(ctx: Ctx): Promise<{ totals: MarketTotalsView; spare: bigint; ok: boolean }> {
   const [totals, account] = await Promise.all([marketTotals(ctx), ctx.rpc.viewAccount(ctx.cfg.contract)])
   if (!account) throw new Error(`account ${ctx.cfg.contract} not found`)

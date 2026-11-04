@@ -1,5 +1,5 @@
 /**
- * EVM testnets (kb/31; spec §8.2 lib/chains/evm; C2/C3 in docs/specs/C1-C2-C3-C7.md). viem 2.57.7.
+ * EVM testnets (kb/31; kb/90 §8.2 lib/chains/evm; C2/C3 in docs/specs/C1-C2-C3-C7.md). viem 2.57.7.
  * What `sign_for` accepts: an unsigned type-2 tx on Sepolia, Base Sepolia, Arbitrum Sepolia or OP Sepolia with an empty
  * access list and either empty data (native ETH) or one `transfer(to, amount)` to the chain's Circle USDC (value 0).
  */

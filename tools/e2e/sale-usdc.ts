@@ -1,5 +1,5 @@
 /**
- * USDC sale e2e (spec §5.12, §12.4; SAT-073, R-10, INV-16) with Circle testnet USDC:
+ * USDC sale e2e (kb/90 §5.12, §12.4; SAT-073, R-10, INV-16) with Circle testnet USDC:
  *   0. preconditions: the contract is USDC-storage-registered; the seller too (else the payout is re-credited);
  *      the buyer holds ≥ price
  *   1. list (currency usdc)

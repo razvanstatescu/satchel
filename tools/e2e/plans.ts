@@ -1,5 +1,5 @@
 /**
- * Pure tx plans for the NFT and sale flows (spec §5.5–§5.7, docs/handoff/contract.md §1). Gas and deposits come from
+ * Pure tx plans for the NFT and sale flows (kb/90 §5.5–§5.7, docs/handoff/contract.md §1). Gas and deposits come from
  * `@satchel/core/near` ATTACH so the scripts and the web app attach the same amounts.
  */
 import { ATTACH } from '@satchel/core/near'

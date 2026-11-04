@@ -1,4 +1,4 @@
-/** Shared pieces of the testnet e2e scripts (spec §12.4). Pure helpers first, then read-only NEAR views. */
+/** Shared pieces of the testnet e2e scripts (kb/90 §12.4). Pure helpers first, then read-only NEAR views. */
 import { deriveSatchelAddresses, tokenPath, type ChainSlug } from '@satchel/core/derive'
 import { decodeOnSignedResult, signForCall, signRequestChain, signRequestCount, type MpcSignature, type SignRequest } from '@satchel/core/near'
 import { classifySignRequest } from '@satchel/core/policy'

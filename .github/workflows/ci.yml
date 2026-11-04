@@ -15,7 +15,7 @@ on:
         required: false
         type: string
   schedule:
-    - cron: "30 6 * * *" # daily smoke, keep-alive window Nov 14–19 (plan §5.5)
+    - cron: "30 6 * * *" # daily smoke, keep-alive window Nov 14–19 (plan/implementation-plan.md §5.5)
 
 permissions:
   contents: read

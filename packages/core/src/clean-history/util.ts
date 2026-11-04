@@ -1,3 +1,7 @@
+/**
+ * Small helpers shared by the clean-history checker (kb/90 §7): bounded concurrency, error capture, code-hash
+ * normalization, the final-verdict cache (keyed by contract, token, seq and payload) and provider agreement.
+ */
 import { base58 } from '@scure/base'
 import { hexToBytesStrict, toHex } from '../bytes'
 import type { CachedVerdict, ItemReport, ItemStatus, SigRecordView, VerdictCache } from './types'
@@ -75,7 +79,7 @@ export function baseItem(r: SigRecordView): Pick<ItemReport, 'seq' | 'request_id
 
 /**
  * Combine one chain's per-provider verdicts for an item. ≥ 2 answers must agree, else `unknown`.
- * One answer counts only if the policy allows single-source verdicts (H-25).
+ * One answer counts only if the policy allows single-source verdicts (H-25 in plan/decisions.md).
  */
 export function agree(
   answers: { status: ItemStatus; reason: string; evidence: Record<string, unknown> }[],

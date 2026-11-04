@@ -180,9 +180,9 @@ Tests, all offline except where noted. Latest recorded results, with dates; the 
 |---|---|
 | `cargo test -p satchel --lib` | `test result: ok. 202 passed; 0 failed; 0 ignored` (re-run on Linux x86-64, 2026-11-04). Includes the shared vectors in `vectors/*.json` and the parser fuzz properties |
 | `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4; first build the three wasm files: `for c in satchel mock-signer mock-ft; do cargo near build non-reproducible-wasm --manifest-path contracts/$c/Cargo.toml; done`) | 137 passed (2026-10-31) |
-| `pnpm --filter @satchel/core test` | 540 passed, plus the browser-bundle check (2026-10-31) |
-| `pnpm --filter @satchel/tools test` | 92 passed, plus the vectors freshness check (2026-10-30) |
-| `pnpm --filter web test` / `test:e2e` (fixture mode) | 654 vitest / 307 Playwright passed (2026-11-03) |
+| `pnpm --filter @satchel/core test` | 540 passed, plus the browser-bundle check (re-run 2026-11-04) |
+| `pnpm --filter @satchel/tools test` | 92 passed, plus the vectors freshness check (re-run 2026-11-04) |
+| `pnpm --filter web test` / `test:e2e` (fixture mode) | 654 vitest (re-run 2026-11-04) / 307 Playwright (2026-11-03) passed |
 | `tools/check-wasm-imports.sh` | INV-22 OK: the release wasm cannot add a key, deploy code or delete the account |
 
 CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests. Run:

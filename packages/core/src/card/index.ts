@@ -1,6 +1,8 @@
 /**
- * Per-token leather hue (kb/81 R3 §Per-token leather hue, B-04). Shared by CSS (inline custom properties) and the
- * /api/card SVG, so both render the same hex.
+ * Per-token leather hue of brand 1.0 (kb/archive/81-design-tokens-R3.md §Per-token leather hue, B-04). Not used by
+ * the Satchel 2.0 app: the 2.0 build dropped the hue from the UI and left this module as it was
+ * (docs/design/satchel-2.0/decisions-during-build.md R1 #6), and the NFT image is apps/web/src/lib/card-svg.ts.
+ * Kept with its test vectors (test/card.test.ts); nothing in apps/web or tools imports it today.
  *
  *   offset = (fnv1a32(utf8("satchel:" + tokenId)) mod 25) − 12        (−12…+12)
  *   hue    = 52 + offset                                                (OKLCH degrees)
@@ -10,7 +12,7 @@
  */
 
 export const LEATHER_HUE = 52
-/** brand Night `surface` (kb/81 R3): the card body takes its lightness */
+/** brand 1.0 Night `surface` (kb/archive/81-design-tokens-R3.md): the card body takes its lightness */
 export const BRAND_SURFACE_NIGHT = '#221812'
 /** brand `leather-light`: the swatch takes its lightness and chroma */
 export const BRAND_LEATHER_LIGHT = '#6a4730'

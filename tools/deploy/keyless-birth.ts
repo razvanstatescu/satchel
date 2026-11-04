@@ -1,5 +1,5 @@
 /**
- * Keyless birth (spec §5.16, D-02/D-28, SAT-084): ONE transaction from the parent (`<team>.testnet`) that
+ * Keyless birth (kb/90 §5.16, D-02/D-28, SAT-084): ONE transaction from the parent (`<team>.testnet`) that
  *   CreateAccount · Transfer · DeployContract · FunctionCall new · FunctionCall nft_mint ×7
  * and contains NO AddKey, so the contract account never has a key. If any action fails, the receipt reverts and no
  * account is left behind; a SUCCESSFUL birth with a wrong argument is permanent (rehearse on rc first).

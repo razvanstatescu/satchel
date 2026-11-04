@@ -6,7 +6,7 @@ export type Hex = string
 
 const HEX_RE = /^[0-9a-fA-F]*$/
 
-/** Strict hex decode, the same rule as the contract (spec §5.9 Common): optional 0x/0X, even length, [0-9a-fA-F]. */
+/** Strict hex decode, the same rule as the contract (kb/90 §5.9 Common): optional 0x/0X, even length, [0-9a-fA-F]. */
 export function hexToBytesStrict(input: string): Uint8Array {
   const h = input.startsWith('0x') || input.startsWith('0X') ? input.slice(2) : input
   if (h.length % 2 !== 0 || !HEX_RE.test(h)) throw new Error('ERR_HEX: invalid hex string')

@@ -1,5 +1,5 @@
 /**
- * NEAR sale e2e (spec §5.12, §12.4; INV-14/15): `list` (currency near) → clean-history check → `buy` at once (no
+ * NEAR sale e2e (kb/90 §5.12, §12.4; INV-14/15): `list` (currency near) → clean-history check → `buy` at once (no
  * post-listing cooldown), bound to (listing_id, expected_sig_count). Checks the new owner, the cleared listing, and
  * that the seller got exactly `price` (or, if the payout failed, `proceeds_of` holds it).
  *

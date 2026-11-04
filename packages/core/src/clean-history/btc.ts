@@ -1,11 +1,12 @@
 /**
- * BTC dead-signature rule (spec §7.2, R-20): ONE `GET /tx/:txid/outspends` per distinct txid, on two providers that
- * must agree, plus one tip per provider (genesis-guarded):
+ * BTC dead-signature rule (kb/90 §7.2; R-20 in plan/decisions.md): ONE `GET /tx/:txid/outspends` per distinct txid,
+ * on two providers that must agree, plus one tip per provider (genesis-guarded):
  *   404 ⇒ every outpoint of that txid is `unfunded`; vout ≥ length ⇒ `unfunded`; spent:false ⇒ `unused`;
  *   spent unconfirmed ⇒ `settling` (full-RBF); confirmed with tip − height + 1 ≥ K ⇒ `spent`.
- * Foreign prevouts (review S-07): when an input would be `unused`/`settling`, one `GET /tx/:txid` per such txid reads
- *   the prevout's scriptPubKey; if it is none of P2WPKH(pkh), P2SH-P2WPKH(pkh), P2WSH(P2PKH(pkh)) for this token's
- *   pkh, the input is `foreign` (dead: it can't move the coins being bought). No script ⇒ the verdict stays.
+ * Foreign prevouts (S-07 in docs/security/contract-review.md): when an input would be `unused`/`settling`, one
+ *   `GET /tx/:txid` per such txid reads the prevout's scriptPubKey; if it is none of P2WPKH(pkh), P2SH-P2WPKH(pkh),
+ *   P2WSH(P2PKH(pkh)) for this token's pkh, the input is `foreign` (dead: it can't move the coins being bought).
+ *   No script ⇒ the verdict stays.
  * Then per request (SIGHASH_ALL + completeness): any input spent ⇒ the whole request is spent ("tx conflict");
  * else any unused ⇒ unused; else any unknown ⇒ unknown; else any settling ⇒ settling; else foreign; else unfunded.
  */

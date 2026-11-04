@@ -49,7 +49,7 @@ type Chain = "btc" | "evm" | "sol";
 type Step = "form" | "review" | "tracker";
 
 const DECIMALS: Record<Chain, number> = { btc: 8, evm: 18, sol: 9 };
-/** The chain picker: Bitcoin · Ethereum, plus Solana when the P2 SOL send flow is on (kb/80 R3 §Send). */
+/** The chain picker: Bitcoin · Ethereum, plus Solana when SOL_SEND_ENABLED (on with the default SOL UI, D-46; kb/80 R3 §Send). */
 export const SEND_CHAINS: Chain[] = SOL_SEND_ENABLED ? ["btc", "evm", "sol"] : ["btc", "evm"];
 
 /** Map a prepare error to copy (SOL rent/balance rules carry a `problem`, kb/80 E25/E26). */

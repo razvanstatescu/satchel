@@ -1,4 +1,4 @@
-/** Minimal strict (canonical) RLP decoder, the same rules the contract applies (spec §5.9 EVM). */
+/** Minimal strict (canonical) RLP decoder, the same rules the contract applies (kb/90 §5.9 EVM). */
 
 export type RlpItem = { kind: 'bytes'; value: Uint8Array } | { kind: 'list'; items: RlpItem[] }
 
