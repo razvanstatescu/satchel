@@ -370,11 +370,11 @@ export function simImplicitExists(accountId: string): boolean {
   return !!read().funded[accountId];
 }
 
-/** The claim: every Satchel this implicit account owns moves to `to`, and its leftover NEAR goes along too. */
-export function simClaim(implicitAccountId: string, to: string): { tokenIds: string[]; nearSent: string } {
+/** The claim: the Satchels this implicit account owns (only `only`, when given) move to `to`, and its leftover NEAR goes along too. */
+export function simClaim(implicitAccountId: string, to: string, only?: readonly string[]): { tokenIds: string[]; nearSent: string } {
   const s = read();
   const tokenIds = Object.entries(s.owners)
-    .filter(([, owner]) => owner === implicitAccountId)
+    .filter(([id, owner]) => owner === implicitAccountId && (!only || only.includes(id)))
     .map(([id]) => id);
   for (const id of tokenIds) s.owners[id] = to;
   const nearSent = s.near[implicitAccountId] ?? "0";

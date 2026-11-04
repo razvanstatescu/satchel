@@ -86,7 +86,7 @@ export function GiveLinkFlow({ snap }: { snap: SatchelSnapshot }) {
 
   if (phase === "done" && key) {
     title = copy.giveLink.createdTitle;
-    const url = buildClaimUrl(key.secretKey);
+    const url = buildClaimUrl(key.secretKey, [snap.token_id]);
     body = (
       <>
         <p className="flex items-start gap-2 rounded-md bg-surface-sunken p-3.5 font-sans text-body text-ink" role="alert">

@@ -40,22 +40,65 @@ export function parseClaimSecret(secret: string): ClaimKey | null {
   }
 }
 
-/** `location.hash` (with or without its leading "#") → a claim key, or null for an invalid / empty link. */
-export function parseClaimFragment(hash: string): ClaimKey | null {
+/** A parsed claim link: the key, plus the gifted token id(s) when the link carries them (R3-X-4). */
+export interface ClaimLink {
+  key: ClaimKey;
+  /** The token ids the giver put in the link, or null for an older link that has none (legacy: claims everything). */
+  giftTokenIds: string[] | null;
+}
+
+const GIFT_PARAM = "gift";
+const TOKEN_ID_RE = /^\d{1,20}$/;
+
+/**
+ * `location.hash` (with or without its leading "#") → the claim link, or null for an invalid / empty one.
+ * Format: `<secret>` (older links) or `<secret>&gift=<id>,<id>`. A `gift` param that is present but malformed makes
+ * the whole link invalid rather than silently falling back to "claim everything".
+ */
+export function parseClaimLink(hash: string): ClaimLink | null {
   const raw = hash.startsWith("#") ? hash.slice(1) : hash;
   if (!raw) return null;
+  const amp = raw.indexOf("&");
+  const secretPart = amp === -1 ? raw : raw.slice(0, amp);
+  const rest = amp === -1 ? "" : raw.slice(amp + 1);
   let decoded: string;
   try {
-    decoded = decodeURIComponent(raw);
+    decoded = decodeURIComponent(secretPart);
   } catch {
     return null;
   }
-  return parseClaimSecret(decoded);
+  const key = parseClaimSecret(decoded);
+  if (!key) return null;
+  let giftTokenIds: string[] | null = null;
+  for (const pair of rest.split("&")) {
+    if (!pair) continue;
+    const eq = pair.indexOf("=");
+    if (pair.slice(0, eq === -1 ? undefined : eq) !== GIFT_PARAM) continue; // unknown params are ignored
+    let value: string;
+    try {
+      value = decodeURIComponent(eq === -1 ? "" : pair.slice(eq + 1));
+    } catch {
+      return null;
+    }
+    const ids = value.split(",");
+    if (!ids.length || !ids.every((id) => TOKEN_ID_RE.test(id))) return null;
+    giftTokenIds = [...new Set(ids)];
+  }
+  return { key, giftTokenIds };
 }
 
-/** The claim link: `https://usesatchel.xyz/claim#<secret>`. The secret is only ever in the fragment. */
-export function buildClaimUrl(secretKey: string): string {
-  return `${APP_URL}/claim#${secretKey}`;
+/** `location.hash` → a claim key only (ignores the gift list). */
+export function parseClaimFragment(hash: string): ClaimKey | null {
+  return parseClaimLink(hash)?.key ?? null;
+}
+
+/**
+ * The claim link: `https://usesatchel.xyz/claim#<secret>&gift=<ids>`. The secret and the gifted ids are only ever in
+ * the fragment (never sent to a server). Without ids it is an older-style link that claims everything in the account.
+ */
+export function buildClaimUrl(secretKey: string, giftTokenIds?: readonly string[]): string {
+  const gift = giftTokenIds?.length ? `&${GIFT_PARAM}=${giftTokenIds.join(",")}` : "";
+  return `${APP_URL}/claim#${secretKey}${gift}`;
 }
 
 /** 0.02 NEAR in yocto, enough gas for the claimer to move the Satchel out and sweep any leftover NEAR (kb/80 A2). */

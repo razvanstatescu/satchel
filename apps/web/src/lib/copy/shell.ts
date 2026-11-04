@@ -104,6 +104,8 @@ export const shell = {
       count: (c: number) => n(c, "Satchel", "Satchels"),
       /** NEW (app-screens §2): the one line under a listed card on /satchels. */
       forSale: (price: string) => `For sale at ${price}`,
+      /** R3-X-3: the page cap was hit, so only the first of a very long list is shown. */
+      truncated: (shown: number, total: number) => `Showing the first ${shown} of ${total} Satchels this account owns.`,
       blocked: (price: string, count: number) =>
         `For sale at ${price}, but ${n(count, "signature", "signatures")} could still move coins, so nobody can buy it yet.`,
     },

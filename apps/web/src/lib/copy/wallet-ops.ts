@@ -72,7 +72,15 @@ export const walletOps = {
     alreadyClaimedTitle: "Already claimed",
     alreadyClaimedBody: "This link's account is empty — someone already claimed it (maybe you, in another tab).",
     failedTitle: "The claim didn't go through",
-    note: "Claiming moves every Satchel this link holds to your wallet, along with any leftover testnet NEAR.",
+    note: "Claiming moves the Satchel this link was made for to your wallet, along with any leftover testnet NEAR.",
+    /** R3-X-4: an older link has no gift list, so it still claims everything in the account. */
+    legacyNote: "This is an older link with no gift list, so claiming moves every Satchel in it. Check each one below before you claim.",
+    alsoHereTitle: "Also here, not part of this gift",
+    alsoHereBody: "Anyone can send a Satchel to this link's account after the link is shared. These were not in the gift, so claiming leaves them where they are. Open one to check its history first.",
+    giftGoneBody: "The Satchel this link was made for isn't in the account any more. Someone already claimed it, maybe you in another tab.",
+    partialBody: (ids: string[]) =>
+      `${ids.length === 1 ? `Satchel #${ids[0]} didn't move` : `Satchels ${ids.map((i) => `#${i}`).join(", ")} didn't move`}. Open the link again to retry.`,
+    truncatedNote: (shown: number) => `This account holds more Satchels than can be listed here. Showing the first ${shown}.`,
   },
   empty: {
     title: (id: string) => `Take everything out of Satchel #${id}`,

@@ -15,6 +15,7 @@ import { truncateMiddle } from "@/lib/format";
 import { readMotionMode } from "@/lib/motion-flag";
 import { EASE, play, stickOnTracks, type Frame, type MotionHandle, type Track } from "@/lib/motion/play";
 import { calls, contractViews } from "@/lib/near/contract";
+import { listOwnerTokens } from "@/lib/near/owner-tokens";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
 
@@ -170,8 +171,8 @@ export function MintFlow({ from }: { from: string | null }) {
         const v = r.value as { token_id?: string } | null;
         let id = v?.token_id ?? null;
         if (!id) {
-          const mine = await views.nftTokensForOwner(accountId, "0", 50).catch(() => []);
-          id = mine.map((t) => t.token_id).sort((a, b) => Number(b) - Number(a))[0] ?? null;
+          const mine = await listOwnerTokens(views, accountId).catch(() => null);
+          id = mine?.tokens.at(-1)?.token_id ?? null; // sorted ascending by numeric id: the newest is last
         }
         if (id) {
           const first = (await views.nftSupplyForOwner(accountId).catch(() => 0)) === 1;

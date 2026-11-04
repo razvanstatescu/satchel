@@ -9,6 +9,7 @@ import { ConnectButton } from "@/components/client/ConnectButton";
 import { MyOfferRow, StorageCreditRow } from "@/components/client/Market";
 import { useCharmSwing } from "@/components/client/MintFlow";
 import { EscrowPanel, useProceeds } from "@/components/client/SoldReceipt";
+import { listOwnerTokens } from "@/lib/near/owner-tokens";
 import { copy } from "@/lib/copy";
 import { IS_FIXTURE, SATCHEL_CONTRACT } from "@/lib/config";
 import { fixtureCleanReport } from "@/lib/data/clean";
@@ -35,7 +36,7 @@ import { priceText } from "@/lib/view";
  */
 
 type Hint = { aggregate: Aggregate; unused: number };
-type Loaded = { for: string | null; error: boolean; items: SatchelSnapshot[]; hints: Record<string, Hint> };
+type Loaded = { for: string | null; error: boolean; items: SatchelSnapshot[]; hints: Record<string, Hint>; truncated?: boolean; total?: number };
 
 const MINT_HREF = "/mint?from=/satchels";
 
@@ -58,11 +59,12 @@ async function hintFor(s: SatchelSnapshot): Promise<Hint | null> {
   }
 }
 
-async function loadMine(accountId: string): Promise<Pick<Loaded, "items" | "hints">> {
+async function loadMine(accountId: string): Promise<Pick<Loaded, "items" | "hints" | "truncated" | "total">> {
   const src = dataSource();
   const views = contractViews(src.view, SATCHEL_CONTRACT);
-  const tokens = await views.nftTokensForOwner(accountId, "0", 50);
-  const ids = tokens.map((t) => t.token_id).sort((a, b) => Number(a) - Number(b));
+  // every page, de-duplicated and sorted by id (R3-X-3): spam mints can't push a received Satchel off page 0
+  const owned = await listOwnerTokens(views, accountId);
+  const ids = owned.tokens.map((t) => t.token_id);
   let items: SatchelSnapshot[];
   if (IS_FIXTURE) {
     const [config, lock] = await Promise.all([views.config(), src.lock()]);
@@ -74,7 +76,7 @@ async function loadMine(accountId: string): Promise<Pick<Loaded, "items" | "hint
   }
   const listed = items.filter((s) => s.listing);
   const hints = Object.fromEntries((await Promise.all(listed.map(async (s) => [s.token_id, await hintFor(s)] as const))).filter((e): e is [string, Hint] => !!e[1]));
-  return { items, hints };
+  return { items, hints, truncated: owned.truncated, total: owned.total };
 }
 
 /** C4: "My offers" — the offers this account has made on other Satchels (docs/specs/C4-C6.md §3). Client-only,
@@ -271,7 +273,14 @@ export function SatchelsHome() {
           />
         </div>
       ) : (
-        <CardGrid items={state.items} hints={state.hints} />
+        <>
+          {state.truncated ? (
+            <p className="mb-4 mt-0 font-sans text-body-sm text-ink-muted" data-testid="my-satchels-truncated">
+              {copy.home.list.truncated(state.items.length, state.total ?? state.items.length)}
+            </p>
+          ) : null}
+          <CardGrid items={state.items} hints={state.hints} />
+        </>
       )}
     </section>
   );

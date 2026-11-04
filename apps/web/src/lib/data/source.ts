@@ -96,7 +96,10 @@ function fixtureView(): ViewFn {
       case "nft_tokens_for_owner": {
         const acct = String(args.account_id);
         const ids = [...Object.keys(FIXTURE_TOKENS), ...sim.minted.map((m) => m.id)];
-        return ids.map((i) => sim.token(i) ?? fixtureToken(i)).filter((t): t is NftToken => !!t && t.owner_id === acct) as T;
+        const from = Math.max(0, Number(args.from_index ?? 0) || 0);
+        const limit = Math.max(1, Math.min(50, Number(args.limit ?? 50) || 50));
+        const mine = ids.map((i) => sim.token(i) ?? fixtureToken(i)).filter((t): t is NftToken => !!t && t.owner_id === acct);
+        return mine.slice(from, from + limit) as T;
       }
       case "nft_supply_for_owner": {
         const acct = String(args.account_id);
