@@ -35,6 +35,9 @@ Approvals:
 - [ ] App host is final (D-23, H-05). `base_uri` = `https://usesatchel.xyz/api/card/` unless H-05 changed;
   it is immutable after birth.
 - [ ] H-26 is decided: either USDC init (default) or `--no-usdc`. rc and final must use the **same** init args.
+- [ ] With USDC: the tool's pre-check prints `PASS USDC contract … is USDC with 6 decimals (ft_metadata)` (review
+  R3-D-1). `usdc` is immutable and the contract prices USDC in 6-decimal base units. The tool also refuses any two of
+  the child, `--mpc`, `--usdc` and `wrap.testnet` being the same account.
 - [ ] The parent balance covers the Transfer, 7 × 0.02 NEAR and the 10× gas hold. The tool prints the requirement:
   about 10.31 NEAR for rc and 20.31 NEAR for final (the Transfer plus about 0.31 NEAR of mint deposits and gas hold).
 - [ ] Final only: the tag `contract-v1.0.0` is on the rc1 commit (R-29) and **H** equals the rc's on-chain code hash.

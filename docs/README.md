@@ -37,7 +37,7 @@ Interface specifications of the features added in the Oct 29 sprint. Each one ex
 | [`security/contract-review.md`](security/contract-review.md) | Adversarial review of the v1 contract (2026-10-23). No Critical or High findings; every finding (S-01…) is fixed or accepted, with its test |
 | [`security/fuzzing.md`](security/fuzzing.md) | Fuzzing of the payload parsers that decide what the MPC signs: about 7 million inputs, no panics, no wrong accepts |
 | [`security/sprint-review.md`](security/sprint-review.md) | Adversarial review of the sprint features C1–C7 (2026-10-29); findings M-/L-/I-xx and their status |
-| [`security/review-round-3.md`](security/review-round-3.md) | Round-three adversarial review of the whole contract (2026-11-04). No Critical or High findings in the contract; R3-xx findings, proof tests `review3_*` |
+| [`security/review-round-3.md`](security/review-round-3.md) | Round-three adversarial review of the whole contract (2026-11-04). No Critical or High findings in the contract; every R3-xx finding is fixed or mitigated (fix pass, same day); tests `review3_*` |
 
 ## testing/
 

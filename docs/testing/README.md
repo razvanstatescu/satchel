@@ -47,19 +47,19 @@ above signs a testnet transaction, except the live scripts in the last row. Live
 
 ## Latest recorded counts
 
-The newest count recorded for each suite, with its date and source. On `main`, the contract code has not changed
-since 2026-10-31 (commit `e785075`), nor have the `packages/core` tests. The README's "Run it locally" table should
-match this one at the release commit.
+The newest count recorded for each suite, with its date and source. The contract code changed on 2026-11-04 with the
+round-three review fixes (branch `fix/r3-findings`, [`security/review-round-3.md`](../security/review-round-3.md)).
+The README's "Run it locally" table should match this one at the release commit.
 
 | Suite | Latest recorded result | Date | Source |
 |---|---|---|---|
-| Contract unit, `cargo test -p satchel --lib` | 202 passed, 0 ignored | 2026-10-31 | [contract.md §7.7](contract.md#77-q-03-and-q-04-fixed-2026-10-31-branch-fixq03-q04-from-main-2ed9759) |
-| Contract sandbox, nearcore 2.13.4 (one `--test` file at a time) | 137 passed, 0 ignored | 2026-10-31 | same |
-| Wasm import check | INV-22 OK (wasm `4dd7cde9…`, the one on dev2) | 2026-10-31 | same |
-| Core | 540 passed (18 files), plus the browser-bundle check | 2026-10-31 | [core-api.md "Round two"](core-api.md#round-two) |
-| Tools unit (`test:unit`) | 92 passed (6 files) | 2026-10-30 | [core-api.md "Suite counts"](core-api.md#suite-counts) |
-| Web unit (vitest) | 654 passed | 2026-11-03 | [`docs/handoff/web.md`](../handoff/web.md), "Update 2026-11-03 (D-52)" |
-| Web end to end (Playwright, fixture) | 307 passed | 2026-11-03 | same |
+| Contract unit, `cargo test -p satchel --lib` | 232 passed, 3 ignored (slow `review3_*` tests; they pass with `--include-ignored`) | 2026-11-04 | [review-round-3.md](../security/review-round-3.md) |
+| Contract sandbox, nearcore 2.13.4 (one `--test` file at a time) | 137 passed, 0 ignored; the new `review3.rs` (2 tests) compiles but was not run (no cargo-near wasm in that environment) | 2026-10-31 / 2026-11-04 | [contract.md §7.7](contract.md#77-q-03-and-q-04-fixed-2026-10-31-branch-fixq03-q04-from-main-2ed9759), review-round-3.md |
+| Wasm import check | INV-22 OK (plain `cargo build --target wasm32-unknown-unknown --release` of `fix/r3-findings`; the reproducible cargo-near artifact still needs its own check) | 2026-11-04 | review-round-3.md |
+| Core | 549 passed (19 files, `test/network` excluded), plus the browser-bundle check | 2026-11-04 | review-round-3.md |
+| Tools unit (`test:unit`) | 94 passed (6 files); vectors regenerate byte-identical | 2026-11-04 | review-round-3.md |
+| Web unit (vitest) | 673 passed (52 files) | 2026-11-04 | review-round-3.md |
+| Web end to end (Playwright, fixture) | 307 passed; on 2026-11-04 the desktop project ran the changed specs (allowance, reject-coverage, give-link, offers, theme-a11y, flows): all pass, one axe colour-contrast hit on the untouched gate line passed on re-run | 2026-11-03 / 2026-11-04 | [`docs/handoff/web.md`](../handoff/web.md), review-round-3.md |
 | Deep Rust-vs-TS differential | 1,000,000 cases, 0 disagreements | 2026-10-30/31 | [contract.md §7.2](contract.md#72-results-filled-in-as-each-run-finishes) |
 
 ## Counts through the audit (2026-10-30/31)
@@ -124,7 +124,7 @@ Details: [contract.md §7](contract.md#7-round-two-2026-10-30-branch-testcontrac
 | R2-01 | The live Activity feed never named a delegate who signed: the app read `requester` from the `sign_requested` event, which (by design) doesn't carry it. Fixtures did, so no test saw it | Low (web) | the requester now comes from the signature record, shown only when it wasn't the owner at that block (`liveActivityRows`, unit-tested) |
 | R2-03 | An accepted offer showed in Activity as a plain transfer, with no price | Info (web) | `offer_accepted` becomes a sale row with its price and buyer |
 | — | A bitcoin amount below dust was refused with core's raw text ("minimum is 294 sats for this recipient") | Cosmetic (web) | coin-selection errors read as sentences ("Send at least 0.00000294 BTC") |
-| R2-02 | For a delegate's invalid message the TS mirror returns `ERR_MSG_*` where the contract returns `ERR_ALLOWANCE_KIND`; both refuse | Info (TS mirror) | not fixed; optional |
+| R2-02 | For a delegate's invalid message the TS mirror returns `ERR_MSG_*` where the contract returns `ERR_ALLOWANCE_KIND`; both refuse | Info (TS mirror) | fixed 2026-11-04 (review round 3): `checkDelegatedSign` refuses any message kind first, before expiry and listing, like `authorize_signer` |
 
 ### Decided by Razvan and fixed (contract, 2026-10-31, before the Nov 9 freeze)
 

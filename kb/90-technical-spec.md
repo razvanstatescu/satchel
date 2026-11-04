@@ -493,7 +493,9 @@ impl Contract {
     /// Owner only. Classifies `request`, writes one SigRecord per MPC request (n = 1, or number of BTC inputs),
     /// emits `sign_requested`, then returns sign×n (each a single-action receipt, joined with .and()) .then(on_signed).
     /// Tx result = on_signed's return value. mpc_deposit: yocto forwarded per MPC call (default 1, max 0.01 NEAR).
-    #[payable] pub fn sign_for(&mut self, token_id: TokenId, request: SignRequest, mpc_deposit: Option<U128>) -> Promise;
+    #[payable] #[deny_unknown_arguments] pub fn sign_for(&mut self, token_id: TokenId, request: SignRequest, mpc_deposit: Option<U128>) -> Promise;
+    // unknown arguments, and unknown fields inside `request` (SignRequest has deny_unknown_fields), are refused at the
+    // entry point (review R3-I-1): a dapp can't add decoy fields a wallet would show next to the signed bytes
 
     /// Self only. Never panics. Per index i: Ok(bytes) → parse → status Signed (+ signature bytes) or Unparsed;
     /// Err → Failed. Emits `sign_resolved`. Returns the raw MPC JSON per request (null on failure), in input order.
@@ -534,8 +536,9 @@ impl Contract {
                                     memo: Option<String>, msg: String) -> PromiseOrValue<bool>;
     fn nft_token(&self, token_id: TokenId) -> Option<Token>;
 }
-#[near] impl NonFungibleTokenEnumeration for Contract { /* nft_total_supply, nft_tokens, nft_supply_for_owner, nft_tokens_for_owner → self.tokens.*;
-                                                           nft_tokens / nft_tokens_for_owner pass limit = min(limit ?? 50, 50) (MAX_PAGE, S-05) */ }
+#[near] impl NonFungibleTokenEnumeration for Contract { /* nft_total_supply, nft_supply_for_owner, nft_tokens_for_owner → self.tokens.*;
+                                                           nft_tokens / nft_tokens_for_owner pass limit = min(limit ?? 50, 50) (MAX_PAGE, S-05);
+                                                           nft_tokens pages by numeric id, in mint order (review R3-X-1/2, §5.14) */ }
 #[near] impl NonFungibleTokenMetadataProvider for Contract { fn nft_metadata(&self) -> NFTContractMetadata; }
 #[near] impl FungibleTokenReceiver for Contract {
     /// Only the configured USDC may call. Panics on any mismatch (FT refunds 100 %). Success → Value(U128(0)).
@@ -836,7 +839,8 @@ Example: `EVENT_JSON:{"standard":"satchel","version":"1.0.0","event":"sign_reque
 
 Page limits:
 - `sig_records` and `listings` clamp `limit` to `MAX_PAGE` = 50.
-- **NEP-181** (`nft_tokens`, `nft_tokens_for_owner`): `limit` **defaults to 50 and is capped at 50** (review S-05). Code: `page_limit(limit) = Some(limit.unwrap_or(MAX_PAGE as u64).min(MAX_PAGE as u64))`, passed to the near-contract-standards implementation. A missing `limit` means 50, never "all", so spam mints cannot push an unpaged call past the view gas limit. Clients that need more page with `from_index`. NEP-181 allows a contract-chosen limit.
+- **NEP-181** (`nft_tokens`, `nft_tokens_for_owner`): `limit` **defaults to 50 and is capped at 50** (review S-05). Code: `page_limit(limit) = Some(limit.unwrap_or(MAX_PAGE as u64).min(MAX_PAGE as u64))`. A missing `limit` means 50, never "all", so spam mints cannot push an unpaged call past the view gas limit. Clients that need more page with `from_index`. NEP-181 allows a contract-chosen limit.
+- **`nft_tokens` pages by numeric id** (review R3-X-1, R3-X-2): ids are dense (`1..next_token_id`, no burn), so index `i` is token `i + 1`; a page is `limit` O(1) lookups at any depth and lists tokens in **mint order**. near-contract-standards' version skipped through its TreeMap with one tree search per skipped token (≥ 710 Tgas of host gas at `from_index` 950 of 1,000 tokens; now 6.9 Tgas) and paged in string order (`1, 10, 11, …, 2`). Its refusals are kept: `from_index` past the supply → "Out of bounds, please use a smaller from_index."; `limit: 0` → "Cannot provide limit of 0.". `nft_tokens_for_owner` is the library's (insertion order with swap-remove; O(1) skip).
 - `proceeds_of` hides zero entries, so a reserved or withdrawn slot (value 0) does not show.
 
 Signature encoding in views:
@@ -1079,7 +1083,7 @@ Test files live in `tests/tests/*.rs` (sandbox, near-workspaces 0.23.0 + mock si
 | EVM | `spent` if `eth_getTransactionCount(addr, tag = toHex(blockNumber − 3)) > nonce`; `settling` if only the `latest` count is `> nonce`; else `unused` | `eth_chainId == 11155111` guard, then two counts per address (`latest`, `latest − 3`) on **two** providers that must agree. O(1) per address, however many records exist | kb/70 §P2; kb/31 §Nonces |
 | BTC (per distinct txid) | **One** `GET /tx/:txid/outspends` per distinct txid referenced by the records, deduplicated (R-20):<br>• **404** ⇒ every outpoint of that txid is **`unfunded`**;<br>• `vout ≥ array length` ⇒ `unfunded`;<br>• `spent:false` ⇒ `unused`;<br>• spent but unconfirmed ⇒ `settling` (full-RBF can replace it, kb/70 F26);<br>• confirmed with `tip − block_height + 1 ≥ K` ⇒ `spent`.<br>Tip comes from one `GET /blocks/tip/height` | mempool.space testnet4 + mempool.emzy.de testnet4 (both serve `/outspends`), which must agree; a third Esplora instance if one is found (A-07). Genesis guard `GET /block-height/0 == 00000000da84…f043`. Never trust `/outspend/:v` alone: it says `spent:false` for unknown txids | kb/30 §1, §7, §TL;DR 12 |
 | BTC (foreign prevout, per input; review S-07) | When an input would be `unused` or `settling`, read the prevout's `scriptpubkey` with one `GET /tx/:txid` per such txid. If it is none of P2WPKH(pkh) `0014{pkh}`, P2SH-P2WPKH(pkh) and P2WSH(`76a914{pkh}88ac`), where pkh = hash160(the token's derived BTC pubkey), the input is **`foreign`**: the coin exists but is not at this Satchel's address, so the signature can never move the coins being bought. A provider that cannot answer `/tx` (or answers an unreadable shape) leaves the verdict as it was (fail closed). Both providers must agree, as for `/outspends` | the same two Esplora providers | contract-review S-07 |
-| BTC (per request) | The contract enforced completeness + SIGHASH_ALL, so: if **any** input of the request is `spent` ⇒ every record of that request is `spent` ("tx conflict"); else if any is `unused` ⇒ `unused`; else if any is `unknown` ⇒ `unknown`; else if any is `settling` ⇒ `settling`; else if any is `foreign` ⇒ `foreign`; else `unfunded` | — | kb/30 §7 ("any input spent ⇒ dead") |
+| BTC (per request) | The contract enforced completeness + SIGHASH_ALL, so: if **any** input of the request is `spent` ⇒ every record of that request is `spent` ("tx conflict"); else if any is `unused` ⇒ `unused`; else if any is `unknown` ⇒ `unknown`; else if any is `settling` ⇒ `settling`; else if any is `foreign` ⇒ `foreign`; else if any is `unfunded` ⇒ `unfunded`; else `inactive` (only past the txid cap, see the limits below) | — | kb/30 §7 ("any input spent ⇒ dead") |
 | SOL | `expired` if the record is **≥ 120 s old** and **at least one** provider reports `isBlockhashValid(recent_blockhash, {commitment: "processed"}) == false`. Dead by construction otherwise (durable nonces refused, quiet period ≥ 138 s), so one provider suffices (R-19). Else `unused`. `expired` is permanent and cached. Optional: `getSignatureStatuses([sig], {searchTransactionHistory: true})` shows "landed" | devnet RPC (a second one if available, A-06), one query per distinct blockhash | kb/32 §TL;DR 3; kb/70 §P2 |
 | any | `unknown` when providers **disagree**, all of them error, or the chain is unsupported. If one of two BTC/EVM providers is **down** (errors, not disagreement), the testnet policy H-25 applies: the verdict comes from the remaining provider and is labelled "1 of 2 sources" | — | kb/70 §P3; R-19 |
 
@@ -1093,7 +1097,7 @@ additionally carries `erc20 {token, to, amount}`.
 
 **Message records, item status `message` (C7; sprint 2026-10-29).** A record whose detail is `evm_message` or
 `sol_message` gets a new item status, **`message`** (reason `message_signature`), which is **never blocking**: the
-aggregate in §7.3 is `clean` when every item is `spent`, `expired`, `unfunded`, `foreign` **or** `message` (INV-37:
+aggregate in §7.3 is `clean` when every item is `spent`, `expired`, `unfunded`, `foreign`, `inactive` **or** `message` (INV-37:
 a message can never move the coins a buyer is checking). The item report carries `message_kind` and the decoded
 `message_text`, so the Buy tab can list it ("Signed a message: '…'. Messages can't move coins."). A record whose
 payload doesn't match its message (`keccak256(eip191(m))` / `sha256(offchain(m))`) is `unknown` / `record_inconsistent`
@@ -1118,6 +1122,7 @@ returns `unknown` — old app builds fail closed, they never show a false `clean
 | `expired` | Expired ("Blockhash expired. It can't be used.") | no |
 | `unfunded` | **Unfunded** ("Spends coins that don't exist. If they ever appear at this address, the previous owner could move them; they're excluded from what you buy.") | **no** (D-04) |
 | `foreign` | **Foreign** ("Points at a coin this Satchel can't spend. It can't move the coins you're buying.", copy key `clean.item.foreignBody`) | **no** (review S-07) |
+| `inactive` (BTC, only past the txid cap) | **Not a current coin** ("Spends a coin that isn't in this Satchel now. It can't move the coins you're buying; if that coin ever comes back, it's excluded from what you buy.", copy key `clean.item.inactiveBody`). Reason `not_a_current_coin`; never cached; its outpoints stay encumbered | **no** (review R3-S-1) |
 | `message` **(sprint 2026-10-29, C7)** | Message ("Signed a message: '{text}'. Messages can't move coins.") | **no** (INV-37) |
 | `settling` | Settling ("Waiting for {k} more confirmation(s)") | yes |
 | `unused` | Unused ("Nonce {n} not used yet" / "{txid}:{vout} unspent" / "Blockhash still valid") | yes |
@@ -1138,7 +1143,7 @@ returns `unknown` — old app builds fail closed, they never show a false `clean
 | `unknown` | any item `unknown` | disabled |
 | `blocked` | any item `unused` | disabled |
 | `settling` | any item `settling` | disabled |
-| `clean` | every item `spent`, `expired`, `unfunded`, `foreign` **or `message` (sprint 2026-10-29, C7)** | enabled; `buy` is called with `(listing_id, expected_sig_count = sig_count read in step 1)`. Shown as "clean (1 of 2 sources)" when policy H-25 applied |
+| `clean` | every item `spent`, `expired`, `unfunded`, `foreign`, `inactive` (review R3-S-1) **or `message` (sprint 2026-10-29, C7)** | enabled; `buy` is called with `(listing_id, expected_sig_count = sig_count read in step 1)`. Shown as "clean (1 of 2 sources)" when policy H-25 applied |
 
 **"Verified balance"** (what the buyer pays for):
 - BTC: confirmed UTXOs at policy depth, **excluding any UTXO whose outpoint is referenced by a non-dead record** ("encumbered", shown separately).
@@ -1175,7 +1180,7 @@ Only the browser result enables Buy (kb/70 §Threat u).
 
 **Limits** (R-20; the rev-1 200-record cap is removed):
 - Calls per check = 2 NEAR views + 2 EVM counts per provider + (1 + distinct BTC txids) per BTC provider + one `GET /tx/:txid` per provider for each distinct txid that still has an `unused`/`settling` input (the S-07 foreign check) + distinct young SOL blockhashes.
-- A soft cap of **100 distinct BTC txids** per run applies. Beyond it the BTC items are `unknown` ("too many coins to verify in the browser; ask the seller to consolidate").
+- A soft cap of **100 distinct uncached BTC txids** per run applies. Beyond it (review R3-S-1) the check lists the coins at the Satchel's BTC address now (`GET /address/:a/utxo`, unconfirmed included, the union over the providers): a signature can only move the coins its own request spends, so only requests with an input among those coins get the per-txid queries above, and only their txids count against the cap. Every other request is `inactive` (non-blocking, never cached, its outpoints still encumbered). If the requests that spend a current coin still name more than 100 txids, their items are `unknown` ("too many coins to verify in the browser; ask the seller to consolidate", which now helps: consolidating shrinks the current coins). Without a coin list (no provider can list coins, both fail, or only one answers when the policy needs two) every BTC item is `unknown` as before (fail closed). Before this, fabricated txids (never cacheable) or an honest history that spent from > 100 funding txs made a token unbuyable from any fresh browser for good.
 - Statuses that are **finally** dead (EVM below `latest − 3`, BTC at depth ≥ K, SOL expired) are cached permanently in `localStorage` and in the server cache. Everything else is re-queried (kb/70 §P3).
 
 ### 7.6 Seller guidance ("How to settle", shown in the Sell tab's pre-list check)

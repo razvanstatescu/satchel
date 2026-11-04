@@ -46,6 +46,9 @@ the reviewers could find:
 **New findings:** 2 Medium (one is a design gap in C5, the other is in the off-chain buyer's checker), 4 Low (R3-X-3
 is in the web app only) and 5 Info (R3-X-4 is reasoning only).
 
+**Status (2026-11-04):** every finding is fixed or mitigated on branch `fix/r3-findings`; see "Fix pass" below.
+R3-A-1 and R3-A-2 are by design, so they are documented and surfaced in the app rather than changed in the contract.
+
 **Fix first:**
 
 1. **R3-S-1** (checker only, no contract change): the BTC txid cap must not cover history that can never be cached.
@@ -56,20 +59,48 @@ is in the web app only) and 5 Info (R3-X-4 is reasoning only).
    - R3-X-1/R3-X-2: `nft_tokens` pages by numeric id;
    - R3-I-1: `deny_unknown_fields` on `SignRequest` and `#[deny_unknown_arguments]` on `sign_for`.
 
+## Fix pass (2026-11-04)
+
+Every finding now has a status. The fixes are on branch `fix/r3-findings`, on top of `review/r3-contract-audit`.
+
+| ID | Status | What changed | Tests |
+|---|---|---|---|
+| R3-S-1 | **Fixed** | `checkBtc`: past the cap it lists the coins at the Satchel's address (`BtcSource.utxos`, Esplora `/address/:a/utxo`, union over the providers). Only requests that spend one of them are queried and count against the cap. The others get the new non-blocking status `inactive` (never cached, outpoints still encumbered). With no coin list the cap applies to every record (fail closed). The app shows `inactive` as "Not a current coin". kb/90 §7.3 and §7.5 updated | core `review-r3s1.test.ts` (9); web `clean-view.test.ts`, `allowance-outstanding.test.ts` |
+| R3-A-1 | **Mitigated** (docs + UI) | C5.md §4 now says the cap limits signing, not spending, and that revoke, expiry and a transfer stop only new signatures; §7 has the note. The app shows each delegate's signatures that the clean-history check hasn't shown dead (count and amounts). The Revoke confirmation says revoking stops only new signatures and links to settling them. A contract-side cumulative budget is a design change, deferred past the freeze | web `allowance-outstanding.test.ts`, e2e `allowance.spec.ts`; the `r3a1_*` demos still pass (the behaviour is by design) |
+| R3-X-1 | **Fixed** | `nft_tokens` pages by numeric id: 6.87 Tgas at any depth (was ≥ 710 Tgas at `from_index` 950 of 1,000 tokens). The library's refusals are kept | unit `r3x1_guard_deep_nft_tokens_page_costs_like_the_first`, the ignored 1,000-token proof (passes); sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (compiled, not run) |
+| R3-X-2 | **Fixed** | The same override: mint order, so page 0 holds tokens 1–50 | unit `r3x2_guard_pages_follow_mint_order`, `r3x_guard_nft_tokens_refusals_and_shape_match_the_library` |
+| R3-A-2 | **Mitigated** (docs + UI) | C5.md §7 documents it. Before List and Accept offer, the app tells an owner with live access granted to revoke first. No contract change: a minimum fee can't stop a delegate who pays a near-zero one | e2e `allowance.spec.ts`; the `r3a2_*` demo still passes (by design) |
+| R3-X-3 | **Fixed** | `listOwnerTokens` pages `nft_tokens_for_owner` up to `nft_supply_for_owner` (at most 20 pages, de-duplicated, sorted by id). My Satchels, Mint and the claim page use it | web `owner-tokens.test.ts` |
+| R3-A-3 | **Fixed** | `set_allowance` emits `allowances_cleared {reason: "expired"}` for the delegates it drops, after the storage charge and before `allowance_set` | unit `r3a3_set_allowance_announces_dropped_expired_allowances` |
+| R3-I-1 | **Fixed** | `SignRequest` has `deny_unknown_fields`, and `sign_for` has `#[deny_unknown_arguments]` | unit `review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_*` (compiled, not run) |
+| R3-X-4 | **Fixed** | The gift link names the gifted ids (`/claim#<secret>&gift=<ids>`, fragment only), and a claim moves only those. Anything else is listed as "also here, not part of this gift". Each transfer is isolated and the NEAR sweep always runs. Older links still work, with a note | web `claim-plan.test.ts`, e2e `give-link.spec.ts` |
+| R3-D-1 | **Fixed** | `validateBirth` refuses any two of the child, `--mpc`, `--usdc` and `wrap.testnet` being the same account, and demo mints to USDC. The pre-checks require USDC's `ft_metadata` to be `USDC` with 6 decimals | tools `keyless-birth.test.ts` |
+| R3-N-1 | Accepted | — | guards `r3_m1_*` |
+| R2-02 + the order note | **Fixed** | `checkDelegatedSign` refuses a delegate's message kind first, as the contract's `authorize_signer` does | tools `new-features.test.ts`, core `allowance.test.ts` |
+
+**The wasm changes.** Before the rc birth:
+- rebuild with cargo-near (reproducible);
+- run the sandbox suite on that artifact, including the new `review3.rs`;
+- run `tools/check-wasm-imports.sh` on it;
+- update the expected code hash (`EXPECTED_CODE_HASH`, docs).
+
+Here, a plain `cargo build -p satchel --target wasm32-unknown-unknown --release` of this branch compiles (so the
+macro-generated entry points with `deny_unknown_fields` are valid) and passes INV-22.
+
 ## Findings
 
 | ID | Severity | Status | Where | Summary |
 |---|---|---|---|---|
-| R3-A-1 | **Medium** | Open (design: docs + UI; contract optional) | `allowance.rs:219-276`, `:616-632`; `evm_nonces.rs:31-40`; `docs/specs/C5.md` §4 | The cap limits what a delegate may **sign** per 24 h, not what it can **spend**. Banked signatures exceed the cap and survive revoke |
-| R3-S-1 | **Medium** (off-chain) | Open (`packages/core`) | `clean-history/btc.ts:85-86`, `:133-135`; `checker.ts:140-148`; `types.ts:98` | More than 100 distinct BTC txids in a token's history make it permanently unbuyable from any fresh browser |
-| R3-X-1 | Low | Open (contract, pre-freeze) | `lib.rs:318-320`; nc-standards `enumeration_impl.rs:37-40`; near-sdk `collections/tree_map.rs:823-831` | S-05's fix is incomplete: deep `nft_tokens` pages cost O(from_index × log n) reads and exceed the view gas limit |
-| R3-X-2 | Low | Open (contract fix above, or web) | same; `apps/web/src/lib/data/server.ts:218` | `nft_tokens` pages in lexicographic id order, so the SSR market page drops Satchels (genesis 6–9, ids ≥ 55) |
-| R3-A-2 | Low | Open (docs/UI; optional contract hardening) | `allowance.rs:384`; `sign.rs:91-92`; `sale.rs:93-96`; `offers.rs:281-289` | A delegate can stall `list`/`accept_offer` and stale every offer with zero-debit requests, up to 32 times a day |
-| R3-X-3 | Low (web) | Open (`apps/web`) | `MySatchels.tsx:64`, `MintFlow.tsx:173`, `claim-source.ts:28,41` | Spam mints push a holder's newly received Satchel off page 0 of every web reader |
-| R3-A-3 | Info | Open | `allowance.rs:583` | `set_allowance` drops other expired allowances without an event |
-| R3-I-1 | Info | Open (contract, pre-freeze) | `types.rs:36-47`; `sign.rs:45-46` | `sign_for` silently accepts unknown JSON fields (phishing decoys in wallet prompts) |
-| R3-X-4 | Info (web; reasoning only) | Open (`apps/web`) | `ClaimFlow.tsx:113,156`; `claim-source.ts:59-64` | A give-by-link claim takes every token in the gift account, including ones an outsider injected |
-| R3-D-1 | Info | Open (`tools`) | `tools/deploy/keyless-birth.ts:61-82`, `:163-184` | The birth pre-checks verify the USDC account exists, not that it is USDC |
+| R3-A-1 | **Medium** | **Mitigated** (docs + UI, 2026-11-04); contract change deferred | `allowance.rs:219-276`, `:616-632`; `evm_nonces.rs:31-40`; `docs/specs/C5.md` §4 | The cap limits what a delegate may **sign** per 24 h, not what it can **spend**. Banked signatures exceed the cap and survive revoke |
+| R3-S-1 | **Medium** (off-chain) | **Fixed** (`packages/core` + app, 2026-11-04) | `clean-history/btc.ts:85-86`, `:133-135`; `checker.ts:140-148`; `types.ts:98` | More than 100 distinct BTC txids in a token's history make it permanently unbuyable from any fresh browser |
+| R3-X-1 | Low | **Fixed** (contract, 2026-11-04) | `lib.rs:318-320`; nc-standards `enumeration_impl.rs:37-40`; near-sdk `collections/tree_map.rs:823-831` | S-05's fix is incomplete: deep `nft_tokens` pages cost O(from_index × log n) reads and exceed the view gas limit |
+| R3-X-2 | Low | **Fixed** (contract, 2026-11-04) | same; `apps/web/src/lib/data/server.ts:218` | `nft_tokens` pages in lexicographic id order, so the SSR market page drops Satchels (genesis 6–9, ids ≥ 55) |
+| R3-A-2 | Low | **Mitigated** (docs + UI, 2026-11-04); no contract change | `allowance.rs:384`; `sign.rs:91-92`; `sale.rs:93-96`; `offers.rs:281-289` | A delegate can stall `list`/`accept_offer` and stale every offer with zero-debit requests, up to 32 times a day |
+| R3-X-3 | Low (web) | **Fixed** (`apps/web`, 2026-11-04) | `MySatchels.tsx:64`, `MintFlow.tsx:173`, `claim-source.ts:28,41` | Spam mints push a holder's newly received Satchel off page 0 of every web reader |
+| R3-A-3 | Info | **Fixed** (contract, 2026-11-04) | `allowance.rs:583` | `set_allowance` drops other expired allowances without an event |
+| R3-I-1 | Info | **Fixed** (contract, 2026-11-04) | `types.rs:36-47`; `sign.rs:45-46` | `sign_for` silently accepts unknown JSON fields (phishing decoys in wallet prompts) |
+| R3-X-4 | Info (web; reasoning only) | **Fixed** (`apps/web`, 2026-11-04) | `ClaimFlow.tsx:113,156`; `claim-source.ts:59-64` | A give-by-link claim takes every token in the gift account, including ones an outsider injected |
+| R3-D-1 | Info | **Fixed** (`tools`, 2026-11-04) | `tools/deploy/keyless-birth.ts:61-82`, `:163-184` | The birth pre-checks verify the USDC account exists, not that it is USDC |
 | R3-N-1 | Info | Accepted (pinned by a guard test) | `sale.rs:68-79`; `market.rs:133-147` | A USDC buy's payout yocto comes from the contract's own NEAR. It's harmless because no USDC buy leaves storage level |
 
 ### R3-A-1 (Medium): the cap limits signing, not spending, and revoke stops only new signatures
@@ -292,21 +323,21 @@ fn nft_tokens(&self, from_index: Option<U128>, limit: Option<u64>) -> Vec<Token>
 ## Proof tests
 
 The tests come in three kinds:
-- **Demonstrating tests** pass while the behaviour exists. When a finding is fixed, flip them into guards.
-- **`PROOF` tests** are `#[ignore]`d and fail until the fix lands.
+- **Demonstrating tests** pass while a behaviour exists. They stay for R3-A-1 and R3-A-2, which are by design.
+- **Guards** pass since the 2026-11-04 fix pass and fail if a fix regresses. The R3-X, R3-A-3 and R3-I-1 tests were
+  flipped from demonstrations or `PROOF` tests into guards.
 - **Slow tests** are `#[ignore]`d and should be run on demand.
 
 | ID | File · test | Today |
 |---|---|---|
 | R3-A-1 | `review3_allowance_tests::r3a1_banked_evm_signatures_exceed_the_cap_and_survive_revoke`, `::r3a1_banked_btc_chain_on_own_change_exceeds_the_cap` | pass (demonstrate) |
 | R3-A-2 | `review3_allowance_tests::r3a2_zero_debit_requests_stale_offers_and_restart_the_quiet_period` | pass (demonstrates) |
-| R3-A-3 | `review3_allowance_tests::r3a3_set_allowance_drops_expired_allowances_without_an_event` | pass (demonstrates) |
-| R3-S-1 | `review3_sign_tests::review3_s1_btc_txid_cap_poison_is_cheap_and_travels_with_the_token`; core `clean-history.test.ts:266` | pass (demonstrate) |
-| R3-I-1 | `review3_sign_tests::review3_i1_sign_request_ignores_unknown_fields` | pass (demonstrates) |
-| R3-X-1 | `review3_acl_tests::r3x1_proof_every_nft_tokens_page_fits_a_view_call` | **ignored; fails** until fixed |
-| R3-X-1 | `review3_acl_tests::r3x1_demo_nft_tokens_page_cost_grows_with_from_index`, `::r3x1_demo_numeric_id_paging_is_flat` | ignored (slow); pass |
-| R3-X-2 | `review3_acl_tests::r3x2_proof_first_page_holds_the_first_minted_tokens` | **ignored; fails** until fixed |
-| R3-X-2 | `review3_acl_tests::r3x2_demo_first_nft_tokens_page_is_lexicographic` | pass (demonstrates) |
+| R3-A-3 | `review3_allowance_tests::r3a3_set_allowance_announces_dropped_expired_allowances` | pass (guard) |
+| R3-S-1 | `review3_sign_tests::review3_s1_btc_txid_cap_poison_is_cheap_and_travels_with_the_token` (the records are still accepted; the checker no longer blocks on them); core `review-r3s1.test.ts` (9) | pass (guards) |
+| R3-I-1 | `review3_sign_tests::review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_sign_for_refuses_unknown_arguments_and_fields` (compiled, not run) | pass (guard) |
+| R3-X-1 | `review3_acl_tests::r3x1_guard_deep_nft_tokens_page_costs_like_the_first` (200 tokens, with the library measured alongside) | pass (guard) |
+| R3-X-1 | `review3_acl_tests::r3x1_proof_every_nft_tokens_page_fits_a_view_call` (1,000 tokens) | ignored (slow); passes since the fix (6.87 Tgas) |
+| R3-X-2 | `review3_acl_tests::r3x2_guard_pages_follow_mint_order`, `::r3x_guard_nft_tokens_refusals_and_shape_match_the_library`; sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (compiled, not run) | pass (guards) |
 | R3-X-3 | `review3_acl_tests::r3x3_demo_spam_mints_hide_a_newly_received_token` | pass (demonstrates) |
 | R3-N-1 | `review3_money_tests::r3_m1_usdc_buy_spends_one_yocto_of_contract_near`, `::r3_m1_no_usdc_buy_keeps_storage_level` | pass (guards) |
 | — | `review3_money_tests::prop_r3_conservation_over_every_money_path` (conservation fuzz, ≈ 1 s per case) | ignored (slow); 256 cases pass |
@@ -320,7 +351,8 @@ Run all of them:
 cargo test -p satchel --lib review3_ -- --include-ignored
 ```
 
-The two `PROOF` tests fail by design. The fuzz takes `PROPTEST_CASES` (default 64).
+Since the fix pass every one of them passes, including the ignored slow ones. The fuzz takes `PROPTEST_CASES`
+(default 64). The checker's tests: `cd packages/core && pnpm exec vitest run test/review-r3s1.test.ts`.
 
 ## What was checked and found sound
 
@@ -387,19 +419,38 @@ The two `PROOF` tests fail by design. The fuzz takes `PROPTEST_CASES` (default 6
 
 ## Test runs (2026-11-04)
 
+**During the review** (branch `review/r3-contract-audit`, contract unchanged):
+
 | Suite | Result |
 |---|---|
-| `cargo test -p satchel --lib` (this branch, default) | **230 passed, 0 failed, 6 ignored** in 32 s (the baseline before this round was 202 passed in 29 s) |
+| `cargo test -p satchel --lib` (default) | **230 passed, 0 failed, 6 ignored** in 32 s (the baseline before this round was 202 passed in 29 s) |
 | `PROPTEST_CASES=16 cargo test -p satchel --lib review3_ -- --include-ignored` | 32 passed and 2 failed: exactly the R3-X-1 and R3-X-2 `PROOF` tests, as intended |
 | `PROPTEST_CASES=256 … prop_r3_conservation_over_every_money_path -- --include-ignored` | 256 cases passed in the reviewer's run (≈ 258 s); 24 cases re-run and passed during consolidation |
 | `PROPTEST_CASES=2000 cargo test -p satchel --lib review3_` (parser and signing proptests, before the money tests were merged) | 28 passed, 0 failed, 2 ignored |
 
+**After the fix pass** (branch `fix/r3-findings`):
+
+| Suite | Result |
+|---|---|
+| `cargo test -p satchel --lib` (default) | **232 passed, 0 failed, 3 ignored** (the slow 1,000-token proof, a diagnostic and the conservation fuzz) |
+| `PROPTEST_CASES=16 cargo test -p satchel --lib review3_ -- --include-ignored` | **33 passed, 0 failed** |
+| `cargo build -p satchel --target wasm32-unknown-unknown --release` + `tools/check-wasm-imports.sh` | compiles; INV-22 OK (promise actions FunctionCall and Transfer only) |
+| `cargo test -p satchel-tests --test review3 --no-run` | compiles (not run: no cargo-near wasm here) |
+| `packages/core`: `vitest run --exclude 'test/network/**'`, `typecheck`, `check-browser.mjs` | **549 passed** (19 files), typecheck clean, bundle check OK |
+| `tools`: `pnpm test` (vitest + `vectors/gen.ts --check`), `typecheck` | **94 passed**, every vector file byte-identical, typecheck clean |
+| `apps/web`: `vitest run`, `typecheck`, `lint` | **673 passed** (52 files), clean |
+| `apps/web` Playwright, desktop project (`allowance`, `reject-coverage`, `give-link`, `offers`, then `allowance`, `theme-a11y`, `flows`), run by the web agent | 34/34, then 81/82: the one failure was an axe colour-contrast hit on the untouched gate line at `/s/4/sale` (Day), which passed when re-run alone |
+
 ## Limitations
 
 - **No sandbox run.** `cargo-near` couldn't be installed in this environment (an external binary download was
-  declined), so no wasm was built and `tests/` (near-workspaces) wasn't run.
+  declined), so no reproducible wasm was built and `tests/` (near-workspaces) wasn't run.
   - The R3-X-1 gas figures are host-gas lower bounds from the mocked runtime. Real calls also pay wasm execution and
     trie-node costs, so they're higher.
-  - The contract code is unchanged since the last sandbox runs, so the runtime behaviour those suites cover still holds.
-- **R3-S-1's checker side wasn't re-run.** There is no `node_modules` here, so vitest wasn't run. That part is shown by
-  the existing core test and the code citations above.
+  - **The fix pass changed the contract**, so the sandbox suite (137 tests plus the new `review3.rs`) must run on the
+    rebuilt cargo-near artifact before the rc birth. The changes are small and covered by unit tests: `nft_tokens`,
+    `sign_for`'s argument parsing and one event in `set_allowance`. `review3.rs` checks the two behaviours that only the
+    wasm entry points show.
+- **The checker and the app were tested here.** The workspace's npm dependencies were installed from the lockfile for
+  the fix pass, and the core, tools and web suites above ran on this branch. Live provider behaviour (mempool.space's
+  `/address/:a/utxo` on testnet4) wasn't exercised. `EsploraClient.utxos` already serves the app's balances.
