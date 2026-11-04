@@ -1,6 +1,6 @@
 /**
  * @network: read-only live checks (spec §12.1 "TS derivation (network)", CI non-blocking).
- * Run with `pnpm --filter @satchel/core test:network`. Never rpc.testnet.near.org.
+ * Run with `pnpm --filter @satchel/core test:network`. Never the deprecated near.org testnet RPC (CLAUDE.md).
  */
 import { describe, expect, it } from 'vitest'
 import { deriveEd25519, deriveSecp256k1, MPC_ROOT_KEYS, nearKeyString, tokenPath, type ChainSlug } from '../../src/derive'
