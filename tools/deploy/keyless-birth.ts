@@ -58,6 +58,21 @@ export function defaultTransfer(child: string, parent: string): bigint | null {
 
 export const isFinalChild = (child: string, parent: string): boolean => child === `satchel.${parent}`
 
+/** wNEAR on testnet: the contract allowlists it for inside deposits (`market.rs` WNEAR), so it is never the USDC. */
+export const WNEAR_TESTNET = 'wrap.testnet'
+
+/**
+ * Review R3-D-1: `usdc` is immutable after birth, and the contract prices USDC listings and offers in 6-decimal base
+ * units, so the account must really be USDC. null when `ft_metadata` says USDC with 6 decimals, else what is wrong.
+ */
+export function usdcMetadataProblem(meta: unknown): string | null {
+  if (meta === null || typeof meta !== 'object') return 'ft_metadata unreadable'
+  const m = meta as { symbol?: unknown; decimals?: unknown }
+  if (m.symbol !== 'USDC') return `symbol ${JSON.stringify(m.symbol)}, expected "USDC"`
+  if (m.decimals !== 6) return `decimals ${JSON.stringify(m.decimals)}, expected 6`
+  return null
+}
+
 export function validateBirth(o: BirthOptions): string {
   assertAccountId(o.parent, 'parent')
   assertAccountId(o.child, 'child')
@@ -66,8 +81,14 @@ export function validateBirth(o: BirthOptions): string {
     throw new Error(`${o.child} is not a direct sub-account of ${o.parent} (only the parent can create it)`)
   assertAccountId(o.mpc, 'mpc')
   if (o.usdc !== null) assertAccountId(o.usdc, 'usdc')
+  // R3-D-1: each of these has its own immutable role in the contract, so no two may be the same account
+  const roles: [string, string | null][] = [['the contract', o.child], ['--mpc', o.mpc], ['--usdc', o.usdc], ['wNEAR', WNEAR_TESTNET]]
+  for (const [i, [a, x]] of roles.entries())
+    for (const [b, y] of roles.slice(i + 1))
+      if (x !== null && x === y) throw new Error(`${a} and ${b} are the same account (${x}); each has its own role and is immutable after birth`)
   assertAccountId(o.mintTo, 'mint receiver')
-  if (o.mintTo === o.child || o.mintTo === o.mpc) throw new Error('the demo tokens must go to a persona, not the contract or the MPC')
+  if (o.mintTo === o.child || o.mintTo === o.mpc || o.mintTo === o.usdc)
+    throw new Error('the demo tokens must go to a persona, not the contract, the MPC or USDC (the contract refuses them, ERR_BAD_RECEIVER)')
   if (!/^https:\/\/[a-z0-9.-]+(:\d+)?\/api\/card\/$/.test(o.baseUri)) throw new Error(`base_uri must be https://<app-host>/api/card/ (got ${o.baseUri}); it is immutable after birth`)
   if (!Number.isInteger(o.mints) || o.mints < 1 || o.mints > 10) throw new Error('--mints must be 1..10')
   if (o.wasm.length === 0) throw new Error('empty wasm')
@@ -178,7 +199,11 @@ async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions): Promise<boole
   } else line(null, `needs ≥ ${formatNear(need.total)} up front (deposits + 10× gas hold)`)
   const v = await ctx.rpc.view<string>(o.mpc, 'version').catch(() => null)
   line(v === '3.17.0', `MPC ${o.mpc} version ${v ?? 'unreadable'} (expected 3.17.0, A-01)`)
-  if (o.usdc) line((await ctx.rpc.viewAccount(o.usdc)) !== null, `USDC contract ${o.usdc} exists`)
+  if (o.usdc) {
+    line((await ctx.rpc.viewAccount(o.usdc)) !== null, `USDC contract ${o.usdc} exists`)
+    const problem = usdcMetadataProblem(await ctx.rpc.view<unknown>(o.usdc, 'ft_metadata').catch(() => null))
+    line(problem === null, `USDC contract ${o.usdc} is USDC with 6 decimals (ft_metadata)${problem ? `: ${problem}` : ''}`)
+  }
   line((await ctx.rpc.viewAccount(o.mintTo)) !== null, `mint receiver ${o.mintTo} exists`)
   return ok
 }

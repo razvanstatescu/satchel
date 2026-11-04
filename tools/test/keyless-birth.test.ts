@@ -2,7 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { KeyPair, Transaction } from 'near-api-js'
-import { assertBirthShape, BIRTH_DEFAULTS, buildBirthPlan, defaultTransfer, initArgs, proofCommands, requiredParentBalance, validateBirth, type BirthOptions } from '../deploy/keyless-birth'
+import {
+  assertBirthShape,
+  BIRTH_DEFAULTS,
+  buildBirthPlan,
+  defaultTransfer,
+  initArgs,
+  proofCommands,
+  requiredParentBalance,
+  usdcMetadataProblem,
+  validateBirth,
+  type BirthOptions,
+} from '../deploy/keyless-birth'
 import { actionKinds, buildTransaction, sha256Hex, totalDeposit, totalGas } from '../lib/tx'
 import { parseNear, TGAS } from '../lib/units'
 import { BLOCK_HASH } from './helpers'
@@ -80,6 +91,23 @@ describe('keyless birth batch (spec §5.16)', () => {
     const final = opts({ child: 'satchel.satchelhq.testnet', transfer: parseNear('20') })
     expect(() => validateBirth(final)).toThrow(/requires --expected-sha256/)
     expect(validateBirth({ ...final, expectedSha256: sha256Hex(FAKE_WASM).toUpperCase() })).toBe(sha256Hex(FAKE_WASM))
+  })
+  it('refuses accounts that would collide in the contract, which are immutable after birth (review R3-D-1)', () => {
+    expect(() => validateBirth(opts({ usdc: 'wrap.testnet' }))).toThrow(/--usdc and wNEAR are the same account/)
+    expect(() => validateBirth(opts({ usdc: 'v1.signer-prod.testnet' }))).toThrow(/--mpc and --usdc are the same account/)
+    expect(() => validateBirth(opts({ mpc: 'rc.satchelhq.testnet' }))).toThrow(/the contract and --mpc are the same account/)
+    expect(() => validateBirth(opts({ usdc: 'rc.satchelhq.testnet' }))).toThrow(/the contract and --usdc are the same account/)
+    expect(() => validateBirth(opts({ mpc: 'wrap.testnet' }))).toThrow(/--mpc and wNEAR are the same account/)
+    expect(() => validateBirth(opts({ mintTo: opts().usdc! }))).toThrow(/persona/)
+    expect(validateBirth(opts({ usdc: null }))).toBe(sha256Hex(FAKE_WASM))
+  })
+  it('the USDC pre-check accepts only USDC with 6 decimals (review R3-D-1)', () => {
+    expect(usdcMetadataProblem({ spec: 'ft-1.0.0', name: 'USDC', symbol: 'USDC', decimals: 6 })).toBeNull()
+    expect(usdcMetadataProblem({ spec: 'ft-1.0.0', name: 'Wrapped NEAR fungible token', symbol: 'wNEAR', decimals: 24 })).toMatch(/symbol "wNEAR"/)
+    expect(usdcMetadataProblem({ symbol: 'USDC', decimals: 18 })).toMatch(/decimals 18, expected 6/)
+    expect(usdcMetadataProblem({ symbol: 'USDC' })).toMatch(/decimals undefined/)
+    expect(usdcMetadataProblem(null)).toMatch(/unreadable/)
+    expect(usdcMetadataProblem('USDC')).toMatch(/unreadable/)
   })
   it('shape assertion catches a tampered batch', () => {
     const { plan } = buildBirthPlan(opts())
