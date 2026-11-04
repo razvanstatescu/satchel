@@ -349,3 +349,7 @@ mod market_tests;
 mod feature_tests;
 #[cfg(test)]
 mod review3_allowance_tests;
+#[cfg(test)]
+mod review3_acl_tests;
+#[cfg(test)]
+mod review3_sign_tests;

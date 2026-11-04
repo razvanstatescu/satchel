@@ -126,3 +126,5 @@ pub fn classify(req: &SignRequest) -> Result<Classified, &'static str> {
 mod tests;
 #[cfg(test)]
 mod fuzz_tests;
+#[cfg(test)]
+mod review3_parse_tests;
