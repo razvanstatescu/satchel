@@ -172,16 +172,17 @@ pnpm --filter web dev                        # http://localhost:3000, fixture da
 NEXT_PUBLIC_DATA_MODE=live pnpm --filter web dev   # live testnet reads; see .env.example for every variable
 ```
 
-Tests, all offline except where noted. These are the latest recorded results (Apple Silicon, 2026-10-27/29); they
-are re-recorded on the release commit `[TBD]`:
+Tests, all offline except where noted. Latest recorded results, with dates; the full table and its sources are in
+[`docs/testing/README.md`](docs/testing/README.md#latest-recorded-counts). They are re-recorded on the release commit
+`[TBD]`:
 
 | Command | Result |
 |---|---|
-| `cargo test -p satchel --lib` | `test result: ok. 86 passed` (includes the shared vectors in `vectors/*.json`) |
-| `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4; first build the three wasm files with `cargo near build non-reproducible-wasm --manifest-path contracts/{satchel,mock-signer,mock-ft}/Cargo.toml`) | 83 passed |
-| `pnpm --filter @satchel/core test` | 299 passed, plus the browser-bundle check |
-| `pnpm --filter @satchel/tools test` | 72 passed, plus the vectors freshness check (4 files ok) |
-| `pnpm --filter web test` / `test:e2e` (fixture mode) | 340 vitest / 133 Playwright passed |
+| `cargo test -p satchel --lib` | `test result: ok. 202 passed; 0 failed; 0 ignored` (re-run on Linux x86-64, 2026-11-04). Includes the shared vectors in `vectors/*.json` and the parser fuzz properties |
+| `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4; first build the three wasm files: `for c in satchel mock-signer mock-ft; do cargo near build non-reproducible-wasm --manifest-path contracts/$c/Cargo.toml; done`) | 137 passed (2026-10-31) |
+| `pnpm --filter @satchel/core test` | 540 passed, plus the browser-bundle check (2026-10-31) |
+| `pnpm --filter @satchel/tools test` | 92 passed, plus the vectors freshness check (2026-10-30) |
+| `pnpm --filter web test` / `test:e2e` (fixture mode) | 654 vitest / 307 Playwright passed (2026-11-03) |
 | `tools/check-wasm-imports.sh` | INV-22 OK: the release wasm cannot add a key, deploy code or delete the account |
 
 CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests. Run:
