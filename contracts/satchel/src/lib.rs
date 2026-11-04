@@ -347,3 +347,5 @@ mod allowance_tests;
 mod market_tests;
 #[cfg(test)]
 mod feature_tests;
+#[cfg(test)]
+mod review3_allowance_tests;
