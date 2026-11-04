@@ -53,14 +53,37 @@ The README's "Run it locally" table should match this one at the release commit.
 
 | Suite | Latest recorded result | Date | Source |
 |---|---|---|---|
-| Contract unit, `cargo test -p satchel --lib` | 232 passed, 3 ignored (slow `review3_*` tests; they pass with `--include-ignored`) | 2026-11-04 | [review-round-3.md](../security/review-round-3.md) |
-| Contract sandbox, nearcore 2.13.4 (one `--test` file at a time) | 137 passed, 0 ignored; the new `review3.rs` (2 tests) compiles but was not run (no cargo-near wasm in that environment) | 2026-10-31 / 2026-11-04 | [contract.md §7.7](contract.md#77-q-03-and-q-04-fixed-2026-10-31-branch-fixq03-q04-from-main-2ed9759), review-round-3.md |
-| Wasm import check | INV-22 OK (plain `cargo build --target wasm32-unknown-unknown --release` of `fix/r3-findings`; the reproducible cargo-near artifact still needs its own check) | 2026-11-04 | review-round-3.md |
-| Core | 549 passed (19 files, `test/network` excluded), plus the browser-bundle check | 2026-11-04 | review-round-3.md |
-| Tools unit (`test:unit`) | 94 passed (6 files); vectors regenerate byte-identical | 2026-11-04 | review-round-3.md |
-| Web unit (vitest) | 673 passed (52 files) | 2026-11-04 | review-round-3.md |
-| Web end to end (Playwright, fixture) | 307 passed; on 2026-11-04 the desktop project ran the changed specs (allowance, reject-coverage, give-link, offers, theme-a11y, flows): all pass, one axe colour-contrast hit on the untouched gate line passed on re-run | 2026-11-03 / 2026-11-04 | [`docs/handoff/web.md`](../handoff/web.md), review-round-3.md |
+| Contract unit, `cargo test -p satchel --lib` | 232 passed, 3 ignored; the 3 ignored (slow `review3_*` proofs) pass with `--ignored` | 2026-11-04 (integration of `fix/r3-findings`) | this file, "Round three integration" |
+| Contract sandbox, nearcore 2.13.4 | **139 passed, 0 ignored** (20 files, `review3.rs` included), on the cargo-near wasm `3a73b492…` | 2026-11-04 | this file, "Round three integration" |
+| Wasm import check | INV-22 OK on the cargo-near (non-reproducible) wasm `3a73b492…`; the reproducible rc artifact still needs its own check | 2026-11-04 | this file |
+| Core | 549 passed | 2026-11-04 | this file |
+| Tools (`test`) | 94 passed; vectors regenerate byte-identical | 2026-11-04 | this file |
+| Web unit (vitest) | 673 passed | 2026-11-04 | this file |
+| Web end to end (Playwright, fixture) | **308 passed** (full suite, mobile and desktop) | 2026-11-04 | this file |
 | Deep Rust-vs-TS differential | 1,000,000 cases, 0 disagreements | 2026-10-30/31 | [contract.md §7.2](contract.md#72-results-filled-in-as-each-run-finishes) |
+
+## Round three integration (2026-11-04)
+
+`fix/r3-findings` ([`security/review-round-3.md`](../security/review-round-3.md)) was re-checked and merged into `main`
+after a second review of every fix. Every suite in the table above ran on the merged result, plus a live check on dev2.
+
+- **One test fix.** The fix branch made `sign_for` strict (`#[deny_unknown_arguments]`, R3-I-1) but its sandbox suite
+  was compiled, not run. One round-two sandbox test, `round2::r2_extra_sign_for_arguments_cannot_relabel_the_requester`,
+  still expected extra arguments to be ignored and failed on the new wasm. It now asserts the refusal (nothing written),
+  then that the same request without them still names the delegate. The full sandbox then passed, 139/139.
+- **Clients checked against the strict parsing.** Every `sign_for` builder (web `calls.signFor`, core `signForArgs`,
+  tools `signForPlan`) sends exactly `token_id`, `request` and an optional `mpc_deposit`, with the five request shapes the
+  contract accepts.
+- **dev2 redeployed** with the cargo-near (non-reproducible) wasm, sha256
+  `3a73b492d4142db92e9fd733447df63499d0a74563b2091ac870f7ac8a2f2361`, state kept (no borsh type changed), tx
+  `5ZGwNbuaG648Q8rTmywGiKyKfTL5hSWBMSvGzHqZLeJc`. `apps/web/.env.production` expects that hash. Live checks:
+  - the code hash matches the wasm; 4 Satchels, #1 still alice's with its signatures;
+  - `nft_tokens` pages in mint order (`[1, 2, 3, 4]`; `from_index 2, limit 2` → `[3, 4]`);
+  - alice's `sign_for` with an extra `requester` argument is refused ("unknown field `requester`") before anything runs;
+  - a normal EVM request through the real MPC signs and recovers to the Satchel's address (`tools/e2e/evm.ts
+    --sign-only`, tx `4eigXUFsn5P5xw6U6cbmgM6ko9pGx9uA1xtaUsmRQGjq`; not broadcast, so that record stays unused until
+    its nonce is spent).
+- **Circle testnet USDC passes the new birth pre-check** (R3-D-1): `ft_metadata` is `USDC`, 6 decimals.
 
 ## Counts through the audit (2026-10-30/31)
 
@@ -72,7 +95,7 @@ grown since ("Latest recorded counts" above).
 | Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | 199 passed, 0 ignored | **202 passed, 0 ignored** |
 | Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | 136 passed, 0 ignored (19 files) | **137 passed, 0 ignored** (20 files) |
 | Contract sandbox (2.14.0-rc.5) | not run | not run | not run | 136 passed (one file at a time) | not re-run |
-| Core | 467 | 467 | 472 | 540 | **540** |
+| Core | 549 passed | 2026-11-04 | this file |
 | Web unit | 486 | 531 | 535 | 606 | **606** |
 | Tools unit | 92 | 92 | 92 | 92 | **92** |
 | Web end to end | 224 | 263 | 265 | 286 (+21) | **286** (app unchanged) |

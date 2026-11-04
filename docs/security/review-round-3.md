@@ -67,12 +67,12 @@ Every finding now has a status. The fixes are on branch `fix/r3-findings`, on to
 |---|---|---|---|
 | R3-S-1 | **Fixed** | `checkBtc`: past the cap it lists the coins at the Satchel's address (`BtcSource.utxos`, Esplora `/address/:a/utxo`, union over the providers). Only requests that spend one of them are queried and count against the cap. The others get the new non-blocking status `inactive` (never cached, outpoints still encumbered). With no coin list the cap applies to every record (fail closed). The app shows `inactive` as "Not a current coin". kb/90 §7.3 and §7.5 updated | core `review-r3s1.test.ts` (9); web `clean-view.test.ts`, `allowance-outstanding.test.ts` |
 | R3-A-1 | **Mitigated** (docs + UI) | C5.md §4 now says the cap limits signing, not spending, and that revoke, expiry and a transfer stop only new signatures; §7 has the note. The app shows each delegate's signatures that the clean-history check hasn't shown dead (count and amounts). The Revoke confirmation says revoking stops only new signatures and links to settling them. A contract-side cumulative budget is a design change, deferred past the freeze | web `allowance-outstanding.test.ts`, e2e `allowance.spec.ts`; the `r3a1_*` demos still pass (the behaviour is by design) |
-| R3-X-1 | **Fixed** | `nft_tokens` pages by numeric id: 6.87 Tgas at any depth (was ≥ 710 Tgas at `from_index` 950 of 1,000 tokens). The library's refusals are kept | unit `r3x1_guard_deep_nft_tokens_page_costs_like_the_first`, the ignored 1,000-token proof (passes); sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (compiled, not run) |
+| R3-X-1 | **Fixed** | `nft_tokens` pages by numeric id: 6.87 Tgas at any depth (was ≥ 710 Tgas at `from_index` 950 of 1,000 tokens). The library's refusals are kept | unit `r3x1_guard_deep_nft_tokens_page_costs_like_the_first`, the ignored 1,000-token proof (passes); sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (run 2026-11-04 on the cargo-near wasm: pass) |
 | R3-X-2 | **Fixed** | The same override: mint order, so page 0 holds tokens 1–50 | unit `r3x2_guard_pages_follow_mint_order`, `r3x_guard_nft_tokens_refusals_and_shape_match_the_library` |
 | R3-A-2 | **Mitigated** (docs + UI) | C5.md §7 documents it. Before List and Accept offer, the app tells an owner with live access granted to revoke first. No contract change: a minimum fee can't stop a delegate who pays a near-zero one | e2e `allowance.spec.ts`; the `r3a2_*` demo still passes (by design) |
 | R3-X-3 | **Fixed** | `listOwnerTokens` pages `nft_tokens_for_owner` up to `nft_supply_for_owner` (at most 20 pages, de-duplicated, sorted by id). My Satchels, Mint and the claim page use it | web `owner-tokens.test.ts` |
 | R3-A-3 | **Fixed** | `set_allowance` emits `allowances_cleared {reason: "expired"}` for the delegates it drops, after the storage charge and before `allowance_set` | unit `r3a3_set_allowance_announces_dropped_expired_allowances` |
-| R3-I-1 | **Fixed** | `SignRequest` has `deny_unknown_fields`, and `sign_for` has `#[deny_unknown_arguments]` | unit `review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_*` (compiled, not run) |
+| R3-I-1 | **Fixed** | `SignRequest` has `deny_unknown_fields`, and `sign_for` has `#[deny_unknown_arguments]` | unit `review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_*` (run 2026-11-04 on the cargo-near wasm: pass) |
 | R3-X-4 | **Fixed** | The gift link names the gifted ids (`/claim#<secret>&gift=<ids>`, fragment only), and a claim moves only those. Anything else is listed as "also here, not part of this gift". Each transfer is isolated and the NEAR sweep always runs. Older links still work, with a note | web `claim-plan.test.ts`, e2e `give-link.spec.ts` |
 | R3-D-1 | **Fixed** | `validateBirth` refuses any two of the child, `--mpc`, `--usdc` and `wrap.testnet` being the same account, and demo mints to USDC. The pre-checks require USDC's `ft_metadata` to be `USDC` with 6 decimals | tools `keyless-birth.test.ts` |
 | R3-N-1 | Accepted | — | guards `r3_m1_*` |
@@ -334,10 +334,10 @@ The tests come in three kinds:
 | R3-A-2 | `review3_allowance_tests::r3a2_zero_debit_requests_stale_offers_and_restart_the_quiet_period` | pass (demonstrates) |
 | R3-A-3 | `review3_allowance_tests::r3a3_set_allowance_announces_dropped_expired_allowances` | pass (guard) |
 | R3-S-1 | `review3_sign_tests::review3_s1_btc_txid_cap_poison_is_cheap_and_travels_with_the_token` (the records are still accepted; the checker no longer blocks on them); core `review-r3s1.test.ts` (9) | pass (guards) |
-| R3-I-1 | `review3_sign_tests::review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_sign_for_refuses_unknown_arguments_and_fields` (compiled, not run) | pass (guard) |
+| R3-I-1 | `review3_sign_tests::review3_i1_sign_request_refuses_unknown_fields`; sandbox `review3.rs::r3_i1_sign_for_refuses_unknown_arguments_and_fields` (run 2026-11-04 on the cargo-near wasm: pass) | pass (guard) |
 | R3-X-1 | `review3_acl_tests::r3x1_guard_deep_nft_tokens_page_costs_like_the_first` (200 tokens, with the library measured alongside) | pass (guard) |
 | R3-X-1 | `review3_acl_tests::r3x1_proof_every_nft_tokens_page_fits_a_view_call` (1,000 tokens) | ignored (slow); passes since the fix (6.87 Tgas) |
-| R3-X-2 | `review3_acl_tests::r3x2_guard_pages_follow_mint_order`, `::r3x_guard_nft_tokens_refusals_and_shape_match_the_library`; sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (compiled, not run) | pass (guards) |
+| R3-X-2 | `review3_acl_tests::r3x2_guard_pages_follow_mint_order`, `::r3x_guard_nft_tokens_refusals_and_shape_match_the_library`; sandbox `review3.rs::r3_x_nft_tokens_pages_in_mint_order` (run 2026-11-04 on the cargo-near wasm: pass) | pass (guards) |
 | R3-X-3 | `review3_acl_tests::r3x3_demo_spam_mints_hide_a_newly_received_token` | pass (demonstrates) |
 | R3-N-1 | `review3_money_tests::r3_m1_usdc_buy_spends_one_yocto_of_contract_near`, `::r3_m1_no_usdc_buy_keeps_storage_level` | pass (guards) |
 | — | `review3_money_tests::prop_r3_conservation_over_every_money_path` (conservation fuzz, ≈ 1 s per case) | ignored (slow); 256 cases pass |
@@ -443,6 +443,9 @@ Since the fix pass every one of them passes, including the ignored slow ones. Th
 
 ## Limitations
 
+- **Resolved on 2026-11-04, at integration:** the sandbox suite ran on the cargo-near wasm `3a73b492…`, 139/139
+  with `review3.rs`, after one stale round-two pin was updated to the R3-I-1 refusal; dev2 runs that wasm. See
+  `docs/testing/README.md` "Round three integration". The note below is what this round found at review time.
 - **No sandbox run.** `cargo-near` couldn't be installed in this environment (an external binary download was
   declined), so no reproducible wasm was built and `tests/` (near-workspaces) wasn't run.
   - The R3-X-1 gas figures are host-gas lower bounds from the mocked runtime. Real calls also pay wasm execution and
