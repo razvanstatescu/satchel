@@ -6,7 +6,7 @@ members = ["contracts/satchel", "contracts/mock-signer", "contracts/mock-ft", "t
 edition = "2024"
 rust-version = "1.93"
 license = "MIT"
-repository = "https://github.com/satchelhq/satchel"   # placeholder until the repo exists (H-04)
+repository = "https://github.com/satchelhq/satchel"   # placeholder (H-04): the code lives at github.com/razvanstatescu/satchel
 
 [profile.release]
 codegen-units = 1

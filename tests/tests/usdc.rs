@@ -1,4 +1,4 @@
-//! USDC sale path via `ft_transfer_call` → `ft_on_transfer` (spec §5.7, §5.12, §12.4 SAT-073):
+//! USDC sale path via `ft_transfer_call` → `ft_on_transfer` (kb/90 §5.7, §5.12, §12.4 SAT-073):
 //! INV-02 (ft buy), INV-16, INV-25 (USDC).
 
 mod common;

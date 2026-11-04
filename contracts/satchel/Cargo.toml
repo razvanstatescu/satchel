@@ -12,7 +12,7 @@ crate-type = ["cdylib"]                 # NOT ["cdylib","rlib"]: +27–55 % wasm
 [dependencies]
 near-sdk = "=5.29.1"                    # default features (wee_alloc smaller, kb/20 §Cargo.toml)
 near-contract-standards = "=5.29.1"     # enables near-sdk "legacy" (NFT uses near_sdk::collections)
-hex = { version = "0.4", default-features = false, features = ["alloc"] }   # [ASSUMED] exact patch pinned by Cargo.lock on Nov 1
+hex = { version = "0.4", default-features = false, features = ["alloc"] }   # exact patch pinned by the committed Cargo.lock
 
 [dev-dependencies]
 near-sdk = { version = "=5.29.1", features = ["unit-testing"] }   # does not change the wasm hash (kb/20 §Cargo.toml)

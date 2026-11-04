@@ -1,4 +1,4 @@
-//! INV-31 keyless birth (spec §5.16, SAT-036): one transaction from a parent account does
+//! INV-31 keyless birth (kb/90 §5.16, SAT-036): one transaction from a parent account does
 //! CreateAccount · Transfer · DeployContract · `new` · `nft_mint` ×7 with **no AddKey**.
 
 mod common;

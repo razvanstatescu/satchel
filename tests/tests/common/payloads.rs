@@ -1,4 +1,4 @@
-//! Byte-exact builders for the three structured payloads `sign_for` accepts (spec §5.3, §5.9), plus
+//! Byte-exact builders for the three structured payloads `sign_for` accepts (kb/90 §5.3, §5.9), plus
 //! the hash oracles the contract must reproduce. Written from the spec layouts, independent of the
 //! contract's parsers and of the TS vector generator, so a disagreement shows up as a test failure.
 

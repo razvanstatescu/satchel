@@ -1,4 +1,4 @@
-//! NEAR sale path (spec §5.7, §5.10, §5.12): INV-02 (buy), 13, 14, 15, 17 (sale side), 25 (NEAR).
+//! NEAR sale path (kb/90 §5.7, §5.10, §5.12): INV-02 (buy), 13, 14, 15, 17 (sale side), 25 (NEAR).
 
 mod common;
 

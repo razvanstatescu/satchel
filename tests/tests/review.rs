@@ -106,9 +106,10 @@ async fn sr_injected_history_reads_back() -> Result<()> {
     Ok(())
 }
 
-/// SR-05 (measurement + pin): `history_digest` reads every record, so its gas grows with the history. Spec §5.1 says it
-/// "stays within the 300 Tgas view limit up to roughly 2,500 records". Measured here for the two extremes: small
-/// native EVM records (52-byte tx) and maximal 1,024-byte C7 message records.
+/// SR-05 (measurement + pin): `history_digest` reads every record, so its gas grows with the history. The C1 spec
+/// (docs/specs/C1-C2-C3-C7.md §5.1) first estimated "up to roughly 2,500 records"; it now cites this test's numbers
+/// (L-03). Measured here for the two extremes: small native EVM records (52-byte tx) and maximal 1,024-byte C7
+/// message records. Pinned: at least 2,500 small records fit.
 #[tokio::test]
 async fn sr05_history_digest_gas_ceiling() -> Result<()> {
     let env = setup_with(Opts { mint_to_alice: 3, ..Default::default() }).await?;
@@ -199,9 +200,9 @@ async fn sr06_accept_offer_storage_delta() -> Result<()> {
 }
 
 /// M-01 (proof; fixed on `fix/m01-solvency` by `ensure_solvent`): contract-paid storage (the S-02 class: `nft_transfer`, `buy`,
-/// `accept_offer` to a first-time holder) comes out of the same balance that holds user escrow since C4/C6. Once the
-/// contract's own surplus is gone, transfers silently spend inside NEAR, I-M1 breaks, and the owner's
-/// `withdraw_near` of the whole balance fails. Passes when the transfers are refused or the escrow stays withdrawable.
+/// `accept_offer` to a first-time holder) comes out of the same balance that holds user escrow since C4/C6. Before the
+/// fix, once the contract's own surplus was gone, transfers silently spent inside NEAR, I-M1 broke, and the owner's
+/// `withdraw_near` of the whole balance failed. Passes when the transfers are refused or the escrow stays withdrawable.
 #[tokio::test]
 async fn m01_contract_paid_storage_never_consumes_escrow() -> Result<()> {
     let env = setup_with(Opts { usdc_enabled: false, fund_usdc: false, mint_to_alice: 4 }).await?;

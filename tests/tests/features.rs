@@ -56,7 +56,7 @@ fn offchain(m: &[u8]) -> Vec<u8> {
     [b"\xffsolana offchain".to_vec(), vec![0, fmt], (m.len() as u16).to_le_bytes().to_vec(), m.to_vec()].concat()
 }
 
-/// A third, independent encoder of the C1 digest (spec §5.1), straight from the `sig_records` JSON.
+/// A third, independent encoder of the C1 digest (docs/specs/C1-C2-C3-C7.md §5.1), straight from the `sig_records` JSON.
 fn digest_of(contract: &str, token: &str, rows: &[Value]) -> String {
     let s = |x: &str| [(x.len() as u32).to_le_bytes().to_vec(), x.as_bytes().to_vec()].concat();
     let b = |h: &str| {

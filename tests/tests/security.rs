@@ -58,13 +58,13 @@ fn receipt_on<'a>(r: &'a ExecutionFinalResult, env: &Env, needle: &str) -> Optio
         .map(|o| (o.gas_burnt.as_gas(), o.logs.clone()))
 }
 
-/// S-01 (proof): a sale whose payout fails must never leave the price orphaned. Today the re-credit is written in
-/// `on_payout`, a separate receipt that needs contract-funded storage (≈ 77 B per (seller, currency)). When the
-/// contract's free balance is below that, `on_payout` fails with LackBalanceForState after the sale already
-/// completed: the buyer has the NFT, the USDC sits in the contract, and nothing records that the seller is owed it.
-/// The locked contract has no admin or sweep, so the money is lost for good.
-/// Expected: the sale either credits the seller or does not happen (e.g. reserve the proceeds slot inside the sale
-/// receipt, so `on_payout` only overwrites a fixed-size value, like `on_signed`).
+/// S-01 (proof): a sale whose payout fails must never leave the price orphaned. Before the fix pass the re-credit was
+/// written in `on_payout`, a separate receipt that needed contract-funded storage (≈ 77 B per (seller, currency)).
+/// With the contract's free balance below that, `on_payout` failed with LackBalanceForState after the sale had
+/// completed: the buyer had the NFT, the USDC sat in the contract, and nothing recorded that the seller was owed it.
+/// The locked contract has no admin or sweep, so the money would be lost for good.
+/// Expected (and now true): the sale either credits the seller or does not happen. The fix reserves the proceeds
+/// slot at `list` time, so `on_payout` only overwrites a fixed-size value, like `on_signed`.
 #[tokio::test]
 async fn s01_failed_payout_is_never_orphaned_when_contract_balance_is_low() -> Result<()> {
     let env = setup().await?;

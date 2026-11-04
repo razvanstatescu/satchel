@@ -1,6 +1,6 @@
 //! Adversarial review tests (docs/security/contract-review.md).
 //!
-//! Two kinds of test live here:
+//! Three kinds of test live here:
 //! - **Guards** (run by default): attack attempts the review tried that the contract correctly refuses. They pin the
 //!   current safe behaviour so a later change cannot silently reopen the hole.
 //! - **Proofs** (`s0x_*`): each asserts the behaviour the review recommended. They were `#[ignore]`d and failed until

@@ -1,6 +1,6 @@
 //! Sandbox fixture that mirrors the `sign` interface of `v1.signer-prod.testnet` (near/mpc 3.17.0).
 //!
-//! Wire format (kb/10 §`sign`, §Response; spec §5.8):
+//! Wire format (kb/10 §`sign`, §Response; kb/90 §5.8):
 //! - request:  `{"request":{"path":"satchel/1/evm","payload_v2":{"Ecdsa":"<64 hex>"},"domain_id":0}}`
 //! - response: `{"scheme":"Secp256k1","big_r":{"affine_point":"02…"},"s":{"scalar":"…"},"recovery_id":1}`
 //!   or        `{"scheme":"Ed25519","signature":[64 numbers]}`
@@ -9,7 +9,7 @@
 //! - preconditions in source order: domain exists → domain purpose is Sign → prepaid gas ≥ 15 Tgas →
 //!   deposit ≥ 1 yocto (excess refunded to the *predecessor*) → payload matches the domain's scheme →
 //!   ECDSA payload < secp256k1 order n; each failure panics with the live error text;
-//! - `sign` creates a yield (`promise_yield_create`, 7 Tgas callback, weight 0) and returns it, so the
+//! - `sign` creates a yield (`Promise::new_yield`, 7 Tgas callback, weight 0) and returns it, so the
 //!   caller's promise resolves only when the yield is resumed or times out (200 blocks);
 //! - the yield callback returns the resumed bytes as-is on success; on timeout it chains to a 2 Tgas
 //!   `fail_on_timeout` that panics `Request has timed out.`, so the caller sees `PromiseError::Failed`;
@@ -17,7 +17,7 @@
 //!
 //! Test knobs (not part of the real interface): a global `Mode`, `respond*` hooks that play the MPC
 //! node, and a request log that records `(predecessor, path, payload_v2, domain_id, prepaid_gas,
-//! attached_deposit)` for every accepted request (spec §6 preamble). Signatures are fake but have the
+//! attached_deposit)` for every accepted request (kb/90 §6 preamble). Signatures are fake but have the
 //! real shape; key derivation is not implemented because no sandbox test needs it.
 
 use near_sdk::json_types::{U64, U128};

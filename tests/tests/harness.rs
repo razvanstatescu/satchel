@@ -1,4 +1,5 @@
-//! Self-checks of the harness payload builders against KB-cited constants (no sandbox).
+//! Self-checks that need no sandbox: the harness payload builders against KB-cited constants, and
+//! `tools/check-wasm-imports.sh` (INV-22) on synthetic wasm modules with and without forbidden imports.
 
 mod common;
 use common::payloads::*;

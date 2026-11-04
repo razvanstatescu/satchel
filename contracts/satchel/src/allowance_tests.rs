@@ -469,7 +469,7 @@ fn rate_limit_counts_every_debit_including_zero() {
 
 #[test]
 fn forbidden_kinds_for_delegates() {
-    // EVM calldata other than an ERC-20 transfer (pure function: today's classifier refuses all calldata first)
+    // EVM calldata other than an ERC-20 transfer (pure function; through `sign_for` the C2 classifier refuses it first)
     let mut f = evm::tests::base();
     f.data = evm::tests::enc_str(&[0x09, 0x5e, 0xa7, 0xb3, 0, 0, 0, 0]); // approve selector, short
     assert_eq!(evm_debits(&evm::tests::build(&f)).unwrap_err().code, ERR_ALLOWANCE_KIND);
@@ -737,7 +737,7 @@ fn shared_allowance_vectors() {
         }
         n += 1;
     }
-    // 2. raw EVM tx bytes → debits (covers ERC-20 calldata the stateless classifier refuses today)
+    // 2. raw EVM tx bytes → debits (also covers ERC-20 calldata the stateless classifier refuses, e.g. another token)
     for v in doc["evm_raw"].as_array().unwrap() {
         let name = v["name"].as_str().unwrap();
         let tx = hex::decode(v["unsigned_tx"].as_str().unwrap()).unwrap();

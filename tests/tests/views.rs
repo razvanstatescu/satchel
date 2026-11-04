@@ -1,4 +1,4 @@
-//! INV-27 (config = compiled constants) and the exact JSON shapes of spec §5.14 that the UI, the SSR
+//! INV-27 (config = compiled constants) and the exact JSON shapes of kb/90 §5.14 that the UI, the SSR
 //! pages and the README consume.
 
 mod common;

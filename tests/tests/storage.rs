@@ -1,4 +1,4 @@
-//! Storage charging (spec §5.4, review R-26): INV-18 exactness and INV-29 (callback never grows).
+//! Storage charging (kb/90 §5.4, review R-26): INV-18 exactness and INV-29 (callback never grows).
 //! The refund is read from the receipts' Transfer actions (EXPERIMENTAL_tx_status), not inferred
 //! from balances, because the contract also earns gas rewards and receives MPC deposit refunds.
 

@@ -186,7 +186,8 @@ async fn r2_events_once_and_in_order_on_every_ownership_change() -> Result<()> {
 /// The delegate signing path's events on the real wasm: `sign_requested` (owner_id = the OWNER, no `requester` field),
 /// then `allowance_spent` (delegate_id, same first_seq) in the same receipt, then `sign_resolved` in the callback. The
 /// delegate is visible only in the record's `requester` and in `allowance_spent` (C5.md §1.3). Finding R2-01: the web
-/// app's live Activity reads `sign_requested.data.requester` (apps/web/src/lib/data/server.ts:295), which never exists.
+/// app's live Activity used to read `sign_requested.data.requester`, which never exists; it now reads the record's
+/// `requester` (`signRow` in apps/web/src/lib/data/server.ts).
 #[tokio::test]
 async fn r2_delegate_sign_events_and_requester() -> Result<()> {
     let env = setup().await?;

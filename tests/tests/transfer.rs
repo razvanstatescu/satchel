@@ -1,4 +1,4 @@
-//! Ownership paths (spec §5.11): INV-02 (transfer), 03, 05, 11 (survive transfer), 17 (1 yocto), 28, 30.
+//! Ownership paths (kb/90 §5.11): INV-02 (transfer), 03, 05, 11 (survive transfer), 17 (1 yocto), 28, 30.
 
 mod common;
 

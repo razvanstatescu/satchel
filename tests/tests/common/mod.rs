@@ -1,8 +1,9 @@
 //! Shared harness for the Satchel sandbox suite (near-workspaces 0.23.0 + mock signer + mock FT).
 //!
-//! Wasm comes from `target/near/<crate>/<crate>.wasm` (build with `cargo near build
-//! non-reproducible-wasm --manifest-path contracts/<crate>/Cargo.toml`). Overrides:
-//! - `SATCHEL_WASM=<path>` tests another artifact, e.g. the reproducible build (spec §12.3, R-35);
+//! Wasm comes from `target/near/<name>/<name>.wasm`, where `<name>` is the crate name with `-` → `_` (`satchel`,
+//! `mock_signer`, `mock_ft`). Build each with `cargo near build non-reproducible-wasm --manifest-path
+//! contracts/<crate>/Cargo.toml`. Overrides:
+//! - `SATCHEL_WASM=<path>` tests another artifact, e.g. the reproducible build (kb/90 §12.3, R-35);
 //! - `SANDBOX_VERSION=2.14.0-rc.5` runs against testnet's nearcore instead of the default 2.13.4.
 #![allow(dead_code)]
 

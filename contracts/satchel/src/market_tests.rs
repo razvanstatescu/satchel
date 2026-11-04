@@ -371,7 +371,7 @@ fn on_inside_withdraw_recredits_only_on_failure_and_never_panics() {
     assert!(!c.on_inside_withdraw(bare.clone(), Some(usdc()), U128(5)));
     assert_eq!(inside(&c, &bare)["near"], "0");
     // `#[private]` is enforced by the wasm entry point only; the sandbox checks a direct call
-    // (tests/tests/market.rs::callbacks_are_private).
+    // (tests/tests/market.rs::withdraw_failures_recredit, last step).
 }
 
 // ── storage credit ─────────────────────────────────────────────────────────────────────────────
