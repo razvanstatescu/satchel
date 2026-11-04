@@ -1,5 +1,11 @@
 # Parser fuzzing: the §5.9 classifiers
 
+> **Status (2026-11-04): no open finding.** F-01, F-02 and W-01 are fixed and F-03 is accepted (§0). The original run
+> is of 2026-10-23 (v1 classifiers); §0b, §5b and §8 add the sprint's C2/C3/C7, C5 and C4/C6 coverage (2026-10-29).
+> The latest deep differential is the test audit's round two: 1,000,000 Rust-vs-TS cases, 0 disagreements
+> ([`docs/testing/contract.md`](../testing/contract.md) §7.2). Spec: `kb/90-technical-spec.md` §5.9 and
+> [`docs/specs/C1-C2-C3-C7.md`](../specs/C1-C2-C3-C7.md). Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 Target: `contracts/satchel/src/parse/{hex,rlp,evm,btc,sol}.rs`, the code that decides what the MPC signs. The rules are
 spec `kb/90-technical-spec.md` §5.9 and the error codes are §5.15. Reference: the TS mirror in `packages/core/src/policy/`.
 Run date: 2026-10-23. The contract logic was not changed.

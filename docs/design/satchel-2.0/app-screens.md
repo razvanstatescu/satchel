@@ -23,7 +23,7 @@ with the real derived addresses.
 | 8 | Send's chain picker clips at 390. Addresses break mid-group. The hand-off moves 58 px and the names collide. Targets are 24 px | The chain picker shows **charm + ticker only** (the balance moves under the amount). Addresses wrap only **between** 4-character groups. The hand-off card is 208 px below 480, so it travels 112 px at 360 and 142 px at 390 (200 px in the dialog), and each name gets its own column. Every control is ≥ 44 px |
 
 ## 1. Shared rules for every app screen
-### 1.1 Shell (`proto/shell.html` and `design-spec.md`, the lead's; my pages mirror it through `tools/app-sync.mjs`)
+### 1.1 Shell (`proto/shell.html` and `design-spec.md`, the lead's; my pages mirror it through `tools/app-sync.mjs`, which is not in the repo)
 - **The top bar (below 1024):**
   - lockup, Testnet badge, then a Connect or account control and the Menu sheet button;
   - the account shows as its avatar (`account--icon`);

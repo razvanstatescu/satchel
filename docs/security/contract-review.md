@@ -1,12 +1,20 @@
 # Satchel contract: adversarial security review
 
+> **Status (2026-11-04): closed.** Every finding was fixed or accepted in the fix pass of 2026-10-23 (the
+> [Fix pass](#fix-pass-2026-10-23) table: S-01, S-03–S-07, S-09 and S-13 fixed; S-02 mitigated by operations, and its
+> escrow side guarded on-chain since the sprint's M-01 fix; S-08, S-10–S-12 accepted). This review covers the **v1
+> contract** (2026-10-23, wasm `aea0b2e9…`). The sprint features C1–C7 were reviewed separately in
+> [`sprint-review.md`](sprint-review.md) (2026-10-29), and the test audits of 2026-10-30/31 are in
+> [`docs/testing/contract.md`](../testing/contract.md) (AUDIT-01…04, Q-01…Q-05). Line numbers and test counts below are
+> those of the reviewed sources, not of today's `main`. Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 Reviewed on 2026-10-23. Scope: `contracts/satchel/src/**` (`lib.rs`, `sign.rs`, `mpc.rs`, `parse/{hex,rlp,evm,btc,sol}.rs`, `sale.rs`, `views.rs`, `events.rs`, `errors.rs`, `types.rs`).
 
 The code was checked against the design in kb/90 §5–§7, the kb/70 threat model, `plan/review.md`, and `docs/handoff/{contract,sandbox}.md`. Sandbox runs used the handoff wasm (`satchel.wasm`, sha256 `bec41e44…8da584`; the sources are unchanged since that build). No contract source was edited. The only change to an existing source file is the `#[cfg(test)] mod security_tests;` line in `lib.rs`.
 
 ## Summary verdict
 
-**There are no Critical or High findings. There is one Medium finding (S-01). Fix it before the keyless birth.**
+**There are no Critical or High findings. There is one Medium finding (S-01). Fix it before the keyless birth.** *(S-01 was fixed the same day; see the Fix pass.)*
 
 The properties behind the product promise hold:
 - **No blind signing.** Every path to the MPC goes through a classifier that hashes the exact bytes it parsed.
@@ -52,7 +60,7 @@ Every finding now has a status (the **Status** column below). The orchestrator m
 
 ## Findings
 
-Severity combines impact and likelihood for the **locked testnet contract**. Line numbers refer to the current sources; `lib.rs` lines include the added test-module line.
+Severity combines impact and likelihood for the **locked testnet contract**. Line numbers refer to the sources as reviewed on 2026-10-23 (before the fix pass); `lib.rs` lines include the added test-module line.
 
 | ID | Severity | Status | Location | Description | Exploit scenario | Fix recommendation |
 |---|---|---|---|---|---|---|

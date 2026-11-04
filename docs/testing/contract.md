@@ -3,14 +3,17 @@
 Status: test audit of 2026-10-30 (branch `test/contract`), which changed no contract source; every finding was a test.
 AUDIT-01, -02 and -04 were then fixed the same day on branch `fix/audit` (§4). Round two (branch `test/contract2`,
 2026-10-30/31, §7) re-audited the fixed code: nearcore 2.14, the deep differential, new adversarial tests, Q-03/Q-04, gas.
+Q-03 and Q-04 were fixed on 2026-10-31 (§7.7); that is the contract on `main` and on dev2 today (its code on
+`main` is unchanged since). §6's table stops before §7.7: the latest counts (202 unit, 137 sandbox) are in §7.7 and in
+[README.md](README.md#latest-recorded-counts). Shorthand (INV-xx, AUDIT-xx, Q-xx, R2-xx): [docs/GLOSSARY.md](../GLOSSARY.md).
 
 Scope: `contracts/satchel` (unit tests) and `tests/` (sandbox suite, near-workspaces 0.23.0 with the mock signer and
 mock FT). The source of truth for intended behaviour is `kb/90-technical-spec.md` §5–§6 and `docs/specs/*.md`.
 
 ## 1. How to run the suites
 
-Every command below assumes the toolchain pinned by `rust-toolchain.toml` (Rust 1.93.0). On this machine prefix each
-shell with `export PATH="$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH";`.
+Every command below assumes the toolchain pinned by `rust-toolchain.toml` (Rust 1.93.0). On the original dev machine
+(macOS) each shell needed the prefix `export PATH="$HOME/.cargo/bin:/opt/homebrew/bin:/usr/local/bin:$PATH";`.
 
 | Suite | Command | Needs |
 |---|---|---|

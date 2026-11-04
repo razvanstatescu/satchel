@@ -1,5 +1,10 @@
 # Site refresh (2026-11-03, D-51)
 
+> **What this folder is:** the research and design record of one landing-page round of the web app (`apps/web`, the
+> `/` route). It sits on top of the Satchel 2.0 design (`docs/design/satchel-2.0/`); `brand/` stays the source of
+> truth for visual identity. Kept as written on 2026-11-03; partly superseded the same day by `docs/design/site-polish/`
+> (below). The built landing is the reference.
+
 The landing (`/`) catches up with the feature sprint (Oct 29 – Nov 2):
 - the claims the new features made false are fixed;
 - the sample card is the app's value card (D-50);

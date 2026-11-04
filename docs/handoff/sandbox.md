@@ -1,5 +1,13 @@
 # Handoff: `sandbox` (contracts/mock-signer, contracts/mock-ft, tests/, tools/check-wasm-imports.sh)
 
+> **Historical record** (2026-10-22, against the v1 wasm `bec41e44…`). The harness, the how-to-run steps (§2) and the
+> mock interfaces (§3) still hold. The suite has grown since: 83 tests after the security fix pass (2026-10-23), the
+> sprint files `allowance`, `features`, `market` and `review` (2026-10-29), the test audit's `audit`, `round2` and
+> `gas_paths` files, and Q-03/Q-04: **137 passed** on 2026-10-31. The §5 INV map stops at INV-31 (the v1 invariants).
+> **Current truth:** the latest measured counts are in [`docs/testing/README.md`](../testing/README.md); the full
+> method and invariant coverage matrix (including the sprint's INV-34…INV-38) is
+> [`docs/testing/contract.md`](../testing/contract.md) §2. Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 Status: **suite complete and green** against `satchel.wasm` sha256 `bec41e44…8da584` (2026-10-22). The sections are: (0) results, (1) contract findings, (2) how to run, (3) mock interfaces, (4) deviations, (5) the INV → test map.
 
 ## 0. Results (2026-10-22, Apple Silicon)

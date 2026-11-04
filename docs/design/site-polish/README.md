@@ -1,5 +1,10 @@
 # Site polish (2026-11-03, D-52)
 
+> **What this folder is:** the research and design record of the latest landing-page round of the web app
+> (`apps/web`, the `/` route), after `docs/design/site-refresh/` (D-51). It sits on top of the Satchel 2.0 design
+> (`docs/design/satchel-2.0/`); `brand/` stays the source of truth for visual identity. Kept as written on 2026-11-03;
+> the built landing is the reference.
+
 The landing (`/`) presents the mainnet product:
 - it names the product's networks, and its one testnet signal is the header badge and its tooltip (plus the phone
   menu sheet's line);
@@ -33,4 +38,5 @@ the working scripts, the screenshots and frame strips, and the saved Mobbin and 
 reference.
 
 **App follow-up found on the way** (outside the landing): in mainnet mode (`IS_TESTNET` false), `SatchelCard`'s head
-row should be `items-center`, like the landing card (P13; `design-notes.md` §4). It isn't built.
+row should be `items-center`, like the landing card (P13; `design-notes.md` §4). It wasn't built in this round; it
+was built later the same day (commit `f0d37bb`: the pill centres beside a one-line total).

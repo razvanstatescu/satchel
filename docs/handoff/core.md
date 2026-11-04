@@ -1,6 +1,15 @@
 # Handoff: `core` (packages/core, tools/vectors, vectors/)
 
-Status: **vectors generated** (`vectors/evm.json` 43 = 8 ok + 35 refused, `vectors/btc.json` 39 = 10 + 29, `vectors/sol.json` 28 = 6 + 22, `vectors/derive.json` 49). The schema below is fixed. Every error code of spec §5.15 for EVM/BTC/SOL (plus `ERR_HEX`) has at least one vector.
+> **Historical record** (written 2026-10-21/22, before the feature sprint). The vector schema and the module layout
+> below still hold, but the counts do not: `vectors/` now also holds `msg.json`, `history.json` and `allowance.json`
+> (sprint, 2026-10-29), and `evm.json` has grown from 43 to 86 vectors (S-04 nonce-gap and C2/C3 cases). The sprint
+> added `@satchel/core` modules for C1–C7 (see [`docs/specs/`](../specs/)). `@satchel/core/card` (brand 1.0 leather
+> colours, §2) is no longer imported by the app ([`docs/testing/core-api.md`](../testing/core-api.md)).
+> **Current truth:** the spec is `kb/90-technical-spec.md` (§5.9 classifier, §7 clean history) plus `docs/specs/*.md`;
+> the latest measured test counts are in [`docs/testing/README.md`](../testing/README.md); the per-module test
+> inventory is [`docs/testing/core-api.md`](../testing/core-api.md). Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
+Status (2026-10-22): **vectors generated** (`vectors/evm.json` 43 = 8 ok + 35 refused, `vectors/btc.json` 39 = 10 + 29, `vectors/sol.json` 28 = 6 + 22, `vectors/derive.json` 49). The schema below is fixed. Every error code of spec §5.15 for EVM/BTC/SOL (plus `ERR_HEX`) has at least one vector.
 
 ## 1. Shared vectors: `vectors/{evm,btc,sol}.json` (for the `contract` agent)
 

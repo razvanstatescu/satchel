@@ -1,5 +1,15 @@
 # Handoff: `web` (apps/web)
 
+> **A running log, appended per wave** (2026-10-22 → 2026-11-03). Each section's counts and "today"/"yet" statements
+> are as of its own date. Wave 7 (2026-10-26) replaced the brand 1.0 app described in waves 2–6. §1–§5 date from the
+> early waves; where a later "Update" section disagrees, the later one wins.
+> **Since the early waves:** the app is live at https://usesatchel.xyz (D-49) against `dev2.satchelhq.testnet`, and
+> live testnet runs are recorded in `research/spikes/dev2-live/RESULTS.md`. The feature-sprint UIs (A1–A3, C2–C7,
+> 2026-10-29/30) have no wave section here: see `plan/progress/feature-sprint.md` and [`docs/specs/`](../specs/).
+> **Latest recorded web counts:** vitest 654/654 and Playwright 307/307 (2026-11-03, the D-52 section at the end);
+> the test inventory is in [`docs/testing/`](../testing/README.md). Design sources: `brand/` (visual identity) and
+> [`docs/design/`](../design/satchel-2.0/README.md). Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 Status (2026-10-22, wave 2): **Phase 1 routes + the P2 sale/market, the seller's Sold receipt + escrow/withdraw, the SOL
 send flow (P2, behind a flag) and the font-embedded card SVG, all tested in fixture mode.** `next build` passes in fixture
 and live mode; 122 vitest tests, 36 Playwright tests (fixture) and 265 `@satchel/core` tests pass; eslint: 0 warnings.
@@ -295,6 +305,10 @@ always has a SOL source (`cleanSources()` in `clean-live.ts`, pinned by a unit t
   devDependency `subset-font@2.9.0` (card font generator only; never bundled) — `pnpm-lock.yaml` changed.
 
 ## 5. Open issues
+
+*As of 2026-10-22. Since then the live paths have run on dev2 (`research/spikes/dev2-live/RESULTS.md`), and the Solana UI
+is on by default (D-46, "Update 2026-10-27" below).*
+
 - Live paths (wallet, RPC, broadcast, `withdraw_proceeds`, the SOL devnet broadcast) are untested end to end here: no
   testnet tx in this wave. First live run: Day 1 smoke. Things to watch there: the FastNEAR `is_event_log` lookup for the
   seller's `sold`/`payout` events; the devnet public RPC's rate limit with an 8 s blockhash refresh on Review.

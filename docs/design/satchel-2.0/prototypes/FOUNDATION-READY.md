@@ -20,7 +20,7 @@ The shared base for every prototype in `proto/`. Visual check: `shots/foundation
   external-link, log-out, house, layers, scroll-text, badge-check, eye, info, hourglass, receipt, list, coins,
   hand-coins, package, rotate-ccw, refresh-cw, ellipsis, book-open, file-text, landmark, key, signature, pen-line,
   circle-alert, shield, wallet-minimal, sticker, scan-line). Need another? Add it to `ICONS` in `tools/build-assets.mjs`,
-  run `node tools/build-assets.mjs`, then `node tools/sync.mjs`.
+  run `node tools/build-assets.mjs`, then `node tools/sync.mjs` (that tooling was not kept in the repo; see `../README.md`).
 - **The lockup** (wordmark in `currentColor`, so one asset covers both themes): `<!--@lockup--><!--/@lockup-->` inside a
   link, then `tools/sync.mjs`. It renders `<svg class="lockup">`.
 - **Assets** (`assets/`): `brand/*.svg` (the pack, verbatim: mark, mark-small, lockups, wordmark, charm, charm-coral,

@@ -1,37 +1,71 @@
 # Testing Satchel
 
-This is the overview. Each area has its own detailed document:
+The overview of every test suite: how to run each one, where the coverage maps are, and the latest recorded counts.
+Written after the two test-audit rounds (2026-10-30/31); the counts table below was brought up to date on 2026-11-04
+from the latest recorded runs (nothing was re-run for that edit). Shorthand (INV-xx, AUDIT-xx, Q-xx, R2-xx, C1–C7):
+[docs/GLOSSARY.md](../GLOSSARY.md).
 
-- [contract.md](contract.md): the Rust contract (unit and sandbox). It has a coverage matrix of every method and every
-  INV-xx invariant, the edge cases explored, and the bugs found (AUDIT-01 to AUDIT-04).
+Each area has its own detailed document, with its coverage map:
+
+- [contract.md](contract.md): the Rust contract (unit and sandbox). Coverage map: §2, every public method, callback
+  and view (§2.1) and every INV-xx invariant (§2.2), each mapped to its tests. Also the edge cases explored (§3), the
+  bugs found and fixed (AUDIT-01 to AUDIT-04, §4) and round two (§7).
 - [core-api.md](core-api.md): the shared TypeScript core (`packages/core`), the web app's data layer (`apps/web/src/lib`)
-  and the API routes, with a module-by-module inventory.
-- [ui.md](ui.md): the web UI end to end (Playwright), with a page/flow/state coverage matrix.
+  and the API routes. Coverage map: "Module-by-module inventory" (core, then `apps/web/src/lib`) and "API routes".
+- [ui.md](ui.md): the web UI end to end (Playwright). Coverage map: "Coverage matrix (page / flow / state → spec)".
+
+Related: the parser fuzzing and its re-run commands are in [`docs/security/fuzzing.md`](../security/fuzzing.md) §5;
+the security reviews are in [`docs/security/`](../security/); live testnet runs (real MPC, real chains) are in
+`research/spikes/dev2-live/RESULTS.md`.
 
 The audit ran in two rounds, with one agent per area: round one on 2026-10-30, round two on 2026-10-30/31. Both were
-merged into `main`. Every count below was measured on the merged `main`, not copied from an agent's report.
+merged into `main`. Every audit count below was measured on the merged `main`, not copied from an agent's report.
 
 ## Run everything
 
-Every command runs from the repo root. On this machine, prefix each shell with
-`export PATH="$HOME/.cargo/bin:$HOME/.nvm/versions/node/v22.22.2/bin:/opt/homebrew/bin:/usr/local/bin:$PATH";`.
+Every command runs from the repo root. You need Node 22.22.2 (`.nvmrc`) with pnpm 11, and Rust 1.93.0 with the wasm32
+target and cargo-near 0.22.0 (`rust-toolchain.toml`). On the original dev machine (macOS, nvm) each shell needed
+`export PATH="$HOME/.cargo/bin:$HOME/.nvm/versions/node/v22.22.2/bin:/opt/homebrew/bin:/usr/local/bin:$PATH";` first.
+Heavy suites share the machine's CPU: run one at a time (`CLAUDE.md`, "CPU budget").
 
 | Suite | Command | Needs |
 |---|---|---|
 | Contract unit tests (parsers, policy, fuzz/proptest, shared vectors) | `cargo test -p satchel` | nothing |
 | Contract sandbox (real wasm on a local NEAR node) | build the three wasms, then `cargo test -p satchel-tests` (see [contract.md §1](contract.md#1-how-to-run-the-suites)) | `cargo near build non-reproducible-wasm` for `contracts/{satchel,mock-signer,mock-ft}` |
+| Wasm import check (INV-22: no AddKey, DeployContract or DeleteAccount) | `tools/check-wasm-imports.sh target/near/satchel/satchel.wasm` | the built wasm |
 | Core (TS mirror of the policy, chain builders, clean-history checker) | `pnpm --filter @satchel/core test` | nothing |
+| Core live checks (read-only, real networks; opt-in) | `pnpm --filter @satchel/core test:network` | network access |
 | Web unit tests | `pnpm --filter web test` | nothing |
-| Tools unit tests | `pnpm --filter @satchel/tools test:unit` | nothing |
-| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port; **never 3100** (reserved on the dev machine) |
+| Tools unit tests | `pnpm --filter @satchel/tools test:unit` (`test` also checks that `vectors/*.json` are fresh) | nothing |
+| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port; **never 3100** (reserved on the dev machine, and it is the config's default) |
 | Typecheck and lint | `pnpm --filter web typecheck`, `pnpm --filter web lint` | nothing |
+| Live signing without funds (real MPC on testnet) | `pnpm --filter @satchel/tools e2e:evm -- --sign-only` (also `e2e:btc`, `e2e:sol`; scripts in `tools/e2e/`) | testnet keys in `~/.near-credentials` |
 
 The end-to-end suite builds the app (`next build && next start`) in fixture mode and takes about 5 minutes. No suite
-signs a testnet transaction. Live testnet runs are separate and documented in `research/spikes/dev2-live/RESULTS.md`.
+above signs a testnet transaction, except the live scripts in the last row. Live testnet runs are documented in
+`research/spikes/dev2-live/RESULTS.md`.
 
-## Counts on `main`
+## Latest recorded counts
 
-Measured on `main` after round two, its fixes, and the Q-03/Q-04 contract change (2026-10-31).
+The newest count recorded for each suite, with its date and source. On `main`, the contract code has not changed
+since 2026-10-31 (commit `e785075`), nor have the `packages/core` tests. The README's "Run it locally" table should
+match this one at the release commit.
+
+| Suite | Latest recorded result | Date | Source |
+|---|---|---|---|
+| Contract unit, `cargo test -p satchel --lib` | 202 passed, 0 ignored | 2026-10-31 | [contract.md §7.7](contract.md#77-q-03-and-q-04-fixed-2026-10-31-branch-fixq03-q04-from-main-2ed9759) |
+| Contract sandbox, nearcore 2.13.4 (one `--test` file at a time) | 137 passed, 0 ignored | 2026-10-31 | same |
+| Wasm import check | INV-22 OK (wasm `4dd7cde9…`, the one on dev2) | 2026-10-31 | same |
+| Core | 540 passed (18 files), plus the browser-bundle check | 2026-10-31 | [core-api.md "Round two"](core-api.md#round-two) |
+| Tools unit (`test:unit`) | 92 passed (6 files) | 2026-10-30 | [core-api.md "Suite counts"](core-api.md#suite-counts) |
+| Web unit (vitest) | 654 passed | 2026-11-03 | [`docs/handoff/web.md`](../handoff/web.md), "Update 2026-11-03 (D-52)" |
+| Web end to end (Playwright, fixture) | 307 passed | 2026-11-03 | same |
+| Deep Rust-vs-TS differential | 1,000,000 cases, 0 disagreements | 2026-10-30/31 | [contract.md §7.2](contract.md#72-results-filled-in-as-each-run-finishes) |
+
+## Counts through the audit (2026-10-30/31)
+
+Measured on `main` after round two, its fixes, and the Q-03/Q-04 contract change (2026-10-31). The web counts have
+grown since ("Latest recorded counts" above).
 
 | Suite | Before the audit | After round one | After the round-one fixes | After round two | **After Q-03/Q-04** |
 |---|---|---|---|---|---|

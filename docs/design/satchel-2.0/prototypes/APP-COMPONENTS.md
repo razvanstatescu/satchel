@@ -80,4 +80,5 @@ the bottom.
 
 ## Prototype-only (never port)
 `.state-bar` (the state switcher, `assets/app-states.js`), `.proto-flag` (marks the SOL-flagged and R7-optional
-variants), `tools/app-sync.mjs` (pastes the shell, grouped addresses, code hashes and real QR codes).
+variants), `tools/app-sync.mjs` (pastes the shell, grouped addresses, code hashes and real QR codes; not kept in the repo, see
+`../README.md`).

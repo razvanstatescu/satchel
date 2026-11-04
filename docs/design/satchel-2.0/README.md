@@ -1,5 +1,12 @@
 # Satchel 2.0: design specs for the web app rebuild (2026-10-26)
 
+> **What this folder is:** the design record of the Satchel 2.0 rebuild of the web app (`apps/web`), 2026-10-26. It
+> governs how the app and the landing look and behave, under `brand/` (the source of truth for visual identity, D-44)
+> and the tokens in `kb/81-design-tokens.md` R4. Later rounds changed the landing: `docs/design/site-refresh/`
+> (2026-11-03, D-51) and `docs/design/site-polish/` (2026-11-03, D-52); where they differ, the later round wins. The
+> built app is the reference for what shipped; these files are kept as they were written, so their counts and "today"
+> statements are of 2026-10-26.
+
 Razvan rebuilt the brand: Satchel 2.0, the "Sticker S" (`brand/`). He asked for the web app and the site to be
 recreated from scratch in it. Decision D-44 in `plan/decisions.md` records his choices:
 - the H1 "Sell a wallet with everything inside. The buyer checks it first.";
@@ -9,6 +16,12 @@ recreated from scratch in it. Decision D-44 in `plan/decisions.md` records his c
 
 The team (research, design, build, QA) worked from these documents. They are copied here from the session scratchpad,
 so a spec that says `<R>/…` means this folder, and `<R>/proto/…` means `prototypes/`.
+
+**Names the files use for things not kept here:** `rulings.md` is this folder's `decisions-during-build.md`, and
+`app-inventory.md` is `audit-v4-app-inventory.md`. `context.md`, `build-plan.md`, the build shots (`<R>/build/shots/`,
+`shots/`, `refs-shots/`), `motion-work/` and the prototype tooling (`tools/app-sync.mjs`, `tools/build-assets.mjs`,
+`tools/sync.mjs`) were working files in the session scratchpad and are not in the repo. The prototypes in
+`prototypes/` are the generated output, so they open without that tooling.
 
 | File | What |
 |---|---|

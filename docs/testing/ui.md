@@ -1,12 +1,17 @@
 # Web UI testing
 
+> **Test audit record:** round one 2026-10-30, round two 2026-10-30/31 (per [README.md](README.md)). The counts here
+> stop at 286 end-to-end tests; the suite has grown since (latest recorded counts: [README.md](README.md#latest-recorded-counts)).
+> The spec files listed still exist except `balance-refresh.spec.ts`, which round two removed (see "Round two").
+> Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 This is an audit of the web app's Playwright coverage (apps/web/test/e2e), done in fixture mode (the mock wallet +
 the in-browser chain simulation, `apps/web/src/lib/data/sim.ts`) — no testnet transactions are signed by this suite,
 so it runs fully offline.
 
 ## How to run
 
-From the repo root, in this worktree:
+From the repo root:
 
 ```sh
 cd apps/web

@@ -1,7 +1,20 @@
 # Handoff: `release` (tools/e2e, tools/deploy, tools/*.sh, .github/workflows, README.md, .env.example)
 
+> **Historical record** (2026-10-22). Many "today" statements below are no longer true:
+> - the private git repo `github.com/razvanstatescu/satchel` exists since 2026-10-29, and agents push to it;
+> - `satchelhq.testnet` and the personas `alice`, `bob`, `carol` exist since 2026-10-29 (D-48), and agents may sign
+>   testnet transactions;
+> - `dev1` and `dev2.satchelhq.testnet` are deployed, and the app is live at https://usesatchel.xyz (D-49) against dev2;
+> - `LICENSE` (MIT) is in the repo.
+>
+> Still true: the final keyless birth of `satchel.satchelhq.testnet` (H-15) is planned for Nov 10 and has not happened,
+> and the README still has `[TBD]` values for it. The tools test count grew after this (92 vitest tests on 2026-10-30).
+> **Current truth:** `README.md` (judge-facing), `plan/launch-checklist.md` and `plan/human-actions-ready.md` for open
+> steps, [`docs/testing/README.md`](../testing/README.md) for the latest measured test counts,
+> `tools/deploy/keyless-birth.md` for the birth runbook. Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 Status (2026-10-22): **all scripts written, unit-tested and run in dry-run / read-only mode. No transaction was
-signed or sent, and nothing was broadcast.** No git repo exists yet (D-39), so nothing was committed.
+signed or sent, and nothing was broadcast.** At the time no git repo existed (D-39), so nothing was committed.
 
 ## 1. Files
 

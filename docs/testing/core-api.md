@@ -1,5 +1,10 @@
 # Core, data-layer and API test audit
 
+> **Test audit record:** round one 2026-10-30, round two 2026-10-31 ("Round two", at the end). Counts are as of those
+> dates; the latest recorded counts are in [README.md](README.md#latest-recorded-counts). The unused
+> `packages/core/src/card` module (brand 1.0) it flags is still in the tree (checked 2026-11-04).
+> Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
+
 This document inventories test coverage for `packages/core`, the pure logic and data layer under
 `apps/web/src/lib/**`, and the API routes under `apps/web/src/app/api/**`. It lists edge cases explored (with
 result), bugs found, and what remains untested and why. Another agent covers UI flows (apps/web Playwright
@@ -7,7 +12,8 @@ user-journeys) and another covers the Rust contract — this document only cover
 
 ## How to run each suite
 
-All commands need this PATH prefix on this machine (the shell otherwise has no PATH):
+On the original dev machine (macOS, nvm), every command needed this PATH prefix (the agent's shell otherwise had no
+PATH); elsewhere, Node 22.22.2 with pnpm 11 on the PATH is enough:
 
 ```
 export PATH="$HOME/.cargo/bin:$HOME/.nvm/versions/node/v22.22.2/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
