@@ -208,9 +208,10 @@ async fn r2_delegate_sign_events_and_requester() -> Result<()> {
 
 // ── the delegate path ───────────────────────────────────────────────────────────────────
 
-/// "Mislabeled" calls: extra JSON arguments (`requester`, `owner_id`, `signer`) are ignored by the generated
-/// deserializer, so a delegate cannot pass itself off as the owner (the record names the delegate and it is debited);
-/// a request object with two kinds is refused while deserializing, before anything is written.
+/// "Mislabeled" calls: extra JSON arguments (`requester`, `owner_id`, `signer`) are refused while deserializing
+/// (`#[deny_unknown_arguments]`, review R3-I-1; before that fix they were silently ignored), so nothing is written. The
+/// same request without them succeeds, and the record names the delegate, who is debited: a delegate cannot pass itself
+/// off as the owner either way. A request object with two kinds is refused while deserializing too.
 #[tokio::test]
 async fn r2_extra_sign_for_arguments_cannot_relabel_the_requester() -> Result<()> {
     let env = setup().await?;
@@ -218,6 +219,18 @@ async fn r2_extra_sign_for_arguments_cannot_relabel_the_requester() -> Result<()
     let args = json!({ "token_id": "1", "request": evm_req(&unhex(KB_EVM_TX)), "requester": env.alice.id(),
                        "owner_id": env.alice.id(), "signer": env.alice.id() });
     let st = env.carol.call(env.satchel.id(), "sign_for").args_json(args).gas(sign_attach_gas(1)).deposit(sign_attach_deposit(1)).transact_async().await?;
+    let r = wait_final(&st, Duration::from_secs(60)).await?;
+    assert!(r.is_failure(), "extra sign_for arguments must be refused (R3-I-1)");
+    assert!(fail_text(&r).contains("unknown field"), "{}", fail_text(&r));
+    assert_eq!(sig_count(&env, "1").await?, 0, "a refused call writes no record");
+    let st = env
+        .carol
+        .call(env.satchel.id(), "sign_for")
+        .args_json(json!({ "token_id": "1", "request": evm_req(&unhex(KB_EVM_TX)) }))
+        .gas(sign_attach_gas(1))
+        .deposit(sign_attach_deposit(1))
+        .transact_async()
+        .await?;
     let r = wait_resolved(&st, Duration::from_secs(60)).await?;
     assert_ok(&r);
     assert_eq!(events(&r, "allowance_spent")[0]["delegate_id"], env.carol.id().to_string());
