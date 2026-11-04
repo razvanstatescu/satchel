@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CircleCheck, Hourglass, Info, LoaderCircle, TriangleAlert, Undo2, type LucideIcon } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { gateModel, type ReportMode } from "@/components/Clean";
+import { RevokeFirstNotice } from "@/components/client/Allowance";
 import { FlowShell } from "@/components/client/FlowShell";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
@@ -623,6 +624,7 @@ export function IncomingOffers({ snap, offers: initial }: { snap: SatchelSnapsho
       <h2 id="offers-title" className="m-0 font-sans text-label text-ink">
         {copy.offers.incoming.title}
       </h2>
+      {isOwner ? <RevokeFirstNotice snap={snap} context="accept" /> : null}
       <ul className="m-0 list-none rounded-md border border-line bg-surface p-0">
         {offers.map((o) => (
           <OfferRow key={o.id} snap={snap} offer={o} mine={isOwner} />

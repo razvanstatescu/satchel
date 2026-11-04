@@ -29,6 +29,21 @@ test.describe("C5: server HTML (no JS) names the existing access and its caps", 
   });
 });
 
+test.describe("R3-A-1 / R3-A-2: what an owner is told about other people's access", () => {
+  test("each row says what the clean-history check found, and the Sell sheet says to revoke first", async ({ page }) => {
+    await useMockWallet(page, ALICE);
+    await page.goto("/s/1");
+    const manage = page.getByTestId("allowance-manage").filter({ visible: true });
+    const row = manage.locator("li", { hasText: DANA });
+    await expect(row.getByTestId("delegate-sigs")).not.toContainText("Checking", { timeout: 15_000 });
+
+    await page.goto("/s/1/sale?list=1");
+    const notice = page.getByTestId("sell-flow").getByTestId("revoke-first-notice");
+    await expect(notice).toContainText("restarts the quiet period");
+    await expect(notice.getByRole("link", { name: "Review who can spend" })).toHaveAttribute("href", "/s/1#allowance-manage");
+  });
+});
+
 test.describe("C5: the owner adds, sees and revokes", () => {
   test("Alice lets Carol spend a BTC cap, sees her listed, then revokes her (Dana is untouched)", async ({ page }) => {
     await useMockWallet(page, ALICE);
@@ -61,6 +76,11 @@ test.describe("C5: the owner adds, sees and revokes", () => {
     await expect(page.getByTestId("allowance-facts")).toContainText(CAROL);
 
     await manage.locator("li", { hasText: CAROL }).getByTestId("revoke-allowance").click();
+    // R3-A-1: the confirmation says plainly that revoking stops only new signatures, and links to the settle guidance
+    const confirm = manage.getByTestId("revoke-confirm");
+    await expect(confirm).toContainText("stops only new signatures");
+    await expect(confirm.getByRole("link", { name: "How to clear it" })).toBeVisible();
+    await manage.locator("li", { hasText: CAROL }).getByTestId("confirm-revoke").click();
     await expect(manage).not.toContainText(CAROL);
     await expect(manage).toContainText(DANA);
   });

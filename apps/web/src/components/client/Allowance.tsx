@@ -1,16 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Info, LoaderCircle, TriangleAlert, Undo2 } from "lucide-react";
 import { SectionHead } from "@/components/Facts";
 import { utcShort } from "@/components/Timeline";
 import { useViewer } from "@/components/client/SatchelPage";
 import { toast } from "@/components/client/Toaster";
+import { useCleanCheck } from "@/components/client/useCleanCheck";
 import { Button, HelpLink, Icon, Morph, cx } from "@/components/ui";
-import { assetTicker, formatCapAmount } from "@/lib/allowanceView";
+import { activeDelegates, assetTicker, formatCapAmount, outstandingSigs } from "@/lib/allowanceView";
 import { copy, errorCopy } from "@/lib/copy";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
-import type { SatchelSnapshot } from "@/lib/data/types";
+import type { CleanItem, SatchelSnapshot } from "@/lib/data/types";
 import { calls } from "@/lib/near/contract";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
@@ -71,6 +73,9 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
   const { wallet } = useWallet();
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<Note>(null);
+  const [confirming, setConfirming] = useState<string | null>(null);
+  // R3-A-1: the clean-history check says which of each account's signatures could still move coins
+  const { report, failed } = useCleanCheck(snap.token_id, isOwner && live.allowances.length > 0);
   if (!isOwner) return null;
   const id = snap.token_id;
   const atLimit = live.allowances.length >= MAX_DELEGATES;
@@ -78,6 +83,7 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
   const revoke = (delegate: string) => {
     if (!wallet || !accountId || busy) return;
     setNote(null);
+    setConfirming(null);
     setBusy(delegate);
     runCall(wallet, calls.revokeAllowance(id, delegate), accountId).then((r) => {
       setBusy(null);
@@ -93,7 +99,7 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
   };
 
   return (
-    <section aria-labelledby="allowance-manage-title" className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5" data-testid="allowance-manage">
+    <section id="allowance-manage" aria-labelledby="allowance-manage-title" className="flex flex-col gap-3 rounded-card border border-line bg-surface p-5" data-testid="allowance-manage">
       <h2 id="allowance-manage-title" className="m-0 font-display text-heading text-ink">
         {copy.allowance.manage.title}
       </h2>
@@ -110,7 +116,8 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
                   loading={busy === a.delegate}
                   spinner="none"
                   disabled={!wallet}
-                  onClick={() => revoke(a.delegate)}
+                  onClick={() => setConfirming(confirming === a.delegate ? null : a.delegate)}
+                  aria-expanded={confirming === a.delegate}
                   data-testid="revoke-allowance"
                   aria-label={busy === a.delegate ? undefined : `${copy.allowance.manage.revoke} ${a.delegate}`}
                 >
@@ -120,6 +127,17 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
                   />
                 </Button>
               </div>
+              <OutstandingSigs tokenId={id} items={report?.items ?? null} failed={failed && !report} delegate={a.delegate} />
+              {confirming === a.delegate ? (
+                <RevokeConfirm
+                  tokenId={id}
+                  delegate={a.delegate}
+                  expired={a.status === "expired"}
+                  items={report?.items ?? null}
+                  onConfirm={() => revoke(a.delegate)}
+                  onCancel={() => setConfirming(null)}
+                />
+              ) : null}
               {note?.who === a.delegate ? (
                 <p role={note.kind === "error" ? "alert" : undefined} className={cx("m-0 flex items-start gap-1.5 font-sans text-body-sm", note.kind === "error" ? "text-danger" : "text-ink-muted")}>
                   <Icon icon={note.kind === "error" ? TriangleAlert : Undo2} size={16} className="mt-0.5" />
@@ -144,6 +162,90 @@ export function AllowanceOwnerPanel({ snap }: { snap: SatchelSnapshot }) {
         <HelpLink anchor="q-allow-history" label={copy.questions["q-allow-history"].q} className="ml-1 align-middle" />
       </p>
     </section>
+  );
+}
+
+/** R3-A-1: how many of this account's signatures could still move coins, from the page's clean-history check. */
+function OutstandingSigs({ tokenId, items, failed, delegate }: { tokenId: string; items: readonly CleanItem[] | null; failed: boolean; delegate: string }) {
+  const c = copy.allowance.manage.sigs;
+  if (!items) return <p className="m-0 font-sans text-body-sm text-ink-muted" data-testid="delegate-sigs">{failed ? c.unavailable : c.checking}</p>;
+  const live = outstandingSigs(items, delegate);
+  return (
+    <div className="flex flex-col gap-1" data-testid="delegate-sigs" data-live-count={live.length}>
+      <p className={cx("m-0 flex items-start gap-1.5 font-sans text-body-sm", live.length ? "text-danger" : "text-ink-muted")}>
+        {live.length ? <Icon icon={TriangleAlert} size={16} className="mt-0.5" /> : null}
+        <span>{live.length ? c.count(live.length) : c.none}</span>
+      </p>
+      {live.length ? (
+        <ul className="m-0 flex list-none flex-col gap-0.5 p-0 font-sans text-body-sm text-ink-muted" aria-label={c.listLabel}>
+          {live.map((i) => (
+            <li key={i.seq}>
+              <Link href={`/s/${tokenId}/activity#sig-${tokenId}-${i.seq}`} className="text-link underline decoration-1 underline-offset-3 hover:decoration-2">
+                {i.key}
+              </Link>
+              {i.wouldPay ? <span className="t-num">{` · ${i.wouldPay}`}</span> : null}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+/** R3-A-1: revoking (or an expiry) stops only NEW signatures, so say so plainly before the owner confirms. */
+function RevokeConfirm({ tokenId, delegate, expired, items, onConfirm, onCancel }: { tokenId: string; delegate: string; expired: boolean; items: readonly CleanItem[] | null; onConfirm: () => void; onCancel: () => void }) {
+  const c = copy.allowance.manage.confirm;
+  const live = items ? outstandingSigs(items, delegate) : null;
+  return (
+    <div role="group" aria-label={c.title(delegate)} className="flex flex-col gap-2.5 rounded-md bg-surface-sunken p-3.5" data-testid="revoke-confirm">
+      <p className="m-0 font-sans text-body-sm font-semibold text-ink wrap-anywhere">{c.title(delegate)}</p>
+      <p className="m-0 font-sans text-body-sm text-ink">{expired ? c.expiredBody : c.body}</p>
+      <p className="m-0 font-sans text-body-sm text-ink-muted" data-testid="revoke-confirm-live">
+        {live === null ? c.unavailable : live.length === 0 ? c.none : copy.allowance.manage.sigs.count(live.length)}
+      </p>
+      {live?.length ? (
+        <ul className="m-0 flex list-none flex-col gap-0.5 p-0 font-sans text-body-sm text-ink-muted">
+          {live.map((i) => (
+            <li key={i.seq}>
+              {i.key}
+              {i.wouldPay ? <span className="t-num">{` · ${i.wouldPay}`}</span> : null}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <Link href={`/s/${tokenId}/activity`} className="w-fit font-sans text-body-sm font-semibold text-link underline decoration-1 underline-offset-3 hover:decoration-2">
+        {c.settle}
+      </Link>
+      <div className="flex gap-2">
+        <Button size="md" variant="primary" onClick={onConfirm} data-testid="confirm-revoke">
+          {c.confirm}
+        </Button>
+        <Button size="md" onClick={onCancel}>
+          {c.cancel}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * R3-A-2: before List or Accept offer. Anyone with live access can send zero-cost requests (up to 32 a day) that
+ * restart the quiet period and make every open offer stale. Non-blocking: a note with a link to the allowance section.
+ */
+export function RevokeFirstNotice({ snap, context, className }: { snap: SatchelSnapshot; context: "list" | "accept"; className?: string }) {
+  const { live, isOwner } = useViewer(snap);
+  if (!isOwner || activeDelegates(live.allowances).length === 0) return null;
+  const c = copy.allowance.manage.revokeFirst;
+  return (
+    <p className={cx("m-0 flex items-start gap-2 font-sans text-body-sm text-ink-muted", className)} data-testid="revoke-first-notice">
+      <Icon icon={Info} size={16} className="mt-0.5 flex-none" />
+      <span>
+        {context === "list" ? c.list : c.accept}{" "}
+        <Link href={`/s/${snap.token_id}#allowance-manage`} className="font-semibold text-link underline decoration-1 underline-offset-3 hover:decoration-2">
+          {c.link}
+        </Link>
+      </span>
+    </p>
   );
 }
 

@@ -23,6 +23,7 @@ import {
   type VerdictModel,
 } from "@/components/Clean";
 import { useConnect } from "@/components/client/ConnectButton";
+import { RevokeFirstNotice } from "@/components/client/Allowance";
 import { FlowShell } from "@/components/client/FlowShell";
 import { Handoff, Receipt } from "@/components/client/Handoff";
 import { useViewer, ViewerCard } from "@/components/client/SatchelPage";
@@ -1058,6 +1059,7 @@ function SellFlow({ snap, report }: { snap: SatchelSnapshot; report: CleanReport
             </p>
           ) : null}
           {risky && phase === "idle" ? <FootNote icon={TriangleAlert}>{copy.sell.history.warn}</FootNote> : null}
+          {phase === "idle" ? <RevokeFirstNotice snap={snap} context="list" /> : null}
           {note ? <NoteLine note={note} /> : null}
         </div>
       }

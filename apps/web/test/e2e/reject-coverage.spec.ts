@@ -112,11 +112,13 @@ test.describe("allowance: add and revoke, each rejected then recovered", () => {
     const manage = page.getByTestId("allowance-manage").filter({ visible: true });
     await expect(manage).toBeVisible();
     await manage.locator("li", { hasText: "dana.satchelhq.testnet" }).getByTestId("revoke-allowance").click();
+    await manage.locator("li", { hasText: "dana.satchelhq.testnet" }).getByTestId("confirm-revoke").click();
     await expect(manage).toContainText("Revoking was cancelled. Nothing changed.", { timeout: 10_000 });
     await expect(manage).toContainText("dana.satchelhq.testnet"); // still there
 
     await setReject(page, false);
     await manage.locator("li", { hasText: "dana.satchelhq.testnet" }).getByTestId("revoke-allowance").click();
+    await manage.locator("li", { hasText: "dana.satchelhq.testnet" }).getByTestId("confirm-revoke").click();
     await expect(manage).not.toContainText("dana.satchelhq.testnet", { timeout: 10_000 });
   });
 });

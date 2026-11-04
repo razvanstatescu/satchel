@@ -27,6 +27,31 @@ export const allowanceCopy = {
       /** The history-griefing note (spec §7 "Security notes"), shortened (less-labels); the full explanation moved
        * to /questions#q-allow-history, linked by the Allowance/AllowanceFlow components. */
       trustNote: "Their signatures count as yours. Add only someone you trust.",
+      /** R3-A-1: the limit is on what they can sign per day, not on what they can send, so signatures they already
+       * hold stay valid after Revoke. Shown on each row (from the clean-history check) and in the Revoke confirmation. */
+      sigs: {
+        checking: "Checking their earlier signatures…",
+        unavailable: "Couldn't check their earlier signatures right now.",
+        none: "No earlier signature from them can still move coins.",
+        count: (count: number) => `${n(count, "signature", "signatures")} from them could still move coins.`,
+        listLabel: "Still able to move coins",
+      },
+      confirm: {
+        title: (who: string) => `Revoke ${who}?`,
+        body: "Revoking stops only new signatures. A signature they already hold can still be sent to the network later, even after you revoke, until it is spent or expires.",
+        expiredBody: "This access has expired, which stops only new signatures. A signature they already hold can still be sent to the network later, until it is spent or expires.",
+        none: "None of their earlier signatures can still move coins, as far as the check can tell.",
+        unavailable: "The check isn't available right now, so there is no list of what they still hold.",
+        settle: "How to clear it",
+        confirm: "Revoke",
+        cancel: "Keep access",
+      },
+      /** R3-A-2: before List or Accept offer. A request from them restarts the quiet period and makes every open offer stale. */
+      revokeFirst: {
+        link: "Review who can spend",
+        list: "Someone else can still ask this Satchel to sign. Each request restarts the quiet period and can stop a sale, and you can't list during it. Consider revoking them first.",
+        accept: "Someone else can still ask this Satchel to sign. A request from them makes every open offer stale, so accepting can fail. Consider revoking them first.",
+      },
     },
 
     /** The Add sheet (/s/[id]/allowance). */

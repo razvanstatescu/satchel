@@ -1,6 +1,8 @@
 import { MAX_CAPS, assetKey, type Asset, type AllowanceView } from "@satchel/core/policy";
 import { DECIMALS, formatAmount, type Ticker } from "@/lib/format";
 import { EVM_IDS, OTHER_EVM_IDS, USDC_DECIMALS, evmPickerName, usdcAddress, type EvmChainId } from "@/lib/evm-networks";
+import { isDead, isMessage } from "@/components/Clean";
+import type { CleanItem } from "@/lib/data/types";
 import type { UiChain } from "@/lib/view";
 
 /**
@@ -87,4 +89,19 @@ export const CHAIN_ASSET: Record<UiChain, Asset> = { btc: "btc", evm: { evm: { c
 export function capForChain(view: Pick<AllowanceView, "caps">, chain: UiChain): AllowanceView["caps"][number] | undefined {
   const key = assetKey(CHAIN_ASSET[chain]);
   return view.caps.find((c) => assetKey(c.asset) === key);
+}
+
+/**
+ * R3-A-1: a delegate's cap limits what it may SIGN per rolling day, not what it can send. A signature it holds and
+ * hasn't broadcast stays valid, even after Revoke or expiry. These are that delegate's records (by `requester`) that the
+ * clean-history check has not shown to be dead (spent, expired, unfunded, foreign) or a message: `unused`, `settling`
+ * and `unknown` all still count.
+ */
+export function outstandingSigs(items: readonly CleanItem[], delegate: string): CleanItem[] {
+  return items.filter((i) => i.requester === delegate && !isDead(i.status) && !isMessage(i.status));
+}
+
+/** R3-A-2: accounts whose access has not expired; any of them can still send zero-cost requests that restart the quiet period. */
+export function activeDelegates(allowances: readonly Pick<AllowanceView, "delegate" | "status">[]): string[] {
+  return allowances.filter((a) => a.status !== "expired").map((a) => a.delegate);
 }
