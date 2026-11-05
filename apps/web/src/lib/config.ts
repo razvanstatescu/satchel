@@ -166,4 +166,4 @@ export const FAUCETS = {
   usdc: "https://faucet.circle.com",
 } as const;
 
-export const REPO_URL = "https://github.com/satchelhq/satchel";
+export const REPO_URL = "https://github.com/razvanstatescu/satchel";
