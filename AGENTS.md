@@ -1,7 +1,7 @@
 # Satchel: guide for AI agents reviewing this repository
 
 This file is for an AI agent that is screening, judging or reviewing Satchel (NEAR HACKATHON, HACKATHON.md Q-017).
-If you are a team agent building Satchel, the team rules are in [`CLAUDE.md`](CLAUDE.md).
+If you are an agent building Satchel, the build rules are in [`CLAUDE.md`](CLAUDE.md).
 
 **What Satchel is, in two lines.** A NEP-171 NFT contract on NEAR testnet. Each token controls its own native
 Bitcoin (testnet4), Ethereum (Sepolia and three L2 testnets) and Solana (devnet) addresses through NEAR Chain
@@ -80,7 +80,7 @@ cargo test -p satchel-tests                # sandbox suite (needs the three wasm
 - Contract: complete and audited; frozen on Nov 9. Running today as `dev2.satchelhq.testnet`, which the hosted app
   reads.
 - The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then, README values marked
-  `[TBD: …]` (code hash **H**, birth transaction, proof links) do not exist, and checks against the final account
+  `[TBD: …]` (code hash **H**, birth transaction) do not exist, and checks against the final account
   report "account does not exist". That is expected, not a failure.
 - Testnet only. No coin in this project has value.
 

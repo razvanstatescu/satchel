@@ -20,7 +20,7 @@ cd "$(dirname "$0")/.." || exit 2
 
 TEAM="${SATCHEL_TEAM:-satchelhq}"
 C="${SATCHEL_CONTRACT:-satchel.${TEAM}.testnet}"
-APP="${SATCHEL_APP_URL:-[TBD: app URL]}"
+APP="${SATCHEL_APP_URL:-https://usesatchel.xyz}"
 OWNER="${SATCHEL_OWNER:-alice.${TEAM}.testnet}"
 H="${SATCHEL_EXPECTED_CODE_HASH:-[TBD: reproducible wasm SHA-256]}"
 RPC="${SATCHEL_RPC:-https://near-testnet.drpc.org}"

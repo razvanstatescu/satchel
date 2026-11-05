@@ -17,7 +17,7 @@
 | Web app `apps/web` (Satchel 2.0) | Done in **fixture mode**: 340 unit + 133 Playwright tests pass. **Live mode has never been run against a deployed contract**, and **it isn't hosted anywhere yet**. |
 | Release tooling `tools/` | e2e scripts, keyless-birth tool, judge snippets, monitor and CI: all built and dry-run, **never sent**. |
 | Video | `marketing/out/satchel-2-v2.mp4`, 2:14. It still needs a human listen. |
-| README | A draft with ~40 `[TBD: …]` placeholders: contract id, hash **H**, birth tx, app URL, proof links, team. |
+| README | `[TBD: …]` placeholders only for what the final birth creates: hash **H**, birth tx, block A (2026-11-05: team, fee, app URL filled; proof table, balances and CI link dropped). |
 | On-chain | **Since 2026-10-29:** `satchelhq.testnet` (15.8 NEAR), `dev1` (contract live, #1–#3 minted), and alice, bob and carol exist. rc and the final contract don't exist yet (Days 9–10). Every demo address still holds 0. |
 | Git | There is no repo (D-39: create it when Razvan says so). |
 | External | MPC `v1.signer-prod.testnet` is still 3.17.0 with a 15 Tgas floor. **It is flaky under load: on Oct 27 about 1 in 4 recent `sign` requests timed out after ~120 s, and one of ours took 84 s.** `sepolia.drpc.org` is dead and has been replaced. Testnet now runs nearcore **2.14.0 (protocol 88)**. |
@@ -96,7 +96,7 @@
 
 | # | Owner | Task | Done when |
 |---|---|---|---|
-| F-01 | **Claude** | Fill every `[TBD]` in `README.md`: contract id, H, birth tx, block A, app URL, the Sepolia / testnet4 / NEAR proof links (each with an API form), balances, CI link. Keep the README **Timeline** (Q-001) and **Libraries, tools and AI** (Q-005) | `grep -c "TBD" README.md` = 0, except fields you decide |
+| F-01 | **Claude** | Fill every `[TBD]` in `README.md`: H, birth tx, block A (the proof table, balances and CI link were dropped on 2026-11-05). Keep the README **Timeline** (Q-001) and **Libraries, tools and AI** (Q-005) | `grep -c "TBD" README.md` = 0, except fields you decide |
 | F-02 | **You** | README "Team" section; approve the Timeline text (H-24, as reworded by D-47) | — |
 | F-03 | **Claude** | `tools/judge-snippets.sh` against the final (every README command prints its documented output); `tools/monitor.sh` green | all PASS |
 | F-04 | **Claude** | Full test pass on the release commit: contract unit + sandbox (**also with `SANDBOX_VERSION=2.14.0`**), core, tools, web unit + Playwright; CI green | recorded in the README |

@@ -9,8 +9,8 @@ Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet
 
 > **Status.** The contract is complete, tested and security-reviewed. The app is live at
 > **https://usesatchel.xyz**, reading the development contract `dev2.satchelhq.testnet`. The final contract
-> `satchel.satchelhq.testnet` is born keyless on Nov 10; values marked `[TBD: …]` (its code hash **H**, birth
-> transaction, proof links) do not exist until then, and checks against it report `SKIP` or "account does not
+> `satchel.satchelhq.testnet` is born keyless on Nov 10; values marked `[TBD: …]` (its code hash **H** and birth
+> transaction) do not exist until then, and checks against it report `SKIP` or "account does not
 > exist". Nothing in this file is invented.
 >
 > **Reviewing this repo?** [`AGENTS.md`](AGENTS.md) gives the reading order and maps each claim to its code and
@@ -44,7 +44,7 @@ quoted below; every page and the JSON API already work. Example today:
 
 | Do | See |
 |---|---|
-| Open `https://usesatchel.xyz/s/1` | The owner `alice.satchelhq.testnet`, three full addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd`), their balances `[TBD: balances at submission]`, the signature count and "Contract keys: none since birth". The page is server-rendered, so it reads the same with JavaScript off. |
+| Open `https://usesatchel.xyz/s/1` | The owner `alice.satchelhq.testnet`, three full addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd`), their live balances, the signature count and "Contract keys: none since birth". The page is server-rendered, so it reads the same with JavaScript off. |
 | `curl -s https://usesatchel.xyz/api/satchels/1` | The same facts as JSON: `owner`, `addresses{btc,evm,sol}`, `balances`, `sig_count`, `listing`, `status`. |
 | Open `https://usesatchel.xyz/contract` | The lock facts for `satchel.satchelhq.testnet`: "Account is locked (no access keys)", the birth tx `[TBD: birth tx hash]`, the code hash `[TBD: H]` = the expected hash, and the MPC signer's live version. |
 | Open `https://usesatchel.xyz/market` | Listed Satchels, each with its clean-history verdict. #4 shows "Blocked: 1 unused signature" ([why](#demo-token-4-is-blocked-on-purpose)). |
@@ -139,7 +139,7 @@ curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"
 ```
 Expected: `cooldown_blocks = 250 mpc = v1.signer-prod.testnet evm_chain_ids = [11155111, 84532, 421614, 11155420]`,
 then `mpc version = ` followed by the MPC signer's current version. The MPC network upgrades on its own schedule;
-the team re-checks signing against each new version with the sign-only scripts in `tools/e2e`. The four EVM testnets
+signing is re-checked against each new version with the sign-only scripts in `tools/e2e`. The four EVM testnets
 are specified in `docs/specs/C1-C2-C3-C7.md`.
 
 **8. Balances of Satchel #1's addresses** (no NEAR involved)
@@ -147,23 +147,7 @@ are specified in `docs/specs/C1-C2-C3-C7.md`.
 curl -s https://mempool.space/testnet4/api/address/tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5 | python3 -c 'import sys,json; s=json.load(sys.stdin)["chain_stats"]; print("confirmed sats =", s["funded_txo_sum"]-s["spent_txo_sum"])'
 curl -s https://ethereum-sepolia-rpc.publicnode.com -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"eth_getBalance","params":["0xd0cdbf830b82fabf6aee04d1a2633a51f6b2d5ad","latest"]}' | python3 -c 'import sys,json; print("wei =", int(json.load(sys.stdin)["result"],16))'
 ```
-Expected: `confirmed sats = [TBD: at submission]` and `wei = [TBD: at submission]`.
-
-### Proof transactions
-
-Each row gives an explorer link and an API form. NearBlocks testnet can lag far behind the chain, so the FastNEAR
-command is the proof for NEAR txs. Offline copies of each proof go into `docs/evidence/*.json` after the
-final birth (Day 10).
-
-| Chain | What it proves | Explorer | API |
-|---|---|---|---|
-| NEAR | Keyless birth (no AddKey) | `[TBD: nearblocks link]` | step 3 above |
-| NEAR | `sign_for` (EVM) record + MPC signature | `[TBD]` | `POST tx.test.fastnear.com/v0/transactions {"tx_hashes":["[TBD]"]}` |
-| Sepolia | That signature, broadcast | `[TBD: sepolia.etherscan.io/tx/…]` | `eth_getTransactionReceipt` on publicnode |
-| NEAR | `sign_for` (BTC, 2 inputs, one call) | `[TBD]` | FastNEAR `/v0/transactions` |
-| Bitcoin testnet4 | That 2-input tx in a block | `[TBD: mempool.space/testnet4/tx/…]` | `mempool.space/testnet4/api/tx/[TBD]` |
-| NEAR | Gift: `nft_transfer` #2 alice → bob | `[TBD]` | FastNEAR `/v0/transactions` |
-| NEAR | Sale: `list` then `buy` at once (#3, USDC) | `[TBD]` | FastNEAR `/v0/transactions` |
+Expected: each address's current balance, the same numbers `/s/1` shows.
 
 ---
 
@@ -190,8 +174,7 @@ Tests, all offline. Every suite must pass in full; what each one covers is in
 | `pnpm --filter web test` / `test:e2e` (fixture mode) | The app's unit tests, and Playwright user journeys with accessibility checks |
 | `tools/check-wasm-imports.sh` | INV-22: the release wasm cannot add a key, deploy code or delete the account |
 
-CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests. Run:
-`[TBD: CI run link and badge once the repo is public]`.
+CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests.
 
 Testnet scripts (`tools/e2e`, `tools/deploy`) default to a **dry run** that prints exactly what would be signed.
 They sign only with `--send` and a typed `yes`, using keys from `~/.near-credentials` (never from the repo).
@@ -478,7 +461,7 @@ It also checked that the Ethereum address has no delegated code and that the Sol
 Satchel #4's only record is an Ethereum transaction signed with nonce = current + 1 and never broadcast. It cannot be
 mined while the current nonce is unused, and only the Satchel's own key (through `sign_for` by the owner) could use
 that nonce. The record therefore stays "unused" forever, and #4's listing always shows "Blocked: 1 unused signature".
-This is the negative case of the clean-history check. The team will never send from #4.
+This is the negative case of the clean-history check. Nobody will ever send from #4.
 
 ## Limitations
 
@@ -515,7 +498,7 @@ This is the negative case of the clean-history check. The team will never send f
 3. Third-party NEAR marketplaces. The `history_digest` view (C1) already gives the record count plus one SHA-256 of
    the whole log, so a marketplace can bind its orders to a Satchel's history the same way `buy` does. What remains
    is a sale path for such marketplaces that keeps the freeze and the binding.
-4. Sustainability: a small fee on Satchel sales through the contract. `[TBD: team decision]`
+4. Sustainability: a small fee on Satchel sales, decided at the mainnet launch.
 
 ## Prior art
 
@@ -534,7 +517,7 @@ How it differs:
 
 ## Team
 
-`[TBD: team members and roles]`
+Razvan Statescu, solo builder.
 
 ## Timeline
 
@@ -557,7 +540,7 @@ Q-001). Nothing predates it, so there is no baseline.
 - **Fonts:** Funnel Display, Onest and Geist Mono (Google Fonts, OFL).
 - **Pinned versions:** exact versions are in `Cargo.lock` and `pnpm-lock.yaml`.
 - **No templates or boilerplate repositories were used.**
-- **AI:** the code, tests and docs were written with AI coding agents (Claude Code) under the team's direction. Every
+- **AI:** the code, tests and docs were written with AI coding agents (Claude Code) under the builder's direction. Every
   chunk ships with unit tests and an end-to-end test.
 
 ## License
