@@ -102,7 +102,7 @@
 | F-04 | **Claude** | Full test pass on the release commit: contract unit + sandbox (**also with `SANDBOX_VERSION=2.14.0`**), core, tools, web unit + Playwright; CI green | recorded in the README |
 | F-05 | **Both** | If the UI changed after the video was cut, decide whether any shot needs a re-take (marketing/README has the render pipeline) | decided |
 | F-07 | **Claude** | **Act as a screening agent (Q-017):** run a fresh clone of the release commit in a clean worktree. Follow only the README (install, tests, reproducible build, the "Try it" and "Verify on-chain" steps) and fix anything that doesn't reproduce | a clean-clone run is green and matches the README's numbers |
-| F-06 | **Claude** | Draft the X post text ("built at NEAR HACKATHON", ≤ 280 chars, repo link) | draft approved by you |
+| F-06 | **Claude** | Draft the X post text. HACKATHON.md (re-read 2026-11-05) requires "built at NEAR HACKATHON", **@NEARProtocol** and **#NEARHackathon** (optional @NearLegion, @NearBuilders) and the video or screenshots attached. Razvan has X Premium, so there is no 280-character limit. Its advice: open with the user problem in a line a stranger gets; show one complete moment (action → visible result), no intro or architecture slides; say concretely what NEAR enables (one NEAR contract signs native BTC/ETH/SOL; selling the NFT sells the wallet), not "powered by NEAR"; link the demo and the public repo and ask a real question | draft approved by you |
 
 ## G. Day 13 (Fri Nov 13): ship (every external action needs your "yes")
 

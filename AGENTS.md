@@ -13,7 +13,9 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 1. [`README.md`](README.md): the problem, the product, "Try it" steps, copy-paste on-chain checks, test commands,
    security model and limitations. Its section [How Satchel uses NEAR](README.md#how-satchel-uses-near) lists every
    NEAR feature Satchel relies on (Chain Signatures, NEP-171/177/181/297, NEP-141, the keyless sub-account, NEP-330),
-   how it is used and where the code is.
+   how it is used and where the code is. [Selling a Satchel](README.md#selling-a-satchel-how-control-passes-and-what-stops-the-seller-keeping-the-coins)
+   explains how control passes on transfer and lists every way a seller could try to keep the coins, each with its
+   test.
 2. [`docs/README.md`](docs/README.md): the map of every other document, and which folders are product code.
 3. [`docs/GLOSSARY.md`](docs/GLOSSARY.md): decodes the IDs used in comments and docs (`kb/90 §5.9`, `D-43`,
    `INV-09`, `C5`, `AUDIT-01`, ...).
