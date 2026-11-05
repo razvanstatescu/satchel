@@ -1,0 +1,37 @@
+{
+  // Hide build output from extension file scans (workspace.findFiles honors files.exclude
+  // even when it ignores .gitignore) and from the file tree.
+  "files.exclude": {
+    "**/target": true,
+    "**/.next": true,
+    "**/.vercel": true,
+    "**/test-results": true,
+    "**/playwright-report": true,
+    "**/*.tsbuildinfo": true,
+    ".claude/worktrees": true
+  },
+  // Keep Cmd+Shift+F searches out of dependencies and build output.
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/target": true,
+    "**/.next": true,
+    "**/.vercel": true,
+    "**/test-results": true,
+    "**/playwright-report": true,
+    ".claude/worktrees": true
+  },
+  "search.followSymlinks": false,
+  // Don't watch build output for changes (cargo/next rewrite thousands of files per build).
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/target/**": true,
+    "**/.next/**": true,
+    "**/.vercel/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    ".claude/worktrees/**": true
+  },
+  // Stop rust-analyzer from re-checking every crate on each save.
+  "rust-analyzer.files.excludeDirs": ["target", "research/spikes/sdk/target", ".claude/worktrees"],
+  "typescript.tsserver.maxTsServerMemory": 4096
+}
