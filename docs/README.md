@@ -72,3 +72,4 @@ The UI is built to the Satchel 2.0 brand in [`../brand/`](../brand/README.md) an
 | [`design/satchel-2.0/`](design/satchel-2.0/README.md) | The specs for rebuilding the app in the 2.0 brand (Oct 26): screens, design system, motion, copy, QA and blind tests |
 | [`design/site-refresh/`](design/site-refresh/README.md) | The landing page update after the feature sprint (Nov 3, D-51) |
 | [`design/site-polish/`](design/site-polish/README.md) | The landing page presenting the mainnet product (Nov 3, D-52) |
+| [`assets/readme/`](assets/readme/README.md) | The README's banner and app screens, and how to regenerate them |

@@ -1,23 +1,51 @@
+<p align="center">
+  <img src="docs/assets/readme/banner.png" width="100%" alt="Satchel banner: the Satchel logo, the line 'An NFT that is a wallet.', a short description (each token of a NEP-171 contract on NEAR controls its own Bitcoin, Ethereum and Solana addresses through NEAR Chain Signatures), and the token's own card image for Satchel #1.">
+</p>
+
 # Satchel: an NFT that is a wallet
 
 Satchel is a NEP-171 NFT contract on NEAR testnet. Each token controls its own native Bitcoin (testnet4), Ethereum
 (Sepolia, plus Base, Arbitrum and OP Sepolia; one address on all four) and Solana (devnet) addresses through NEAR
-Chain Signatures. Transfer or sell the NFT and you hand over the
-wallet. No bridge, wrapped token or seed phrase changes hands.
+Chain Signatures. Transfer or sell the NFT and you hand over the wallet. No bridge, wrapped token or seed phrase
+changes hands.
 
 Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet only: the coins have no value.**
 
-> **Status.** The contract is complete, tested and security-reviewed. The app is live at
-> **https://usesatchel.xyz**, reading the development contract `dev2.satchelhq.testnet`. The final contract
-> `satchel.satchelhq.testnet` is born keyless on Nov 10; values marked `[TBD: …]` (its code hash **H** and birth
-> transaction) do not exist until then, and checks against it report `SKIP` or "account does not
-> exist". Nothing in this file is invented.
->
-> **Reviewing this repo?** [`AGENTS.md`](AGENTS.md) gives the reading order and maps each claim to its code and
-> tests. [Repository map](#repository-map) below; IDs such as `D-43` or `INV-09` are decoded in
-> [`docs/GLOSSARY.md`](docs/GLOSSARY.md).
+<p align="center">
+  <a href="https://usesatchel.xyz"><b>Live app</b></a> ·
+  <a href="#try-it-in-60-seconds-no-wallet-no-install">Try it in 60 seconds</a> ·
+  <a href="#how-satchel-uses-near">How it uses NEAR</a> ·
+  <a href="#verify-on-chain-copy-paste-read-only">Verify on-chain</a> ·
+  <a href="AGENTS.md">Guide for AI reviewers</a>
+</p>
 
-**The problem**
+> **Status.** The contract is complete, tested and security-reviewed. The app at **https://usesatchel.xyz** reads the
+> development contract `dev2.satchelhq.testnet` until the final contract `satchel.satchelhq.testnet` is born keyless on
+> Nov 10. Values marked `[TBD: …]` (its code hash **H** and birth transaction) exist from then on; until then, checks
+> against the final account report "account does not exist". Nothing in this file is invented.
+>
+> **Reviewing with an AI agent?** [`AGENTS.md`](AGENTS.md) gives the reading order and maps each claim to its code and
+> tests. IDs such as `D-43` or `INV-09` are decoded in [`docs/GLOSSARY.md`](docs/GLOSSARY.md).
+
+<p align="center">
+  <img src="docs/assets/readme/satchel-page.png" width="100%" alt="The owner's view of Satchel #1 in the app: the Satchel card (marked 'Yours', status Active), buttons for Send, Add coins, Give and Sell, and the coins it holds: ETH, BTC, SOL, USDC and NEAR, each on its own network.">
+  <br><sub>The owner's view of a Satchel: what it holds on each chain, and what the owner can do with it. App screens
+  in this file use the app's built-in sample data (the "Sample data" strip) unless the caption says live.</sub>
+</p>
+
+## Contents
+
+[The problem](#the-problem) · [Try it](#try-it-in-60-seconds-no-wallet-no-install) ·
+[How it works](#how-it-works) · [Buying safely](#buying-safely-clean-history) ·
+[Features](#what-a-satchel-can-do) · [NEAR](#how-satchel-uses-near) ·
+[Selling and the threat model](#selling-a-satchel-how-control-passes-and-what-stops-the-seller-keeping-the-coins) ·
+[Verify on-chain](#verify-on-chain-copy-paste-read-only) · [Run it locally](#run-it-locally) ·
+[Security model](#security-model-and-trust-assumptions) · [Limitations](#limitations) ·
+[What's next](#whats-next) · [Prior art](#prior-art) · [Repository map](#repository-map) ·
+[Team, timeline, libraries, license](#team)
+
+## The problem
+
 - A wallet's keys cannot be sold safely. Whoever held the seed phrase can keep a copy.
 - An NFT that controls keys solves the copy problem: the contract signs only for the current owner. It leaves one
   hole. A signature issued **before** a sale can still be broadcast **after** it.
@@ -33,8 +61,6 @@ Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet
 **Built on NEAR:** Chain Signatures (MPC) for the keys; NEP-171, NEP-177, NEP-181 and NEP-297 for the token; NEP-141
 for USDC and wNEAR; a keyless sub-account so the code can never change; NEP-330 so the source can be verified. The
 details are in [How Satchel uses NEAR](#how-satchel-uses-near).
-
----
 
 ## Try it in 60 seconds (no wallet, no install)
 
@@ -54,7 +80,260 @@ The addresses above are derived from `satchel.satchelhq.testnet` and the paths `
 computed and checked against the MPC's `derived_public_key`. A Satchel's addresses depend only on
 (contract id, path), so they never change when the NFT changes hands.
 
----
+## How it works
+
+**Sending.** The owner asks the contract to sign an unsigned transaction. The contract checks it, records it, and only
+then asks NEAR's MPC network for the signature:
+
+```mermaid
+sequenceDiagram
+    actor Owner as Owner (NEAR wallet)
+    participant S as satchel.satchelhq.testnet<br/>keyless NEP-171 contract
+    participant M as NEAR MPC network<br/>v1.signer-prod.testnet
+    participant X as Bitcoin · Ethereum · Solana
+    Owner->>S: sign_for(token, unsigned transaction)
+    Note over S: Is the caller the owner (or a capped delegate)?<br/>Is the token not listed?<br/>Parse and hash the transaction, refuse anything else
+    Note over S: Write the signature record and a sign_requested event
+    S->>M: sign(path satchel/{id}/{btc|evm|sol}, hash), one call per input
+    M-->>S: signature
+    S-->>Owner: on_signed returns the signature
+    Owner->>X: attach it, verify it, broadcast
+```
+
+<p align="center">
+  <img src="docs/assets/readme/send.png" width="720" alt="Two phone screens of the send flow. Step 1: choose ETH on Sepolia, enter 0.001 ETH and a recipient address. Step 2: review the amount, the recipient, the network fee and the Satchel's balance after the send, then press 'Send 0.0010 ETH'.">
+  <br><sub>Sending ETH from Satchel #1: fill in, then review exactly what will be signed.</sub>
+</p>
+
+- **One contract owns every key.** Token N signs at the MPC paths `satchel/N/btc`, `satchel/N/evm` (secp256k1,
+  domain 0) and `satchel/N/sol` (ed25519, domain 1), with the contract as the predecessor. Only the current owner can
+  call `sign_for` ([`contracts/satchel/src/sign.rs`](contracts/satchel/src/sign.rs)), or an account the owner lets
+  spend within a rolling 24-hour cap per coin and network ([`allowance.rs`](contracts/satchel/src/allowance.rs));
+  allowances end when the Satchel changes hands. Ownership moves only through `nft_transfer`
+  ([`lib.rs`](contracts/satchel/src/lib.rs)), `buy` / `ft_on_transfer` ([`sale.rs`](contracts/satchel/src/sale.rs))
+  and `accept_offer` ([`offers.rs`](contracts/satchel/src/offers.rs)).
+- **Structured payloads, never hashes.** The contract parses the exact bytes and hashes them itself:
+  keccak256 for EVM, sha256d per BTC input, and the raw message for SOL. It accepts only plain ETH and USDC transfers
+  on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and plain-text messages, and refuses anything
+  else, including raw hashes, EIP-712 permits, EIP-7702 authorizations, any other contract call, other chains, non-ALL
+  sighash types and durable nonces ([`contracts/satchel/src/parse/`](contracts/satchel/src/parse)).
+- **The record comes before the signature.** It is written in the same receipt as the MPC call, so a signature that
+  arrives late or after a timeout is still on record.
+
+## Buying safely: clean history
+
+**Buying.** Before Buy is enabled, the buyer's browser reads every signature the Satchel has ever issued and checks
+each one on its own chain. The purchase then names exactly the history the buyer checked:
+
+```mermaid
+sequenceDiagram
+    actor Buyer as Buyer (browser)
+    participant S as satchel.satchelhq.testnet
+    participant X as Bitcoin · Ethereum · Solana
+    Note over S: Listed: signing is frozen<br/>(listing needed 250 blocks with no signature)
+    Buyer->>S: read every signature record (sig_records)
+    Buyer->>X: is each one spent or expired? (two providers per chain)
+    Note over Buyer: Buy stays disabled while any record could still move coins
+    Buyer->>S: buy(token, listing id, record count it checked)
+    Note over S: Fails if the listing or the count changed.<br/>The seller is paid in the same transaction.
+```
+
+<p align="center">
+  <img src="docs/assets/readme/buy-check.png" width="720" alt="Two phone screens of the Buy tab. Left, Satchel #3: 'Clean. No past signature can move these coins', 1 of 1 signatures can't move coins, and the button 'Buy for 5.00 USDC' is enabled. Right, Satchel #4: '1 past signature could still move coins. Ethereum nonce 1 isn't used yet', and the button 'Buy for 2 NEAR' is disabled with 'Blocked: 1 unused signature'.">
+  <br><sub>The check runs in the buyer's browser. Left: every past signature is used up, so Buy is enabled. Right: one
+  signature could still move the coins, so Buy stays off.</sub>
+</p>
+
+- **The sale is bound to the record count.** `list` needs 250 blocks (a couple of minutes) of signing silence. While
+  listed, signing and transfers are refused. `buy(token_id, listing_id, expected_sig_count)` fails if anything
+  changed. The seller is paid in the same transaction, and a failed payout is credited to `proceeds_of` instead.
+- **Clean history** runs in the buyer's browser ([`packages/core/src/clean-history`](packages/core/src/clean-history)).
+  EVM: the nonce is used, read 3 blocks back on two providers. BTC: the outpoint is spent in a confirmed tx, read on
+  two Esplora providers. SOL: the blockhash is expired.
+
+<p align="center">
+  <img src="docs/assets/readme/market.png" width="100%" alt="The Market page: three Satchels for sale. Satchel #5 for 1 NEAR and Satchel #3 for 5.00 USDC show 'clean'; Satchel #4 for 2 NEAR shows 'needs attention'.">
+  <br><sub>The market shows each listing's verdict before anyone opens it.</sub>
+</p>
+
+## What a Satchel can do
+
+Every flow below works in the hosted app; the pages marked **SSR** render their facts in the server HTML (readable
+with `curl`). Contract methods are in [`contracts/satchel/src/`](contracts/satchel/src); the sprint features
+C1–C7 are specified in [`docs/specs/`](docs/specs/).
+
+| What | App route | Contract |
+|---|---|---|
+| See a Satchel: owner, addresses, balances, signature count (**SSR**) | `/s/{id}`, `/api/satchels/{id}` | `satchel`, `sig_records` |
+| Mint one | `/mint` | `nft_mint` |
+| Add coins (anyone can open the link) | `/s/{id}/receive`, `/fund/{id}` | none (addresses are derived) |
+| Send BTC, ETH, USDC or SOL; ETH and USDC on Sepolia, Base, Arbitrum and OP Sepolia (C2, C3) | `/s/{id}/send` | `sign_for` |
+| Sign a plain-text message: EIP-191 or Solana off-chain (C7) | `/s/{id}/sign` | `sign_for` |
+| Give it away, directly or by a claim link (A2) | `/s/{id}/transfer`, `/s/{id}/give-link`, `/claim` | `nft_transfer` |
+| Sell it for NEAR or USDC; buy one after the clean-history check (**SSR**) | `/s/{id}/sale`, `/market` | `list`, `delist`, `buy`, `ft_on_transfer`, `withdraw_proceeds` |
+| Make, accept or cancel an offer on any Satchel (C4) | `/s/{id}/offer` | `make_offer`, `accept_offer`, `cancel_offer` |
+| Let another account spend up to a daily cap (C5) | `/s/{id}/allowance` | `set_allowance`, `revoke_allowance` |
+| Hold NEAR, USDC or wNEAR inside the Satchel on NEAR itself (C6) | `/s/{id}/coin/{key}` | `deposit_near`, `ft_on_transfer`, `withdraw_near`, `withdraw_ft` |
+| Empty it: send everything to one address per chain (A3) | `/s/{id}/empty` | `sign_for` |
+| Read its history: who held it, sales, signatures and what each one signed, coins in and out (C1 adds a digest) | `/s/{id}/activity`, `/s/{id}/transactions` | `sig_records`, `history_digest` |
+| Check the contract itself: lock, code hash, MPC version (**SSR**) | `/contract`, `/api/contract` | `config` |
+
+## How Satchel uses NEAR
+
+Everything that gives a Satchel its value happens on NEAR, in one contract: the token, the authority over its keys,
+the log of every signature, the sale and the offers. The other chains only see ordinary signed transactions.
+
+| Track hint | How Satchel uses it | Code |
+|---|---|---|
+| `open` · **CHAIN ABSTRACTION** | NEAR Chain Signatures signs native Bitcoin, Ethereum (four testnets) and Solana transactions for each token. There is no bridge and no wrapped asset | [`sign.rs`](contracts/satchel/src/sign.rs), [`mpc.rs`](contracts/satchel/src/mpc.rs) |
+| `nfts` · **NEP-171** | The wallet is an ordinary NEP-171 token (with NEP-177, NEP-181 and NEP-297), so any NEAR wallet or explorer can show it. Transferring it is what hands over the coins | [`lib.rs`](contracts/satchel/src/lib.rs) |
+| `nfts` · **DYNAMIC NFTS** | The token's `media` is `https://usesatchel.xyz/api/card/{id}.svg`, drawn from contract state: its status (active, listed or frozen) and how many signatures it has issued (the card in the banner above) | [`api/card`](apps/web/src/app/api/card) |
+| `nfts` · **SUB-ACCOUNTS** | The contract is the named sub-account `satchel.satchelhq.testnet`, born from `satchelhq.testnet` in one transaction with no access key | [`keyless-birth.md`](tools/deploy/keyless-birth.md) |
+| `open` · **EXPERIMENTAL** | Clean history: signature records written when a signature is requested, signing frozen while a token is listed, a buy bound to the record count, and a verifier that runs in the browser | [`clean-history/`](packages/core/src/clean-history) |
+
+### Chain Signatures: one NEAR contract signs for three chains
+
+- **Whose key it is.** The MPC network behind `v1.signer-prod.testnet` derives a child key from the caller's account
+  and a path. Satchel always calls as the contract itself, with the path `satchel/{token_id}/{btc|evm|sol}`. Each
+  token therefore has keys that only this contract can use, and the contract uses them only for the token's current
+  owner (or an account the owner allows, within caps).
+- **The request.** `sign_for` sends `sign({request: {path, payload_v2: {Ecdsa | Eddsa}, domain_id}})` to the MPC
+  contract. Domain 0 (secp256k1) signs for BTC and EVM, and domain 1 (ed25519) signs for SOL. Each call carries
+  exactly 1 yoctoNEAR and at least 15 Tgas, and the contract hands the MPC call whatever gas the caller left over.
+- **The contract hashes; the user never sends a hash.** The owner sends the unsigned transaction: an EVM type-2 tx,
+  BTC BIP143 preimages with the outputs, or a Solana message. The contract parses it, refuses anything it cannot
+  classify, and computes the hash the MPC signs. So the on-chain record says exactly what was signed. A contract that
+  signed raw hashes would be a blind signer, and no buyer could audit its history.
+- **Several signatures in one call.** A Bitcoin spend with two inputs needs two signatures. Two MPC calls placed as
+  separate actions in one transaction both time out, so the contract makes one single-action receipt per payload,
+  joins them with `promise_and`, and adds one `#[private]` callback, `on_signed`.
+- **Timeouts are normal.** The MPC answers through yield/resume, usually within seconds, and a request it does not
+  answer in time fails; on testnet that happens often under load. The record is written in the same receipt that
+  creates the MPC calls, before any node signs, so a signature that arrives late is still on record. `on_signed` only
+  fills in the result: it reads the raw promise bytes, with a size cap, and never panics.
+- **Addresses without a network call.** [`packages/core/src/derive`](packages/core/src/derive/index.ts) reproduces
+  the MPC's key derivation (the tweak `sha3_256(… predecessor "," path)` added to the root key), so a page can show
+  a Satchel's addresses before anyone signs. The buyer's check also compares them with the MPC's own
+  `derived_public_key` view.
+
+### NFT standards
+
+- **NEP-171 core:** `nft_transfer`, `nft_token`. **NEP-177:** metadata. **NEP-181:** enumeration (`nft_tokens`, paged
+  by token id). **NEP-297:** events. These are the standard `nft_mint` and `nft_transfer` events plus Satchel's own
+  (`standard: "satchel"`): `sign_requested`, `sign_resolved`, `listed`, `sold`, `payout`, offers, allowances, and
+  coins held inside a Satchel. The app builds each Satchel's activity page from these events.
+- **A transfer hands over the wallet.** When the owner changes, the next `sign_for` must come from the new owner, and
+  every allowance the old owner granted ends. Records stay with the token, so the next buyer can audit them too.
+- **Left out on purpose:** NEP-178 approvals and `nft_transfer_call` (D-07). Either would let a third party move the
+  token outside the sale flow, and only the sale flow ties a purchase to a checked history. `nft_transfer_call`
+  exists and always fails with a clear error, so NEP-171 tooling does not get a "method not found".
+
+### Fungible tokens (NEP-141)
+
+`ft_on_transfer` accepts Circle's testnet USDC
+(`3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af`) to buy a listed Satchel, to escrow an offer, or to
+deposit USDC into a Satchel. It also accepts wNEAR (`wrap.testnet`) as a deposit. The `msg` must parse as one of a few
+strict shapes; anything else is refunded. Withdrawals go out by `ft_transfer`, and a callback credits the amount
+back if the transfer fails. NEAR itself can be held inside a Satchel too (`deposit_near`, `withdraw_near`).
+
+### Accounts: a keyless sub-account that cannot change
+
+- **Born without a key.** `satchelhq.testnet` creates `satchel.satchelhq.testnet` in a single transaction of batched
+  actions: CreateAccount, Transfer, DeployContract, FunctionCall `new`, and FunctionCall `nft_mint` seven times. There
+  is no AddKey action. On NEAR, an account with no access key can never sign a transaction, so nobody can redeploy
+  or delete the contract, or move its funds except by its own rules. Anyone can check that with two RPC calls
+  (`view_account` and `view_access_key_list`, step 2 of [Verify on-chain](#verify-on-chain-copy-paste-read-only)).
+- **Safe even if the code has a bug.** near-sdk's `Promise` type links the AddKey, DeployContract and DeleteAccount
+  host functions into the wasm. The contract builds its receipts with the low-level `env::promise_batch_*` functions
+  instead, using only FunctionCall and Transfer actions. `tools/check-wasm-imports.sh` (INV-22, run in CI) fails if the
+  release wasm imports any of the others.
+- **Source you can verify (NEP-330).** `contract_source_metadata` names this repository and the standards above. The
+  reproducible build (`cargo near build reproducible-wasm`) also records the pinned Docker image and the build command.
+  Once the repository is public, `near contract verify` can match the deployed code to it (step 6 of
+  [Verify on-chain](#verify-on-chain-copy-paste-read-only)).
+- **Access by account, not by key.** Who may sign is decided by `predecessor_account_id`: the token's owner, or a
+  delegate within a rolling 24-hour cap per coin (C5). Allowances live in contract state rather than as NEAR access
+  keys, which lets the contract end them when the token changes hands.
+
+### Other protocol features the design relies on
+
+- **Storage staking.** Every record, mint, offer and allowance is paid by its caller: the contract measures the bytes
+  it actually stored, charges for them and refunds the rest. `prepay_storage` lets an account fund storage before a
+  `ft_on_transfer` call, which cannot carry NEAR.
+- **Chain time.** Listing needs 250 blocks (a couple of minutes) with no new signature, counted by block height.
+  Allowances measure their rolling 24-hour window with the block timestamp.
+- **A buy bound to state.** `buy` names the listing id and the record count the buyer checked, and fails if either has
+  changed.
+- **Payment in the same transaction.** `buy` pays the seller with a Transfer receipt. If the payout fails, the money
+  is credited to `proceeds_of` for the seller to withdraw.
+
+### In the app and the tests
+
+- **Wallets:** `@hot-labs/near-connect`, which lists Meteor, Intear and other NEAR wallets.
+- **Transactions:** calls are built with near-api-js. The app tracks each transaction by its hash, with the RPC
+  `tx` method and `wait_until`, rather than waiting on the wallet's promise. An MPC receipt can take up to two
+  minutes.
+- **Reads:** FastNEAR RPC, with dRPC (`near-testnet.drpc.org`) as the fallback. History comes from the FastNEAR
+  transactions API, which keeps transactions that ordinary RPC nodes soon forget. Every page a judge needs renders on
+  the server, so it reads the same with `curl`.
+- **Tests:** near-workspaces runs the sandbox suite on a local NEAR node. A mock MPC signer
+  ([`contracts/mock-signer`](contracts/mock-signer)) reproduces the real `sign` interface, its yield/resume and its
+  timeout, and a mock NEP-141 stands in for USDC. A real testnet run checks the same flow against the live MPC:
+  `tools/e2e/{evm,btc,sol}.ts --sign-only`.
+
+## Selling a Satchel: how control passes, and what stops the seller keeping the coins
+
+### How control passes
+
+Ownership changes in exactly three places: `nft_transfer` (a gift), `buy` (NEAR, or USDC through `ft_on_transfer`)
+and `accept_offer`. In the same receipt as the change of owner:
+- `sign_for` starts accepting the new owner and stops accepting the old one;
+- every allowance the old owner granted is cleared;
+- the NEAR, USDC and wNEAR held inside the Satchel move with it;
+- the signature records stay with the token, so the next buyer can check them too.
+
+The old owner keeps nothing to sign with. There is no private key to copy: each address is a key the MPC network
+derives for (this contract, `satchel/{id}/{chain}`), and the MPC uses it only when the contract asks. There is no
+NEP-178 approval and no leftover delegate. And nobody holds a key to the contract itself (it is keyless).
+
+### Threat model: every way we know a seller could try to keep the coins
+
+| The seller tries to… | What stops it | Tested by |
+|---|---|---|
+| Keep a copy of the private key | No key exists outside the MPC network, and only the contract can ask it to sign for a token | `tests/tests/release.rs` `keyless_birth_batch`; `tools/check-wasm-imports.sh` (INV-22) |
+| Keep signing after the sale | `sign_for` accepts only the current owner, or a delegate the current owner added | `tests/tests/transfer.rs` `transfer_moves_control`; `sale.rs` `buy_moves_control`; `usdc.rs` `ft_buy_moves_control` |
+| Leave a delegate behind to keep spending | Every change of owner clears the allowances, and a delegate has no owner powers | `tests/tests/allowance.rs` `transfer_clears_allowances`, `sales_clear_allowances`, `delegate_has_no_owner_powers` |
+| Sign a transaction before the sale and broadcast it afterwards | Every signature is recorded. The buyer's Buy button stays disabled until each record is provably spent or expired | `packages/core/test/clean-history.test.ts`; demo token #4 ([below](#demo-token-4-is-blocked-on-purpose)) |
+| Request a signature, let the MPC time out, and hope it was not recorded | The record is written before the MPC is called, in the same receipt | `tests/tests/sign.rs` `records_written_before_mpc_call`, `timeout_never_sticks` |
+| Sign while the Satchel is listed, just before the buyer clicks | Signing is frozen while listed, for the owner and delegates alike; listing needs 250 blocks without a signature | `tests/tests/sale.rs` `quiet_period_and_freeze`, `quiet_period_exact_boundary`; `allowance.rs` `listing_pauses_delegate` |
+| Delist, sign, and relist between the buyer's check and the buy | `buy` names the listing id and the record count the buyer checked, and fails if either changed | `tests/tests/sale.rs` `buy_guards` |
+| Sign something that is not a plain transfer but moves funds later: a raw hash, an EIP-712 permit, an ERC-20 `approve`, an EIP-7702 delegation, a Solana durable nonce, a Bitcoin sighash other than ALL | The contract parses every payload and refuses all of these | `tests/tests/sign.rs` `refusals_change_nothing_{evm,btc,sol}`; the refused cases in `vectors/*.json`; [`docs/security/fuzzing.md`](docs/security/fuzzing.md) |
+| Leave code on the Ethereum address, or hand the Solana account to a program | The buyer's check marks the Satchel unsafe | `packages/core/test/clean-history.test.ts` (the EIP-7702 and Solana-owner cases) |
+| Withdraw the coins held inside the Satchel on NEAR once it is listed | Withdrawals are refused while listed, and the balances move with the token | `tests/tests/market.rs` `withdraw_blocked_while_listed`, `transfer_moves_inside`, `buy_moves_inside` |
+| Move the token outside the sale, through an approval or `nft_transfer_call` | NEP-178 is not implemented, `nft_transfer_call` always fails, and transfers are refused while listed | `tests/tests/transfer.rs` `no_approvals_surface`, `transfer_call_disabled` |
+| Get the contract changed after the sale | Nobody can: the account has no key, and its code cannot deploy code or add a key | `tests/tests/release.rs`; INV-22 |
+
+**Mid-flight cases.**
+- A transfer while a signature is still pending completes normally. The signature still lands in the record, which
+  names the old owner as the requester (`transfer.rs` `transfer_during_inflight_sign`).
+- If paying the seller fails in the middle of a sale, the buyer still gets the Satchel, and the seller's money is
+  credited to `proceeds_of` (`sale.rs` `payout_failure_recredit`).
+
+What this does not stop is listed under [What it does not cover](#security-model-and-trust-assumptions) below, for
+example a testnet4 reorg.
+
+### Each Satchel's history
+
+`/s/{id}/activity` lists every event in the token's life: minted, given (from and to), listed, sold (to whom and for
+how much), and each signature with what it signed. `/s/{id}/transactions` lists the coins that came in and went out
+on each chain. The same history is on-chain: `sig_records` returns the signature records, and the `history_digest`
+view gives one hash over all of them.
+
+<p align="center">
+  <img src="docs/assets/readme/activity.png" width="100%" alt="The Activity tab of Satchel #1 in the live app: a list of signatures issued on Ethereum Sepolia, Solana devnet and Bitcoin testnet4, and messages signed with its Solana and Ethereum addresses, grouped by day.">
+  <br><sub>Live: Satchel #1's activity on the development contract, every signature it has issued, read from the
+  contract's events.</sub>
+</p>
 
 ## Verify on-chain (copy-paste, read-only)
 
@@ -149,8 +428,6 @@ curl -s https://ethereum-sepolia-rpc.publicnode.com -H 'Content-Type: applicatio
 ```
 Expected: each address's current balance, the same numbers `/s/1` shows.
 
----
-
 ## Run it locally
 
 Prerequisites: Node (version in `.nvmrc`) with pnpm (corepack), plus Rust with the wasm32 target and cargo-near for
@@ -179,230 +456,8 @@ CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build 
 Testnet scripts (`tools/e2e`, `tools/deploy`) default to a **dry run** that prints exactly what would be signed.
 They sign only with `--send` and a typed `yes`, using keys from `~/.near-credentials` (never from the repo).
 
----
-
-## How it works
-
-```
- owner's wallet ──sign_for(token, structured payload)──► satchel.satchelhq.testnet (keyless, NEP-171)
-                                                            1. caller == owner?  token not listed?
-                                                            2. classify: EVM type-2 transfer (4 testnets) or a USDC
-                                                               transfer │ BTC BIP143 preimages + outputs │ Solana
-                                                               legacy transfer │ an EIP-191 or Solana off-chain message
-                                                            3. write SigRecord(s) + sign_requested event
-                                                            4. MPC sign ×n ──► v1.signer-prod.testnet
- browser ◄── on_signed: one signature per request ◄──────────  (path satchel/{id}/{btc|evm|sol}, one receipt each)
-    └── attaches the signature, verifies it, broadcasts ──► Bitcoin testnet4 · Ethereum Sepolia · Solana devnet
-```
-
-- **One contract owns every key.** Token N signs at the MPC paths `satchel/N/btc`, `satchel/N/evm` (secp256k1,
-  domain 0) and `satchel/N/sol` (ed25519, domain 1), with the contract as the predecessor. Only the current owner can
-  call `sign_for` ([`contracts/satchel/src/sign.rs`](contracts/satchel/src/sign.rs)), or an account the owner lets
-  spend within a rolling 24-hour cap per coin and network ([`allowance.rs`](contracts/satchel/src/allowance.rs));
-  allowances end when the Satchel changes hands. Ownership moves only through `nft_transfer`
-  ([`lib.rs`](contracts/satchel/src/lib.rs)), `buy` / `ft_on_transfer` ([`sale.rs`](contracts/satchel/src/sale.rs))
-  and `accept_offer` ([`offers.rs`](contracts/satchel/src/offers.rs)).
-- **Structured payloads, never hashes.** The contract parses the exact bytes and hashes them itself:
-  keccak256 for EVM, sha256d per BTC input, and the raw message for SOL. It accepts only plain ETH and USDC transfers
-  on four Ethereum testnets, standard Bitcoin spends, plain SOL transfers and plain-text messages, and refuses anything
-  else, including raw hashes, EIP-712 permits, EIP-7702 authorizations, any other contract call, other chains, non-ALL
-  sighash types and durable nonces ([`contracts/satchel/src/parse/`](contracts/satchel/src/parse)).
-- **The record comes before the signature.** It is written in the same receipt as the MPC call, so a signature that
-  arrives late or after a timeout is still on record.
-- **The sale is bound to the record count.** `list` needs 250 blocks (a couple of minutes) of signing silence. While listed,
-  signing and transfers are refused. `buy(token_id, listing_id, expected_sig_count)` fails if anything changed. The
-  seller is paid in the same transaction, and a failed payout is credited to `proceeds_of` instead.
-- **Clean history** runs in the buyer's browser ([`packages/core/src/clean-history`](packages/core/src/clean-history)).
-  EVM: the nonce is used, read 3 blocks back on two providers. BTC: the outpoint is spent in a confirmed tx, read on
-  two Esplora providers. SOL: the blockhash is expired.
-
-## What a Satchel can do
-
-Every flow below works in the hosted app; the pages marked **SSR** render their facts in the server HTML (readable
-with `curl`). Contract methods are in [`contracts/satchel/src/`](contracts/satchel/src); the sprint features
-C1–C7 are specified in [`docs/specs/`](docs/specs/).
-
-| What | App route | Contract |
-|---|---|---|
-| See a Satchel: owner, addresses, balances, signature count (**SSR**) | `/s/{id}`, `/api/satchels/{id}` | `satchel`, `sig_records` |
-| Mint one | `/mint` | `nft_mint` |
-| Add coins (anyone can open the link) | `/s/{id}/receive`, `/fund/{id}` | none (addresses are derived) |
-| Send BTC, ETH, USDC or SOL; ETH and USDC on Sepolia, Base, Arbitrum and OP Sepolia (C2, C3) | `/s/{id}/send` | `sign_for` |
-| Sign a plain-text message: EIP-191 or Solana off-chain (C7) | `/s/{id}/sign` | `sign_for` |
-| Give it away, directly or by a claim link (A2) | `/s/{id}/transfer`, `/s/{id}/give-link`, `/claim` | `nft_transfer` |
-| Sell it for NEAR or USDC; buy one after the clean-history check (**SSR**) | `/s/{id}/sale`, `/market` | `list`, `delist`, `buy`, `ft_on_transfer`, `withdraw_proceeds` |
-| Make, accept or cancel an offer on any Satchel (C4) | `/s/{id}/offer` | `make_offer`, `accept_offer`, `cancel_offer` |
-| Let another account spend up to a daily cap (C5) | `/s/{id}/allowance` | `set_allowance`, `revoke_allowance` |
-| Hold NEAR, USDC or wNEAR inside the Satchel on NEAR itself (C6) | `/s/{id}/coin/{key}` | `deposit_near`, `ft_on_transfer`, `withdraw_near`, `withdraw_ft` |
-| Empty it: send everything to one address per chain (A3) | `/s/{id}/empty` | `sign_for` |
-| Read its history: who held it, sales, signatures and what each one signed, coins in and out (C1 adds a digest) | `/s/{id}/activity`, `/s/{id}/transactions` | `sig_records`, `history_digest` |
-| Check the contract itself: lock, code hash, MPC version (**SSR**) | `/contract`, `/api/contract` | `config` |
-
-## How Satchel uses NEAR
-
-Everything that gives a Satchel its value happens on NEAR, in one contract: the token, the authority over its keys,
-the log of every signature, the sale and the offers. The other chains only see ordinary signed transactions.
-
-| Track hint | How Satchel uses it | Code |
-|---|---|---|
-| `open` · **CHAIN ABSTRACTION** | NEAR Chain Signatures signs native Bitcoin, Ethereum (four testnets) and Solana transactions for each token. There is no bridge and no wrapped asset | [`sign.rs`](contracts/satchel/src/sign.rs), [`mpc.rs`](contracts/satchel/src/mpc.rs) |
-| `nfts` · **NEP-171** | The wallet is an ordinary NEP-171 token (with NEP-177, NEP-181 and NEP-297), so any NEAR wallet or explorer can show it. Transferring it is what hands over the coins | [`lib.rs`](contracts/satchel/src/lib.rs) |
-| `nfts` · **DYNAMIC NFTS** | The token's `media` is `https://usesatchel.xyz/api/card/{id}.svg`, drawn from contract state: its status (active, listed or frozen) and how many signatures it has issued | [`api/card`](apps/web/src/app/api/card) |
-| `nfts` · **SUB-ACCOUNTS** | The contract is the named sub-account `satchel.satchelhq.testnet`, born from `satchelhq.testnet` in one transaction with no access key | [`keyless-birth.md`](tools/deploy/keyless-birth.md) |
-| `open` · **EXPERIMENTAL** | Clean history: signature records written when a signature is requested, signing frozen while a token is listed, a buy bound to the record count, and a verifier that runs in the browser | [`clean-history/`](packages/core/src/clean-history) |
-
-### Chain Signatures: one NEAR contract signs for three chains
-
-- **Whose key it is.** The MPC network behind `v1.signer-prod.testnet` derives a child key from the caller's account and a path. Satchel always calls as the contract itself,
-  with the path `satchel/{token_id}/{btc|evm|sol}`. Each token therefore has keys that only this contract can use, and
-  the contract uses them only for the token's current owner (or an account the owner allows, within caps).
-- **The request.** `sign_for` sends `sign({request: {path, payload_v2: {Ecdsa | Eddsa}, domain_id}})` to the MPC
-  contract. Domain 0 (secp256k1) signs for BTC and EVM, and domain 1 (ed25519) signs for SOL. Each call carries
-  exactly 1 yoctoNEAR and at least 15 Tgas, and the contract hands the MPC call whatever gas the caller left over.
-- **The contract hashes; the user never sends a hash.** The owner sends the unsigned transaction: an EVM type-2 tx,
-  BTC BIP143 preimages with the outputs, or a Solana message. The contract parses it, refuses anything it cannot
-  classify, and computes the hash the MPC signs. So the on-chain record says exactly what was signed. A contract that
-  signed raw hashes would be a blind signer, and no buyer could audit its history.
-- **Several signatures in one call.** A Bitcoin spend with two inputs needs two signatures. Two MPC calls placed as
-  separate actions in one transaction both time out, so the contract makes one single-action receipt per payload,
-  joins them with `promise_and`, and adds one `#[private]` callback, `on_signed`.
-- **Timeouts are normal.** The MPC answers through yield/resume, usually within seconds, and a request it does not
-  answer in time fails; on testnet that happens often under load. The record is written in the same receipt that creates the MPC
-  calls, before any node signs, so a signature that arrives late is still on record. `on_signed` only fills in the
-  result: it reads the raw promise bytes, with a size cap, and never panics.
-- **Addresses without a network call.** [`packages/core/src/derive`](packages/core/src/derive/index.ts) reproduces
-  the MPC's key derivation (the tweak `sha3_256(… predecessor "," path)` added to the root key), so a page can show
-  a Satchel's addresses before anyone signs. The buyer's check also compares them with the MPC's own
-  `derived_public_key` view.
-
-### NFT standards
-
-- **NEP-171 core:** `nft_transfer`, `nft_token`. **NEP-177:** metadata. **NEP-181:** enumeration (`nft_tokens`, paged
-  by token id). **NEP-297:** events. These are the standard `nft_mint` and `nft_transfer` events plus Satchel's own
-  (`standard: "satchel"`): `sign_requested`, `sign_resolved`, `listed`, `sold`, `payout`, offers, allowances, and
-  coins held inside a Satchel. The app builds each Satchel's activity page from these events.
-- **A transfer hands over the wallet.** When the owner changes, the next `sign_for` must come from the new owner, and
-  every allowance the old owner granted ends. Records stay with the token, so the next buyer can audit them too.
-- **Left out on purpose:** NEP-178 approvals and `nft_transfer_call` (D-07). Either would let a third party move the
-  token outside the sale flow, and only the sale flow ties a purchase to a checked history. `nft_transfer_call` exists and always fails
-  with a clear error, so NEP-171 tooling does not get a "method not found".
-
-### Fungible tokens (NEP-141)
-
-`ft_on_transfer` accepts Circle's testnet USDC
-(`3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af`) to buy a listed Satchel, to escrow an offer, or to
-deposit USDC into a Satchel. It also accepts wNEAR (`wrap.testnet`) as a deposit. The `msg` must parse as one of a few
-strict shapes; anything else is refunded. Withdrawals go out by `ft_transfer`, and a callback credits the amount
-back if the transfer fails. NEAR itself can be held inside a Satchel too (`deposit_near`, `withdraw_near`).
-
-### Accounts: a keyless sub-account that cannot change
-
-- **Born without a key.** `satchelhq.testnet` creates `satchel.satchelhq.testnet` in a single transaction of batched
-  actions: CreateAccount, Transfer, DeployContract, FunctionCall `new`, and FunctionCall `nft_mint` seven times. There
-  is no AddKey action. On NEAR, an account with no access key can never sign a transaction, so nobody can redeploy
-  or delete the contract, or move its funds except by its own rules. Anyone can check that with two RPC calls (`view_account` and
-  `view_access_key_list`, step 2 above).
-- **Safe even if the code has a bug.** near-sdk's `Promise` type links the AddKey, DeployContract and DeleteAccount
-  host functions into the wasm. The contract builds its receipts with the low-level `env::promise_batch_*` functions
-  instead, using only FunctionCall and Transfer actions. `tools/check-wasm-imports.sh` (INV-22, run in CI) fails if the
-  release wasm imports any of the others.
-- **Source you can verify (NEP-330).** `contract_source_metadata` names this repository and the standards above. The
-  reproducible build (`cargo near build reproducible-wasm`) also records the pinned Docker image and the build command.
-  Once the repository is public, `near contract verify` can match the deployed code to it (step 6 above).
-- **Access by account, not by key.** Who may sign is decided by `predecessor_account_id`: the token's owner, or a
-  delegate within a rolling 24-hour cap per coin (C5). Allowances live in contract state rather than as NEAR access keys,
-  which lets the contract end them when the token changes hands.
-
-### Other protocol features the design relies on
-
-- **Storage staking.** Every record, mint, offer and allowance is paid by its caller: the contract measures the bytes
-  it actually stored, charges for them and refunds the rest. `prepay_storage` lets an account fund storage before a
-  `ft_on_transfer` call, which cannot carry NEAR.
-- **Chain time.** Listing needs 250 blocks (a couple of minutes) with no new signature, counted by block height. Allowances
-  measure their rolling 24-hour window with the block timestamp.
-- **A buy bound to state.** `buy` names the listing id and the record count the buyer checked, and fails if either has
-  changed.
-- **Payment in the same transaction.** `buy` pays the seller with a Transfer receipt. If the payout fails, the money
-  is credited to `proceeds_of` for the seller to withdraw.
-
-### In the app and the tests
-
-- **Wallets:** `@hot-labs/near-connect`, which lists Meteor, Intear and other NEAR wallets.
-- **Transactions:** calls are built with near-api-js. The app tracks each transaction by its hash, with the RPC
-  `tx` method and `wait_until`, rather than waiting on the wallet's promise. An MPC receipt can take up to two
-  minutes.
-- **Reads:** FastNEAR RPC, with dRPC (`near-testnet.drpc.org`) as the fallback. History comes from the FastNEAR
-  transactions API, which keeps transactions that ordinary RPC nodes soon forget. Every page a judge
-  needs renders on the server, so it reads the same with `curl`.
-- **Tests:** near-workspaces runs the sandbox suite on a local NEAR node. A mock MPC signer
-  ([`contracts/mock-signer`](contracts/mock-signer)) reproduces the real `sign` interface, its yield/resume and its
-  timeout, and a mock NEP-141 stands in for USDC. A real testnet run checks the same flow against the live MPC:
-  `tools/e2e/{evm,btc,sol}.ts --sign-only`.
-
-## Repository map
-
-| Path | What it is | Start with |
-|---|---|---|
-| [`contracts/`](contracts/README.md) | The NEP-171 contract (`satchel`) and two sandbox-only test doubles | `contracts/satchel/src/lib.rs`, `sign.rs` |
-| [`packages/core/`](packages/core/README.md) | Shared TypeScript: derivation, transaction builders, the TS mirror of the contract's rules, the clean-history checker | `src/clean-history/`, `src/policy/` |
-| [`apps/web/`](apps/web/README.md) | The Next.js app at https://usesatchel.xyz | `src/app/` (routes), `src/lib/` |
-| [`tests/`](tests/README.md) | Sandbox integration tests (near-workspaces, mock MPC signer and mock FT) | `tests/tests/sign.rs`, `tests/tests/sale.rs` |
-| [`vectors/`](vectors/README.md) | Shared vectors that the Rust contract and the TS library both run | |
-| [`tools/`](tools/README.md) | Testnet scripts (dry run by default), the keyless-birth runbook, vector generator, fuzzing, judge checks | `judge-snippets.sh` |
-| [`docs/`](docs/README.md) | Feature specs, engineering handoffs, security reviews, test audits, UI design | [`docs/README.md`](docs/README.md) |
-| [`kb/`](kb/README.md) | The technical specification ([`kb/90`](kb/90-technical-spec.md), source of truth) and the research notes behind it | `kb/90` §3, §5, §7 |
-| [`plan/`](plan/README.md) | Internal planning: decisions log (why), task plan, checklists, sprint log | `plan/decisions.md` |
-| [`brand/`](brand/README.md) | Visual identity (Satchel 2.0) | |
-| [`research/`](research/README.md) | Throwaway Phase-0 spikes and their results; not product code | |
-| [`marketing/`](marketing/README.md) | Sources of the demo video; not product code | |
-
-## Selling a Satchel: how control passes, and what stops the seller keeping the coins
-
-### How control passes
-
-Ownership changes in exactly three places: `nft_transfer` (a gift), `buy` (NEAR, or USDC through `ft_on_transfer`)
-and `accept_offer`. In the same receipt as the change of owner:
-- `sign_for` starts accepting the new owner and stops accepting the old one;
-- every allowance the old owner granted is cleared;
-- the NEAR, USDC and wNEAR held inside the Satchel move with it;
-- the signature records stay with the token, so the next buyer can check them too.
-
-The old owner keeps nothing to sign with. There is no private key to copy: each address is a key the MPC network
-derives for (this contract, `satchel/{id}/{chain}`), and the MPC uses it only when the contract asks. There is no
-NEP-178 approval and no leftover delegate. And nobody holds a key to the contract itself (it is keyless).
-
-### Threat model: every way we know a seller could try to keep the coins
-
-| The seller tries to… | What stops it | Tested by |
-|---|---|---|
-| Keep a copy of the private key | No key exists outside the MPC network, and only the contract can ask it to sign for a token | `tests/tests/release.rs` `keyless_birth_batch`; `tools/check-wasm-imports.sh` (INV-22) |
-| Keep signing after the sale | `sign_for` accepts only the current owner, or a delegate the current owner added | `tests/tests/transfer.rs` `transfer_moves_control`; `sale.rs` `buy_moves_control`; `usdc.rs` `ft_buy_moves_control` |
-| Leave a delegate behind to keep spending | Every change of owner clears the allowances, and a delegate has no owner powers | `tests/tests/allowance.rs` `transfer_clears_allowances`, `sales_clear_allowances`, `delegate_has_no_owner_powers` |
-| Sign a transaction before the sale and broadcast it afterwards | Every signature is recorded. The buyer's Buy button stays disabled until each record is provably spent or expired | `packages/core/test/clean-history.test.ts`; demo token #4 ([below](#demo-token-4-is-blocked-on-purpose)) |
-| Request a signature, let the MPC time out, and hope it was not recorded | The record is written before the MPC is called, in the same receipt | `tests/tests/sign.rs` `records_written_before_mpc_call`, `timeout_never_sticks` |
-| Sign while the Satchel is listed, just before the buyer clicks | Signing is frozen while listed, for the owner and delegates alike; listing needs 250 blocks without a signature | `tests/tests/sale.rs` `quiet_period_and_freeze`, `quiet_period_exact_boundary`; `allowance.rs` `listing_pauses_delegate` |
-| Delist, sign, and relist between the buyer's check and the buy | `buy` names the listing id and the record count the buyer checked, and fails if either changed | `tests/tests/sale.rs` `buy_guards` |
-| Sign something that is not a plain transfer but moves funds later: a raw hash, an EIP-712 permit, an ERC-20 `approve`, an EIP-7702 delegation, a Solana durable nonce, a Bitcoin sighash other than ALL | The contract parses every payload and refuses all of these | `tests/tests/sign.rs` `refusals_change_nothing_{evm,btc,sol}`; the refused cases in `vectors/*.json`; [`docs/security/fuzzing.md`](docs/security/fuzzing.md) |
-| Leave code on the Ethereum address, or hand the Solana account to a program | The buyer's check marks the Satchel unsafe | `packages/core/test/clean-history.test.ts` (the EIP-7702 and Solana-owner cases) |
-| Withdraw the coins held inside the Satchel on NEAR once it is listed | Withdrawals are refused while listed, and the balances move with the token | `tests/tests/market.rs` `withdraw_blocked_while_listed`, `transfer_moves_inside`, `buy_moves_inside` |
-| Move the token outside the sale, through an approval or `nft_transfer_call` | NEP-178 is not implemented, `nft_transfer_call` always fails, and transfers are refused while listed | `tests/tests/transfer.rs` `no_approvals_surface`, `transfer_call_disabled` |
-| Get the contract changed after the sale | Nobody can: the account has no key, and its code cannot deploy code or add a key | `tests/tests/release.rs`; INV-22 |
-
-**Mid-flight cases.**
-- A transfer while a signature is still pending completes normally. The signature still lands in the record, which
-  names the old owner as the requester (`transfer.rs` `transfer_during_inflight_sign`).
-- If paying the seller fails in the middle of a sale, the buyer still gets the Satchel, and the seller's money is
-  credited to `proceeds_of` (`sale.rs` `payout_failure_recredit`).
-
-What this does not stop is listed under [What it does not cover](#security-model-and-trust-assumptions) below, for
-example a testnet4 reorg.
-
-### Each Satchel's history
-
-`/s/{id}/activity` lists every event in the token's life: minted, given (from and to), listed, sold (to whom and for
-how much), and each signature with what it signed. `/s/{id}/transactions` lists the coins that came in and went out
-on each chain. The same history is on-chain: `sig_records` returns the signature records, and the `history_digest`
-view gives one hash over all of them.
+The images in this file are rendered by `apps/web/scripts/readme-assets.mjs` from the app and the brand files; see
+[`docs/assets/readme/`](docs/assets/readme/README.md).
 
 ## Security model and trust assumptions
 
@@ -503,9 +558,9 @@ This is the negative case of the clean-history check. Nobody will ever send from
 ## Prior art
 
 NEAR's `nft_key` (multichain-gas-station-contract, 2024) showed that an NFT can own a Chain Signatures path, and
-House of Stake's Top Level Accounts make a rented NEAR name an NFT that is also an account. Lit PKPs
-and Ika dWallets make keys transferable, and ERC-6551 gives NFTs smart-contract accounts on one EVM chain. Satchel
-combines native multichain keys with a standard NEP-171 token and adds a buyer-verifiable clean history:
+House of Stake's Top Level Accounts make a rented NEAR name an NFT that is also an account. Lit PKPs and Ika dWallets
+make keys transferable, and ERC-6551 gives NFTs smart-contract accounts on one EVM chain. Satchel combines native
+multichain keys with a standard NEP-171 token and adds a buyer-verifiable clean history:
 - every signature a Satchel has ever issued is recorded on-chain;
 - signing freezes while it is listed;
 - the purchase is blocked unless each recorded signature is provably spent or expired.
@@ -514,6 +569,23 @@ How it differs:
 - vs `nft_key`: a product (wallet UX, BTC/EVM/SOL flows, sale safety) on the current MPC API.
 - vs ERC-6551: native multichain. Native-chain signatures cannot be revoked, which is why clean history exists.
 - vs Lit and Ika: a standard NEP-171 token on NEAR, and permissions reset on transfer.
+
+## Repository map
+
+| Path | What it is | Start with |
+|---|---|---|
+| [`contracts/`](contracts/README.md) | The NEP-171 contract (`satchel`) and two sandbox-only test doubles | `contracts/satchel/src/lib.rs`, `sign.rs` |
+| [`packages/core/`](packages/core/README.md) | Shared TypeScript: derivation, transaction builders, the TS mirror of the contract's rules, the clean-history checker | `src/clean-history/`, `src/policy/` |
+| [`apps/web/`](apps/web/README.md) | The Next.js app at https://usesatchel.xyz | `src/app/` (routes), `src/lib/` |
+| [`tests/`](tests/README.md) | Sandbox integration tests (near-workspaces, mock MPC signer and mock FT) | `tests/tests/sign.rs`, `tests/tests/sale.rs` |
+| [`vectors/`](vectors/README.md) | Shared vectors that the Rust contract and the TS library both run | |
+| [`tools/`](tools/README.md) | Testnet scripts (dry run by default), the keyless-birth runbook, vector generator, fuzzing, judge checks | `judge-snippets.sh` |
+| [`docs/`](docs/README.md) | Feature specs, engineering handoffs, security reviews, test audits, UI design, the README's images | [`docs/README.md`](docs/README.md) |
+| [`kb/`](kb/README.md) | The technical specification ([`kb/90`](kb/90-technical-spec.md), source of truth) and the research notes behind it | `kb/90` §3, §5, §7 |
+| [`plan/`](plan/README.md) | Internal planning: decisions log (why), task plan, checklists, sprint log | `plan/decisions.md` |
+| [`brand/`](brand/README.md) | Visual identity (Satchel 2.0) | |
+| [`research/`](research/README.md) | Throwaway Phase-0 spikes and their results; not product code | |
+| [`marketing/`](marketing/README.md) | Sources of the demo video; not product code | |
 
 ## Team
 
@@ -540,8 +612,8 @@ Q-001). Nothing predates it, so there is no baseline.
 - **Fonts:** Funnel Display, Onest and Geist Mono (Google Fonts, OFL).
 - **Pinned versions:** exact versions are in `Cargo.lock` and `pnpm-lock.yaml`.
 - **No templates or boilerplate repositories were used.**
-- **AI:** the code, tests and docs were written with AI coding agents (Claude Code) under the builder's direction. Every
-  chunk ships with unit tests and an end-to-end test.
+- **AI:** the code, tests and docs were written with AI coding agents (Claude Code) under the builder's direction.
+  Every chunk ships with unit tests and an end-to-end test.
 
 ## License
 
