@@ -129,7 +129,7 @@ evm_chain_ids = [11155111, 84532, 421614, 11155420]"
 
 snippet S8 "The MPC signer version the contract depends on" \
 "curl -s $RPC -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$MPC\",\"method_name\":\"version\",\"args_base64\":\"$CFG_ARGS\"}}' | python3 -c 'import sys,json; print(\"mpc version =\", json.loads(bytes(json.load(sys.stdin)[\"result\"][\"result\"])))'" \
-"mpc version = 3.17.0"
+"mpc version = 3.ANY"
 
 snippet S9 "Satchel #$T's state: how many signatures it has issued, and whether it is listed (satchel view)" \
 "curl -s $RPC -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"query\",\"params\":{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$C\",\"method_name\":\"satchel\",\"args_base64\":\"$ARGS\"}}' | python3 -c 'import sys,json; d=json.load(sys.stdin); \"error\" in d and sys.exit(\"error: \"+str(d[\"error\"].get(\"cause\",{}).get(\"name\"))); r=d[\"result\"]; \"error\" in r and sys.exit(\"error: \"+r[\"error\"][:160]); s=json.loads(bytes(r[\"result\"])); print(\"sig_count =\", s[\"sig_count\"], \"listed =\", s[\"listing\"] is not None)'" \
@@ -169,9 +169,9 @@ fi
 
 echo
 echo "[S14] Offline tests (no keys, no network once dependencies are fetched)"
-echo "    \$ cargo test -p satchel --lib                    # expect: test result: ok. 42 passed"
-echo "    \$ pnpm install --frozen-lockfile && pnpm --filter @satchel/core test && pnpm --filter @satchel/tools test"
-echo "    \$ cargo test -p satchel-tests                    # sandbox suite, Linux or Apple Silicon; expect: 76 passed"
+echo "    \$ cargo test -p satchel --lib                    # expect: 232 passed; 0 failed; 3 ignored (2026-11-04)"
+echo "    \$ pnpm install --frozen-lockfile && pnpm --filter @satchel/core test && pnpm --filter @satchel/tools test   # expect: 549 and 94 passed"
+echo "    \$ cargo test -p satchel-tests                    # sandbox suite, Linux or Apple Silicon; expect: 139 passed (2026-11-04)"
 
 echo
 if [[ "$MODE" == live ]]; then

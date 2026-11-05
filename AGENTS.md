@@ -11,7 +11,9 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 ## Read in this order
 
 1. [`README.md`](README.md): the problem, the product, "Try it" steps, copy-paste on-chain checks, test commands,
-   security model and limitations.
+   security model and limitations. Its section [How Satchel uses NEAR](README.md#how-satchel-uses-near) lists every
+   NEAR feature Satchel relies on (Chain Signatures, NEP-171/177/181/297, NEP-141, the keyless sub-account, NEP-330),
+   how it is used and where the code is.
 2. [`docs/README.md`](docs/README.md): the map of every other document, and which folders are product code.
 3. [`docs/GLOSSARY.md`](docs/GLOSSARY.md): decodes the IDs used in comments and docs (`kb/90 §5.9`, `D-43`,
    `INV-09`, `C5`, `AUDIT-01`, ...).
@@ -39,6 +41,9 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 
 | Claim | Where it is implemented | Where it is tested |
 |---|---|---|
+| Each token's addresses are the MPC's keys for (this contract, `satchel/{id}/{btc\|evm\|sol}`) | `contracts/satchel/src/mpc.rs` (`derivation_path`), `packages/core/src/derive/` | `packages/core/test/derive.test.ts` (addresses checked live against the MPC's `derived_public_key`); `tests/tests/sign.rs` `mpc_request_shape_{evm,btc,sol}` |
+| A Bitcoin spend with n inputs makes n MPC `sign` calls from one `sign_for`, joined with `promise_and` | `sign.rs` (step 8) | `tests/tests/sign.rs` `btc_records_per_input`, `btc_fanout_partial_failure`; live: `tools/e2e/btc.ts --sign-only` |
+| The MPC callback never panics, whatever the MPC returns, and only the contract can call it | `sign.rs` (`on_signed`) | `tests/tests/sign.rs` `garbage_response`, `mpc_panics`, `callbacks_are_private` |
 | Only the owner (or a capped delegate) can make a Satchel sign | `contracts/satchel/src/sign.rs`, `allowance.rs` | `tests/tests/sign.rs` `non_owner_rejected`; `tests/tests/allowance.rs` |
 | The record is written **before** the MPC is asked | `sign.rs` (`sign_for`) | `tests/tests/sign.rs` `records_written_before_mpc_call`, `timeout_never_sticks` |
 | Only structured payloads are signed, never raw hashes; anything else is refused and changes nothing | `contracts/satchel/src/parse/` | the refused cases in `vectors/{evm,btc,sol}.json` (run by Rust and TS); `tests/tests/sign.rs` `refusals_change_nothing_*`; [`docs/security/fuzzing.md`](docs/security/fuzzing.md) |
@@ -68,13 +73,15 @@ cargo test -p satchel-tests                # sandbox suite (needs the three wasm
 
 `tools/judge-snippets.sh` (no `--print`) runs the read-only on-chain checks over the network.
 
-## Status at the time of writing (2026-11-04)
+## Status at the time of writing (2026-11-05)
 
 - Contract: complete and audited; frozen on Nov 9. Running today as `dev2.satchelhq.testnet`, which the hosted app
   reads.
 - The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then, README values marked
   `[TBD: …]` (code hash **H**, birth transaction, proof links) do not exist, and checks against the final account
   report "account does not exist". That is expected, not a failure.
+- The MPC signer `v1.signer-prod.testnet` reports version 3.18.0 (it was 3.17.0 until early November). Sign-only
+  runs through dev2 passed against 3.18.0 on 2026-11-05 for both MPC domains (EVM and SOL).
 - Testnet only. No coin in this project has value.
 
 ## Rules for agents in this repo

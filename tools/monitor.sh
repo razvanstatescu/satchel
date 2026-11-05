@@ -10,7 +10,7 @@
 #   2. /s/1, /contract and /market no-JS HTML: the facts are present and outside hidden elements
 #   3. /api/satchels/1 and /api/contract return JSON
 #   4. the contract's spare NEAR: free balance (amount − storage_usage × 1e19) − market_totals.escrow_near: FAIL (alert) < 3 NEAR, WARN < 5 NEAR (S-02, M-01)
-#   5. the MPC version() is 3.17.0
+#   5. the MPC version() is one whose `sign` interface was checked live (3.17.0, 3.18.0)
 #   6. the near-connect wallet manifest is unchanged (R-34): compare with SATCHEL_MANIFEST_SHA256
 #   7. the endpoints are up: dRPC, FastNEAR RPC and tx API, mempool.space/emzy testnet4, Sepolia, Solana devnet
 #   8. NearBlocks freshness (info only, D-10)
@@ -108,7 +108,7 @@ res "${line%% *}" "${line#* }"
 
 echo; echo "[5] MPC version"
 v=$(rpc query "{\"request_type\":\"call_function\",\"finality\":\"final\",\"account_id\":\"$MPC\",\"method_name\":\"version\",\"args_base64\":\"e30=\"}" | python3 -c 'import sys,json; print(json.loads(bytes(json.load(sys.stdin)["result"]["result"])))' 2>/dev/null)
-if [[ "$v" == "3.17.0" ]]; then res PASS "$MPC version $v"; else res FAIL "$MPC version '${v:-unreadable}' (expected 3.17.0; A-01)"; fi
+if [[ "$v" == "3.17.0" || "$v" == "3.18.0" ]]; then res PASS "$MPC version $v"; else res FAIL "$MPC version '${v:-unreadable}' (expected 3.17.0 or 3.18.0; A-01)"; fi
 
 echo; echo "[6] near-connect wallet manifest (R-34)"
 sha=$(curl -s -m 20 "$MANIFEST_URL" | { command -v sha256sum >/dev/null && sha256sum || shasum -a 256; } | cut -d' ' -f1)

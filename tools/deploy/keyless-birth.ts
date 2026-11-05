@@ -20,6 +20,9 @@ import { bool, executePlan, isMain, makeCtx, parseCli, runMain, str, type Ctx } 
 import { actionKinds, functionCall, sha256Hex, totalDeposit, totalGas, type TxPlan } from '../lib/tx'
 import { formatNear, formatTgas, parseNear, TGAS } from '../lib/units'
 
+/** MPC versions whose `sign` interface was verified live (A-01). Add one only after a sign-only check passes. */
+export const MPC_VERIFIED_VERSIONS: readonly string[] = ['3.17.0', '3.18.0']
+
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 export interface BirthOptions {
@@ -198,7 +201,8 @@ async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions): Promise<boole
     line(bal > need.total, `${o.parent} balance ${formatNear(bal)} ≥ ${formatNear(need.total)} (deposits ${formatNear(need.deposits)} + gas hold ${formatNear(need.gasHold)} at ${gasPrice} yocto/gas)`)
   } else line(null, `needs ≥ ${formatNear(need.total)} up front (deposits + 10× gas hold)`)
   const v = await ctx.rpc.view<string>(o.mpc, 'version').catch(() => null)
-  line(v === '3.17.0', `MPC ${o.mpc} version ${v ?? 'unreadable'} (expected 3.17.0, A-01)`)
+  // A-01: only versions whose `sign` interface was checked live (3.18.0: EVM and SOL sign-only on dev2, 2026-11-05).
+  line(v !== null && MPC_VERIFIED_VERSIONS.includes(v), `MPC ${o.mpc} version ${v ?? 'unreadable'} (expected ${MPC_VERIFIED_VERSIONS.join(' or ')}, A-01)`)
   if (o.usdc) {
     line((await ctx.rpc.viewAccount(o.usdc)) !== null, `USDC contract ${o.usdc} exists`)
     const problem = usdcMetadataProblem(await ctx.rpc.view<unknown>(o.usdc, 'ft_metadata').catch(() => null))

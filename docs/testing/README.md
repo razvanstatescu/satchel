@@ -95,7 +95,7 @@ grown since ("Latest recorded counts" above).
 | Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | 199 passed, 0 ignored | **202 passed, 0 ignored** |
 | Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | 136 passed, 0 ignored (19 files) | **137 passed, 0 ignored** (20 files) |
 | Contract sandbox (2.14.0-rc.5) | not run | not run | not run | 136 passed (one file at a time) | not re-run |
-| Core | 549 passed | 2026-11-04 | this file |
+| Core | 467 | 467 | 472 | 540 | **540** |
 | Web unit | 486 | 531 | 535 | 606 | **606** |
 | Tools unit | 92 | 92 | 92 | 92 | **92** |
 | Web end to end | 224 | 263 | 265 | 286 (+21) | **286** (app unchanged) |

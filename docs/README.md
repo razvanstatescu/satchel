@@ -10,6 +10,7 @@ the on-chain checks are in the root [`README.md`](../README.md); a guide for rev
 | Question | Read |
 |---|---|
 | What is Satchel, and how do I try or verify it? | [`README.md`](../README.md) |
+| Which NEAR features does it use, and how? | [`README.md` § How Satchel uses NEAR](../README.md#how-satchel-uses-near) |
 | How is it designed? (contract interface, invariants, clean-history protocol, app architecture) | [`kb/90-technical-spec.md`](../kb/90-technical-spec.md), the **source of truth** |
 | How do offers, allowances, inside assets, USDC, more EVM chains, message signing and the history digest work? | [`specs/`](#specs-sprint-features) below; each one extends kb/90 |
 | Why was something decided this way? | [`plan/decisions.md`](../plan/decisions.md) (D-xx) |

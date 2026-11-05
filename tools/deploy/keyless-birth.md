@@ -31,7 +31,9 @@ Approvals:
   `shasum -a 256 target/near/satchel/satchel.wasm` (macOS) or `sha256sum target/near/satchel/satchel.wasm` (Linux).
 - [ ] The sandbox suite and `tools/check-wasm-imports.sh` both pass on **that** artifact
   (`SATCHEL_WASM=… cargo test -p satchel-tests`).
-- [ ] MPC `version` = `3.17.0` (the tool's pre-check, A-01).
+- [ ] MPC `version` is one whose `sign` interface was checked live: `3.17.0` or `3.18.0` (the tool's pre-check, A-01;
+  3.18.0 was checked with EVM and SOL sign-only runs on dev2 on 2026-11-05). For a newer version, run
+  `tools/e2e/{evm,sol}.ts --sign-only` on dev2 first, then add it to `MPC_VERIFIED_VERSIONS`.
 - [ ] App host is final (D-23, H-05). `base_uri` = `https://usesatchel.xyz/api/card/` unless H-05 changed;
   it is immutable after birth.
 - [ ] H-26 is decided: either USDC init (default) or `--no-usdc`. rc and final must use the **same** init args.
