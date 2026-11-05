@@ -188,7 +188,7 @@ Every `<…>` value is a human decision, per HACKATHON.md "What the human decide
   "consent": true
 }
 ```
-`size`: the plan has 2 people (S1, S2) plus the design lead, so `"2 - 4"`.
+`size`: Satchel is a solo project, so `"1"` (H-02, 2026-11-05).
 
 Draft `idea` (≈700 chars, for the human to edit and approve, not to be sent unreviewed):
 > Satchel is an NFT that is a wallet. Each NEP-171 token on NEAR controls its own native Bitcoin (testnet4) and Ethereum (Sepolia) addresses through NEAR Chain Signatures: the Satchel contract checks that the caller owns the token and asks the MPC signer (v1.signer-prod.testnet) to sign for that token's derivation path. Transferring or selling the NFT transfers control of the funds, with no bridge, no wrapped tokens and no seed phrase changing hands. Because a signature issued before a sale could be broadcast after it, Satchel freezes signing while a token is listed and shows buyers a "clean history" check of every signature the token has issued. The contract is locked (no access keys); everything runs on NEAR testnet.
