@@ -1,8 +1,8 @@
 # Sandbox integration suite (`satchel-tests`)
 
 End-to-end tests of the **real compiled wasm** on a local NEAR sandbox, with
-[near-workspaces](https://github.com/near/near-workspaces-rs) 0.23.0 (nearcore sandbox 2.13.4 by default). No
-testnet, no keys, no network beyond the one-time sandbox binary download. Two sandbox-only test doubles stand in for
+[near-workspaces](https://github.com/near/near-workspaces-rs) (its default nearcore sandbox; versions pinned in
+`tests/Cargo.toml`). No testnet, no keys, no network beyond the one-time sandbox binary download. Two sandbox-only test doubles stand in for
 the external contracts (both in `contracts/`, never deployed):
 
 - `mock-signer` mirrors the `sign` interface of the MPC signer `v1.signer-prod.testnet` (yield/resume, the 200-block
@@ -32,7 +32,7 @@ replaced by `_` (`satchel`, `mock_signer`, `mock_ft`). A missing file fails with
 Overrides:
 
 - `SATCHEL_WASM=<path>` runs the suite against another Satchel artifact, e.g. the reproducible build (kb/90 §12.3).
-- `SANDBOX_VERSION=2.14.0-rc.5` runs it against testnet's nearcore instead of the default.
+- `SANDBOX_VERSION=<nearcore version>` runs it against another nearcore, such as the one testnet runs.
 
 The sandbox binary exists for Linux and Apple Silicon only. `gas.rs`, `gas_paths.rs`, `security.rs` and `review.rs`
 print measurements; add `-- --nocapture` to see them.

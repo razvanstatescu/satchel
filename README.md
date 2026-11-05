@@ -7,7 +7,7 @@ wallet. No bridge, wrapped token or seed phrase changes hands.
 
 Built for NEAR HACKATHON (Nov 1–14, 2026), tracks `nfts` and `open`. **Testnet only: the coins have no value.**
 
-> **Status (2026-11-05).** The contract is complete, tested and security-reviewed. The app is live at
+> **Status.** The contract is complete, tested and security-reviewed. The app is live at
 > **https://usesatchel.xyz**, reading the development contract `dev2.satchelhq.testnet`. The final contract
 > `satchel.satchelhq.testnet` is born keyless on Nov 10; values marked `[TBD: …]` (its code hash **H**, birth
 > transaction, proof links) do not exist until then, and checks against it report `SKIP` or "account does not
@@ -46,12 +46,12 @@ quoted below; every page and the JSON API already work. Example today:
 |---|---|
 | Open `https://usesatchel.xyz/s/1` | The owner `alice.satchelhq.testnet`, three full addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd`), their balances `[TBD: balances at submission]`, the signature count and "Contract keys: none since birth". The page is server-rendered, so it reads the same with JavaScript off. |
 | `curl -s https://usesatchel.xyz/api/satchels/1` | The same facts as JSON: `owner`, `addresses{btc,evm,sol}`, `balances`, `sig_count`, `listing`, `status`. |
-| Open `https://usesatchel.xyz/contract` | The lock facts for `satchel.satchelhq.testnet`: "Account is locked (no access keys)", the birth tx `[TBD: birth tx hash]`, the code hash `[TBD: H]` = the expected hash, and the live MPC version (3.18.0 on 2026-11-05). |
+| Open `https://usesatchel.xyz/contract` | The lock facts for `satchel.satchelhq.testnet`: "Account is locked (no access keys)", the birth tx `[TBD: birth tx hash]`, the code hash `[TBD: H]` = the expected hash, and the MPC signer's live version. |
 | Open `https://usesatchel.xyz/market` | Listed Satchels, each with its clean-history verdict. #4 shows "Blocked: 1 unused signature" ([why](#demo-token-4-is-blocked-on-purpose)). |
 | With a testnet wallet (Meteor or Intear): open `/mint` and mint | A new Satchel #8+ appears with three fresh addresses. Fund one from a faucet (BTC: `mempool.space/testnet4/faucet`, ETH: a Sepolia faucet) and use Send. |
 
 The addresses above are derived from `satchel.satchelhq.testnet` and the paths `satchel/1/{btc,evm,sol}`. They were
-computed and checked against the MPC's `derived_public_key` on 2026-10-21. A Satchel's addresses depend only on
+computed and checked against the MPC's `derived_public_key`. A Satchel's addresses depend only on
 (contract id, path), so they never change when the NFT changes hands.
 
 ---
@@ -61,7 +61,7 @@ computed and checked against the MPC's `derived_public_key` on 2026-10-21. A Sat
 `tools/judge-snippets.sh` runs every command below and compares the output (`--print` lists them without network).
 It needs `bash`, `curl` and `python3`; the near CLI is optional. RPC: dRPC (`near-testnet.drpc.org`), with
 `test.rpc.fastnear.com` as fallback. NEAR history: the FastNEAR tx API (`tx.test.fastnear.com`), which keeps old
-transactions that non-archival RPC nodes forget after about 1.5 days.
+transactions that non-archival RPC nodes soon forget.
 
 **1. Who owns Satchel #1** (NEP-171 `nft_token`)
 ```sh
@@ -87,7 +87,7 @@ Expected:
 code sha256 = [TBD: H]
 access keys = 0 (full access: 0 )
 ```
-With the near CLI (near-cli-rs 0.30.1): `near account view-account-summary satchel.satchelhq.testnet network-config testnet-fastnear now`
+With the near CLI (near-cli-rs): `near account view-account-summary satchel.satchelhq.testnet network-config testnet-fastnear now`
 → `Local Contract (SHA-256 checksum hex)  [TBD: H]` and `Access keys  Account is locked (no access keys)`. Do not
 use `near account list-keys`: it prints the same empty table for an account that does not exist.
 
@@ -121,7 +121,8 @@ curl -s -X POST https://tx.test.fastnear.com/v0/account -H 'content-type: applic
 ```
 Expected: the first entry is `"transaction_hash":"[TBD: birth tx hash]"` at `"tx_block_height":[TBD: block A]`.
 
-**6. The deployed code is this repository's code.** You need Rust 1.93, cargo-near 0.22.0 and Docker:
+**6. The deployed code is this repository's code.** You need Rust (pinned by `rust-toolchain.toml`), cargo-near and
+Docker; the build itself runs in the Docker image pinned in `contracts/satchel/Cargo.toml`:
 ```sh
 git checkout contract-v1.0.0
 cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml
@@ -137,10 +138,9 @@ curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"
 curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"v1.signer-prod.testnet","method_name":"version","args_base64":"e30="}}' | python3 -c 'import sys,json; print("mpc version =", json.loads(bytes(json.load(sys.stdin)["result"]["result"])))'
 ```
 Expected: `cooldown_blocks = 250 mpc = v1.signer-prod.testnet evm_chain_ids = [11155111, 84532, 421614, 11155420]`,
-then `mpc version = 3.18.0`. The MPC network upgrades itself: the version was 3.17.0 from 2026-10-22 and 3.18.0 on
-2026-11-05. Live sign-only runs through dev2 passed against 3.18.0 on 2026-11-05 (EVM
-`7HDbeM9AFow82JtY3GHpRs2djbT4R1Je2XqBaBjrNGG8`, SOL `d15vvS7iwTNRgkGBGXmpQzDnbEhvqHWFQosKbRoMbXZ`). The four EVM
-testnets shipped in the 2026-10-29 sprint (see `docs/specs/C1-C2-C3-C7.md`).
+then `mpc version = ` followed by the MPC signer's current version. The MPC network upgrades on its own schedule;
+the team re-checks signing against each new version with the sign-only scripts in `tools/e2e`. The four EVM testnets
+are specified in `docs/specs/C1-C2-C3-C7.md`.
 
 **8. Balances of Satchel #1's addresses** (no NEAR involved)
 ```sh
@@ -151,8 +151,8 @@ Expected: `confirmed sats = [TBD: at submission]` and `wei = [TBD: at submission
 
 ### Proof transactions
 
-Each row gives an explorer link and an API form. NearBlocks testnet was 24 days behind on 2026-10-21, so the
-FastNEAR command is the proof for NEAR txs. Offline copies of each proof go into `docs/evidence/*.json` after the
+Each row gives an explorer link and an API form. NearBlocks testnet can lag far behind the chain, so the FastNEAR
+command is the proof for NEAR txs. Offline copies of each proof go into `docs/evidence/*.json` after the
 final birth (Day 10).
 
 | Chain | What it proves | Explorer | API |
@@ -169,8 +169,8 @@ final birth (Day 10).
 
 ## Run it locally
 
-Prerequisites: Node 22.22.2 (`.nvmrc`) with pnpm 11 (corepack), plus Rust 1.93.0 with the wasm32 target and cargo-near
-0.22.0 for the contracts (`rust-toolchain.toml` pins the toolchain). The sandbox suite needs Linux or Apple Silicon.
+Prerequisites: Node (version in `.nvmrc`) with pnpm (corepack), plus Rust with the wasm32 target and cargo-near for
+the contracts (`rust-toolchain.toml` pins the toolchain). The sandbox suite needs Linux or Apple Silicon.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -178,18 +178,17 @@ pnpm --filter web dev                        # http://localhost:3000, fixture da
 NEXT_PUBLIC_DATA_MODE=live pnpm --filter web dev   # live testnet reads; see .env.example for every variable
 ```
 
-Tests, all offline except where noted. Latest recorded results, with dates; the full table and its sources are in
-[`docs/testing/README.md`](docs/testing/README.md#latest-recorded-counts). They are re-recorded on the release commit
-`[TBD]`:
+Tests, all offline. Every suite must pass in full; what each one covers is in
+[`docs/testing/README.md`](docs/testing/README.md), which also keeps the dated results of each run:
 
-| Command | Result |
+| Command | What it covers |
 |---|---|
-| `cargo test -p satchel --lib` | `test result: ok. 232 passed; 0 failed; 3 ignored` (Linux x86-64, 2026-11-04, with the round-three review fixes; the 3 ignored are slow review tests that pass with `-- --include-ignored`). Includes the shared vectors in `vectors/*.json` and the parser fuzz properties |
-| `cargo test -p satchel-tests` (sandbox, nearcore 2.13.4; first build the three wasm files: `for c in satchel mock-signer mock-ft; do cargo near build non-reproducible-wasm --manifest-path contracts/$c/Cargo.toml; done`) | 139 passed (2026-11-04) |
-| `pnpm --filter @satchel/core test` | 549 passed, plus the browser-bundle check (2026-11-04) |
-| `pnpm --filter @satchel/tools test` | 94 passed, plus the vectors freshness check (2026-11-04) |
-| `pnpm --filter web test` / `test:e2e` (fixture mode) | 673 vitest / 308 Playwright passed (2026-11-04) |
-| `tools/check-wasm-imports.sh` | INV-22 OK: the release wasm cannot add a key, deploy code or delete the account |
+| `cargo test -p satchel --lib` | Contract unit tests: every guard and refusal, the payload classifiers, the shared vectors in `vectors/*.json` and the parser fuzz properties. A few slow review proofs are `#[ignore]`d; run them with `-- --include-ignored` |
+| `cargo test -p satchel-tests` | The sandbox suite: the real contract on a local NEAR node, with a mock MPC signer and a mock USDC. First build the three wasm files: `for c in satchel mock-signer mock-ft; do cargo near build non-reproducible-wasm --manifest-path contracts/$c/Cargo.toml; done` |
+| `pnpm --filter @satchel/core test` | The shared TypeScript library: derivation, transaction builders, the TS mirror of the contract's rules, the clean-history checker, and a browser-bundle check |
+| `pnpm --filter @satchel/tools test` | The testnet scripts' dry runs and a check that the shared vectors are up to date |
+| `pnpm --filter web test` / `test:e2e` (fixture mode) | The app's unit tests, and Playwright user journeys with accessibility checks |
+| `tools/check-wasm-imports.sh` | INV-22: the release wasm cannot add a key, deploy code or delete the account |
 
 CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests. Run:
 `[TBD: CI run link and badge once the repo is public]`.
@@ -227,7 +226,7 @@ They sign only with `--send` and a typed `yes`, using keys from `~/.near-credent
   sighash types and durable nonces ([`contracts/satchel/src/parse/`](contracts/satchel/src/parse)).
 - **The record comes before the signature.** It is written in the same receipt as the MPC call, so a signature that
   arrives late or after a timeout is still on record.
-- **The sale is bound to the record count.** `list` needs 250 blocks (≈ 140 s) of signing silence. While listed,
+- **The sale is bound to the record count.** `list` needs 250 blocks (a couple of minutes) of signing silence. While listed,
   signing and transfers are refused. `buy(token_id, listing_id, expected_sig_count)` fails if anything changed. The
   seller is paid in the same transaction, and a failed payout is credited to `proceeds_of` instead.
 - **Clean history** runs in the buyer's browser ([`packages/core/src/clean-history`](packages/core/src/clean-history)).
@@ -271,8 +270,7 @@ the log of every signature, the sale and the offers. The other chains only see o
 
 ### Chain Signatures: one NEAR contract signs for three chains
 
-- **Whose key it is.** The MPC network `v1.signer-prod.testnet` (16 nodes, threshold 11, version 3.18.0 on
-  2026-11-05) derives a child key from the caller's account and a path. Satchel always calls as the contract itself,
+- **Whose key it is.** The MPC network behind `v1.signer-prod.testnet` derives a child key from the caller's account and a path. Satchel always calls as the contract itself,
   with the path `satchel/{token_id}/{btc|evm|sol}`. Each token therefore has keys that only this contract can use, and
   the contract uses them only for the token's current owner (or an account the owner allows, within caps).
 - **The request.** `sign_for` sends `sign({request: {path, payload_v2: {Ecdsa | Eddsa}, domain_id}})` to the MPC
@@ -285,8 +283,8 @@ the log of every signature, the sale and the offers. The other chains only see o
 - **Several signatures in one call.** A Bitcoin spend with two inputs needs two signatures. Two MPC calls placed as
   separate actions in one transaction both time out, so the contract makes one single-action receipt per payload,
   joins them with `promise_and`, and adds one `#[private]` callback, `on_signed`.
-- **Timeouts are normal.** The MPC answers through yield/resume in about 7 s and gives up after 200 blocks (about 2
-  minutes); on testnet it often times out under load. The record is written in the same receipt that creates the MPC
+- **Timeouts are normal.** The MPC answers through yield/resume, usually within seconds, and a request it does not
+  answer in time fails; on testnet that happens often under load. The record is written in the same receipt that creates the MPC
   calls, before any node signs, so a signature that arrives late is still on record. `on_signed` only fills in the
   result: it reads the raw promise bytes, with a size cap, and never panics.
 - **Addresses without a network call.** [`packages/core/src/derive`](packages/core/src/derive/index.ts) reproduces
@@ -337,7 +335,7 @@ back if the transfer fails. NEAR itself can be held inside a Satchel too (`depos
 - **Storage staking.** Every record, mint, offer and allowance is paid by its caller: the contract measures the bytes
   it actually stored, charges for them and refunds the rest. `prepay_storage` lets an account fund storage before a
   `ft_on_transfer` call, which cannot carry NEAR.
-- **Chain time.** Listing needs 250 blocks (about 140 s) with no new signature, counted by block height. Allowances
+- **Chain time.** Listing needs 250 blocks (a couple of minutes) with no new signature, counted by block height. Allowances
   measure their rolling 24-hour window with the block timestamp.
 - **A buy bound to state.** `buy` names the listing id and the record count the buyer checked, and fails if either has
   changed.
@@ -346,16 +344,16 @@ back if the transfer fails. NEAR itself can be held inside a Satchel too (`depos
 
 ### In the app and the tests
 
-- **Wallets:** `@hot-labs/near-connect` 0.11.4, which lists Meteor, Intear and other NEAR wallets.
-- **Transactions:** calls are built with near-api-js 7.3.1. The app tracks each transaction by its hash, with the RPC
+- **Wallets:** `@hot-labs/near-connect`, which lists Meteor, Intear and other NEAR wallets.
+- **Transactions:** calls are built with near-api-js. The app tracks each transaction by its hash, with the RPC
   `tx` method and `wait_until`, rather than waiting on the wallet's promise. An MPC receipt can take up to two
   minutes.
 - **Reads:** FastNEAR RPC, with dRPC (`near-testnet.drpc.org`) as the fallback. History comes from the FastNEAR
-  transactions API, which keeps transactions that ordinary RPC nodes forget after about 1.5 days. Every page a judge
+  transactions API, which keeps transactions that ordinary RPC nodes soon forget. Every page a judge
   needs renders on the server, so it reads the same with `curl`.
-- **Tests:** near-workspaces 0.23.0 runs the sandbox suite on nearcore 2.13.4. A mock MPC signer
+- **Tests:** near-workspaces runs the sandbox suite on a local NEAR node. A mock MPC signer
   ([`contracts/mock-signer`](contracts/mock-signer)) reproduces the real `sign` interface, its yield/resume and its
-  200-block timeout, and a mock NEP-141 stands in for USDC. A real testnet run checks the same flow against the live MPC:
+  timeout, and a mock NEP-141 stands in for USDC. A real testnet run checks the same flow against the live MPC:
   `tools/e2e/{evm,btc,sol}.ts --sign-only`.
 
 ## Repository map
@@ -494,10 +492,10 @@ Q-001). Nothing predates it, so there is no baseline.
 
 ## Libraries, tools and AI (HACKATHON.md Q-005)
 
-- **Contract:** near-sdk 5.29.1, near-contract-standards (NEP-171, NEP-177, NEP-181), cargo-near 0.22.0, and
-  near-workspaces 0.23.0 for sandbox tests.
-- **Web and shared library:** Next.js 16, React 19, Tailwind CSS 4, near-api-js 7.3.1, @hot-labs/near-connect 0.11.4,
-  viem 2.57.7, bitcoinjs-lib 7.0.4, @solana/web3.js 1.99.0, and @noble/@scure (hashing, curves, encoding).
+- **Contract:** near-sdk, near-contract-standards (NEP-171, NEP-177, NEP-181), cargo-near, and near-workspaces for
+  sandbox tests.
+- **Web and shared library:** Next.js, React, Tailwind CSS, near-api-js, @hot-labs/near-connect, viem, bitcoinjs-lib,
+  @solana/web3.js, and @noble/@scure (hashing, curves, encoding).
 - **Fonts:** Funnel Display, Onest and Geist Mono (Google Fonts, OFL).
 - **Pinned versions:** exact versions are in `Cargo.lock` and `pnpm-lock.yaml`.
 - **No templates or boilerplate repositories were used.**

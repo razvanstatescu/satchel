@@ -1,12 +1,12 @@
 # Contracts
 
-Three Rust crates, all members of the root `Cargo.toml` workspace (Rust 1.93.0, pinned by `rust-toolchain.toml`,
-target `wasm32-unknown-unknown`; near-sdk 5.29.1).
+Three Rust crates, all members of the root `Cargo.toml` workspace (Rust pinned by `rust-toolchain.toml`,
+target `wasm32-unknown-unknown`; near-sdk, exact version in `Cargo.lock`).
 
 | Crate | What it is |
 |---|---|
 | `satchel/` | **The product.** A NEP-171 NFT contract on NEAR testnet. Each token controls BTC (testnet4), EVM (Sepolia, Base / Arbitrum / OP Sepolia) and SOL (devnet) addresses through NEAR Chain Signatures (MPC signer `v1.signer-prod.testnet`). Every signature is recorded on-chain before the MPC is asked, so a buyer can check the token's whole signing history ("clean history"). |
-| `mock-signer/` | Sandbox-only test double of the MPC signer's `sign` interface (near/mpc 3.17.0): same wire format, preconditions and yield/timeout behaviour, fake signatures, plus test knobs (`set_mode`, `respond*`, a request log). Never deployed. |
+| `mock-signer/` | Sandbox-only test double of the MPC signer's `sign` interface: same wire format, preconditions and yield/timeout behaviour, fake signatures, plus test knobs (`set_mode`, `respond*`, a request log). Never deployed. |
 | `mock-ft/` | Sandbox-only NEP-141 standing in for Circle testnet USDC (6 decimals, 0.00125 NEAR storage), built on near-contract-standards, with an open `mint` for test setup. Never deployed. |
 
 The sandbox suite that drives all three lives in `tests/` (see `tests/README.md`).

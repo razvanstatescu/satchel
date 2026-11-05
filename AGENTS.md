@@ -25,7 +25,7 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 
 | Path | What it is |
 |---|---|
-| `contracts/satchel/` | **The product contract** (Rust, near-sdk 5.29.1). `contracts/mock-*` are sandbox test doubles |
+| `contracts/satchel/` | **The product contract** (Rust, near-sdk). `contracts/mock-*` are sandbox test doubles |
 | `packages/core/` | **Shared TypeScript library**: address derivation, transaction builders, the TS mirror of the contract's payload rules, the clean-history checker |
 | `apps/web/` | **The web app** (Next.js 16), live at https://usesatchel.xyz |
 | `tests/` | Sandbox integration tests (near-workspaces + a mock MPC signer) |
@@ -63,7 +63,7 @@ Commands and the latest recorded results are in README.md §"Run it locally". Of
 
 ```sh
 tools/judge-snippets.sh --print            # lists every on-chain check from the README, no network
-cargo test -p satchel --lib                # contract unit tests + shared vectors (Rust 1.93.0, pinned)
+cargo test -p satchel --lib                # contract unit tests + shared vectors (toolchain pinned)
 pnpm install --frozen-lockfile && pnpm --filter @satchel/core test
 pnpm --filter @satchel/tools test
 pnpm --filter web test                     # web unit tests, fixture data
@@ -73,15 +73,13 @@ cargo test -p satchel-tests                # sandbox suite (needs the three wasm
 
 `tools/judge-snippets.sh` (no `--print`) runs the read-only on-chain checks over the network.
 
-## Status at the time of writing (2026-11-05)
+## Status
 
 - Contract: complete and audited; frozen on Nov 9. Running today as `dev2.satchelhq.testnet`, which the hosted app
   reads.
 - The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then, README values marked
   `[TBD: …]` (code hash **H**, birth transaction, proof links) do not exist, and checks against the final account
   report "account does not exist". That is expected, not a failure.
-- The MPC signer `v1.signer-prod.testnet` reports version 3.18.0 (it was 3.17.0 until early November). Sign-only
-  runs through dev2 passed against 3.18.0 on 2026-11-05 for both MPC domains (EVM and SOL).
 - Testnet only. No coin in this project has value.
 
 ## Rules for agents in this repo

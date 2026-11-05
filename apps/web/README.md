@@ -1,4 +1,4 @@
-# apps/web: the Satchel app (Next.js 16.4.2)
+# apps/web: the Satchel app (Next.js)
 
 The website and app for Satchel, an NFT that is a wallet: each token on the NEAR testnet contract controls a Bitcoin
 testnet4, an Ethereum-testnet (Sepolia, Base, Arbitrum and OP Sepolia) and a Solana devnet address through NEAR Chain

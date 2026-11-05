@@ -169,9 +169,9 @@ fi
 
 echo
 echo "[S14] Offline tests (no keys, no network once dependencies are fetched)"
-echo "    \$ cargo test -p satchel --lib                    # expect: 232 passed; 0 failed; 3 ignored (2026-11-04)"
-echo "    \$ pnpm install --frozen-lockfile && pnpm --filter @satchel/core test && pnpm --filter @satchel/tools test   # expect: 549 and 94 passed"
-echo "    \$ cargo test -p satchel-tests                    # sandbox suite, Linux or Apple Silicon; expect: 139 passed (2026-11-04)"
+echo "    \$ cargo test -p satchel --lib                    # expect: test result: ok (0 failed)"
+echo "    \$ pnpm install --frozen-lockfile && pnpm --filter @satchel/core test && pnpm --filter @satchel/tools test   # expect: all pass"
+echo "    \$ cargo test -p satchel-tests                    # sandbox suite, Linux or Apple Silicon; expect: all pass"
 
 echo
 if [[ "$MODE" == live ]]; then
