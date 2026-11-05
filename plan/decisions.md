@@ -908,7 +908,7 @@ Razvan: "try to fix as many of those things … by yourself".
 |---|---|
 | Team account (H-01) | **`<team>` = `satchelhq`** (free on 2026-10-21; no personal data). Final `satchel.satchelhq.testnet` (keyless, Day 10), `rc.satchelhq.testnet` (keyless, Day 9), `dev1.satchelhq.testnet`, personas `alice.`/`bob.`/`carol.satchelhq.testnet`. **Wherever the docs say `<team>`, read `satchelhq`.** |
 | Addresses (P0-A1) | Computed and live-checked: `research/final-addresses.md` |
-| Licence (H-03) | MIT |
+| Licence (H-03) | MIT (superseded by D-53: MIT for `contracts/`, AGPL-3.0-only for the rest) |
 | Repo (H-04) | `satchel`, private under Razvan's GitHub account or org until Day 13 |
 | App host (H-05) | **`satchelhq.vercel.app`** (free on 2026-10-21), fallback `satchel-hq.vercel.app`. It is frozen into `base_uri` at the Day-10 birth, so confirm the Vercel project name before then |
 | FastNEAR key (H-06) | Optional: dRPC is keyless and works; add the key only if rate limits bite |
@@ -1065,7 +1065,7 @@ submission per project" in place of "per team". The live copy is `research/spike
   URL** is (a 409 now means "this repo was already submitted").
 - **Q-010: testnet-only projects are eligible in every track.**
 - **Q-012: keep the hosted demo up until at least 2026-11-18, ideally 2026-11-25.** Keep-alive runs to Nov 25.
-- **Q-014: any licence, with a LICENSE file.** MIT is already in the repo root.
+- **Q-014: any licence, with a LICENSE file.** Root `LICENSE` is AGPL-3.0-only and `contracts/LICENSE` is MIT (D-53).
 - **Q-005: list libraries, templates and AI-written code in the README.**
 - **Q-017: Claude Code and Codex screen every project** (reproducibility check, feature verification, report,
   preliminary score); humans decide. A clean-clone "reproduce" run is now a release task, not only server-rendered
@@ -1253,6 +1253,24 @@ references.
 
 **Human:** decided by Razvan.
 
+## D-53 · Two licences: MIT for the contracts, AGPL-3.0 for the rest (2026-11-05, Razvan)
+
+**Context.** The whole repo was MIT (D-38, H-03). Razvan: "use MIT for contracts and AGPL-3.0 for anything else".
+
+**Decision.**
+- `contracts/` (`satchel`, `mock-signer`, `mock-ft`): MIT, in `contracts/LICENSE`. The Cargo workspace's
+  `license = "MIT"` is what these crates inherit.
+- Everything else: AGPL-3.0-only, in the root `LICENSE` (the official GNU text). `tests/Cargo.toml` and every
+  `package.json` say `AGPL-3.0-only`.
+- Third-party files keep their own licences (`research/**/vendor/`, the OFL fonts).
+- "Only" rather than "or later": the project does not pre-accept future AGPL versions. Changing it later is one
+  edit in each manifest plus the README.
+
+**Effect on the contract.** None. NEP-330 metadata does not carry the licence, and the contract crates still say
+MIT, so the wasm and its hash do not change.
+
+**Human:** decided by Razvan.
+
 ## Decisions that need the human (Razvan / team)
 
 Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into the existing H-xx. Every row has a default and a deadline. "Default" means what happens if nobody objects by the deadline. H-02 and the payout account have no default, because an agent may never fill them in.
@@ -1261,7 +1279,7 @@ Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into
 |---|---|---|---|---|
 | H-01 | **[decided D-38]** Team account name `<team>` → `<team>.testnet`; final `satchel.<team>.testnet`; `dev1.`, `rc.`; personas `alice.`/`bob.`/`carol.<team>.testnet`. **Create `<team>.testnet` in the same sitting** (an agent may run the faucet command with your OK) and record its creation tx (R-02) | a short lowercase name unique to Satchel | **Sat Oct 24** | every address derives from the final id; nobody else may own `<team>.testnet` while its sub-account addresses hold funds (D-02) |
 | H-02 | Submission fields: projectName, leadName, email (the Satchel team's own; monitored until payout), size, tracks, mainnet payout `nearAddress`; the repo URL must not have been submitted before | size `"2 - 4"`; tracks `["nfts","open"]` (kb/00 §Tracks); **no default for names, email or payout account**: the human creates the payout account and an agent must never invent it | Nov 12 (payout account by Nov 10) | HACKATHON.md "What the human decides" |
-| H-03 | **[decided D-38]** Licence | MIT | **Oct 28** | "Is the project open source" (kb/00 §Rec P1-8) |
+| H-03 | **[decided D-38; changed by D-53, 2026-11-05]** Licence | MIT for `contracts/`, AGPL-3.0-only for the rest | **Oct 28** | "Is the project open source" (kb/00 §Rec P1-8) |
 | H-04 | **[decided D-38; link set 2026-11-05]** GitHub repo: `github.com/razvanstatescu/satchel`, private until Day 13 | `razvanstatescu/satchel` | **Nov 5** | `package.repository` (root `Cargo.toml`) is embedded in NEP-330 `contract_source_metadata.link`; the app's `REPO_URL` matches. Set before the reproducible rc build, since the final contract can't change it |
 | H-05 | **[decided D-38]** App host (Vercel project name or custom domain) | `satchel-<team>.vercel.app` | **Oct 28** | `base_uri` is immutable from the rc/final birth (D-23) |
 | H-06 | **[decided D-38]** FastNEAR API key (server) | free dashboard key | **Oct 28** | rate limits (kb/41 §TL;DR) |

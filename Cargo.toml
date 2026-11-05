@@ -5,7 +5,7 @@ members = ["contracts/satchel", "contracts/mock-signer", "contracts/mock-ft", "t
 [workspace.package]
 edition = "2024"
 rust-version = "1.93"
-license = "MIT"
+license = "MIT"   # inherited by contracts/* (contracts/LICENSE); tests/ sets AGPL-3.0-only like the rest of the repo
 repository = "https://github.com/razvanstatescu/satchel"   # H-04 (2026-11-05): embedded in NEP-330 `contract_source_metadata.link`
 
 [profile.release]

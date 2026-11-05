@@ -3,6 +3,7 @@ name = "satchel-tests"
 version = "0.0.0"
 edition.workspace = true
 rust-version.workspace = true
+license = "AGPL-3.0-only"
 publish = false
 
 [dev-dependencies]

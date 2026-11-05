@@ -504,4 +504,14 @@ Q-001). Nothing predates it, so there is no baseline.
 
 ## License
 
-MIT, see [LICENSE](LICENSE). The repository stays public through judging (Q-014).
+- **Contracts: MIT.** Everything in [`contracts/`](contracts/) (the Satchel contract and its two sandbox test
+  doubles) is under the MIT License, see [`contracts/LICENSE`](contracts/LICENSE). Anyone may reuse the contract
+  code, including in closed-source work.
+- **Everything else: AGPL-3.0-only.** The rest of the repository (the app, the shared TypeScript library, the tools
+  and tests, the docs and the other assets) is under the GNU Affero General Public License v3.0, see
+  [`LICENSE`](LICENSE). If you run a modified version as a network service, you must offer its source to that
+  service's users.
+- **Third-party files keep their own licenses:** the copies under `research/**/vendor/`, and the fonts (SIL Open Font
+  License 1.1) in `docs/design/`, `marketing/` and the app's generated font files.
+
+The repository stays public through judging (Q-014).

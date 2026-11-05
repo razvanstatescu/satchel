@@ -2,6 +2,7 @@
   "name": "@satchel/tools",
   "version": "1.0.0",
   "private": true,
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "vectors": "tsx vectors/gen.ts",

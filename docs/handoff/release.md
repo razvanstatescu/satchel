@@ -5,7 +5,7 @@
 > - `satchelhq.testnet` and the personas `alice`, `bob`, `carol` exist since 2026-10-29 (D-48), and agents may sign
 >   testnet transactions;
 > - `dev1` and `dev2.satchelhq.testnet` are deployed, and the app is live at https://usesatchel.xyz (D-49) against dev2;
-> - `LICENSE` (MIT) is in the repo.
+> - the licences are in the repo (D-53): `contracts/LICENSE` (MIT) for `contracts/`, root `LICENSE` (AGPL-3.0-only) for the rest.
 >
 > Still true: the final keyless birth of `satchel.satchelhq.testnet` (H-15) is planned for Nov 10 and has not happened,
 > and the README still has `[TBD]` values for it. The tools test count grew after this (92 vitest tests on 2026-10-30).

@@ -5,7 +5,7 @@
   "description": "Satchel framework-free libraries: derivation, NEAR payload encoders, chain builders, clean-history checker, card hue, formatting",
   "type": "module",
   "sideEffects": false,
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "exports": {
     ".": "./src/index.ts",
     "./bytes": "./src/bytes.ts",
