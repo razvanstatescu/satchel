@@ -80,7 +80,7 @@ pnpm --filter @satchel/tools deploy:keyless-birth --child <child> --base-uri <ur
   to alice. It then writes `docs/evidence/birth-<child>.json`.
 - Record the tx hash and block **A** in the team channel.
 
-## 3. Proofs (kb/90 §5.16 1–6; README "Verify on-chain")
+## 3. Proofs (kb/90 §5.16 1–6; `docs/verify.md`)
 
 The tool prints commands 1–4 with the hash filled in:
 1. `POST /v0/transactions {"tx_hashes":["<hash>"]}` lists CreateAccount, Transfer, DeployContract and FunctionCall ×8.

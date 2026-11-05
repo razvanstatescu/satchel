@@ -49,7 +49,7 @@ above signs a testnet transaction, except the live scripts in the last row. Live
 
 The newest count recorded for each suite, with its date and source. The contract code changed on 2026-11-04 with the
 round-three review fixes (branch `fix/r3-findings`, [`security/review-round-3.md`](../security/review-round-3.md)).
-The README's "Run it locally" table should match this one at the release commit.
+[`docs/development.md`](../development.md) lists every suite and what it covers; the dated results stay here.
 
 | Suite | Latest recorded result | Date | Source |
 |---|---|---|---|

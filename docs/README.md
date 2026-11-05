@@ -1,7 +1,7 @@
 # Satchel documentation map
 
-Where every document lives and which one to read for a given question. The product overview, the try-it steps and
-the on-chain checks are in the root [`README.md`](../README.md); a guide for reviewing agents is in
+Where every document lives and which one to read for a given question. The product overview and the try-it steps are in
+the root [`README.md`](../README.md), the on-chain checks in [`verify.md`](verify.md); a guide for reviewing agents is in
 [`AGENTS.md`](../AGENTS.md). Internal IDs (`kb/90 §5.9`, `D-43`, `INV-09`, `C5`, `AUDIT-01`, ...) are decoded in
 [`GLOSSARY.md`](GLOSSARY.md).
 
@@ -10,7 +10,12 @@ the on-chain checks are in the root [`README.md`](../README.md); a guide for rev
 | Question | Read |
 |---|---|
 | What is Satchel, and how do I try or verify it? | [`README.md`](../README.md) |
-| Which NEAR features does it use, and how? | [`README.md` § How Satchel uses NEAR](../README.md#how-satchel-uses-near) |
+| How does it work, and what can it do? | [`how-it-works.md`](how-it-works.md) |
+| Which NEAR features does it use, and how? | [`near.md`](near.md) |
+| How does control pass on a sale, and what stops a seller keeping the coins? | [`selling.md`](selling.md) |
+| How do I check the on-chain claims myself? | [`verify.md`](verify.md) |
+| What does clean history trust, and what are the limits? | [`security-model.md`](security-model.md) |
+| How do I run it and its tests? | [`development.md`](development.md) |
 | How is it designed? (contract interface, invariants, clean-history protocol, app architecture) | [`kb/90-technical-spec.md`](../kb/90-technical-spec.md), the **source of truth** |
 | How do offers, allowances, inside assets, USDC, more EVM chains, message signing and the history digest work? | [`specs/`](#specs-sprint-features) below; each one extends kb/90 |
 | Why was something decided this way? | [`plan/decisions.md`](../plan/decisions.md) (D-xx) |

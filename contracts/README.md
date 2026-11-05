@@ -56,7 +56,7 @@ tools/check-wasm-imports.sh target/near/satchel/satchel.wasm                    
 ```
 
 The reproducible build runs in the Docker image pinned in `contracts/satchel/Cargo.toml`
-(`[package.metadata.near.reproducible_build]`); the root `README.md` (Verify on-chain, step 6) compares its SHA-256
+(`[package.metadata.near.reproducible_build]`); [`docs/verify.md`](../docs/verify.md) (step 6) compares its SHA-256
 with the deployed contract. Build the mocks the same way (`--manifest-path contracts/mock-signer/Cargo.toml`,
 `contracts/mock-ft/Cargo.toml`) before running the sandbox suite.
 

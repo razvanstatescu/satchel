@@ -10,12 +10,16 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 
 ## Read in this order
 
-1. [`README.md`](README.md): the problem, the product, "Try it" steps, copy-paste on-chain checks, test commands,
-   security model and limitations. Its section [How Satchel uses NEAR](README.md#how-satchel-uses-near) lists every
-   NEAR feature Satchel relies on (Chain Signatures, NEP-171/177/181/297, NEP-141, the keyless sub-account, NEP-330),
-   how it is used and where the code is. [Selling a Satchel](README.md#selling-a-satchel-how-control-passes-and-what-stops-the-seller-keeping-the-coins)
-   explains how control passes on transfer and lists every way a seller could try to keep the coins, each with its
-   test.
+1. [`README.md`](README.md): the problem, the product, "Try it" steps and short summaries, each linking to a
+   detailed doc:
+   - [`docs/how-it-works.md`](docs/how-it-works.md): signing, buying, and every feature with its route and method;
+   - [`docs/near.md`](docs/near.md): every NEAR feature Satchel relies on (Chain Signatures, NEP-171/177/181/297,
+     NEP-141, the keyless sub-account, NEP-330), how it is used and where the code is;
+   - [`docs/selling.md`](docs/selling.md): how control passes on transfer, and every way a seller could try to keep
+     the coins, each with its test;
+   - [`docs/verify.md`](docs/verify.md): copy-paste on-chain checks with expected output;
+   - [`docs/security-model.md`](docs/security-model.md): what clean history checks and trusts, and the limitations;
+   - [`docs/development.md`](docs/development.md): running the app and every test suite.
 2. [`docs/README.md`](docs/README.md): the map of every other document, and which folders are product code.
 3. [`docs/GLOSSARY.md`](docs/GLOSSARY.md): decodes the IDs used in comments and docs (`kb/90 §5.9`, `D-43`,
    `INV-09`, `C5`, `AUDIT-01`, ...).
@@ -61,7 +65,7 @@ Security reviews and their findings, all closed or accepted with reasons: [`docs
 
 ## Run things
 
-Commands and the latest recorded results are in README.md §"Run it locally". Offline, in rough order of cost:
+Every suite and what it covers is in [`docs/development.md`](docs/development.md). Offline, in rough order of cost:
 
 ```sh
 tools/judge-snippets.sh --print            # lists every on-chain check from the README, no network

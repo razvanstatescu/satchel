@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Every README "Verify on-chain" command with its expected output (SAT-102, kb/00 §Judge-runnable commands).
+# Every docs/verify.md command with its expected output (SAT-102, kb/00 §Judge-runnable commands).
 # Read-only: no keys, no transactions. Needs bash, curl and python3. The near CLI is optional.
 #
 #   tools/judge-snippets.sh --print     print every command and its expected output (no network)

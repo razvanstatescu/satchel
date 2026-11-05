@@ -74,7 +74,7 @@ See `vectors/README.md` for each output file and who runs it.
 | Script | What it does |
 |---|---|
 | `check-wasm-imports.sh` | INV-22: fails if the release wasm imports a host function that could add a key, deploy code or delete the account. Needs only bash and python3 |
-| `judge-snippets.sh` | Every README "Verify on-chain" command with its expected output. `--print` (no network), `--offline` (plus local wasm hashes), default `--live` against testnet |
+| `judge-snippets.sh` | Every `docs/verify.md` command with its expected output. `--print` (no network), `--offline` (plus local wasm hashes), default `--live` against testnet |
 | `monitor.sh` | Daily keep-alive checks: the README commands, the no-JS judge pages, the JSON routes, the contract's spare NEAR, the MPC version, the wallet manifest, the endpoints. `--offline`, `--quick` |
 | `onboarding-report.ts` (`onboarding:report`) | A read-out of the onboarding survey from Upstash Redis (same env vars as `POST /api/onboarding`) |
 
