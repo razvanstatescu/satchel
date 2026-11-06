@@ -4,6 +4,7 @@ import { Providers } from "@/components/client/Providers";
 import { PressFeedback } from "@/components/client/PressFeedback";
 import { APP_URL } from "@/lib/config";
 import { copy } from "@/lib/copy";
+import { LLMS_PATH } from "@/lib/seo";
 import { MOTION_HEAD_SCRIPT } from "@/lib/motion-flag";
 import { GROUND, THEME_HEAD_SCRIPT } from "@/lib/theme";
 import "./globals.css";
@@ -30,8 +31,11 @@ export const metadata: Metadata = {
   title: { default: "Satchel", template: "%s · Satchel" },
   description: copy.home.lead,
   applicationName: "Satchel",
-  openGraph: { title: "Satchel", description: "An NFT that is a wallet.", type: "website", siteName: "Satchel" },
-  twitter: { card: "summary_large_image", title: "Satchel", description: "An NFT that is a wallet." },
+  // Fallbacks for a route with no metadata of its own. Pages call `pageMetadata` (lib/seo.ts), which sets title, description,
+  // canonical and og/twitter per page; nothing here hard-codes a page's title (the old twitter title was on every page).
+  openGraph: { type: "website", siteName: "Satchel" },
+  twitter: { card: "summary_large_image" },
+  alternates: { types: { "text/markdown": LLMS_PATH } },
 };
 
 /**

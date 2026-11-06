@@ -981,6 +981,8 @@ export function SatchelThumb({ width = 40, className }: { width?: number; classN
 /* ── Overlays: the flow panel and the toast (their behaviour lives in client/FlowShell and client/Toaster) ─────────── */
 
 export interface FlowHead {
+  /** The flow is the whole page (Mint): its title is the page's one h1, not an h2. */
+  asH1?: boolean;
   title: string;
   /** Input steps only ("Step 1 of 2"); guards, trackers and outcomes show none. */
   step?: { index: number; count: number };
@@ -1022,6 +1024,7 @@ export function FlowPanel({
   meta,
   thumb = false,
   titleSize = "title",
+  asH1 = false,
   closeHref,
   minimize = false,
   children,
@@ -1070,9 +1073,14 @@ export function FlowPanel({
       <header className={cx("flex flex-none items-start gap-2 px-5 pb-2", layout === "dialog" ? "pt-5" : layout === "sheet" ? "pt-4" : "pt-4 md:pt-5")}>
         {thumb ? <SatchelThumb className="mt-3.25" /> : null}
         <div className="flex min-w-0 flex-1 flex-col gap-1 pt-1.5">
-          <h2 id={titleId} ref={titleRef} tabIndex={-1} className={cx("m-0 font-display text-ink outline-none", titleSize === "title" ? "text-title" : "text-heading")}>
-            {title}
-          </h2>
+          {(() => {
+            const T = asH1 ? "h1" : "h2";
+            return (
+              <T id={titleId} ref={titleRef} tabIndex={-1} className={cx("m-0 font-display text-ink outline-none", titleSize === "title" ? "text-title" : "text-heading")}>
+                {title}
+              </T>
+            );
+          })()}
           {stepLine ? <p className="font-sans text-body-sm text-ink-muted">{stepLine}</p> : null}
         </div>
         <Link

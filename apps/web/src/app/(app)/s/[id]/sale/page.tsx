@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { SaleTab } from "@/components/client/SaleTab";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { getCleanHint, getSatchelSnapshot } from "@/lib/data/server";
 
 /**
@@ -16,7 +18,12 @@ export async function generateMetadata(props: PageProps<"/s/[id]/sale">): Promis
   const { id } = await props.params;
   const snap = await getSatchelSnapshot(id);
   // the server can't know the viewer: a listed Satchel is a Buy page; the owner's view retitles itself ("Sell · …")
-  return { title: `${snap?.listing ? copy.page.tabs.buy : "Sale"} · ${copy.card.name(id)}` };
+  return pageMetadata({
+    path: `/s/${id}/sale`,
+    title: `${snap?.listing ? copy.page.tabs.buy : "Sale"} · ${copy.card.name(id)}`,
+    description: marketing.meta.sale(id, Boolean(snap?.listing)),
+    images: false,
+  });
 }
 
 /** The request's time: "Server check 2 min ago" is measured per request, not when the hint was cached. */

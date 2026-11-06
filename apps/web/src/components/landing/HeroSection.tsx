@@ -5,6 +5,7 @@ import { CONTAINER, sentences } from "@/components/landing/layout";
 import { Button } from "@/components/ui";
 import { LANDING_NAMES_SOL } from "@/lib/faq";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
 
 /**
  * The hero, option A "the shelf" (design-spec §4.2; R12.2). The 5-second test: what it is (the H1's first sentence and
@@ -36,14 +37,18 @@ export function HeroSection() {
             </span>
           </div>
           <div className="flex flex-col items-start gap-3 md:items-center">
-            <p data-hero-who="" className="rounded-pill bg-surface-sunken px-3 py-1 text-body-sm font-semibold text-ink-muted">
+            {/* a div, not a p: the hero's first paragraph is the definition below the H1 (the first sentence an answer engine reads) */}
+            <div data-hero-who="" className="rounded-pill bg-surface-sunken px-3 py-1 text-body-sm font-semibold text-ink-muted">
               {h.who}
-            </p>
+            </div>
             <h1 id="hero-title" className="text-display md:text-display-md lg:text-[3.125rem] lg:leading-[3.25rem] xl:text-[3.875rem] xl:leading-16">
               <span className="lg:block">{what}</span> <span className="text-ink-muted lg:block">{why}</span>
             </h1>
           </div>
-          <p className="max-w-[33rem] text-lead text-ink-muted md:max-w-[40rem] md:text-lead-md">{h.lead(LANDING_NAMES_SOL)}</p>
+          <p className="max-w-[33rem] text-lead text-ink-muted md:max-w-[40rem] md:text-lead-md">
+            <strong className="font-semibold text-ink">{marketing.home.definition}</strong>
+            {` ${h.lead(LANDING_NAMES_SOL)}`}
+          </p>
           <div className="mt-1.5 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center md:justify-center">
             <Button variant="primary" size="xl" href="/s/1" iconEnd={ArrowRight}>
               {h.cta.primary}

@@ -269,7 +269,7 @@ export function MintFlow({ from }: { from: string | null }) {
     );
 
   return (
-    <FlowShell title={copy.mint.title} closeHref={closeHref} testId="mint-flow" action={action}>
+    <FlowShell asH1 title={copy.mint.title} closeHref={closeHref} testId="mint-flow" action={action}>
       {phase === "done" && minted ? (
         <div ref={stageRef} className="flex flex-col items-center gap-4 pt-1">
           {minted.first ? (

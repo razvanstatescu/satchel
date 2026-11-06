@@ -117,7 +117,7 @@ export const shell = {
   mint: {
     title: "Mint a Satchel",
     /** /mint meta description. */
-    meta: `Mint a Satchel: an NFT with its own ${SOL_NAMED ? "Bitcoin testnet4, Ethereum Sepolia and Solana devnet" : "Bitcoin testnet4 and Ethereum Sepolia"} addresses.`,
+    meta: `Mint a Satchel: an NFT on NEAR testnet with its own ${SOL_NAMED ? "Bitcoin testnet4, Ethereum Sepolia and Solana devnet" : "Bitcoin testnet4 and Ethereum Sepolia"} addresses. Test coins only.`,
     youGet: "You get",
     deposit: "Deposit",
     /** The Deposit row, split (app-screens §10): the amount, and the note under it. */

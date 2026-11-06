@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { parseTxFilter } from "@/lib/chain-txs";
 import { getSatchelSnapshot } from "@/lib/data/server";
 import { TX_SOURCES } from "@/lib/data/txs";
@@ -15,7 +17,12 @@ export const instant = false;
 
 export async function generateMetadata(props: PageProps<"/s/[id]/transactions">): Promise<Metadata> {
   const { id } = await props.params;
-  return { title: `${copy.page.tabs.transactions} · ${copy.page.title(id)}` };
+  return pageMetadata({
+    path: `/s/${id}/transactions`,
+    title: `${copy.page.tabs.transactions} · ${copy.page.title(id)}`,
+    description: marketing.meta.transactions(id),
+    images: false,
+  });
 }
 
 export default async function TransactionsTab(props: PageProps<"/s/[id]/transactions">) {

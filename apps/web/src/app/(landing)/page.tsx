@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
 import { Landing } from "@/components/Landing";
+import { APP_URL } from "@/lib/config";
+import { pageMetadata, siteJsonLd } from "@/lib/seo";
 import { LANDING_NAMES_SOL } from "@/lib/faq";
 import { copy } from "@/lib/copy";
 
@@ -11,18 +14,18 @@ const description = copy.landing.meta.description(LANDING_NAMES_SOL);
  * replaces the layout's whole object, including the image from the root's `opengraph-image.png` file convention, so
  * the layout's fields and that image (1200 × 630, served at /opengraph-image.png) are listed again here.
  */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  path: "/",
   title: copy.landing.meta.title,
   description,
-  openGraph: {
-    title: copy.app.name,
-    description,
-    type: "website",
-    siteName: copy.app.name,
-    images: [{ url: "/opengraph-image.png", width: 1200, height: 630, type: "image/png", alt: copy.landing.meta.ogAlt }],
-  },
-};
+  ogTitle: copy.app.name,
+});
 
 export default async function Home() {
-  return <Landing />;
+  return (
+    <>
+      <JsonLd data={siteJsonLd(APP_URL)} />
+      <Landing />
+    </>
+  );
 }

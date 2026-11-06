@@ -1,9 +1,10 @@
-import { SOL_UI_ENABLED } from "@/lib/config";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { ObjArticle, ObjHead } from "@/components/client/SatchelPage";
 import { NotFoundView } from "@/components/NavShell";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { getSatchelSnapshot } from "@/lib/data/server";
 import { FIXTURE_IDS } from "@/lib/data/fixtures";
 
@@ -30,8 +31,9 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
   const { id } = await props.params;
   const snap = await getSatchelSnapshot(id);
   if (!snap) return { title: copy.page.notfound.title(id), robots: { index: false } };
-  const description = copy.page.meta(id, snap.addresses.btc, snap.addresses.evm, SOL_UI_ENABLED ? snap.addresses.sol : undefined);
-  return { title: copy.page.title(id), description, openGraph: { title: copy.title.page(copy.page.title(id)), description } };
+  const description = marketing.meta.satchel(id, snap.addresses.btc, snap.addresses.evm);
+  // the per-Satchel social card is this segment's file-based image (opengraph-image.tsx), so no site-wide one here
+  return pageMetadata({ path: `/s/${id}`, title: copy.page.title(id), description, images: false });
 }
 
 export default async function SatchelLayout(props: { params: Promise<{ id: string }>; children: ReactNode }) {

@@ -17,7 +17,7 @@ export const landing = {
   meta: {
     title: "An NFT that is a wallet",
     description: (sol = false) =>
-      `An NFT on NEAR with its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.`,
+      `An NFT on NEAR with its own ${sol ? "Bitcoin, Ethereum and Solana" : "Bitcoin and Ethereum"} addresses. Give it or sell it and the coins go too; a buyer's browser checks past signatures first.`,
     /** The OG image's alt, as in src/app/opengraph-image.alt.txt (a unit test keeps the two equal). `/` lists the image
      * itself because its own `openGraph` replaces the layout's, file-based image included. */
     ogAlt: "Satchel: an NFT that is a wallet",

@@ -4,6 +4,9 @@ import { QuestionsSearch } from "@/components/client/QuestionsSearch";
 import { Icon } from "@/components/ui";
 import { CONTRACT_ROLE } from "@/lib/config";
 import { copy } from "@/lib/copy";
+import { JsonLd } from "@/components/JsonLd";
+import { marketing } from "@/lib/copy/marketing";
+import { breadcrumbLd, faqLd, jsonLdGraph, pageMetadata } from "@/lib/seo";
 import { allFaqGroups, LANDING_SOL, splitLead } from "@/lib/faq";
 
 /**
@@ -15,12 +18,21 @@ import { allFaqGroups, LANDING_SOL, splitLead } from "@/lib/faq";
  */
 export const instant = false;
 
-export const metadata: Metadata = { title: copy.questionsPage.title, description: copy.questionsPage.meta };
+export const metadata: Metadata = pageMetadata({ path: "/questions", title: copy.questionsPage.title, description: marketing.meta.questions });
 
 export default function QuestionsPage() {
   const groups = allFaqGroups({ role: CONTRACT_ROLE, sol: LANDING_SOL });
   return (
     <article className="mx-auto flex w-full max-w-180 flex-col gap-7" data-page="questions">
+      <JsonLd
+        data={jsonLdGraph(
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: copy.questionsPage.title, path: "/questions" },
+          ]),
+          faqLd(groups.flatMap(({ items }) => items.map((it) => ({ q: it.q, a: it.a })))),
+        )}
+      />
       <header className="flex flex-col gap-2.5">
         <h1 className="m-0 font-display text-title text-ink">{copy.questionsPage.title}</h1>
         <p className="m-0 max-w-[60ch] font-sans text-body text-ink-muted">{copy.questionsPage.lead}</p>
@@ -52,7 +64,7 @@ export default function QuestionsPage() {
                   return (
                     <details key={it.id} id={it.id} data-faq-q={it.q} className="group scroll-mt-20 border-b border-line">
                       <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 rounded-sm py-3.5 font-sans text-[1rem] font-bold tracking-[-0.01em] text-ink [&::-webkit-details-marker]:hidden">
-                        <span className="min-w-0">{it.q}</span>
+                        <h3 className="m-0 min-w-0 [font:inherit] [letter-spacing:inherit] [color:inherit]">{it.q}</h3>
                         <Icon
                           icon={Plus}
                           size={18}

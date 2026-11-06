@@ -14,6 +14,9 @@ import { RestoreHeadFlags } from "@/components/client/RestoreHeadFlags";
 import { ThemeControl } from "@/components/client/ThemeControl";
 import { copy } from "@/lib/copy";
 import { IS_FIXTURE, REPO_URL } from "@/lib/config";
+import { marketing } from "@/lib/copy/marketing";
+import { pagePath, readyPages } from "@/lib/marketing-pages";
+import { LLMS_PATH } from "@/lib/seo";
 
 /**
  * The one shell of Satchel 2.0 (design-spec §3.3; app-screens §1.1; proto/shell.html). Server components; the
@@ -186,6 +189,11 @@ const FOOTER_GROUPS: { id: string; title: string; links: FooterLink[] }[] = [
     ],
   },
   {
+    id: "learn",
+    title: marketing.footer.group,
+    links: [{ href: "/learn", label: marketing.footer.hub }, ...readyPages().map((p) => ({ href: pagePath(p), label: p.short ?? p.title }))],
+  },
+  {
     id: "verify",
     title: copy.footer.verify,
     links: [
@@ -193,6 +201,7 @@ const FOOTER_GROUPS: { id: string; title: string; links: FooterLink[] }[] = [
       { href: "/s/1", label: copy.footer.live },
       { href: `${REPO_URL}#readme`, label: copy.footer.readme, external: true },
       { href: REPO_URL, label: copy.footer.repo, external: true },
+      { href: LLMS_PATH, label: marketing.footer.llms, external: true },
     ],
   },
   { id: "hackathon", title: copy.footer.hackathon, links: [{ href: HACKATHON_URL, label: copy.footer.nearHackathon, external: true }] },
@@ -210,7 +219,7 @@ export function Footer({ surface }: { surface: "app" | "landing" }) {
   const landing = surface === "landing";
   const body = (
     <>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(3,minmax(0,1fr))]">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-[1.4fr_repeat(4,minmax(0,1fr))]">
         <div className="col-span-full flex flex-col items-start gap-3 lg:col-span-1">
           <Link href="/" aria-label={copy.nav.home} className="inline-flex min-h-11 items-center rounded-sm">
             <Lockup height={32} />

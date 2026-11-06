@@ -193,7 +193,7 @@ describe("copy deck (kb/80 R3 rules; Satchel 2.0 voice, voice-copy.md)", () => {
     expect(Q["q-cost"].a).toMatch(/Satchel charges no fee\.$/);
     expect(L.cta.body).toBe("Look around without a wallet. To mint your own, connect a NEAR wallet.");
     expect(L.meta.description(false)).toBe(
-      "An NFT on NEAR with its own Bitcoin and Ethereum addresses. Give it or sell it, and everything inside goes too; a buyer's browser checks every past signature first.",
+      "An NFT on NEAR with its own Bitcoin and Ethereum addresses. Give it or sell it and the coins go too; a buyer's browser checks past signatures first.",
     );
   });
 

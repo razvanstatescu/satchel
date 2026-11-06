@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { getActivity, getSatchelSnapshot } from "@/lib/data/server";
 import { ActivityView } from "./ActivityView";
 
@@ -12,7 +14,12 @@ export const instant = false;
 
 export async function generateMetadata(props: PageProps<"/s/[id]/activity">): Promise<Metadata> {
   const { id } = await props.params;
-  return { title: `${copy.page.tabs.activity} · ${copy.page.title(id)}` };
+  return pageMetadata({
+    path: `/s/${id}/activity`,
+    title: `${copy.page.tabs.activity} · ${copy.page.title(id)}`,
+    description: marketing.meta.activity(id),
+    images: false,
+  });
 }
 
 export default async function ActivityTab(props: PageProps<"/s/[id]/activity">) {

@@ -7,6 +7,8 @@ import { GateLine, checkedAgo, hintModel, marketOrder } from "@/components/Clean
 import { SatchelCard } from "@/components/SatchelCard";
 import { Banner, Button, EmptyState } from "@/components/ui";
 import { copy } from "@/lib/copy";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { getMarket, getUnlistedMarket } from "@/lib/data/server";
 import { priceText } from "@/lib/view";
 import { MarketCard } from "./MarketCard";
@@ -18,10 +20,12 @@ import { MarketCard } from "./MarketCard";
  */
 export const instant = false;
 
-export const metadata: Metadata = {
-  title: copy.market.title,
-  description: "Satchels for sale on NEAR testnet. Your browser checks each one's history before you can buy.",
-};
+export const metadata: Metadata = pageMetadata({
+  path: "/market",
+  title: marketing.meta.market.title,
+  ogTitle: marketing.meta.market.ogTitle,
+  description: marketing.meta.market.description,
+});
 
 /** The request's time: "2 min ago" is measured per request, not when the listings were cached. */
 async function requestTime(): Promise<number> {

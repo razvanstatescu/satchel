@@ -154,7 +154,9 @@ export function ObjHead({ snap, tab: forced }: { snap: SatchelSnapshot; tab?: Ob
           <h1 className="m-0 font-display text-title text-ink">{copy.page.ownerH1(id)}</h1>
         ) : (
           <div className="flex flex-col gap-1.5">
-            <h1 className="m-0 font-display text-title text-ink">{copy.page.visitorH1}</h1>
+            <h1 className="m-0 font-display text-title text-ink">
+              <span className="text-ink-muted">{copy.page.title(id)}:</span> {copy.page.visitorH1}
+            </h1>
             <p className="m-0 max-w-[60ch] font-sans text-body text-ink-muted">{copy.page.visitorSub(id)}</p>
           </div>
         )
@@ -163,7 +165,10 @@ export function ObjHead({ snap, tab: forced }: { snap: SatchelSnapshot; tab?: Ob
         // 360, and if it still can't fit the pill wraps under it
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 max-[359px]:gap-x-2">
           <SatchelThumb className="lg:hidden" />
-          <h1 className="m-0 shrink-0 font-display text-heading text-ink lg:text-title">{copy.page.ownerH1(id)}</h1>
+          <h1 className="m-0 shrink-0 font-display text-heading text-ink lg:text-title">
+            {copy.page.ownerH1(id)}
+            <span className="sr-only">{` · ${tabs.find((x) => x.current)?.label ?? t.activity}`}</span>
+          </h1>
           <StatusPill status={cardStatus(v)} className="ml-auto lg:hidden" />
         </div>
       )}

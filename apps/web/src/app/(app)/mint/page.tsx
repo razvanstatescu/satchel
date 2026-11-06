@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MintFlow } from "@/components/client/MintFlow";
 import { Skeleton } from "@/components/ui";
 import { copy } from "@/lib/copy";
+import { pageMetadata } from "@/lib/seo";
 import { safeReturnPath } from "./safe-from";
 
 /**
@@ -10,7 +11,8 @@ import { safeReturnPath } from "./safe-from";
  */
 export const instant = false;
 
-export const metadata: Metadata = { title: copy.mint.title, description: copy.mint.meta };
+// `?from=` only says where Close returns: every variant canonicalises to /mint.
+export const metadata: Metadata = pageMetadata({ path: "/mint", title: copy.mint.title, description: copy.mint.meta });
 
 function MintBackdrop() {
   return (

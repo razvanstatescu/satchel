@@ -4,7 +4,9 @@ import { Check, ChevronDown, Lock } from "lucide-react";
 import { CopyButton } from "@/components/client/CopyButton";
 import { Icon, Pill, cx } from "@/components/ui";
 import { copy } from "@/lib/copy";
-import { EXPLORERS } from "@/lib/config";
+import { CONTRACT_ROLE, EXPLORERS } from "@/lib/config";
+import { marketing } from "@/lib/copy/marketing";
+import { pageMetadata } from "@/lib/seo";
 import { getContractFacts } from "@/lib/data/server";
 import type { ContractFacts } from "@/lib/data/types";
 import { truncateMiddle, utcStamp } from "@/lib/format";
@@ -18,7 +20,12 @@ import { truncateMiddle, utcStamp } from "@/lib/format";
  */
 export const instant = false;
 
-export const metadata: Metadata = { title: copy.contract.title, description: copy.contract.meta };
+// The dev contract has keys: "born without a key" is for the rc and final contracts only (CR-19).
+export const metadata: Metadata = pageMetadata({
+  path: "/contract",
+  title: copy.contract.title,
+  description: CONTRACT_ROLE === "dev" ? marketing.meta.contract.dev : marketing.meta.contract.keyless,
+});
 
 const F = copy.contract.facts;
 

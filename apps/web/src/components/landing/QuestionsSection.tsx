@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
 import { CONTAINER, H2, HEAD_CENTER, SECTION_Y } from "@/components/landing/layout";
+import { JsonLd } from "@/components/JsonLd";
 import { Icon } from "@/components/ui";
+import { faqLd, jsonLdGraph } from "@/lib/seo";
 import { CONTRACT_ROLE } from "@/lib/config";
 import { copy, type SolVariant } from "@/lib/copy";
 import { faqItems, LANDING_SOL, splitLead } from "@/lib/faq";
@@ -20,6 +22,7 @@ export function QuestionsSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { 
   const items = faqItems({ role, sol });
   return (
     <section id="questions" aria-labelledby="questions-title" className={SECTION_Y}>
+      <JsonLd data={jsonLdGraph(faqLd(items.map((it) => ({ q: it.q, a: it.a }))))} />
       <div className={CONTAINER}>
         <div className="mx-auto max-w-[51.25rem]">
           <div className={HEAD_CENTER}>
@@ -33,7 +36,7 @@ export function QuestionsSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { 
               return (
                 <details key={it.id} id={it.id} name="faq" data-question={it.id} className="group scroll-mt-24 border-b border-line">
                   <summary className="flex min-h-16 cursor-pointer list-none items-center gap-4 rounded-sm px-1 py-4 font-display text-[1.125rem]/6 font-bold tracking-[-0.01em] md:min-h-18 md:text-[1.25rem]/6.5 [&::-webkit-details-marker]:hidden">
-                    <span className="min-w-0">{it.q}</span>
+                    <h3 className="m-0 min-w-0 [font:inherit] [letter-spacing:inherit] [color:inherit]">{it.q}</h3>
                     <Icon
                       icon={Plus}
                       size={22}
