@@ -1,4 +1,4 @@
-import { decodeMessageText, MAX_MESSAGE_BYTES } from "@satchel/core/policy";
+import { decodeMessageText, MAX_MESSAGE_BYTES } from "@satchel/core/policy/message-text";
 import { hexToBytesStrict, toHex, utf8 } from "@satchel/core/bytes";
 
 /**

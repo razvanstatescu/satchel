@@ -107,11 +107,12 @@ test.describe("judge facts without JavaScript", () => {
     await expect(items.nth(2).locator("[data-gate]")).toHaveAttribute("data-gate", "blocked");
     await expect(items.first().locator("[data-gate]")).toHaveAttribute("data-gate", "clean");
     // the market shows the SERVER's check, labelled as such; only the buyer's browser check (on Buy) enables Buy
-    // its age: "8 s ago", or "just now" under 5 s (as the browser's gate line says it; W4 design QA)
-    await expect(items.nth(2).locator("[data-gate]")).toContainText(/^Server check (.+ ago|just now): needs attention$/);
+    // its time: without JavaScript the server states it absolutely ("at Nov 6, 10:56 UTC", the page is prerendered);
+    // once hydrated the market's HintGateLine island says "8 s ago", or "just now" under 5 s (perf-budget.spec.ts)
+    await expect(items.nth(2).locator("[data-gate]")).toContainText(/^Server check (at .+ UTC|.+ ago|just now): needs attention$/);
     await expect(page.locator("[data-market]")).not.toContainText(/checked in your browser/i);
     // #5 (first: clean, newest) has 2 signatures since C7 added its message record; a message never blocks Buy
-    await expect(items.first().getByRole("link")).toHaveAccessibleName(/^Satchel #\d, .+ Listing #\d · \d+ signatures? Server check (.+ ago|just now): clean$/);
+    await expect(items.first().getByRole("link")).toHaveAccessibleName(/^Satchel #\d, .+ Listing #\d · \d+ signatures? Server check (at .+ UTC|.+ ago|just now): clean$/);
   });
 
   test("/s/4/sale shows the listing and the verdict hint without JS", async ({ page }) => {

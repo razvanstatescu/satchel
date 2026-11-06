@@ -7,21 +7,11 @@
 import { keccak_256 } from '@noble/hashes/sha3.js'
 import { sha256 } from '@noble/hashes/sha2.js'
 import { concatBytes, hexToBytesStrict, toHex, utf8 } from '../bytes'
+import { MAX_MESSAGE_BYTES, decodeMessageText } from './message-text'
 import { type ClassifyResult, type MessageFields, type PolicyError, PolicyRefusal } from './types'
 
-export const MAX_MESSAGE_BYTES = 1024
+export { MAX_MESSAGE_BYTES, decodeMessageText }
 export const SOL_OFFCHAIN_DOMAIN = Uint8Array.from([0xff, ...utf8('solana offchain')])
-
-const fatalUtf8 = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true })
-
-/** The UTF-8 text of a body, or null if it isn't valid UTF-8 (WHATWG decoder = Rust `str::from_utf8`). */
-export function decodeMessageText(m: Uint8Array): string | null {
-  try {
-    return fatalUtf8.decode(m)
-  } catch {
-    return null
-  }
-}
 
 /** The contract's rule: 1..=1024 bytes of valid UTF-8. */
 export function checkMessage(m: Uint8Array): PolicyError | null {

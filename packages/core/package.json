@@ -13,6 +13,7 @@
     "./near": "./src/near/index.ts",
     "./near/constants": "./src/near/constants.ts",
     "./policy": "./src/policy/index.ts",
+    "./policy/message-text": "./src/policy/message-text.ts",
     "./chains/evm": "./src/chains/evm/index.ts",
     "./chains/evm/networks-data": "./src/chains/evm/networks-data.ts",
     "./chains/btc": "./src/chains/btc/index.ts",

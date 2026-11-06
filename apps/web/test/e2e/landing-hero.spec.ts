@@ -52,6 +52,8 @@ function heroAnims(page: Page): Promise<Anim[]> {
 }
 
 async function expectRunning(page: Page) {
+  // the loop starts after load, once the main thread is idle (LandingMotion), so wait for it to exist
+  await expect.poll(async () => (await heroAnims(page)).length).toBeGreaterThan(40);
   await expect.poll(async () => (await heroAnims(page)).map((a) => a.state)).not.toContain("paused");
   const a = await heroAnims(page);
   expect(a.length).toBeGreaterThan(40);
