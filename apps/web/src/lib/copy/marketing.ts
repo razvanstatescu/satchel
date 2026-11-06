@@ -159,7 +159,7 @@ export const marketing = {
         h2: "See it on a Satchel",
         body: [
           "Open the sale page of a listed Satchel from the [Market](/market). The record lists each signature with its status, and two panels explain how Satchel checks it and what it doesn't cover.",
-          "[Satchel #4](/s/4/sale) is the demo built to fail. Its only record is an Ethereum transaction signed with the next nonce and never sent. That signature can never be used, so it stays Unused and Buy stays off.",
+          "[Satchel #4](/s/4/sale) is the demo built to fail. Its only record is an Ethereum transaction signed with a future nonce and never sent. It could still move the coins one day, so it stays Unused and Buy stays off.",
           "For more, read the [questions](/questions) and the [contract facts](/contract).",
         ],
       },
