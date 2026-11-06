@@ -1,4 +1,4 @@
-import { EVM_CHAIN_ID_LIST, EVM_NETWORKS, isSupportedEvmChain, type EvmChainId } from "@satchel/core/chains/evm";
+import { EVM_CHAIN_ID_LIST, EVM_NETWORK_DATA, isSupportedEvmChain, type EvmChainId } from "@satchel/core/chains/evm/networks-data";
 import { SEPOLIA_RPCS } from "@/lib/config";
 import type { EvmChainBalance, SatchelSnapshot } from "@/lib/data/types";
 
@@ -27,7 +27,7 @@ export function pickEvmChainId(raw: unknown): EvmChainId {
   return isEvmChainId(v) ? (Number(v) as EvmChainId) : SEPOLIA;
 }
 
-export const evmNet = (chainId: number) => EVM_NETWORKS[(isEvmChainId(chainId) ? chainId : SEPOLIA) as EvmChainId];
+export const evmNet = (chainId: number) => EVM_NETWORK_DATA[(isEvmChainId(chainId) ? chainId : SEPOLIA) as EvmChainId];
 /** "Ethereum Sepolia", "Base Sepolia", … */
 export const evmNetworkName = (chainId: number) => evmNet(chainId).name;
 /** One word per network, for compact pickers ("Sepolia · Base · Arbitrum · OP"). */

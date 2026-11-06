@@ -11,8 +11,11 @@ import { EASE, play, rollTracks, stickOnTracks, type Track } from "@/lib/motion/
 import { etaKey, trackerRows, type RowState } from "@/lib/signing/machine";
 import { blockingIntent } from "@/lib/signing/retry";
 import { intentStore } from "@/lib/signing/store";
-import { startRunner, useIntents } from "@/lib/signing/client";
+import { useIntents } from "@/lib/signing/intents";
 import type { PendingIntent, SigningStage } from "@/lib/signing/types";
+
+/** Restart a runner: the runtime (data source, chain code) loads on demand, so pages that only show a stuck send stay light. */
+const startRunner = (id: string) => void import("@/lib/signing/client").then((m) => m.startRunner(id));
 import { chainTxUrl } from "@/lib/view";
 import { evmExplorerName, evmNetworkName, evmTxLink } from "@/lib/evm-networks";
 

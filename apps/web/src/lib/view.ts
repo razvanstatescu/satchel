@@ -2,7 +2,7 @@ import { CHAIN_NAME, NETWORK_LABEL, TICKER } from "@/lib/copy";
 import { formatAmount, type Ticker } from "@/lib/format";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { EXPLORERS, SOL_UI_ENABLED, USDC_CONTRACT } from "@/lib/config";
-import { WNEAR_TESTNET } from "@/lib/near/contract";
+import { WNEAR_TESTNET } from "@satchel/core/near/constants";
 import { anyEvmFunds } from "@/lib/evm-networks";
 
 /** View helpers shared by server and client components. */

@@ -8,7 +8,7 @@ import { FeedGroup, utcClock, utcDay } from "@/components/Timeline";
 import { copy } from "@/lib/copy";
 import { useNow } from "@/lib/clock";
 import { formatElapsed, MINUS, relativeTime } from "@/lib/format";
-import { useIntents } from "@/lib/signing/client";
+import { useIntents } from "@/lib/signing/intents";
 import type { PendingIntent } from "@/lib/signing/types";
 
 /**

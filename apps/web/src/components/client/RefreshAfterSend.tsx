@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { refreshSnapshot } from "@/lib/data/client";
-import { useIntents } from "@/lib/signing/client";
+import { useIntents } from "@/lib/signing/intents";
 
 /**
  * Balances follow a send without a page refresh: when any send reaches "sent" (broadcast) or "confirmed", its Satchel's
@@ -17,7 +16,7 @@ export function RefreshAfterSend() {
     for (const i of intents) {
       const before = seen.current.get(i.id);
       seen.current.set(i.id, i.stage);
-      if (before !== undefined && before !== i.stage && MOVED.has(i.stage)) refreshSnapshot(i.tokenId);
+      if (before !== undefined && before !== i.stage && MOVED.has(i.stage)) void import("@/lib/data/client").then((m) => m.refreshSnapshot(i.tokenId));
     }
   }, [intents]);
   return null;

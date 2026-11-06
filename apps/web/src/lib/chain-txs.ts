@@ -1,7 +1,7 @@
 import { EXPLORERS, USDC_CONTRACT } from "@/lib/config";
 import { evmTxLink, usdcAddress } from "@/lib/evm-networks";
 import type { Coin, Network } from "@/lib/holdings";
-import { WNEAR_TESTNET } from "@/lib/near/contract";
+import { WNEAR_TESTNET } from "@satchel/core/near/constants";
 
 /**
  * The Transactions tab: what moved in and out of a Satchel, on every chain we can read without a key, newest first.

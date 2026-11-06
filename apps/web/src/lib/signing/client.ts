@@ -1,6 +1,5 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { IS_FIXTURE, NEAR_RPCS, SATCHEL_CONTRACT } from "@/lib/config";
 import { dataSource } from "@/lib/data/source";
 import { contractViews } from "@/lib/near/contract";
@@ -55,13 +54,4 @@ export function startRunner(id: string) {
   void ensureRunner(id, runnerDeps());
 }
 
-const EMPTY: PendingIntent[] = [];
-export function useIntents(): PendingIntent[] {
-  const store = intentStore();
-  return useSyncExternalStore(store.subscribe, store.getSnapshot, () => EMPTY);
-}
-
-export function useIntent(id: string | null): PendingIntent | null {
-  const all = useIntents();
-  return id ? all.find((i) => i.id === id) ?? null : null;
-}
+export { useIntent, useIntents } from "@/lib/signing/intents";

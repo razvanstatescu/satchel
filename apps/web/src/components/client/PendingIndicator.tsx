@@ -6,7 +6,9 @@ import { CircleCheck, LoaderCircle, TriangleAlert } from "lucide-react";
 import { useNow } from "@/lib/clock";
 import { copy } from "@/lib/copy";
 import { formatElapsed } from "@/lib/format";
-import { resumeOnLoad, useIntents } from "@/lib/signing/client";
+import { SATCHEL_CONTRACT } from "@/lib/config";
+import { useIntents } from "@/lib/signing/intents";
+import { intentStore } from "@/lib/signing/store";
 import type { PendingIntent } from "@/lib/signing/types";
 import { Icon } from "@/components/ui";
 
@@ -20,6 +22,7 @@ import { Icon } from "@/components/ui";
  */
 
 const SHOWN = new Set(["preparing", "awaiting_wallet", "signing", "signed", "broadcasting", "sent", "signed_not_sent"]);
+const RESUMABLE = new Set(["awaiting_wallet", "signing", "signed", "broadcasting", "sent"]);
 const TITLE_PREFIX = /^\(\d+\) Signing… · /;
 
 type Tone = "progress" | "sent" | "attention";
@@ -70,7 +73,12 @@ export function PendingPill() {
 /** The card (from 1024), the resume-on-load and the background-tab title. */
 export function PendingIndicator() {
   const intents = useIntents();
-  useEffect(() => resumeOnLoad(), []);
+  // Resume only when something is actually in flight: the runtime (data source, chain code) is a dynamic import, so
+  // pages with nothing pending never download it.
+  useEffect(() => {
+    if (!intentStore().getSnapshot().some((i) => i.contract === SATCHEL_CONTRACT && RESUMABLE.has(i.stage))) return;
+    void import("@/lib/signing/client").then((m) => m.resumeOnLoad());
+  }, []);
   const signingCount = intents.filter((i) => i.stage === "awaiting_wallet" || i.stage === "signing").length;
 
   useEffect(() => {

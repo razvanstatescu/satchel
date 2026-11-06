@@ -3,10 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { simCleanState } from "@/components/client/fixture-switches";
 import { IS_FIXTURE } from "@/lib/config";
-import { fixtureCleanReport } from "@/lib/data/clean";
-import { dataSource } from "@/lib/data/source";
 import type { CleanReport } from "@/lib/data/types";
-import { contractViews } from "@/lib/near/contract";
 
 /**
  * The BROWSER clean-history check (kb/90 §7.5 place 1): runs on mount, silently every 10 s, and on demand right before
@@ -14,6 +11,12 @@ import { contractViews } from "@/lib/near/contract";
  */
 export async function browserCheck(tokenId: string): Promise<CleanReport> {
   if (IS_FIXTURE) {
+    // loaded on demand: the data source and fixture evidence are not part of the page's first JavaScript
+    const [{ fixtureCleanReport }, { dataSource }, { contractViews }] = await Promise.all([
+      import("@/lib/data/clean"),
+      import("@/lib/data/source"),
+      import("@/lib/near/contract"),
+    ]);
     const src = dataSource();
     const views = contractViews(src.view);
     const s = await views.satchel(tokenId);

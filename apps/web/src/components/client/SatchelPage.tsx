@@ -42,7 +42,7 @@ import { calls } from "@/lib/near/contract";
 import { DEFAULT_BLOCK_MS } from "@/lib/near/constants";
 import { runCall } from "@/lib/near/run-call";
 import { useWallet } from "@/lib/near/wallet";
-import { useIntents } from "@/lib/signing/client";
+import { useIntents } from "@/lib/signing/intents";
 import { allZero, priceText } from "@/lib/view";
 
 /**

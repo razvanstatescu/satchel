@@ -34,12 +34,30 @@ const WalletCtx = createContext<Ctx | null>(null);
 type Connector = import("@hot-labs/near-connect").NearConnector;
 let connector: Connector | null = null;
 let connectorPromise: Promise<Connector> | null = null;
+/** Set by the mounted provider: called once with the connector the moment it exists, however it was created (a saved
+ * session at mount, the Connect button, the wallet picker), so the provider is always listening for sign in/out. */
+let onConnectorCreated: ((c: Connector) => void) | null = null;
+const SELECTED_WALLET_KEY = "selected-wallet"; // near-connect's own key for the signed-in wallet
+
+/** Is there a wallet session to restore (or a wallet redirect to finish)? Without one, near-connect and its wallet
+ * manifest (a fetch from raw.githubusercontent.com) stay unloaded until the person presses Connect. */
+function hasSavedSession(): boolean {
+  try {
+    if (window.localStorage.getItem(SELECTED_WALLET_KEY)) return true;
+    return /[?&](account_id|transactionHashes|errorCode)=/.test(window.location.search);
+  } catch {
+    return false;
+  }
+}
 
 export async function getConnector(): Promise<Connector> {
   if (typeof window === "undefined") throw new Error("client only");
   if (connector) return connector;
   connectorPromise ??= import("@hot-labs/near-connect").then(({ NearConnector }) => {
-    connector ??= new NearConnector({ network: "testnet", footerBranding: null });
+    if (!connector) {
+      connector = new NearConnector({ network: "testnet", footerBranding: null });
+      onConnectorCreated?.(connector);
+    }
     return connector;
   });
   return connectorPromise;
@@ -87,8 +105,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
     let off = () => {};
     let alive = true;
-    void getConnector().then((c) => {
-      if (!alive) return;
+    let attached: Connector | null = null;
+    let readyTimer: ReturnType<typeof setTimeout> | undefined;
+    const attach = (c: Connector) => {
+      if (!alive || attached === c) return;
+      attached = c;
       const asAdapter = (w: import("@hot-labs/near-connect").NearWalletBase): WalletAdapter => ({
         kind: "near-connect",
         signAndSendTransaction: (tx) => w.signAndSendTransaction(tx as never),
@@ -107,9 +128,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       c.getConnectedWallet()
         .then(({ wallet, accounts }) => setState({ ready: true, accountId: accounts[0]?.accountId ?? null, wallet: asAdapter(wallet), connecting: false }))
         .catch(() => setState((s) => ({ ...s, ready: true })));
-    });
+    };
+    onConnectorCreated = attach;
+    if (connector) attach(connector);
+    else if (hasSavedSession()) void getConnector();
+    else readyTimer = setTimeout(() => setState((s) => ({ ...s, ready: true })), 0); // signed out: no connector, no manifest fetch, until Connect
+    // another tab signed in: pick the session up
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === SELECTED_WALLET_KEY && e.newValue) void getConnector();
+    };
+    window.addEventListener("storage", onStorage);
     return () => {
       alive = false;
+      clearTimeout(readyTimer);
+      if (onConnectorCreated === attach) onConnectorCreated = null;
+      window.removeEventListener("storage", onStorage);
       off();
     };
   }, []);

@@ -15,7 +15,7 @@ import { IS_FIXTURE, SATCHEL_CONTRACT, USDC_CONTRACT } from "@/lib/config";
 import { copy, errorCopy } from "@/lib/copy";
 import { buyEnabled } from "@/lib/data/clean";
 import { refreshSnapshot, useLiveSnapshot } from "@/lib/data/client";
-import { dataSource } from "@/lib/data/source";
+import { lazyView } from "@/lib/data/lazy-view";
 import type { SatchelSnapshot } from "@/lib/data/types";
 import { formatAmount, parseUnits } from "@/lib/format";
 import { ATTACH_MARKET, contractViews, FT_STORAGE, marketCalls, offerAcceptBlock, WNEAR_TESTNET, type OfferBlock } from "@/lib/near/contract";
@@ -181,7 +181,7 @@ function useStorageCredit(accountId: string | null) {
   useEffect(() => {
     if (!accountId) return;
     let alive = true;
-    void contractViews(dataSource().view, SATCHEL_CONTRACT)
+    void contractViews(lazyView, SATCHEL_CONTRACT)
       .storageCreditOf(accountId)
       .then((v) => alive && setState({ for: accountId, value: BigInt(v) }))
       .catch(() => alive && setState({ for: accountId, value: 0n }));
@@ -433,7 +433,7 @@ export function MakeOfferFlow({ snap }: { snap: SatchelSnapshot }) {
       setNote({ kind: "error", text: copy.buy.recheckFailed });
       return;
     }
-    const views = contractViews(dataSource().view);
+    const views = contractViews(lazyView);
     const [sat, inside] = await Promise.all([views.satchel(id), views.insideOf(id)]);
     if (!sat) {
       setNote({ kind: "error", text: copy.buy.readFailed });
@@ -601,7 +601,7 @@ function useOffersFor(tokenId: string, initial: OfferView[]): OfferView[] {
     if (!IS_FIXTURE) return; // live mode: the server prop is a real contract read, refreshed on navigation
     let alive = true;
     const tick = () =>
-      contractViews(dataSource().view, SATCHEL_CONTRACT)
+      contractViews(lazyView, SATCHEL_CONTRACT)
         .offersFor(tokenId, 0, 50)
         .then((list) => alive && setOffers(list))
         .catch(() => undefined);

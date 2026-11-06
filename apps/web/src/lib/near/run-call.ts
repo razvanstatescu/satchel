@@ -3,7 +3,6 @@
 import { IS_FIXTURE, NEAR_RPCS } from "@/lib/config";
 import type { WalletTx } from "@/lib/near/contract";
 import { decodeSuccessValue, mapFailure, type MappedFailure } from "@/lib/near/outcome";
-import { trackTx } from "@/lib/near/track-tx";
 import { isRejection } from "@/lib/signing/machine";
 import type { WalletAdapter } from "@/lib/near/wallet";
 
@@ -27,6 +26,8 @@ export function runCall(wallet: WalletAdapter, tx: WalletTx, signerId: string, o
         if (st && "Failure" in st) return { ok: false as const, failure: mapFailure(st.Failure), hash };
         return { ok: true as const, hash, value: st && "SuccessValue" in st ? decodeSuccessValue(st.SuccessValue as string) : null };
       }
+      // the tracker (and the RPC client behind it) loads here, after the wallet call: nothing waits on it before the popup
+      const { trackTx } = await import("@/lib/near/track-tx");
       const r = await trackTx({ txHash: hash, senderId: signerId, rpcUrls: NEAR_RPCS });
       if (r.ok) return { ok: true as const, hash, value: r.value };
       if ("failure" in r) return { ok: false as const, failure: mapFailure(r.failure, r.outcome), hash };

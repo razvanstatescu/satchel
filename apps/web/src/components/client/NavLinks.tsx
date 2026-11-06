@@ -6,8 +6,6 @@ import { useEffect, useRef, useState, type ComponentProps } from "react";
 import { BookUser, FileCode, Sparkles, Store, Wallet, type LucideIcon } from "lucide-react";
 import { copy } from "@/lib/copy";
 import { SATCHEL_CONTRACT } from "@/lib/config";
-import { dataSource } from "@/lib/data/source";
-import { contractViews } from "@/lib/near/contract";
 import { useWallet } from "@/lib/near/wallet";
 import { Icon, cx } from "@/components/ui";
 
@@ -47,8 +45,10 @@ function useOwnsSatchel(tokenId: string | null, path: string): boolean {
   useEffect(() => {
     if (!key || !accountId || !tokenId) return;
     let alive = true;
-    contractViews(dataSource().view, SATCHEL_CONTRACT)
-      .nftToken(tokenId)
+    // The data source and chain modules load on demand (only a connected owner on a Satchel page reads), so the
+    // shared shell stays light.
+    Promise.all([import("@/lib/data/source"), import("@/lib/near/contract")])
+      .then(([{ dataSource }, { contractViews }]) => contractViews(dataSource().view, SATCHEL_CONTRACT).nftToken(tokenId))
       .then((t) => {
         if (alive) setAnswer({ key, owns: t?.owner_id === accountId });
       })

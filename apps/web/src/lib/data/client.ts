@@ -2,10 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { IS_FIXTURE } from "@/lib/config";
-import { buildSnapshot } from "@/lib/data/snapshot";
-import { dataSource } from "@/lib/data/source";
 import type { SatchelSnapshot } from "@/lib/data/types";
-import { contractViews } from "@/lib/near/contract";
 
 /**
  * Client refresh of a server-rendered snapshot (kb/90 §8.1: blocking SSR + 15 s client refresh).
@@ -24,20 +21,12 @@ import { contractViews } from "@/lib/near/contract";
 type Listener = (s: SatchelSnapshot) => void;
 const shared = new Map<string, { latest: SatchelSnapshot | null; seed: SatchelSnapshot | null; listeners: Set<Listener>; timer: ReturnType<typeof setInterval> | null; burst: ReturnType<typeof setTimeout>[] }>();
 
-/** The snapshot straight from the chains, built in the browser (no server or CDN cache in the way). */
-async function freshSnapshot(initial: SatchelSnapshot): Promise<SatchelSnapshot> {
-  const src = dataSource();
-  const [config, lock] = await Promise.all([contractViews(src.view).config(), src.lock()]);
-  const s = await buildSnapshot(initial.token_id, src, { config, lock }, Date.now());
-  return s ?? initial;
-}
+/** The snapshot straight from the chains, built in the browser (no server or CDN cache in the way). The builder (data
+ * source, derivation, chain reads) is its own chunk: pages only download it when something actually needs it. */
+const freshSnapshot = (initial: SatchelSnapshot) => import("@/lib/data/fresh").then((m) => m.freshSnapshot(initial));
 
 async function fetchSnapshot(initial: SatchelSnapshot): Promise<SatchelSnapshot> {
-  if (IS_FIXTURE) {
-    const src = dataSource();
-    const [config, lock] = await Promise.all([contractViews(src.view).config(), src.lock()]);
-    return (await buildSnapshot(initial.token_id, src, { config, lock }, Date.now())) ?? initial;
-  }
+  if (IS_FIXTURE) return freshSnapshot(initial);
   const r = await fetch(`/api/satchels/${initial.token_id}`, { cache: "no-store" });
   if (!r.ok) throw new Error(`satchel ${r.status}`);
   return (await r.json()) as SatchelSnapshot;

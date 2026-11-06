@@ -3,7 +3,7 @@ import type { SatchelSnapshot } from "@/lib/data/types";
 import { evmBalances, evmNetworkName, SEPOLIA } from "@/lib/evm-networks";
 import { DECIMALS, formatAmount, type Ticker } from "@/lib/format";
 import { SOL_UI_ENABLED, USDC_CONTRACT } from "@/lib/config";
-import { WNEAR_TESTNET } from "@/lib/near/contract";
+import { WNEAR_TESTNET } from "@satchel/core/near/constants";
 
 /** "btc" | "evm" | "sol" (the three addresses; view.ts re-exports it as UiChain). */
 type UiChain = "btc" | "evm" | "sol";
