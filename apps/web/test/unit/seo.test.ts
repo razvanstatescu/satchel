@@ -51,6 +51,9 @@ describe("sitemap.xml", () => {
     expect(urls(3)).toEqual([
       ...STATIC,
       `${BASE}/clean-history`,
+      `${BASE}/sell-a-crypto-wallet`,
+      `${BASE}/buy-a-crypto-wallet`,
+      `${BASE}/transfer-a-crypto-wallet`,
       `${BASE}/s/1`,
       `${BASE}/s/1/activity`,
       `${BASE}/s/1/sale`,
@@ -106,7 +109,7 @@ describe("sitemap.xml", () => {
 });
 
 describe("marketing registry", () => {
-  it("pre-registers every planned page, with only /clean-history ready", () => {
+  it("pre-registers every planned page, with the shipped guides ready", () => {
     expect(MARKETING_PAGES.map((p) => p.slug)).toEqual([
       "clean-history",
       "sell-a-crypto-wallet",
@@ -116,7 +119,7 @@ describe("marketing registry", () => {
       "erc-6551",
       "chain-signatures",
     ]);
-    expect(readyPages().map((p) => p.slug)).toEqual(["clean-history"]);
+    expect(readyPages().map((p) => p.slug)).toEqual(["clean-history", "sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet"]);
   });
 
   it("keeps titles and descriptions inside search-result limits", () => {
@@ -130,8 +133,9 @@ describe("marketing registry", () => {
   });
 
   it("lists related guides from the ready pages only, never the page itself", () => {
-    expect(relatedPages("clean-history")).toEqual([]);
-    expect(relatedPages("clean-history", withReady("gift-crypto")).map((p) => p.slug)).toEqual(["gift-crypto"]);
+    expect(relatedPages("clean-history").map((p) => p.slug)).toEqual(["sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet"]);
+    expect(relatedPages("sell-a-crypto-wallet").map((p) => p.slug)).not.toContain("sell-a-crypto-wallet");
+    expect(relatedPages("clean-history", withReady("gift-crypto")).map((p) => p.slug)).toContain("gift-crypto");
   });
 });
 
