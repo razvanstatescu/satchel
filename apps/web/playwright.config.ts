@@ -5,7 +5,7 @@ import { defineConfig, devices } from "@playwright/test";
  * in-browser simulation stand in for the wallet, the contract and the chains). Role `final` = the strict gate.
  * Set E2E_BASE_URL to run the read-only judge checks against a deployed URL instead (kb/90 §12.5).
  */
-const PORT = Number(process.env.E2E_PORT ?? 3100);
+const PORT = Number(process.env.E2E_PORT ?? 3340); // any free port; E2E_PORT overrides it
 const external = process.env.E2E_BASE_URL;
 
 export default defineConfig({

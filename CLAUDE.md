@@ -56,7 +56,9 @@ buyer-verifiable **clean history** of every signature a Satchel has ever issued.
    on `rc.` (Day 9).
 4. Testnet only. The optional 1Click mainnet clip is human-run and needs its own approval; it is currently
    recommended to cut it.
-5. Never commit keys or `.env*`. Keys live in env vars or `~/.near-credentials/`; never print them.
+5. Never commit keys or secrets. Keys live in env vars or `~/.near-credentials/`; never print them. The only `.env*`
+   files in git are the templates (`.env.example`, `apps/web/.env.example`) and `apps/web/.env.production`, the hosted
+   app's public settings: public values only, with `FASTNEAR_API_KEY` always left empty (it is set in Vercel).
 
 ## Environment gotchas (this machine)
 - The global default Rust is an old 2023 nightly. Always pin `rust-toolchain.toml` (`channel = "1.93.0"`, target

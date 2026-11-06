@@ -47,7 +47,7 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 
 | Claim | Where it is implemented | Where it is tested |
 |---|---|---|
-| Each token's addresses are the MPC's keys for (this contract, `satchel/{id}/{btc\|evm\|sol}`) | `contracts/satchel/src/mpc.rs` (`derivation_path`), `packages/core/src/derive/` | `packages/core/test/derive.test.ts` (addresses checked live against the MPC's `derived_public_key`); `tests/tests/sign.rs` `mpc_request_shape_{evm,btc,sol}` |
+| Each token's addresses are the MPC's keys for (this contract, `satchel/{id}/{btc\|evm\|sol}`) | `contracts/satchel/src/mpc.rs` (`derivation_path`), `packages/core/src/derive/` | `packages/core/test/derive.test.ts` (offline: derivation against fixed vectors); `packages/core/test/network/live.network.test.ts` (live: the same addresses against the MPC's `derived_public_key`; `pnpm --filter @satchel/core test:network`); `tests/tests/sign.rs` `mpc_request_shape_{evm,btc,sol}` |
 | A Bitcoin spend with n inputs makes n MPC `sign` calls from one `sign_for`, joined with `promise_and` | `sign.rs` (step 8) | `tests/tests/sign.rs` `btc_records_per_input`, `btc_fanout_partial_failure`; live: `tools/e2e/btc.ts --sign-only` |
 | The MPC callback never panics, whatever the MPC returns, and only the contract can call it | `sign.rs` (`on_signed`) | `tests/tests/sign.rs` `garbage_response`, `mpc_panics`, `callbacks_are_private` |
 | Only the owner (or a capped delegate) can make a Satchel sign | `contracts/satchel/src/sign.rs`, `allowance.rs` | `tests/tests/sign.rs` `non_owner_rejected`; `tests/tests/allowance.rs` |
@@ -81,16 +81,20 @@ cargo test -p satchel-tests                # sandbox suite (needs the three wasm
 
 ## Status
 
-- Contract: complete and audited; frozen on Nov 9. Running today as `dev2.satchelhq.testnet`, which the hosted app
-  reads.
-- The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then, README values marked
-  `[TBD: …]` (code hash **H**, birth transaction) do not exist, and checks against the final account
-  report "account does not exist". That is expected, not a failure.
+- Contract: complete and reviewed internally (three rounds); the freeze is set for Nov 9. Until the final birth
+  the hosted app reads the development contract `dev2.satchelhq.testnet`.
+- The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then the README values marked
+  `[TBD: …]` (code hash **H**, birth transaction) do not exist, and checks against the final account report
+  "account does not exist". That is expected, not a failure: `tools/judge-snippets.sh` skips those checks, and
+  `SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh` runs them against the development contract
+  (the lock checks apply to the final contract only).
 - Testnet only. No coin in this project has value.
 
 ## Rules for agents in this repo
 
 - Do not sign or send transactions. Scripts in `tools/e2e` and `tools/deploy` are dry runs unless given `--send` and a
   typed `yes`; leave them that way.
-- No secrets are needed to build, test or read the chain. Never commit `.env*` files or keys.
+- No secrets are needed to build, test or read the chain. Never commit keys or secrets. The only `.env*` files in git
+  are the `.env.example` templates and `apps/web/.env.production` (the hosted app's public settings; its one secret,
+  `FASTNEAR_API_KEY`, is always empty).
 - Never use `rpc.testnet.near.org` (deprecated and throttled). Use `https://near-testnet.drpc.org` or FastNEAR.

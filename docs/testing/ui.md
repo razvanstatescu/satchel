@@ -61,7 +61,7 @@ Notes:
 - `test/e2e/popup-edge-cases.spec.ts` (4 tests): clicking the scrim closes a popup and returns focus to its trigger
   (see Bug 1 below); the browser's back button closes a popup and forward reopens it, no inert/scroll-lock left
   behind; `/s/999/send` and `/s/1/coin/nope` (bad id / bad holding key on a flow route) fall back to the same
-  soft-404 view as `/s/999` itself.
+  not-found view as `/s/999` itself (`/s/999/send` with HTTP 404).
 - `test/e2e/mobile-and-night-gaps.spec.ts` (4 tests): `/fund/1`, `/address-book`, `/s/1/transactions` and
   `/s/1/coin/btc` at 320px width (no horizontal overflow) and with axe in both Day and stored Night — these four
   pages were added to the app after `theme-a11y.spec.ts`'s axe sweep and `responsive.spec.ts`'s mobile sweep were
@@ -95,7 +95,7 @@ Legend: ✅ covered before this audit · 🆕 added by this audit · ⚠️ gap 
 | Page / flow | State | Spec |
 |---|---|---|
 | `/` landing | server HTML, sections, budgets, CLS, reduced motion, 390/360/320, axe Day+Night | ✅ `landing*.spec.ts`, `theme-a11y.spec.ts` |
-| `/s/[id]` (Satchel page) | owner/visitor/signed-out, server-rendered judge facts, soft 404 (`/s/999`), og/twitter image | ✅ `judge.spec.ts`, `og-image.spec.ts`, `theme-a11y.spec.ts` |
+| `/s/[id]` (Satchel page) | owner/visitor/signed-out, server-rendered judge facts, 404 for an unknown id (`/s/999`), og/twitter image | ✅ `judge.spec.ts`, `og-image.spec.ts`, `theme-a11y.spec.ts` |
 | `/s/[id]` | bad holding key popup (`/s/1/coin/nope`), bad id on a flow route (`/s/999/send`) | 🆕 `popup-edge-cases.spec.ts` |
 | `/s/[id]/send` | EVM/BTC happy path (Review → tracker → confirmed), reload-resume, broadcast-fail, MPC timeout, wallet reject, BTC invalid/mainnet address, visitor guard | ✅ `flows.spec.ts` |
 | `/s/[id]/send` | USDC on a second EVM network, no-ETH-for-gas guard, network picker | ✅ `multichain.spec.ts` |
@@ -113,7 +113,7 @@ Legend: ✅ covered before this audit · 🆕 added by this audit · ⚠️ gap 
 | `/s/[id]/transactions` | per-source loading, merge, retry on failure, chain filter + URL persistence | ✅ `transactions.spec.ts` |
 | `/s/[id]/transactions` | 320px layout (found a real overflow bug, fixed), axe Day+Night | 🆕 `mobile-and-night-gaps.spec.ts` |
 | `/s/[id]/coin/[key]` (coin popup) | Inside NEAR/USDC/wNEAR sheets with deposit prepay + owner withdraw, offer-adjacent states | ✅ `offers.spec.ts`, `theme-a11y.spec.ts` |
-| `/s/[id]/coin/[key]` | a plain held coin (BTC) at 320px, axe Day+Night; bad key → soft 404 | 🆕 `mobile-and-night-gaps.spec.ts`, `popup-edge-cases.spec.ts` |
+| `/s/[id]/coin/[key]` | a plain held coin (BTC) at 320px, axe Day+Night; bad key → the not-found view | 🆕 `mobile-and-night-gaps.spec.ts`, `popup-edge-cases.spec.ts` |
 | `/s/[id]/allowance` | owner adds/revokes, 4-live-account cap, USDC + second-EVM-chain caps, server HTML fact, axe | ✅ `allowance.spec.ts` |
 | `/s/[id]/empty` | sweeps every coin on every network, disabled while listed, address-form axe | ✅ `empty.spec.ts`, `theme-a11y.spec.ts` |
 | `/s/[id]/give-link` | create, claim, already-claimed, bearer-token warning, server fact, axe | ✅ `give-link.spec.ts`, `theme-a11y.spec.ts` |
@@ -127,7 +127,7 @@ Legend: ✅ covered before this audit · 🆕 added by this audit · ⚠️ gap 
 | `/mint` | preview, tracker, "yours" state, `Close` returns to `?from=`, owner-cancel neutral note, signed-out CTA | ✅ `flows.spec.ts` |
 | `/market` | listed/unlisted sections, unlisted→offer entry point | ✅ `offers.spec.ts`, `judge.spec.ts` |
 | `/contract` | server-rendered facts | ✅ `judge.spec.ts`, `landing-trust.spec.ts` |
-| theme (Day/Night/System) | no-flash first paint, OS-follow, junk-storage fallback, toggle a11y/keyboard, one control per surface, soft-404 keeps stored Night | ✅ `theme-a11y.spec.ts` |
+| theme (Day/Night/System) | no-flash first paint, OS-follow, junk-storage fallback, toggle a11y/keyboard, one control per surface, the not-found page keeps stored Night | ✅ `theme-a11y.spec.ts` |
 | accessibility sweep | every main page + several flow states, Day and Night, WCAG 2.0–2.2 A/AA | ✅ `theme-a11y.spec.ts` (now also the 4 pages added 🆕 above) |
 | navigation feedback | same-Satchel tab, popup route, other page — skeleton while the server responds | ✅ `nav-feedback.spec.ts` |
 | popups: reopen, nested (one popup opening another) | leaves nothing inert/scroll-locked | ✅ `nav-feedback.spec.ts` |
@@ -225,7 +225,7 @@ read as sentences"), and `dust-amounts.spec.ts` now asserts the new wording.
 | Allowance send over/under cap | ✅ already covered (`allowance.spec.ts`) |
 | Offer expiry/staleness | ✅ already covered (`offers.spec.ts`, "a stale offer…is refused") |
 | Claim link invalid/used | ✅ already covered (`give-link.spec.ts`) |
-| Deep link bad params (`/s/999/send`, `/s/1/coin/nope`) | was untested → 🆕 covered, both fall back to the soft-404 view |
+| Deep link bad params (`/s/999/send`, `/s/1/coin/nope`) | was untested → 🆕 covered, both fall back to the not-found view |
 | `/fund/1?coin=x` (unknown value) | ✅ already covered (`fund.spec.ts`: "unknown pre-fills are dropped, never guessed") |
 | Browser back/forward around a popup | was untested → 🆕 covered |
 | Popup opened from a popup | ✅ already covered (`nav-feedback.spec.ts`) |

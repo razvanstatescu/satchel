@@ -290,8 +290,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 /**
  * Not found, in the one shell (app-screens §11.2): the charm S on sky, "This Satchel doesn't exist", Mint a Satchel and
- * Go to My Satchels. `/s/[id]` past the minted ids renders it inside the (app) layout (a soft 404, noindex); any other
- * URL renders it from the root not-found inside `AppShell` (a hard 404).
+ * Go to My Satchels. The root not-found renders it inside `AppShell` (a hard 404) for any unmatched URL and, through
+ * `src/proxy.ts`, for `/s/[id]` past the minted ids; the `/s/[id]` layout renders it itself if the proxy couldn't tell.
  */
 export function NotFoundView() {
   return (

@@ -37,7 +37,7 @@ Heavy suites share the machine's CPU: run one at a time (`CLAUDE.md`, "CPU budge
 | Core live checks (read-only, real networks; opt-in) | `pnpm --filter @satchel/core test:network` | network access |
 | Web unit tests | `pnpm --filter web test` | nothing |
 | Tools unit tests | `pnpm --filter @satchel/tools test:unit` (`test` also checks that `vectors/*.json` are fresh) | nothing |
-| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port; **never 3100** (reserved on the dev machine, and it is the config's default) |
+| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port (the default is 3340); **never 3100** (reserved on the dev machine) |
 | Typecheck and lint | `pnpm --filter web typecheck`, `pnpm --filter web lint` | nothing |
 | Live signing without funds (real MPC on testnet) | `pnpm --filter @satchel/tools e2e:evm -- --sign-only` (also `e2e:btc`, `e2e:sol`; scripts in `tools/e2e/`) | testnet keys in `~/.near-credentials` |
 

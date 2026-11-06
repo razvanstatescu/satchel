@@ -101,7 +101,7 @@ test.describe("theme (R12.3, D-42): Day by default whatever the OS; Night and Sy
     await ctx.close();
   });
 
-  test("the soft 404 (/s/999, an unknown id inside the app shell) keeps a stored Night", async ({ browser }) => {
+  test("the not-found page (/s/999, an unknown id) keeps a stored Night", async ({ browser }) => {
     const { ctx, page } = await themedPage(browser, { stored: "night", os: "light" });
     await page.goto("/s/999");
     await expect(page.getByRole("heading", { level: 1, name: copy.page.notfound.generic })).toBeVisible();

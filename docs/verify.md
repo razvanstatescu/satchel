@@ -10,6 +10,20 @@ It needs `bash`, `curl` and `python3`; the near CLI is optional. RPC: dRPC (`nea
 `test.rpc.fastnear.com` as fallback. NEAR history: the FastNEAR tx API (`tx.test.fastnear.com`), which keeps old
 transactions that non-archival RPC nodes soon forget.
 
+Until the final contract is born (Nov 10), the checks that read it **skip** rather than fail, and so does any check
+whose expected value is still `[TBD]`. To run the same checks against the development contract that the hosted app
+reads today:
+
+```sh
+SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh
+```
+
+On a development contract the lock checks (2 and 4 below) skip, because a development contract keeps its key, and so
+do the birth checks (3 and 5), which belong to the final contract. The
+token's addresses come from the app when it serves that contract. Every other value can be overridden too:
+`SATCHEL_TOKEN`, `SATCHEL_OWNER`, `SATCHEL_EXPECTED_CODE_HASH`, `SATCHEL_BIRTH_TX`, `SATCHEL_BTC_ADDRESS`,
+`SATCHEL_EVM_ADDRESS`, `SATCHEL_APP_URL`, `SATCHEL_RPC` (the full list is in `tools/judge-snippets.sh --help`).
+
 **1. Who owns Satchel #1** (NEP-171 `nft_token`)
 ```sh
 curl -s https://near-testnet.drpc.org -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"query","params":{"request_type":"call_function","finality":"final","account_id":"satchel.satchelhq.testnet","method_name":"nft_token","args_base64":"eyJ0b2tlbl9pZCI6IjEifQ=="}}' | python3 -c 'import sys,json; d=json.load(sys.stdin); r=d["result"]; print("owner_id =", json.loads(bytes(r["result"]))["owner_id"])'

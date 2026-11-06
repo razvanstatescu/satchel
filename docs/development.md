@@ -26,6 +26,14 @@ Tests, all offline. Every suite must pass in full; what each one covers is in
 | `pnpm --filter web test` / `test:e2e` (fixture mode) | The app's unit tests, and Playwright user journeys with accessibility checks |
 | `tools/check-wasm-imports.sh` | INV-22: the release wasm cannot add a key, deploy code or delete the account |
 
+The end-to-end suite builds the app in fixture mode and starts it on port 3340. If that port is taken, pick another
+with `E2E_PORT`. `CI=1` makes Playwright start a fresh server instead of reusing one already running on that port:
+
+```sh
+CI=1 pnpm --filter web test:e2e                  # port 3340
+CI=1 E2E_PORT=3400 pnpm --filter web test:e2e    # another free port
+```
+
 CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build and the unit tests.
 
 Testnet scripts (`tools/e2e`, `tools/deploy`) default to a **dry run** that prints exactly what would be signed.

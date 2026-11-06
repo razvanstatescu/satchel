@@ -43,10 +43,12 @@ test.describe("A1: social card (opengraph-image / twitter-image)", () => {
   });
 
   test("an unknown id still gets a valid 1200×630 PNG (the generic branded fallback, not a broken image)", async ({ page, request }) => {
-    await page.goto("/s/999");
-    const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+    // /s/999 itself is a 404 page (src/proxy.ts), so take #1's image URL and ask for #999's
+    await page.goto("/s/1");
+    const og1 = await page.locator('meta[property="og:image"]').getAttribute("content");
+    const og = og1!.replace("/s/1/", "/s/999/");
     expect(og).toMatch(/\/s\/999\/opengraph-image/);
-    const r = await request.get(og!);
+    const r = await request.get(og);
     expect(r.status()).toBe(200);
     expect(r.headers()["content-type"]).toBe("image/png");
     const { width, height } = pngSize(await r.body());

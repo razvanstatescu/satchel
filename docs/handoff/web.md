@@ -140,8 +140,8 @@ default site-wide.
     - Activity and Sale get a compact header below 1024, and a sticky card column from 1024;
     - one `[data-judge-facts]` per page;
     - the Buy price, verdict and a pinned bar sit in the first screen on phones.
-  - **Unknown ids:** the layout renders `NotFoundView` itself (HTTP 200, noindex, the heading in the server HTML). This
-    replaces the earlier "soft 404 after the shell" (§3.5).
+  - **Unknown ids:** a hard 404 from `src/proxy.ts`; the layout's own `NotFoundView` (HTTP 200, noindex) is the
+    fallback when the contract can't be read. This replaces the earlier "soft 404 after the shell" (§3.5).
 - **Vocabulary** (copy split into `src/lib/copy/{shell,satchel,flows,commerce,landing}.ts`, merged as `copy`):
   - Give / Giving… / Given;
   - Paused for sale;
@@ -263,8 +263,10 @@ always has a SOL source (`cleanSources()` in `clean-live.ts`, pinned by a unit t
 4. **Solana address in the Facts grid.** The brief asks for three full addresses on `/s/1`; SOL is shown as a fact
    ("signable by the contract; sending from the app comes later"; with SOL_SEND on: its balance + "the owner can send SOL
    from the app"), not as a wallet row (SOL UI is P2).
-5. **Unknown ids are a soft 404** (HTTP 200 + noindex + the not-found UI). Wave 7: the `/s/[id]` layout renders
-   `NotFoundView` itself, so the heading is in the server HTML (it used to render after the shell was sent). `/api/satchels/[id]` is a hard 404. A hard 404 would need `dynamicParams=false` (breaks new mints) or a proxy.
+5. **Unknown ids are a hard 404** (HTTP 404 + noindex + the not-found UI, in the server HTML). `src/proxy.ts` reads
+   the contract's `next_token_id` (cached for seconds, so a new mint shows at once) and rewrites `/s/<unknown id>/…` to
+   the root not-found before the page streams; the social images are left alone. If the read fails, the request goes
+   through and the `/s/[id]` layout renders `NotFoundView` itself (HTTP 200 + noindex). `/api/satchels/[id]` is a 404 too.
 6. **Card SVG fonts (D-23; kb/80 R3 "NFT SVG"):** three WOFF2 subsets are embedded as `data:` URIs (≈ 16 KB of fonts; the
    SVG is ≈ 24.5 KB): "Satchel Card Display" = Bricolage 650 (opsz 24) for the name and the status word, "Satchel Card
    Hero" = Bricolage 700 (opsz 36) for "{n} signatures", "Satchel Card Sans" = Instrument Sans 500 for the chips and the

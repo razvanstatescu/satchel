@@ -14,10 +14,11 @@ import { FIXTURE_IDS } from "@/lib/data/fixtures";
  * header from the path); each tab page brings its two grid items (`ObjCol`, `ObjMain` from SatchelWallet.tsx), and the
  * flows render the Wallet tab as their inert background.
  *
- * An unknown id (past the minted ones) is a soft 404: HTTP 200, robots noindex and the not-found view, all in the server
- * HTML. The layout renders that view itself rather than calling `notFound()`: thrown from this blocking layout, it made
- * Next answer with its client-rendered error document (`<html id="__next_error__">`, no heading in the HTML; QA-POLISH
- * #6). The tab pages below never render for an unknown id.
+ * An unknown id (past the minted ones) is a hard 404, answered by `src/proxy.ts` before rendering starts. If the
+ * proxy could not read the contract, the request reaches this layout, which renders the not-found view itself (HTTP
+ * 200, robots noindex, the heading in the server HTML) rather than calling `notFound()`: thrown from this blocking
+ * layout, it made Next answer with its client-rendered error document (`<html id="__next_error__">`; QA-POLISH #6).
+ * The tab pages below never render for an unknown id.
  */
 export const instant = false;
 

@@ -4,7 +4,7 @@ import { ALICE, useMockWallet } from "./helpers";
 /**
  * Popup-route edge cases not covered elsewhere: the scrim click (not just Escape/flow-close), browser back/forward
  * around a popup, focus returning to the trigger, and deep links to a flow with a bad id/key (/s/999/send,
- * /s/1/coin/nope) — both must fall back to the soft-404 UI the same way /s/999 itself does (judge.spec.ts).
+ * /s/1/coin/nope) — both must fall back to the not-found UI the same way /s/999 itself does (judge.spec.ts).
  */
 
 test.describe("popups: scrim, back/forward, focus return", () => {
@@ -43,16 +43,16 @@ test.describe("popups: scrim, back/forward, focus return", () => {
   });
 });
 
-test.describe("deep links with a bad id or key fall back to the soft-404 UI", () => {
+test.describe("deep links with a bad id or key fall back to the not-found UI", () => {
   test("/s/999/send (an unminted id) behaves like /s/999 itself", async ({ page, request }) => {
     const res = await request.get("/s/999/send");
-    expect(res.status()).toBe(200);
+    expect(res.status()).toBe(404);
     expect(await res.text()).toMatch(/<h1[^>]*>This Satchel doesn(?:'|&#x27;)t exist<\/h1>/);
     await page.goto("/s/999/send");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("This Satchel doesn't exist");
   });
 
-  test("/s/1/coin/nope (an unknown holding key) also soft-404s", async ({ page }) => {
+  test("/s/1/coin/nope (an unknown holding key) also shows the not-found view", async ({ page }) => {
     await useMockWallet(page, ALICE);
     await page.goto("/s/1/coin/nope");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("This Satchel doesn't exist");

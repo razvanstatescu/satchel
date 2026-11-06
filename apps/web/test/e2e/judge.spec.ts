@@ -132,12 +132,12 @@ test.describe("judge facts without JavaScript", () => {
 
 });
 
-test("unknown ids: not-found UI (soft 404, noindex) and a hard 404 from the JSON route", async ({ page, request }) => {
-  // Ids outside the prerendered 1–7 are a soft 404: HTTP 200 + robots noindex + the not-found UI (documented in
-  // docs/handoff/web.md). The JSON route is a hard 404. The view is in the server HTML (QA-POLISH #6), not left to the
-  // client as Next's error document, because judges and crawlers read the HTML.
+test("unknown ids: HTTP 404 with the not-found UI (noindex), and a 404 from the JSON route", async ({ page, request }) => {
+  // An id that was never minted is a hard 404, set by src/proxy.ts before the page streams (docs/handoff/web.md). The
+  // view is in the server HTML (QA-POLISH #6), not left to the client as Next's error document, because judges and
+  // crawlers read the HTML.
   const res = await request.get("/s/999");
-  expect(res.status()).toBe(200);
+  expect(res.status()).toBe(404);
   const raw = await res.text();
   expect(raw).not.toContain("__next_error__");
   expect(raw).toMatch(/<h1[^>]*>This Satchel doesn(?:'|&#x27;)t exist<\/h1>/);
