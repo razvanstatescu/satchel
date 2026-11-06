@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { readyPages } from "@/lib/marketing-pages";
 import { ADDR1 } from "./helpers";
 
 /**
@@ -208,7 +209,8 @@ test("robots.txt allows every crawler and sitemap.xml lists every minted Satchel
   // plus the seven public pages (/, /questions, /market, /mint, /contract, /learn and the ready guide /clean-history)
   const listed = [...(await (await request.get("/market")).text()).matchAll(/data-market-item="(\d+)"/g)].length;
   expect(listed).toBeGreaterThan(0);
-  expect(x.match(/<url>/g)).toHaveLength(7 + 7 * 2 + listed);
+  // 5 static pages + /learn + every ready guide (src/lib/marketing-pages.ts) + 2 tabs per Satchel + /sale for each listed one
+  expect(x.match(/<url>/g)).toHaveLength(5 + 1 + readyPages().length + 7 * 2 + listed);
   expect(x).toMatch(/<loc>[^<]*\/s\/7\/activity<\/loc>/);
   expect(x).not.toMatch(/\/s\/8</);
   expect(x).not.toMatch(/\/(send|transfer)</);

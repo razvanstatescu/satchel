@@ -446,10 +446,10 @@ test.describe("landing: budgets", () => {
     }
   });
 
-  test("heights: ≤ 7,000 px at 1280 and ≤ 10,300 px at 390 (site polish round P8; +200 for the SEO definition sentence), #clean ≤ 900 px at 1280", async ({ page }) => {
+  test("heights: ≤ 7,100 px at 1280 and ≤ 10,400 px at 390 (site polish round P8; +200 for the SEO definition sentence, +100 for the footer's Learn links), #clean ≤ 900 px at 1280", async ({ page }) => {
     for (const [w, h, max] of [
-      [1280, 900, 7_000],
-      [390, 844, 10_300],
+      [1280, 900, 7_100],
+      [390, 844, 10_400],
     ] as const) {
       await page.setViewportSize({ width: w, height: h });
       await page.goto("/");
