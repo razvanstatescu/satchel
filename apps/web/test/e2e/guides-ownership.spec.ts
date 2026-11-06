@@ -95,9 +95,12 @@ test.describe("ownership guides, from the server HTML alone", () => {
       expect(page.indexOf('data-testid="answer"')).toBeLessThan(page.indexOf("<h2"));
       for (const f of g.facts) expect(body).toContain(f);
 
-      // a comparison table with a caption and header scopes, and the testnet note by the CTA
+      // a comparison table with a caption and header scopes; product framing (D-52): no testnet wording in the article
       expect(page).toMatch(/<table[\s\S]*<caption[\s\S]*<th scope="col"[\s\S]*<th scope="row"/);
-      expect(body).toContain("Satchel runs on NEAR testnet today. Try it with test coins; nothing here has real value.");
+      const articleHtml = /<article[\s\S]*<\/article>/.exec(page)![0];
+      expect(articleHtml).not.toMatch(/testnet|devnet|sepolia|test coins|no value/i);
+      // the no-admin-key line shows on the release and final contracts only (this suite runs as final)
+      if (["/sell-a-crypto-wallet", "/buy-a-crypto-wallet"].includes(g.path)) expect(articleHtml).toContain("The contract has no admin key and no upgrade method");
 
       // headings never skip a level
       const levels = [...page.matchAll(/<h([1-6])\b/g)].map((m) => Number(m[1]));

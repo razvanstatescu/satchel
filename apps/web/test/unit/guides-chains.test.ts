@@ -92,17 +92,16 @@ describe.each(GUIDES)("/$slug copy", ({ slug, copy, answerStart, min, max }) => 
     for (const f of copy.faq) expect(f.a).not.toMatch(/\[[^\]]+\]\(/); // FAQ answers are plain text (the JSON-LD mirrors them)
   });
 
-  it("links to clean history and keeps the testnet wording", () => {
+  it("links to clean history and describes the product, never the deployment (D-52)", () => {
     const body = strings.join(" ");
     expect(body).toContain("(/clean-history)");
-    expect(body).toMatch(/testnet/i);
+    expect(body).not.toMatch(/testnet|devnet|sepolia|test coins|no value/i);
   });
 });
 
 describe("/gift-crypto honesty notes", () => {
   const body = allStrings(giftCrypto).join(" ");
-  it("states the testnet, the NEAR wallet, the envelope, the cancel and the buyer's-check limits", () => {
-    expect(body).toMatch(/Testnet only today/);
+  it("states the NEAR wallet, the envelope, the cancel and the buyer's-check limits", () => {
     expect(body).toMatch(/connects? a NEAR wallet/);
     expect(body).toMatch(/cash in an envelope/);
     expect(body).toMatch(/can't cancel/);

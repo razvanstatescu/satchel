@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { Info } from "lucide-react";
 import { Rich } from "@/components/marketing/Rich";
 import { Icon, cx } from "@/components/ui";
-import type { FaqEntry, TableCopy } from "@/lib/copy/marketing";
+import { CONTRACT_ROLE } from "@/lib/config";
+import { marketing, type FaqEntry, type TableCopy } from "@/lib/copy/marketing";
 
 /**
  * The article template's building blocks (docs/design/seo/technical-audit.md §5). Pure server components: no client JS,
@@ -37,6 +38,11 @@ export function Sub({ title, children }: { title: string; children: ReactNode })
 }
 
 /** One paragraph, with `[label](/path)` links. */
+/** The no-admin-key line, only where it is true: the release and final contracts (the landing's #trust rule). */
+export function KeylessNote() {
+  return CONTRACT_ROLE === "dev" ? null : <P text={marketing.template.keyless} />;
+}
+
 export function P({ text, className }: { text: string; className?: string }) {
   return (
     <p className={cx("m-0", PROSE, className)}>

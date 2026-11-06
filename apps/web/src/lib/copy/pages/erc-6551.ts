@@ -28,7 +28,7 @@ export const erc6551 = {
       h2: "One EVM chain, or Bitcoin, Ethereum and Solana",
       body: [
         "A token bound account is an EVM account. It holds assets on EVM chains. It cannot hold native Bitcoin or native Solana coins, because those chains have no EVM accounts.",
-        "A Satchel has three addresses of its own: one on Bitcoin, one on Ethereum and one on Solana. The coins are native on their own chains. There is no bridge and no wrapped token for the chain addresses. Today they sit on Bitcoin testnet4, Ethereum Sepolia and Solana devnet, so they have no value.",
+        "A Satchel has three addresses of its own: one on Bitcoin, one on Ethereum and one on Solana. The coins are native on their own chains. There is no bridge and no wrapped token for the chain addresses.",
         "The Ethereum address also works on Base, Arbitrum and Optimism test networks, so one address holds ETH and USDC on four networks.",
       ],
     },

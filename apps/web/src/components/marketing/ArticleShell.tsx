@@ -16,8 +16,8 @@ import { APP_URL } from "@/lib/config";
  * The article template for every marketing page (docs/design/seo/technical-audit.md §5; geo-research.md §5). Pure server
  * components: no client JS of its own, text LCP, explicit sizes on the art, no layout shift. It renders inside the
  * `(landing)` layout, so it shares the landing's top bar and footer. Order: breadcrumb, H1, the answer block (the first
- * 30% of a page is where citations come from), the updated date, the sections (children), the FAQ, the testnet note and
- * CTA band, then related guides. JSON-LD (Article, BreadcrumbList and, with a FAQ, FAQPage) mirrors the visible text.
+ * 30% of a page is where citations come from), the updated date, the sections (children), the FAQ, the CTA band, then
+ * related guides. Product framing, like the landing (D-52): the header badge is the only network signal. JSON-LD (Article, BreadcrumbList and, with a FAQ, FAQPage) mirrors the visible text.
  */
 
 const T = marketing.template;
@@ -50,8 +50,8 @@ export function Breadcrumb({ trail }: { trail: readonly { name: string; href?: s
   );
 }
 
-/** The CTA band: a Day-island coral panel (constant in both themes) with the testnet note beside the buttons. */
-export function CtaBand({ testnetNote = true }: { testnetNote?: boolean }) {
+/** The CTA band: a Day-island coral panel (constant in both themes). */
+export function CtaBand() {
   return (
     <section aria-labelledby="cta-title" data-scheme="day" className="mt-12 flex flex-col gap-4 rounded-card bg-brand p-6 text-on-brand md:mt-14 md:p-8">
       <h2 id="cta-title" className="m-0 text-[1.5rem]/[1.875rem] font-extrabold tracking-[-0.02em] text-on-brand md:text-title">
@@ -66,11 +66,6 @@ export function CtaBand({ testnetNote = true }: { testnetNote?: boolean }) {
           {T.cta.secondary}
         </Button>
       </div>
-      {testnetNote ? (
-        <p className="m-0 max-w-[34rem] text-body-sm font-medium" data-testid="testnet-note">
-          {T.testnetNote}
-        </p>
-      ) : null}
     </section>
   );
 }
@@ -106,13 +101,11 @@ export interface ArticleShellProps {
   answer: string;
   /** The FAQ block, rendered as visible HTML and mirrored in FAQPage JSON-LD. */
   faq?: readonly FaqEntry[];
-  /** The practical-intent pages show the testnet note by the CTA. Default true. */
-  testnetNote?: boolean;
   schemaType?: "Article" | "TechArticle";
   children: ReactNode;
 }
 
-export function ArticleShell({ page, answer, faq, testnetNote = true, schemaType = "Article", children }: ArticleShellProps) {
+export function ArticleShell({ page, answer, faq, schemaType = "Article", children }: ArticleShellProps) {
   const path = pagePath(page);
   const crumb = page.short ?? page.title;
   const trail = [
@@ -158,7 +151,7 @@ export function ArticleShell({ page, answer, faq, testnetNote = true, schemaType
       </header>
       {children}
       {faq?.length ? <Faq title={T.faq} items={faq} /> : null}
-      <CtaBand testnetNote={testnetNote} />
+      <CtaBand />
       <RelatedGuides slug={page.slug} />
     </article>
   );

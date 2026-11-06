@@ -166,14 +166,13 @@ pub fn on_signed(&mut self, token_id: TokenId, first_seq: u64, n: u32) -> Vec<Op
       body: [
         "Wrapped bitcoin is a token on another chain that stands for bitcoin held somewhere else. It depends on whoever holds the original coins. The [Chainflip overview of wrapped and native bitcoin](https://blog.chainflip.io/wrapped-bitcoin-vs-native-bitcoin-understanding-the-difference-risks) explains the difference and the risks.",
         "A Satchel's Bitcoin address is on Bitcoin itself. The contract builds a standard P2WPKH spend, the signer network signs each input, and the transaction goes out on the Bitcoin network like any other. There is no bridge and no wrapped token for the chain addresses. The coins are native on their own chains.",
-        "The trade is trust. A wrapped token trusts a custodian or a bridge. A Satchel trusts NEAR's signer network, and enough colluding nodes could sign anything. Today the Bitcoin side runs on testnet4 with testnet-grade confirmation depth.",
+        "The trade is trust. A wrapped token trusts a custodian or a bridge. A Satchel trusts NEAR's signer network, and enough colluding nodes could sign anything.",
       ],
     },
     limits: {
       h2: "What to keep in mind",
       lead: "This is a working example, not a security claim.",
       items: [
-        "Satchel runs on NEAR testnet. Its Bitcoin, Ethereum and Solana addresses are on testnet4, Sepolia and devnet, and the coins have no value.",
         "NEAR's signer network makes every signature. Satchel is new and hasn't been audited.",
         "Each sign request needs a small attached deposit and a minimum amount of gas. The contract checks both before it writes anything.",
         "If the signer network changed its interface, a locked contract could no longer sign. The contract forwards leftover gas and lets the caller raise the deposit to soften this.",
@@ -198,7 +197,7 @@ pub fn on_signed(&mut self, token_id: TokenId, first_seq: u64, n: u32) -> Vec<Op
     },
     {
       q: "Is a Satchel's bitcoin native or wrapped?",
-      a: "Native. A Satchel's Bitcoin address is on the Bitcoin network. There is no bridge and no wrapped token for its chain addresses. On testnet today, the coins have no value.",
+      a: "Native. A Satchel's Bitcoin address is on the Bitcoin network. There is no bridge and no wrapped token for its chain addresses.",
     },
     {
       q: "Why does the contract not sign raw hashes?",

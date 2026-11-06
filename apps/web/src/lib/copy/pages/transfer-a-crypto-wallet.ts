@@ -2,7 +2,7 @@ import type { FaqEntry, TableCopy } from "@/lib/copy/marketing";
 
 /**
  * Copy for /transfer-a-crypto-wallet (docs/design/seo/keyword-research.md #5). A how-to: handing over a wallet while its
- * addresses stay the same. Testnet-explicit; gifts skip the buyer's check and the page says so; give-by-link is a
+ * addresses stay the same. Product framing like the landing (D-52); gifts skip the buyer's check and the page says so; give-by-link is a
  * bearer link ("cash in an envelope"). The UI verb is Give. Links use `[label](/path)`.
  */
 export const transferCopy = {
@@ -88,7 +88,6 @@ export const transferCopy = {
   limits: {
     h2: "What to know before you give one",
     items: [
-      "Satchel runs on testnet today. Its coins have no value, so try a Give with test coins.",
       "There is no recovery service. If an owner loses access to their NEAR account, nobody at Satchel can restore it.",
       "Everyone still trusts NEAR's signer network, which makes every signature. Satchel hasn't been audited.",
       "Satchel gives no tax or legal advice. Gifts of crypto can have tax rules, so check yours.",

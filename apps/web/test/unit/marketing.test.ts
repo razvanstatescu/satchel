@@ -61,8 +61,9 @@ describe("marketing copy follows the claims register", () => {
     }
   });
 
-  it("keeps the testnet note and the definition as written", () => {
-    expect(marketing.template.testnetNote).toBe("Satchel runs on NEAR testnet today. Try it with test coins; nothing here has real value.");
+  it("keeps the definition as written, and the guides' copy free of testnet wording (D-52)", () => {
+    expect(marketing.template).not.toHaveProperty("testnetNote");
+    expect(JSON.stringify(marketing.template) + JSON.stringify(marketing.cleanHistory)).not.toMatch(/testnet|test coins|no value/i);
     expect(marketing.home.definition).toBe("Satchel is an NFT on NEAR that is a wallet.");
   });
 });

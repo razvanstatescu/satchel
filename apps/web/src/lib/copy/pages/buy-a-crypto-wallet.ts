@@ -2,7 +2,7 @@ import type { FaqEntry, TableCopy } from "@/lib/copy/marketing";
 
 /**
  * Copy for /buy-a-crypto-wallet (docs/design/seo/keyword-research.md #4). A protective safety explainer: it leads with
- * the scam patterns, never promises a balance, never says "free", and is testnet-explicit. The three outbound sources
+ * the scam patterns, never promises a balance, never says "free", and uses product framing like the landing (D-52). The three outbound sources
  * are the ones the research cites. Links use `[label](/path-or-url)`.
  */
 export const buyCopy = {
@@ -68,7 +68,7 @@ export const buyCopy = {
     check: [
       "Before signing, the contract writes down exactly what it will sign. Timed-out requests stay on the record too.",
       "On the sale page, your browser reads every record and checks each one on its own chain. Buy turns on only when no old signature can move the coins. The contract doesn't run this check, because it can't see other chains.",
-      "[Satchel #4](/s/4/sale) is a demo built to fail: its one record can never be used, so Buy stays off. The [clean history](/clean-history) page explains each check.",
+      "[Satchel #4](/s/4/sale) is a demo built to fail: its one record could still move the coins one day, so Buy stays off. The [clean history](/clean-history) page explains each check.",
     ],
     oneH3: "One transaction settles it",
     one: [
@@ -80,7 +80,6 @@ export const buyCopy = {
     h2: "What a Satchel purchase still can't promise",
     lead: "The check is a strong filter. It is not a guarantee, and Satchel is new.",
     items: [
-      "Satchel runs on testnet today. Its coins have no value, and no balance here is real money.",
       "You still trust NEAR's signer network, which makes every signature. Satchel hasn't been audited.",
       "The check covers signatures made before the sale, not ones made after you buy.",
       "Prices on the market are in NEAR, and Satchel gives no tax or legal advice.",
@@ -93,7 +92,7 @@ export const buyCopy = {
     },
     {
       q: "Can a funded crypto wallet be bought legitimately?",
-      a: "Only if the seller can't sign afterwards and you can read every past signature. Few designs offer both. A Satchel does, on testnet today.",
+      a: "Only if the seller can't sign afterwards and you can read every past signature. Few designs offer both. A Satchel is built for exactly that.",
     },
     {
       q: "What is the pre-filled seed phrase scam?",

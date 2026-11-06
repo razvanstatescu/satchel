@@ -79,8 +79,8 @@ describe.each(GUIDES)("%s copy", (slug, C) => {
     for (const s of strings.filter((x) => /audit/i.test(x))) expect(s).toMatch(/hasn't been audited/);
   });
 
-  it("names the testnet where it makes claims about coins", () => {
-    expect(strings.join(" ")).toMatch(/runs on (NEAR )?testnet today/);
+  it("describes the product, never the deployment (D-52: the header badge is the only network signal)", () => {
+    expect(strings.join(" ")).not.toMatch(/testnet|devnet|sepolia|test coins|no value/i);
   });
 
   it("keeps the answer first, naming Satchel, in short sentences, and each FAQ answer quotable", () => {

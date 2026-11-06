@@ -1,8 +1,8 @@
 import type { FaqEntry, TableCopy } from "@/lib/copy/marketing";
 
 /**
- * Copy for /sell-a-crypto-wallet (docs/design/seo/keyword-research.md #1). Deployment framing: testnet-explicit, prices
- * in NEAR only, no tax advice, no "safe" promise, the buyer's browser (not the contract) runs the check. The marketing
+ * Copy for /sell-a-crypto-wallet (docs/design/seo/keyword-research.md #1). Product framing, like the landing (D-52): it
+ * describes the product, never the deployment; prices in NEAR only, no tax advice, no "safe" promise, the buyer's browser (not the contract) runs the check. The marketing
  * copy bans (test/unit/marketing.test.ts) apply to every string here too. Links use `[label](/path)`.
  */
 export const sellCopy = {
@@ -83,7 +83,6 @@ export const sellCopy = {
     h2: "What this does not solve",
     lead: "A Satchel sale removes two holes. It does not remove every risk from a sale.",
     items: [
-      "Satchel runs on testnet today. Its coins have no value, so no sale here is a real-money sale.",
       "The buyer still trusts NEAR's signer network, which makes every signature. Satchel is new and hasn't been audited.",
       "The check covers past signatures. It can't cover signatures made after you buy.",
       "Only Satchel's own market lists Satchels. Other NEAR marketplaces can't list one yet.",
@@ -108,8 +107,8 @@ export const sellCopy = {
       a: "Not while it's for sale: a listed Satchel is paused and can't sign. Your browser also checks every past signature, and Buy stays off until none can move the coins.",
     },
     {
-      q: "Can I sell a Satchel for real money?",
-      a: "Not today. Satchel runs on NEAR testnet, its coins have no value, and prices are in NEAR. Try a sale with test coins on the market.",
+      q: "How is the seller paid?",
+      a: "In NEAR, in the same transaction that hands the Satchel to the buyer. If the payout fails, the money waits as proceeds the seller can withdraw.",
     },
   ] satisfies FaqEntry[],
 } as const;

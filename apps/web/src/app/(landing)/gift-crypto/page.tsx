@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo";
 
 /**
  * /gift-crypto: how to gift crypto to someone without a wallet (docs/design/seo/keyword-research.md §2 entry 2). A fair
- * look at the usual options first, then Satchel's give by link, with the honesty notes as plain text: testnet today, the
+ * look at the usual options first, then Satchel's give by link, with the honesty notes as plain text: the
  * receiver connects a NEAR wallet, the link is a bearer secret, gifts skip the buyer's check. Server HTML only.
  */
 const page = findPage("gift-crypto")!;

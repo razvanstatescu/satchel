@@ -3,7 +3,8 @@
  * (`import { marketing } from "@/lib/copy/marketing"`); it is not merged into `copy`, so the shared deck stays small.
  *
  * Rules (docs/design/seo/product-inventory.md §3, the claims register; test/unit/marketing.test.ts enforces the bans):
- * sentence case; no fiat; testnet-explicit (these pages describe the deployment, CR-4); never "safe to buy",
+ * sentence case; no fiat; product framing like the landing (D-52: describe the product, never the deployment; the header
+ * badge is the only network signal, so no testnet names, no "test coins"); never "safe to buy",
  * "guaranteed", "trustless", "audited"; never "every chain"; "NEAR's signer network", not "MPC"; "quiet period", never
  * "cooldown"; prices in NEAR only; nothing about the repo while it is private. Inline links use `[text](/path)` and are
  * rendered by `<Rich>`. Sentences stay short (6 to 20 words): the evidence says that's what gets cited.
@@ -33,8 +34,9 @@ export const marketing = {
     guide: "Guide",
     /** "Updated November 6, 2026" (the date is formatted from the registry's ISO date). */
     updated: (date: string) => `Updated ${date}`,
-    /** Near the CTA on pages with practical intent, on top of the header badge. */
-    testnetNote: "Satchel runs on NEAR testnet today. Try it with test coins; nothing here has real value.",
+    /** Rendered only on the release and final contracts (the landing's #trust rule: a build-time claim tied to the
+     * contract role; the dev contract keeps its key, D-48). */
+    keyless: "Nobody can change the rules under you. The contract has no admin key and no upgrade method, not even for Satchel's makers.",
     related: "Related guides",
     faq: "Questions and answers",
     cta: {
@@ -151,7 +153,7 @@ export const marketing = {
           "Signatures made after you buy. Those are yours to control.",
           "Tokens other than USDC, and any chain or address Satchel doesn't support.",
           "NEAR's signer network. You still trust it, and enough colluding nodes could sign anything.",
-          "Bitcoin testnet4 reorgs. Confirmation depth on testnet is shallow, and the page says so.",
+          "Bitcoin reorgs. A deep enough reorg could undo a spend the check counted as confirmed.",
           "Data providers. For Bitcoin and Ethereum two must agree, and the page says when only one answered.",
         ],
       },
@@ -171,7 +173,7 @@ export const marketing = {
       },
       {
         q: "Is clean history a guarantee?",
-        a: "No. It checks the signatures that already exist. It doesn't cover signatures made after you buy, NEAR's signer network or Bitcoin testnet4 reorgs, and Satchel hasn't been audited.",
+        a: "No. It checks the signatures that already exist. It doesn't cover signatures made after you buy, NEAR's signer network or Bitcoin reorgs, and Satchel hasn't been audited.",
       },
       {
         q: "Who runs the check?",

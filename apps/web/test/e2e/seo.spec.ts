@@ -172,14 +172,16 @@ test.describe("/questions: the questions are headings", () => {
 });
 
 test.describe("/clean-history: the template", () => {
-  test("a breadcrumb, a definition block, a table with a caption and scopes, a visible FAQ and the testnet note", async ({ request }) => {
+  test("a breadcrumb, a definition block, a table with a caption and scopes, a visible FAQ and no testnet wording", async ({ request }) => {
     const html = await (await request.get("/clean-history")).text();
     const page = noScripts(html);
     expect(page).toMatch(/<nav aria-label="Breadcrumb"/);
     expect(page).toMatch(/<table[\s\S]*<caption[\s\S]*<th scope="col"[\s\S]*<th scope="row"/);
     expect(page).toContain('data-testid="answer"');
     expect(page).toContain('data-testid="faq"');
-    expect(page).toContain("Satchel runs on NEAR testnet today. Try it with test coins; nothing here has real value.");
+    // product framing (D-52): the header badge is the only network signal, so the article never names the testnet
+    const articleHtml = /<article[\s\S]*<\/article>/.exec(page)![0];
+    expect(articleHtml).not.toMatch(/testnet|devnet|sepolia|test coins|no value/i);
     // heading levels never skip: h1, then h2s, with h3 only after an h2
     const levels = [...page.matchAll(/<h([1-6])\b/g)].map((m) => Number(m[1]));
     expect(levels[0]).toBe(1);

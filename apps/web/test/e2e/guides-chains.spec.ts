@@ -57,7 +57,6 @@ const GUIDES: Guide[] = [
     key: [
       "Giver can keep a copy of the keys?",
       "Satchel by link",
-      "Testnet only today.",
       "The receiver connects a NEAR wallet to claim.",
       "The link works like cash in an envelope.",
       "You can't cancel a link once it is out.",
@@ -157,11 +156,13 @@ test.describe("the three guides, from the server HTML alone", () => {
       }
       for (const href of g.links) expect(noScripts(html), href).toContain(`href="${href}"`);
 
-      // the template: breadcrumb, a captioned table, the testnet note by the CTA, related guides
+      // the template: breadcrumb, a captioned table, the CTA band, related guides
       const page = noScripts(html);
       expect(page).toMatch(/<nav aria-label="Breadcrumb"/);
       expect(page).toMatch(/<table[\s\S]*<caption[\s\S]*<th scope="col"[\s\S]*<th scope="row"/);
-      expect(page).toContain("Satchel runs on NEAR testnet today. Try it with test coins; nothing here has real value.");
+      // product framing (D-52): the header badge is the only network signal, so the article never names the testnet
+      const articleHtml = /<article[\s\S]*<\/article>/.exec(page)![0];
+      expect(articleHtml).not.toMatch(/testnet|devnet|sepolia|test coins|no value/i);
       const related = /id="related-title"[\s\S]*$/.exec(page)![0];
       for (const other of GUIDES.filter((x) => x.path !== g.path)) expect(related).toContain(`href="${other.path}"`);
       expect(related).toContain('href="/clean-history"');

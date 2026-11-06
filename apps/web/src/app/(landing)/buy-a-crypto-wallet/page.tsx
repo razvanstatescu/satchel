@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ArticleShell } from "@/components/marketing/ArticleShell";
-import { BulletList, CompareTable, P, Paragraphs, Section, Sub } from "@/components/marketing/blocks";
+import { BulletList, CompareTable, KeylessNote, P, Paragraphs, Section, Sub } from "@/components/marketing/blocks";
 import { buyCopy as C } from "@/lib/copy/pages/buy-a-crypto-wallet";
 import { findPage, pagePath } from "@/lib/marketing-pages";
 import { pageMetadata } from "@/lib/seo";
@@ -41,6 +41,7 @@ export default function BuyPage() {
         <P text={C.satchel.lead} />
         <Sub title={C.satchel.keyH3}>
           <Paragraphs items={C.satchel.key} />
+          <KeylessNote />
         </Sub>
         <Sub title={C.satchel.checkH3}>
           <Paragraphs items={C.satchel.check} />

@@ -2,13 +2,14 @@ import type { FaqEntry, TableCopy } from "@/lib/copy/marketing";
 
 /**
  * Copy for /gift-crypto (docs/design/seo/keyword-research.md §2 entry 2; claims register CR-30, CR-40, CR-41).
- * Deployment framing: testnet-explicit, no fiat, prices in NEAR only. The honesty notes are required text: testnet today,
- * the receiver connects a NEAR wallet to claim, the link works like cash in an envelope, gifts skip the buyer's check.
+ * Product framing, like the landing (D-52): it describes the product, never the deployment (the header badge is the only
+ * network signal); no fiat, prices in NEAR only. The honesty notes are required text: the receiver connects a NEAR wallet
+ * to claim, the link works like cash in an envelope, it can't be cancelled, gifts skip the buyer's check.
  * No tax advice. Sentences stay short (6 to 20 words).
  */
 export const giftCrypto = {
   answer:
-    "To gift crypto to someone without a wallet, give them a Satchel by link. A Satchel is an NFT on NEAR that is a wallet, with its own Bitcoin, Ethereum and Solana addresses. They open the link and connect a NEAR wallet to claim it. Satchel runs on testnet today, so the coins inside have no value.",
+    "To gift crypto to someone without a wallet, give them a Satchel by link. A Satchel is an NFT on NEAR that is a wallet, with its own Bitcoin, Ethereum and Solana addresses. They open the link and connect a NEAR wallet to claim it, and every coin inside comes with it.",
   sections: {
     usual: {
       h2: "The usual ways to gift crypto",
@@ -56,7 +57,7 @@ export const giftCrypto = {
       steps: [
         "[Mint a Satchel](/mint) or open one you own, then add coins to it. Anyone can add coins to its addresses, so friends can chip in too.",
         "Choose Give by link, then review. Your browser makes a one-time secret and builds the link. The secret sits after the # in the link, so it never goes to a server.",
-        "Create the link. Your wallet asks you once. The Satchel moves to a fresh NEAR account made for the claim, and 0.02 testnet NEAR goes along to pay gas.",
+        "Create the link. Your wallet asks you once. The Satchel moves to a fresh NEAR account made for the claim, and 0.02 NEAR goes along to pay gas.",
         "Send the link in a message or as a QR code. Keeping a copy of the link in your browser is off by default.",
         "The receiver opens the link and connects a NEAR wallet. The Satchel and any leftover NEAR move to their wallet, and the coins inside go with it.",
       ],
@@ -69,7 +70,6 @@ export const giftCrypto = {
       h2: "What to know before you send a link",
       lead: "A Satchel gift has sharp edges. Read these before you send one.",
       items: [
-        "Testnet only today. Satchel runs on NEAR testnet, Bitcoin testnet4, Ethereum Sepolia and Solana devnet. The coins have no value.",
         "The receiver connects a NEAR wallet to claim. They don't need an account beforehand, but they do need a NEAR wallet at the moment they claim.",
         "The link works like cash in an envelope. Whoever holds it can claim the Satchel and everything inside, and that includes you.",
         "You can't cancel a link once it is out. A lost link can't be replaced either.",
@@ -92,11 +92,11 @@ export const giftCrypto = {
   faq: [
     {
       q: "How do I gift crypto to someone without a wallet?",
-      a: "Give them a Satchel by link. The link carries a one-time secret. They open it, connect a NEAR wallet and claim the Satchel with its Bitcoin, Ethereum and Solana addresses. Satchel runs on testnet today.",
+      a: "Give them a Satchel by link. The link carries a one-time secret. They open it, connect a NEAR wallet and claim the Satchel with its Bitcoin, Ethereum and Solana addresses.",
     },
     {
       q: "Can I send bitcoin to someone without a wallet?",
-      a: "You can put bitcoin in a Satchel and give it by link. On testnet today, the coins have no value. The receiver still needs a NEAR wallet to claim it.",
+      a: "Yes. Put bitcoin in a Satchel and give it by link. The receiver needs no Bitcoin wallet, only a NEAR wallet to claim it.",
     },
     {
       q: "Can I cancel a gift link?",
@@ -108,7 +108,7 @@ export const giftCrypto = {
     },
     {
       q: "Can I gift crypto for Christmas with a Satchel?",
-      a: "Not with value yet. Satchel runs on testnet, so a gift holds test coins that are worth nothing. It is a way to try the gift flow before a real one.",
+      a: "Yes. Add coins to a Satchel, create a link and put it in a card, as text or a QR code. Whoever holds the link can claim it, so keep it private until the day.",
     },
     {
       q: "Is gifting crypto taxable?",

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ArticleShell } from "@/components/marketing/ArticleShell";
-import { BulletList, CompareTable, P, Paragraphs, Section, Steps } from "@/components/marketing/blocks";
+import { BulletList, CompareTable, KeylessNote, P, Paragraphs, Section, Steps } from "@/components/marketing/blocks";
 import { sellCopy as C } from "@/lib/copy/pages/sell-a-crypto-wallet";
 import { findPage, pagePath } from "@/lib/marketing-pages";
 import { pageMetadata } from "@/lib/seo";
@@ -40,6 +40,7 @@ export default function SellPage() {
         <P text={C.how.lead} />
         <Steps items={C.how.steps} />
         <Paragraphs items={C.how.after} />
+        <KeylessNote />
       </Section>
       <Section id="seller" title={C.gets.h2}>
         <Paragraphs items={C.gets.body} />
