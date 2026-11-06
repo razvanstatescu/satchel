@@ -14,7 +14,7 @@ export const buyCopy = {
     items: [
       "Leaked credentials. Scammers imitate an insider leak of a wallet's seed phrase or key, so you rush to take the coins. Kaspersky describes this in [Crypto trap for the greedy](https://www.kaspersky.com/blog/cryptowallet-seed-phrase-fake-leaks/51607/).",
       "Pre-filled seed phrases. A hardware wallet arrives with a recovery phrase already set. The seller knows it, so they can take whatever you add. PhishFort explains [the pre-filled seed phrase scam](https://phishfort.com/hardware-wallets-the-pre-filled-seed-phrase-scam/).",
-      "Rotten seed phrases. MetaMask describes a related scam aimed at crypto users in [Rotten seed phrases](https://medium.com/metamask/rotten-seed-phrases-a-new-scam-targeting-crypto-users-b414f9ef292e).",
+      "Rotten seed phrases. A fake wallet site hands you a seed phrase the scammer already knows, then waits for you to add coins. MetaMask describes it in [Rotten seed phrases](https://medium.com/metamask/rotten-seed-phrases-a-new-scam-targeting-crypto-users-b414f9ef292e).",
       "Pay first. A common pattern asks for a fee, a deposit or a seed phrase before you see anything real.",
     ],
     after: [
