@@ -1,6 +1,6 @@
 # Facts for the landing refresh (facts researcher, 2026-11-03)
 
-Read from the worktree at 690129c (= `main`). Specs and code beat plans. Paths: **C5** `docs/specs/C5.md` ·
+Read from the worktree at e94af6f (= `main`). Specs and code beat plans. Paths: **C5** `docs/specs/C5.md` ·
 **C46** `docs/specs/C4-C6.md` · **C7S** `docs/specs/C1-C2-C3-C7.md` · **kb90** `kb/90-technical-spec.md` · **dec**
 `plan/decisions.md` · **ct** `contracts/satchel/src` · **core** `packages/core/src` · **W** `apps/web/src` · **live**
 `research/spikes/dev2-live/RESULTS.md`. "Safe wording" is testnet-honest, uses the app's own words, and avoids the

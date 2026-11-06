@@ -5,7 +5,7 @@
 > **Since then:** the sprint features C1–C7 (2026-10-29; interfaces in [`docs/specs/`](../specs/)), the M-01 solvency
 > guard ([`docs/security/sprint-review.md`](../security/sprint-review.md)), AUDIT-01/-02/-04 (2026-10-30) and Q-03/Q-04
 > (2026-10-31) ([`docs/testing/contract.md`](../testing/contract.md) §4 and §7.7). On `main`, the contract code has not
-> changed since 2026-10-31 (commit `e785075`).
+> changed since 2026-10-31 (commit `90e4aa9`).
 > **Current truth:** the interface is `kb/90-technical-spec.md` §5 plus `docs/specs/*.md`; the latest measured test
 > counts are in [`docs/testing/README.md`](../testing/README.md). `dev1` and `dev2.satchelhq.testnet` are deployed (dev2
 > runs the fixed contract and backs https://usesatchel.xyz); the final keyless birth of `satchel.satchelhq.testnet` is

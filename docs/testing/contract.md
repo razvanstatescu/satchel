@@ -178,7 +178,7 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 
 ### AUDIT-01 (Medium, C5): delegate BTC cap bypass with BIP143 split-amount requests — FIXED
 
-- **Status: FIXED** on `fix/audit` (contract `485c615`, TS mirror + vectors + UI copy `3a60df8`, sandbox `c5dac99`),
+- **Status: FIXED** on `fix/audit` (contract `ce56335`, TS mirror + vectors + UI copy `25f66d2`, sandbox `e53f781`),
   with fix option 1 (Razvan, 2026-10-30): a delegate (requester ≠ owner) may sign a BTC request only with **exactly
   one input**; more is refused with the new code **`ERR_ALLOWANCE_BTC_ONE_INPUT`** (`allowance.rs::request_debits`,
   after the classifier, before the caps). The owner's own BTC signing is unchanged. With one input, BIP143 commits that
@@ -217,7 +217,7 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 
 ### AUDIT-02 (Info): `listings(from_index ≥ 2^32)` returns the first page on wasm32 — FIXED
 
-- **Status: FIXED** on `fix/audit` (`c1d97d1`): `usize::try_from(from_index)`; an offset that doesn't fit is past the
+- **Status: FIXED** on `fix/audit` (`52cab52`): `usize::try_from(from_index)`; an offset that doesn't fit is past the
   end (empty page). `listings` was the only paged view casting a u64 offset to `usize` (`sig_records` and the offer
   indexes page in u64). The sandbox test below is un-ignored and passes.
 
@@ -230,7 +230,7 @@ Result key: **covered** (an existing test already pins it), **added** (new test 
 
 ### AUDIT-04 (Low): events logged before a later refusal in the same receipt — FIXED
 
-- **Status: FIXED** on `fix/audit` (`a0eed62`): every `emit()` now comes after the last check that can refuse.
+- **Status: FIXED** on `fix/audit` (`2b02ddf`): every `emit()` now comes after the last check that can refuse.
   `insert_offer` returns `offer_made` and `make_offer` / `ft_offer` emit it after `charge_storage` / `charge_credit`;
   `execute_sale`, `accept_offer` and `nft_transfer` emit nep171 `nft_transfer`, `delisted`, `allowances_cleared`,
   `sold` and `offer_accepted` after `ensure_solvent`, in the same order as before. To defer the NEP-171 event, these
@@ -333,7 +333,7 @@ Property runs for the fix (release): `PROPTEST_CASES=50000 cargo test -p satchel
 `PROPTEST_CASES=20000 FUZZ_STATS_CASES=20000 … parse::fuzz_tests` (26 tests incl. the seed-corpus differential), and
 `FUZZ_CASES=20000 pnpm --filter @satchel/core exec vitest run test/allowance.test.ts test/fuzz` (78 tests): all pass.
 
-## 7. Round two (2026-10-30, branch `test/contract2`, from `main` 3272e4c)
+## 7. Round two (2026-10-30, branch `test/contract2`, from `main` 17850e5)
 
 Second test audit, on the post-fix code (AUDIT-01, -02 and -04 fixed). No contract source is changed; a real bug gets a
 failing test marked `#[ignore = "BUG: …"]` and a write-up here. Wasm under test: `cargo near build
@@ -341,7 +341,7 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 
 ### 7.1 Plan
 
-1. Baselines: unit and default sandbox (2.13.4) on 3272e4c.
+1. Baselines: unit and default sandbox (2.13.4) on 17850e5.
 2. The sandbox suite on nearcore 2.14 (`SANDBOX_VERSION=2.14.0-rc.5`); record every difference from 2.13.4.
 3. The deep Rust-vs-TS differential corpus (≥ 100k per kind, two seeds), results and timings.
 4. Adversarial tests on the post-fix code:
@@ -353,7 +353,7 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 5. Q-03 (withdraw to the MPC / USDC as receiver) and Q-04 (`ft_on_transfer` extra fields): tests that pin the current
    behaviour, plus the risk spelled out for the human to decide. No behaviour change.
 6. Gas: re-measure the heaviest paths (`gas.rs` and the other measuring tests) after the fixes and compare with the
-   pre-fix wasm (the parent of `c1d97d1`) on the same machine.
+   pre-fix wasm (the parent of `52cab52`) on the same machine.
 7. Update the coverage matrix and the counts (§6, §7.6).
 
 ### 7.2 Results (filled in as each run finishes)
@@ -363,7 +363,7 @@ non-reproducible-wasm`, sha256 `9dd652867c96bb4aa40bd1db93077c19223d94503d45e7f5
 | Unit baseline, `cargo test -p satchel --lib` | **194 passed, 0 ignored** (15 s) |
 | Sandbox baseline, default 2.13.4, `cargo test -p satchel-tests` | **127 passed, 0 ignored** in 17 files |
 | Sandbox on 2.14, `SANDBOX_VERSION=2.14.0-rc.5`, first pass (9 min 20 s) | 107 passed in 13 files; `storage.rs` 4 failed with "Could not start sandbox: Failed to bind to available ports after 5 retries" (host port exhaustion, not the contract), and cargo stopped before `transfer`, `usdc`, `views`. Re-run of those four files: the "re-run one file at a time" row below |
-| New sandbox file `round2.rs`, default 2.13.4 (from 63e2553) | **7 passed** on the first run, 21 s |
+| New sandbox file `round2.rs`, default 2.13.4 (from 0f971c2) | **7 passed** on the first run, 21 s |
 | New unit tests `allowance_tests::r2_*` | **5 passed** |
 | Sandbox on 2.14, re-run one file at a time (2026-10-31): `storage`, `transfer`, `usdc`, `views` | **4 + 7 + 7 + 2 passed**. `storage.rs` byte deltas identical to 2.13.4 (mint 639 B, list 260 B, EVM 276/268 B, BTC×3 723 B, SOL 237 B). The earlier failures were sandbox start-up only (port binding after ≈ 8 min of back-to-back sandboxes); a first re-run of all four files together failed the same way |
 | **Sandbox on 2.14, total** | **127 / 127 of the existing suite pass** (107 first pass + 20 re-run), plus `round2.rs` 7/7 and `gas_paths.rs` 2/2 on 2.14 |
@@ -432,7 +432,7 @@ No contract bug was found in round two: no test is ignored, and the contract sou
 - Suggested fix (web lane): in the live branch, take the requester from the record that `signRow` already looks up
   (`rec.requester`, or the record at `first_seq`), or pair `sign_requested` with the `allowance_spent` of the same tx
   on `first_seq`. Make the fixture events match the contract: no `requester` on `sign_requested`.
-- **Fixed** (2026-10-31, commit `6eb8bb1`): the live mapping is now a pure `liveActivityRows` in `server.ts`. It takes
+- **Fixed** (2026-10-31, commit `56a25d3`): the live mapping is now a pure `liveActivityRows` in `server.ts`. It takes
   the requester from the record at `first_seq` and names it only when it wasn't the owner at that block (the owner is
   replayed from the token's mint and transfer events). Unit tests in `apps/web/test/unit/multichain.test.ts`. The
   fixture events still carry `requester`, so the e2e path doesn't exercise the live mapping; the unit tests do.
@@ -448,7 +448,7 @@ vector (`vectors/allowance.json`).
 **R2-03 (Info, web app): an accepted offer shows only as "transferred" in Activity.** `getActivity` maps `sold` but
 not `offer_accepted`, so a sale by offer shows a plain transfer (memo `offer`) with no price. The events are right
 (`round2::r2_events_once_and_in_order_on_every_ownership_change`). Optional: map `offer_accepted` to a `sold` row. **Fixed**
-(2026-10-31, commit `6eb8bb1`): `offer_accepted` becomes a `sold` row with its amount, currency and buyer.
+(2026-10-31, commit `56a25d3`): `offer_accepted` becomes a `sold` row with its amount, currency and buyer.
 
 **Q-03: withdraw to the MPC or the USDC contract as receiver. Decided (option b) and FIXED 2026-10-31, §7.7.** As found:
 - What happens today (`round2::q03_*`):
@@ -494,7 +494,7 @@ deterministically; round two saw no `ERR_INSOLVENT` in any run on either version
 ### 7.5 Gas after the fixes
 
 Same machine, default sandbox 2.13.4, `--test-threads 1`. Pre-fix wasm = `cargo near build non-reproducible-wasm` of
-`4e42b47` (the parent of the first fix commit `c1d97d1`), sha256 `10c6a8e9…53353614a`, 423,977 B; post-fix wasm
+`73d00c2` (the parent of the first fix commit `52cab52`), sha256 `10c6a8e9…53353614a`, 423,977 B; post-fix wasm
 `9dd65286…49d1ebd9e3`, 423,019 B (−958 B). Run with `SATCHEL_WASM=<pre-fix wasm>` for the "before" column.
 
 `gas_paths.rs::gas_heavy_paths` (new; behaviour-neutral so it runs on both wasms). Total = every receipt of the tx;
@@ -535,7 +535,7 @@ Tgas (`release::keyless_birth_batch`), `history_digest` fits 3,000 EVM records (
 - Not done in round two: the C5-debit differential (§5), a web test for R2-01 (another lane), real Circle USDC and real
   MPC behaviour (no testnet transactions).
 
-### 7.7 Q-03 and Q-04 fixed (2026-10-31, branch `fix/q03-q04`, from `main` 2ed9759)
+### 7.7 Q-03 and Q-04 fixed (2026-10-31, branch `fix/q03-q04`, from `main` 0baa86e)
 
 Razvan approved option (b) for both (§7.4).
 
@@ -553,11 +553,11 @@ Razvan approved option (b) for both (§7.4).
 fields refuses nothing the app or the tools send today.
 
 **What changed (contract).**
-- **Q-03** (`8b0bca5`): `withdraw_near`, `withdraw_ft` and `prepay_storage(account_id)` call `ensure_receiver`, the one
+- **Q-03** (`daa386d`): `withdraw_near`, `withdraw_ft` and `prepay_storage(account_id)` call `ensure_receiver`, the one
   existing check `nft_mint`, `nft_transfer` and offers already use: the contract itself, the MPC and the configured USDC
   are `ERR_BAD_RECEIVER` (existing code, sentence "receiver would strand the funds"). With `usdc: None` the USDC id is
   an ordinary receiver, as for `nft_transfer`. The check runs before any write, event or promise.
-- **Q-04** (`e785075`): `#[serde(deny_unknown_fields)]` on `FtMsg` (the `buy` struct variant and the top level) and on
+- **Q-04** (`90e4aa9`): `#[serde(deny_unknown_fields)]` on `FtMsg` (the `buy` struct variant and the top level) and on
   `OfferMsg` (the `offer` body). `deposit` is a bare string, so it has no inner fields. An unknown field is
   `ERR_BAD_MSG`; the FT refunds 100 %. The bare JSON `null`, `{}`, `""` and duplicate fields were already refused and
   still are (no change was needed there). Field order and whitespace stay free.
@@ -599,7 +599,7 @@ and the msg without that key is accepted). Sandbox (`round2.rs`): `q03_withdraw_
 **Suites on the fixed code** (2026-10-31, wasm `4dd7cde9da18d6a455993f1e1484c8f0140672144d368153948cc9a10050aed2`,
 421,659 B, `cargo near build non-reproducible-wasm`, INV-22 OK):
 
-| Suite | Before (2ed9759) | After |
+| Suite | Before (0baa86e) | After |
 |---|---|---|
 | Unit, `cargo test -p satchel --lib` | 199 passed | **202 passed**, 0 ignored (+ `q03_caller_chosen_receivers_…`, `q04_unknown_msg_fields_…`, `prop_ft_msg_any_extra_key_is_refused`; `audit_ft_msg_strict_cases` is the renamed lenient pin) |
 | Sandbox, default 2.13.4, one `--test` file at a time | 136 passed | **137 passed**, 0 ignored, in 20 files (+ `gas_paths::gas_withdraw_and_ft_msg_paths`; the three round-two pins flipped) |
@@ -613,7 +613,7 @@ properties pass, 63 s (incl. `prop_accounting_matches_model` and the new `prop_f
 differential cover `sign_for` payloads, which these changes don't touch, so they were not re-run; no corpus or vector
 changed.
 
-**Gas before / after** (same machine, default sandbox 2.13.4, `gas_paths.rs`; before = `SATCHEL_WASM=` the 2ed9759
+**Gas before / after** (same machine, default sandbox 2.13.4, `gas_paths.rs`; before = `SATCHEL_WASM=` the 0baa86e
 build `9dd65286…`, the wasm dev2 ran). Main = the contract's first receipt.
 
 | Path | Before: total / main (Tgas) | After: total / main (Tgas) | Δ main | Attached by the app |

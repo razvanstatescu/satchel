@@ -5,7 +5,7 @@
 - 2026-10-29T14:32Z [orchestrator] started: tracker, role definitions, 5 agents (contract-sign, contract-allowance, contract-market, web-share, web-flows)
 - 2026-10-29T14:35Z [orchestrator] spawned 5 agents in worktrees: contract-sign/allowance/market (Opus), web-share/web-flows (Sonnet)
 - 2026-10-29T14:56Z [orchestrator] restart: previous session ended before any agent committed; respawning 5 agents under the satchel-contract/satchel-web roles
-- 2026-10-29T14:57Z [orchestrator] respawned 5 agents (satchel-contract ×3 Opus/high; satchel-web ×2 Sonnet/medium), branched from bff1397
+- 2026-10-29T14:57Z [orchestrator] respawned 5 agents (satchel-contract ×3 Opus/high; satchel-web ×2 Sonnet/medium), branched from 5c522f9
 - 2026-10-29T15:04Z [A2,A3] progress: claim-link + btc-sweep pure logic with unit tests, committed on feat/web-flows
 - 2026-10-29T15:04Z [C5] spec: docs/specs/C5.md committed on feat/contract-allowance (set/revoke_allowance, allowances_of/allowance views, ERR_ALLOWANCE_* codes, rolling 24 h window, clear on transfer+sale)
 - 2026-10-29T15:07Z [C1,C2,C3,C7] spec: docs/specs/C1-C2-C3-C7.md committed on feat/contract-sign (request/record/view JSON, error codes, digest encoding; USDC x4 verified on-chain)
@@ -19,70 +19,70 @@
 - 2026-10-29T15:22Z [A3] progress: empty-the-satchel flow (multi-chain drain, BTC auto-batching), typecheck/lint/unit green
 - 2026-10-29T15:26Z [A4] done: request coins — BIP-21/EIP-681/Solana Pay builders (lib/payment-uri.ts, vector-tested), Add coins' optional amount field (GET form, works with JS off), payment-URI QR + Copy payment link + Share, shareable app link /s/<id>/receive?chain=&amount= (display only). Unit (payment-uri.test.ts) + Playwright (request-coins.spec.ts incl. axe Day/Night) green.
 - 2026-10-29T15:26Z [C4|C6] progress: sandbox tests/tests/market.rs 15/15 green (deposit/withdraw, listed freeze, transfer+buy move balances, NEAR+USDC offers, stale/quiet/expiry, FT failure re-credit, per-offerer cap, solvency I-M1/I-M3 incl. drained contract)
-- 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @5cce2af; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs bff1397), INV-22 OK
+- 2026-10-29T15:29Z [C5] done (ready for review): feat/contract-allowance @32ec784; unit 115 (29 C5) + deep proptest 50k green, sandbox 91 (8 C5) green, core 359 (65 C5) green, tools 72 + vectors:check ok; wasm 329,320 B sha256 e7ded724…4e21 (+38.8 KB vs 5c522f9), INV-22 OK
 - 2026-10-29T15:31Z [C1,C2,C3,C7] wip: TS mirror + vectors (evm/msg/history) + fuzz corpus regenerated; Rust/TS agree (0 disagreements), core 354 tests green
-- 2026-10-29T15:34Z [orchestrator] merged A1+A4 (1571bf5) and C5 (24a680b) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
+- 2026-10-29T15:34Z [orchestrator] merged A1+A4 (735699a) and C5 (fafcc55) into local main; push blocked pending Razvan's yes; spawned web-allowance (C5 UI)
 - 2026-10-29T16:05Z [orchestrator] session restart #2: resumed contract-sign, contract-market, web-flows, web-allowance from their transcripts; sandbox on main restarted
 - 2026-10-29T16:05Z [C1,C2,C3,C7] wip: core TS tests added (379 green); next sandbox tests, deep fuzz, wasm build
 - 2026-10-29T16:05Z [A2,A3] progress: Playwright specs green (give->link->claim, empty-everything); fixed hashchange, fixture UTXO depletion, and a stale-closure bug in EmptyFlow
 - 2026-10-29T16:08Z [orchestrator] main (A1+A4+C5) verified: sandbox 91/91, wasm 329,320 B e7ded724…, INV-22 OK
 - 2026-10-29T16:08Z [C4|C6] progress: merged main (C5) into feat/contract-market; accept_offer clears allowances via on_owner_change -> clear_allowances; delegates refused (ERR_NOT_OWNER); StorageKey C4/C6 variants after Allowances; lib 142/142, market sandbox 16/16
 - 2026-10-29T16:11Z [A2,A3] progress: axe (Day+Night) added for give-link/claim/empty; full e2e suite (139 tests) and unit suite green
-- 2026-10-29T16:15Z [A2,A3] done: full suite green (151 e2e, 357 unit, tsc, lint) on feat/web-flows @ c0538ec
+- 2026-10-29T16:15Z [A2,A3] done: full suite green (151 e2e, 357 unit, tsc, lint) on feat/web-flows @ f668a5b
 - 2026-10-29T16:16Z [C1,C2,C3,C7] wip: sandbox suite green (88 incl. 5 new in features.rs); wasm 309,266 B sha256 1cac1e97…077e, INV-22 OK; next deep fuzz + C5 trial merge
-- 2026-10-29T16:17Z [C4|C6] done: feat/contract-market @ 4cfb33f (main 24a680b+bd94fcc merged in); lib 142/142, sandbox 107/107 (market 16), core 371/371, proptest 1000 cases clean; wasm 403,886 B sha256 f5527f72…ddd06, INV-22 OK; spec docs/specs/C4-C6.md
+- 2026-10-29T16:17Z [C4|C6] done: feat/contract-market @ 8dfd852 (main fafcc55+ffd3a42 merged in); lib 142/142, sandbox 107/107 (market 16), core 371/371, proptest 1000 cases clean; wasm 403,886 B sha256 f5527f72…ddd06, INV-22 OK; spec docs/specs/C4-C6.md
 - 2026-10-29T16:18Z [C5-ui] in progress: data layer done (views/calls in near/contract.ts, snapshot+source+sim.ts fixture mirror of set/revoke/delegated debit, mock wallet, requester threaded through Activity); typecheck green; UI next
 - 2026-10-29T16:20Z [C2,C3,C7] fuzz: 4.0M Rust property cases + 400k Rust/TS differential (0 disagreements) + 400k TS self-check; docs/security/fuzzing.md §0b
-- 2026-10-29T16:24Z [orchestrator] merged A2+A3 (94428ea, pushed) and C4+C6 (a512d45); spawned web-market UI agent; contract-sign asked to merge main
-- 2026-10-29T16:40Z [orchestrator] restart #3: resumed contract-sign (mid-merge), web-allowance, web-market; main pushed (4349840)
+- 2026-10-29T16:24Z [orchestrator] merged A2+A3 (329af75, pushed) and C4+C6 (2dc4fa6); spawned web-market UI agent; contract-sign asked to merge main
+- 2026-10-29T16:40Z [orchestrator] restart #3: resumed contract-sign (mid-merge), web-allowance, web-market; main pushed (eecd3a3)
 - 2026-10-29T16:40Z [C5-ui] in progress: copy deck added (copy/allowance.ts, errorCopy ERR_ALLOWANCE_* mapping); config-copy-theme unit test passes (house rule: never say 'delegate' in UI copy); building the owner/delegate UI next
-- 2026-10-29T16:42Z [C1,C2,C3,C7] merge: main a512d45 (C5, C4/C6) merged into feat/contract-sign; EvmNonces after StorageCredit; C7 kinds refused for delegates; unit 172 green
+- 2026-10-29T16:42Z [C1,C2,C3,C7] merge: main 2dc4fa6 (C5, C4/C6) merged into feat/contract-sign; EvmNonces after StorageCredit; C7 kinds refused for delegates; unit 172 green
 - 2026-10-29T16:46Z [orchestrator] main (A1-A4, C4, C5, C6) confirmed: sandbox 107/107, web unit 379, typecheck clean
 - 2026-10-29T16:47Z [C5-ui] in progress: owner panel + add sheet + delegate banner + Send gating built; typecheck/lint/unit (366) all green; unit+e2e tests for allowance next
-- 2026-10-29T16:50Z [C1,C2,C3,C7] done: feat/contract-sign at a6de2ae incl. main a512d45; unit 172, sandbox 112, core 459, tools 72, web 379, vectors:check ok; merged wasm 422,562 B sha256 bd5d8e01…a1a5, INV-22 OK
+- 2026-10-29T16:50Z [C1,C2,C3,C7] done: feat/contract-sign at ea22ba9 incl. main 2dc4fa6; unit 172, sandbox 112, core 459, tools 72, web 379, vectors:check ok; merged wasm 422,562 B sha256 bd5d8e01…a1a5, INV-22 OK
 - 2026-10-29T16:51Z [C5-ui] in progress: unit tests added (test/unit/allowance.test.ts, 17 tests); full unit suite 383 passed, typecheck/lint green; Playwright next (owner add/revoke, delegate send within/over cap, server HTML)
-- 2026-10-29T17:11Z [C4-ui|C6-ui] wip: data layer committed (market views/calls, fixtures, sim engine, mock wallet) on feat/ui-market @44a0ae9
-- 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (e985d82, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
-- 2026-10-29T17:40Z [review] start: branch review/sprint @ e985d82, reviewing bff1397..e985d82 (C1-C7)
+- 2026-10-29T17:11Z [C4-ui|C6-ui] wip: data layer committed (market views/calls, fixtures, sim engine, mock wallet) on feat/ui-market @157485e
+- 2026-10-29T17:34Z [orchestrator] all 7 contract features on main (2094200, pushed); auth outage recovered: resumed web-allowance, web-market; respawned reviewer, web-sign, docs-spec
+- 2026-10-29T17:40Z [review] start: branch review/sprint @ 2094200, reviewing 5c522f9..2094200 (C1-C7)
 - 2026-10-29T17:40Z [orchestrator] Razvan: continue. Restart #4: resumed web-allowance, web-market, reviewer, web-sign, docs-spec with the PATH fix; main verification re-running
 - 2026-10-29T17:41Z [orchestrator] web-sign delegated to a nested agent; web multi-chain gaps recorded as a release gate in the tracker
 - 2026-10-29T17:42Z [C5-ui] in progress: fixed allowance.test.ts token-id collisions (fixture demo delegate renamed BOB->DANA to avoid breaking flows.spec.ts); unit suite 383 passed, typecheck/lint green; merging main next
-- 2026-10-29T17:43Z [docs] kb/90-technical-spec.md updated for C1/C2/C3/C7 (docs/specs/C1-C2-C3-C7.md), C5 (docs/specs/C5.md) and C4/C6 (docs/specs/C4-C6.md): new §5.17 interface index, §5.9 policy deltas (4 EVM testnets, per-chain nonces, USDC calldata, message kinds, EVM_MAX_TX_BYTES 160), §6.1 invariants INV-34..38, §7 per-chain EVM checks + non-blocking 'message' status, wasm/code-stake figure (~422KB/4.2 NEAR), §13 errata E-49..E-52, §14 assumptions A-21..A-25. Fixed Sepolia-only evm_chain_ids in tools/judge-snippets.sh and README.md. Branch docs/kb90-sprint @ 33fc2bb (not pushed).
-- 2026-10-29T17:43Z [docs] done: kb/90-technical-spec.md updated for C1/C2/C3/C7 (contract-sign), C5 (allowance), C4/C6 (market) on docs/kb90-sprint @33fc2bb; new §5.17 method/view/event/error/storage-key index, §5.9 policy deltas (4 EVM testnets, per-chain nonces, USDC calldata, message kinds), §6.1 invariants INV-34..38, §7 per-chain EVM checks + non-blocking 'message' status, wasm/code-stake re-estimated (~422KB/4.2 NEAR), §13 errata E-49..E-52, §14 assumptions A-21..A-25; fixed Sepolia-only evm_chain_ids in tools/judge-snippets.sh and README.md; not pushed
+- 2026-10-29T17:43Z [docs] kb/90-technical-spec.md updated for C1/C2/C3/C7 (docs/specs/C1-C2-C3-C7.md), C5 (docs/specs/C5.md) and C4/C6 (docs/specs/C4-C6.md): new §5.17 interface index, §5.9 policy deltas (4 EVM testnets, per-chain nonces, USDC calldata, message kinds, EVM_MAX_TX_BYTES 160), §6.1 invariants INV-34..38, §7 per-chain EVM checks + non-blocking 'message' status, wasm/code-stake figure (~422KB/4.2 NEAR), §13 errata E-49..E-52, §14 assumptions A-21..A-25. Fixed Sepolia-only evm_chain_ids in tools/judge-snippets.sh and README.md. Branch docs/kb90-sprint @ f0c3460 (not pushed).
+- 2026-10-29T17:43Z [docs] done: kb/90-technical-spec.md updated for C1/C2/C3/C7 (contract-sign), C5 (allowance), C4/C6 (market) on docs/kb90-sprint @f0c3460; new §5.17 method/view/event/error/storage-key index, §5.9 policy deltas (4 EVM testnets, per-chain nonces, USDC calldata, message kinds), §6.1 invariants INV-34..38, §7 per-chain EVM checks + non-blocking 'message' status, wasm/code-stake re-estimated (~422KB/4.2 NEAR), §13 errata E-49..E-52, §14 assumptions A-21..A-25; fixed Sepolia-only evm_chain_ids in tools/judge-snippets.sh and README.md; not pushed
 - 2026-10-29T18:36Z [orchestrator] continue: resumed web-allowance, web-market, web-sign (nested), reviewer; spawned contract-fix-m01 (fix/m01-solvency)
-- 2026-10-29T18:37Z [C5-ui] in progress: merged main (c95be49, C1/C2/C3/C7 + A2/A3 + C4/C6) into feat/ui-allowance (e134bb2); resolved copy.ts/sim.ts/mock-wallet.ts conflicts keeping both sides; unit 396 passed, typecheck/lint green; writing e2e next
-- 2026-10-29T19:19Z [C2-ui C3-ui C7-ui] wip: afeb29b types, per-chain ETH/USDC balance reads, #2 fixture records; paused: Edit tool PreToolUse hook timing out
+- 2026-10-29T18:37Z [C5-ui] in progress: merged main (513f98f, C1/C2/C3/C7 + A2/A3 + C4/C6) into feat/ui-allowance (2739d7c); resolved copy.ts/sim.ts/mock-wallet.ts conflicts keeping both sides; unit 396 passed, typecheck/lint green; writing e2e next
+- 2026-10-29T19:19Z [C2-ui C3-ui C7-ui] wip: 231ba88 types, per-chain ETH/USDC balance reads, #2 fixture records; paused: Edit tool PreToolUse hook timing out
 - 2026-10-29T19:27Z [M-01] blocked: Read/Write PreToolUse hook times out (host unreachable) in worktree fix-m01; no code changed, nothing committed; stopped per no-route-around rule
-- 2026-10-29T19:41Z [review] resumed in worktree .claude/worktrees/review-sprint (review/sprint ff to 9319255). core 459/459, tools 72/72, differential fuzz 400k cases (evm/btc/sol/msg) 0 disagreements, TS fuzz+allowance 73/73, allowance proptests 30/30 @5000, market props 3/3 @1000. BLOCKED: Write/Read PreToolUse hook times out (host unreachable), so tests/tests/review.rs (SR-05/SR-06/M-01 proof), the SR-01 checker fix and docs/security/sprint-review.md are not written. Nothing committed.
+- 2026-10-29T19:41Z [review] resumed in worktree .claude/worktrees/review-sprint (review/sprint ff to 8532f13). core 459/459, tools 72/72, differential fuzz 400k cases (evm/btc/sol/msg) 0 disagreements, TS fuzz+allowance 73/73, allowance proptests 30/30 @5000, market props 3/3 @1000. BLOCKED: Write/Read PreToolUse hook times out (host unreachable), so tests/tests/review.rs (SR-05/SR-06/M-01 proof), the SR-01 checker fix and docs/security/sprint-review.md are not written. Nothing committed.
 - 2026-10-29T19:48Z [orchestrator] Razvan reconnected (continue): file tools OK; resumed contract-fix-m01, reviewer, web-allowance, web-market, web-sign (nested)
-- 2026-10-29T19:49Z [C5-ui] in progress: test/e2e/allowance.spec.ts written and committed (691db2b); owner add/see/revoke, MAX_DELEGATES guard, delegate send within/over cap, server HTML, axe Day/Night; typecheck/lint green; running full Playwright suite next
+- 2026-10-29T19:49Z [C5-ui] in progress: test/e2e/allowance.spec.ts written and committed (f5ed0a5); owner add/see/revoke, MAX_DELEGATES guard, delegate send within/over cap, server HTML, axe Day/Night; typecheck/lint green; running full Playwright suite next
 - 2026-10-29T19:49Z [review] review.rs: SR-05 digest ceiling ≈3,000 small / ≈2,000-2,500 x 1 KiB msg records (300 Tgas call); SR-06 accept_offer −143 B (frees); M-01 proven (3 transfers → escrow > free, withdraw LackBalanceForState), proof #[ignore]d. WIP committed.
-- 2026-10-29T19:50Z [C4-ui|C6-ui] wip: Market.tsx built and wired into WalletTab (inside NEAR add/withdraw, incoming offers); copy.ts merge bug fixed @c862cac
+- 2026-10-29T19:50Z [C4-ui|C6-ui] wip: Market.tsx built and wired into WalletTab (inside NEAR add/withdraw, incoming offers); copy.ts merge bug fixed @2b8f407
 - 2026-10-29T19:52Z [review] SR-01 fixed in core (evmConfirmationsByChain, evmDepth; test/review-sr01.test.ts 6 tests); core 465/465, core+web typecheck clean. WIP committed.
-- 2026-10-29T19:53Z [C4-ui] wip: /s/[id]/offer route and My offers on /satchels @9df16a0
-- 2026-10-29T19:56Z [C4-ui|C6-ui] wip: unit tests for market.ts/sim.ts (21 cases, all green); lint+typecheck clean @7d2a7e1
+- 2026-10-29T19:53Z [C4-ui] wip: /s/[id]/offer route and My offers on /satchels @093efa2
+- 2026-10-29T19:56Z [C4-ui|C6-ui] wip: unit tests for market.ts/sim.ts (21 cases, all green); lint+typecheck clean @d68b8ba
 - 2026-10-29T19:56Z [review] docs/security/sprint-review.md written (no Crit/High; M-01 Medium fix in progress on fix/m01-solvency; L-04 fixed; L-01/L-03 documented; L-02/L-05 proposed). Unit 172/172. Sandbox final run in progress. WIP committed.
 - 2026-10-29T19:57Z [M-01] wip: failing sandbox tests committed (transfer 150 B → LackBalanceForState on last withdraw; NEAR buy +63 B breaks I-M1; accept nets -194 B)
 - 2026-10-29T19:57Z [C2-ui C3-ui C7-ui] wip: data layer committed (per-chain send/nonce, message adapter, mock wallet msgs, Messages group, evmByChain SR-02, safe text SR-04); unit 379/379, tsc clean
-- 2026-10-29T20:01Z [review] DONE: final unit 172/172, sandbox 115 passed 0 failed 1 ignored (M-01 proof), core 465/465, tools 72/72, diff fuzz 400k/0. Commits 072afea, 0b64dbe, 9ee2696 on review/sprint (not pushed).
-- 2026-10-29T20:02Z [orchestrator] review merged (cf70d63): no Crit/High; M-01 fix pending; L-02/L-05 to web-sign; M-01 proof handed to the fixer
+- 2026-10-29T20:01Z [review] DONE: final unit 172/172, sandbox 115 passed 0 failed 1 ignored (M-01 proof), core 465/465, tools 72/72, diff fuzz 400k/0. Commits 7c91c7b, c9caca4, 654850a on review/sprint (not pushed).
+- 2026-10-29T20:02Z [orchestrator] review merged (43a698e): no Crit/High; M-01 fix pending; L-02/L-05 to web-sign; M-01 proof handed to the fixer
 - 2026-10-29T20:03Z [C5-ui] in progress: allowance.spec.ts 8/8 green after 3 rounds of fixes (AllowanceFacts converted to a client component on useLiveSnapshot so client-side set/revoke is ever visible server-side; stale-route testid filter; BTC sent|confirmed timing; hard nav in the MAX_DELEGATES loop). Noted a product follow-up: AllowanceFlow doesn't reset its phase on a fast re-open via its own Link (Next router cache). Running the full Playwright suite next.
-- 2026-10-29T20:05Z [M-01] wip: fix committed (ensure_solvent + proceeds_near + escrow_near view); merged main cf70d63; review.rs M-01 proof un-ignored and passing (3/3 transfers refused, withdraw ok); my 3 m01_* sandbox tests pass; unit 176/176
-- 2026-10-29T20:07Z [C5-ui] done: full suite green on feat/ui-allowance (480fef3) -- unit 396, typecheck, lint, Playwright 169/169 (incl. allowance.spec.ts 8/8, axe Day/Night). C5 spending-allowance UI complete: owner add/revoke panel, public server-rendered facts, delegate banner, Send gating with client-side cap checks, fixture simulation of set/revoke/delegated debit. Known follow-up: AllowanceFlow doesn't reset its step on a fast re-open via its own Link (Next router cache); worked around in the test, not yet fixed in the component.
+- 2026-10-29T20:05Z [M-01] wip: fix committed (ensure_solvent + proceeds_near + escrow_near view); merged main 43a698e; review.rs M-01 proof un-ignored and passing (3/3 transfers refused, withdraw ok); my 3 m01_* sandbox tests pass; unit 176/176
+- 2026-10-29T20:07Z [C5-ui] done: full suite green on feat/ui-allowance (7aa1ddc) -- unit 396, typecheck, lint, Playwright 169/169 (incl. allowance.spec.ts 8/8, axe Day/Night). C5 spending-allowance UI complete: owner add/revoke panel, public server-rendered facts, delegate banner, Send gating with client-side cap checks, fixture simulation of set/revoke/delegated debit. Known follow-up: AllowanceFlow doesn't reset its step on a fast re-open via its own Link (Next router cache); worked around in the test, not yet fixed in the component.
 - 2026-10-29T20:07Z [C2-ui C3-ui C7-ui] wip: UI committed (network rows, send picker + gas check, receive picker + EIP-681 chain id, /sign flow); tsc + lint clean
-- 2026-10-29T20:11Z [C4-ui|C6-ui] wip: Playwright offers.spec.ts green; fixed offers' fixture-mode client refresh and an aria-label collision @b7b5b10
-- 2026-10-29T20:13Z [orchestrator] C5 UI merged (1fb28f8) + stale-sheet fix; web unit 396, e2e 169/169
-- 2026-10-29T20:13Z [C2-ui C3-ui C7-ui] wip: merged main (C5 UI, review cf70d63); L-02 hex+digest flag; unit 422/422, tsc + lint clean; e2e next
+- 2026-10-29T20:11Z [C4-ui|C6-ui] wip: Playwright offers.spec.ts green; fixed offers' fixture-mode client refresh and an aria-label collision @098475b
+- 2026-10-29T20:13Z [orchestrator] C5 UI merged (f080f48) + stale-sheet fix; web unit 396, e2e 169/169
+- 2026-10-29T20:13Z [C2-ui C3-ui C7-ui] wip: merged main (C5 UI, review 43a698e); L-02 hex+digest flag; unit 422/422, tsc + lint clean; e2e next
 - 2026-10-29T20:22Z [M-01] wip: monitor spare=free-escrow, TS mirror (MarketTotalsView, spareNear), docs (C4-C6 §2.4, kb/90 §5.17 + E-53), new proptest prop_ensure_solvent (found+fixed a zero-escrow edge); unit 177/177
-- 2026-10-29T20:24Z [C4-ui|C6-ui] wip: axe coverage for offer flow + inside/offers state, Day and Night, all green @35c0ab8
+- 2026-10-29T20:24Z [C4-ui|C6-ui] wip: axe coverage for offer flow + inside/offers state, Day and Night, all green @ea6d13e
 - 2026-10-29T20:28Z [M-01] done: fix/m01-solvency ready to merge (unit 177/177, sandbox 119/119 incl. review.rs M-01 proof un-ignored, core 467, tools 72; wasm 423,977 B sha256 10c6a8e9…614a, INV-22 OK)
-- 2026-10-29T20:29Z [C2-ui C3-ui C7-ui] done: feat/ui-sign (merged main 1fb28f8); web unit 422/422, Playwright 183/183 (CI=1 E2E_PORT=3329), tsc + lint clean; not pushed
-- 2026-10-29T20:30Z [C4-ui|C6-ui] merge: main (ac5b01b, includes C1/C2/C3/C7 + C5 allowance UI) merged into feat/ui-market @ff40b59; typecheck/lint/unit (417) all green
-- 2026-10-29T20:35Z [C4-ui|C6-ui] green: full suite post-merge — unit 417, typecheck clean, lint clean, Playwright 180/180 (desktop+mobile) @ff40b59
-- 2026-10-29T20:35Z [orchestrator] merged M-01 fix (32f9467) and C2/C3/C7 UI (aeba7f3); web unit 422, e2e 183/183; only C4/C6 UI left
+- 2026-10-29T20:29Z [C2-ui C3-ui C7-ui] done: feat/ui-sign (merged main f080f48); web unit 422/422, Playwright 183/183 (CI=1 E2E_PORT=3329), tsc + lint clean; not pushed
+- 2026-10-29T20:30Z [C4-ui|C6-ui] merge: main (7240bb6, includes C1/C2/C3/C7 + C5 allowance UI) merged into feat/ui-market @38c3228; typecheck/lint/unit (417) all green
+- 2026-10-29T20:35Z [C4-ui|C6-ui] green: full suite post-merge — unit 417, typecheck clean, lint clean, Playwright 180/180 (desktop+mobile) @38c3228
+- 2026-10-29T20:35Z [orchestrator] merged M-01 fix (778172a) and C2/C3/C7 UI (2f2cda8); web unit 422, e2e 183/183; only C4/C6 UI left
 - 2026-10-29T20:42Z [orchestrator] ALL sprint features merged; final main: sandbox 119/119, e2e 194/194, wasm 423,977 B 10c6a8e9…
 - 2026-10-29T21:00Z [orchestrator] dev2 live (10c6a8e9…), #1 funded; spawned tools-live + web-gaps; prod env switch to dev2 needs Razvan (Vercel)
-- 2026-10-30T08:09Z [orchestrator] prod env -> dev2 pushed (0e8bd03); resumed tools-live + web-gaps after restart
+- 2026-10-30T08:09Z [orchestrator] prod env -> dev2 pushed (3415e01); resumed tools-live + web-gaps after restart
 - 2026-10-30T08:18Z [live] tools-live: extended tools/e2e with message.ts, market.ts, allowance.ts, history.ts; added --chain-id/--usdc to evm.ts; unit tests pass (92 + 13). Starting live run on dev2.satchelhq.testnet.
 - 2026-10-30T08:20Z [ui-gaps] wip: USDC offer prepay, FT deposit/withdraw UI (InsideFtActions), storage credit row, unlisted /market section; typecheck green
 - 2026-10-30T08:21Z [live] tools-live: dev2 live run — EVM Sepolia send #1→#2 (0.002 ETH, tx DuNMM3c…), Base Sepolia sign-only, USDC Sepolia sign-only all PASS first try; evm_message and sol_message signed+verified on #1 (seq 3,4); history_digest recomputed matches on-chain (sig_count 5).
@@ -90,15 +90,15 @@
 - 2026-10-30T08:23Z [ui-gaps] wip: unit tests green (455), lint/typecheck clean; FT deposit/offer storage-credit gating covered
 - 2026-10-30T08:26Z [live] tools-live: dev2 market scenario complete (alice deposits 0.1 NEAR into #2; carol offers 0.2, alice accepts; carol owns #2 with inside NEAR intact, I-M1 holds; carol withdraws; bob offers on #3, cancels, refunded). Allowance scenario complete (alice caps bob at 20000 sats BTC on #1; bob signs 10282 sats within cap; 15282 over cap refused both locally and on-chain with ERR_ALLOWANCE_EXCEEDED; alice revokes). Fixed a view-lag race (readUntil retry) and a BTC self-sweep debit bug found along the way.
 - 2026-10-30T08:27Z [ui-gaps] wip: e2e (12/12) + axe Day/Night (6/6) green for USDC offer prepay, FT deposit/withdraw, storage credit, unlisted market
-- 2026-10-30T08:32Z [live] tools-live: dev2 live run complete. Clean-history checker verdicts: #1 blocked (2 intentional unused sign-only records; messages correctly non-blocking), #2/#3 empty/clean, Buy enabled on both. All 20 flows recorded in research/spikes/dev2-live/RESULTS.md, all within D-48 caps. tools test suite 92 passed, typecheck clean. Branch feat/tools-live at ca7b8c4, not pushed.
+- 2026-10-30T08:32Z [live] tools-live: dev2 live run complete. Clean-history checker verdicts: #1 blocked (2 intentional unused sign-only records; messages correctly non-blocking), #2/#3 empty/clean, Buy enabled on both. All 20 flows recorded in research/spikes/dev2-live/RESULTS.md, all within D-48 caps. tools test suite 92 passed, typecheck clean. Branch feat/tools-live at 0f7bd05, not pushed.
 - 2026-10-30T08:33Z [orchestrator] tools-live merged; dev2 live run 20/20 PASS
 - 2026-10-30T08:36Z [ui-gaps] fix: axe label-content-name-mismatch on /market unlisted cards (dropped SatchelCard href+linkLabel for the listed-grid's split card+stretched-Link pattern); full e2e suite rerunning
-- 2026-10-30T08:39Z [ui-gaps] done: full Playwright suite green (205/205), unit (455 web + 467 core), typecheck, lint all clean on feat/ui-gaps @ 0069c38
+- 2026-10-30T08:39Z [ui-gaps] done: full Playwright suite green (205/205), unit (455 web + 467 core), typecheck, lint all clean on feat/ui-gaps @ 6fb3ff9
 - 2026-10-30T08:45Z [orchestrator] ui-gaps merged; e2e 205/205; sprint scope complete
 - 2026-10-30T09:55Z [C5-caps] WIP: extraCapOptions() + Add sheet 'Other networks' disclosure (ETH Base/Arbitrum/OP, USDC x4), 8-cap limit disables checkboxes; typecheck/lint/unit all green
 - 2026-10-30T09:59Z [C5-caps] WIP: unit tests for extraCapOptions, 8-cap limit, delegate USDC/other-EVM sign_for; 463 unit tests green, typecheck/lint clean
 - 2026-10-30T10:06Z [C5-caps] WIP: Playwright tests for USDC/Base-ETH caps in Add sheet (facts display, delegate send within/over cap), axe covers Other-networks disclosure; allowance.spec.ts 10/10 green
-- 2026-10-30T10:09Z [C5-caps] done: full suite green — 463 unit tests, 207 Playwright e2e tests, typecheck/lint clean on feat/allowance-caps (commits 93f33cf, b9b1b4f, 0133d47, c3f1f26)
+- 2026-10-30T10:09Z [C5-caps] done: full suite green — 463 unit tests, 207 Playwright e2e tests, typecheck/lint clean on feat/allowance-caps (commits 7555e10, aa111af, 691fb08, 58e595a)
 - 2026-10-30T10:10Z [orchestrator] allowance-caps merged; every sprint item done
 - 2026-10-30T10:47Z [orchestrator] UI notes: unified holdings list + coin sheets, Make an offer in the left column, Add coins overflow fixed, card shows top holdings + '+N more'; unit 474, e2e 207/207
 - 2026-10-30T11:05Z [orchestrator] D-50 overview: labelled ≈$ estimate + value bar + top coins on card/Wallet tab/market/You get; prices 1Click→CoinGecko; unit 479, e2e 207/207
@@ -113,9 +113,9 @@
 - 2026-10-30T15:35Z [test-contract] found bug: AUDIT-01 delegate BTC cap bypass via BIP143 split amounts (ignored failing unit test)
 - 2026-10-30T15:41Z [test-contract] wip: sandbox audit.rs (AUDIT-01 confirmed on wasm, AUDIT-02 listings u32 wrap, wNEAR e2e)
 - 2026-10-30T15:43Z [test-contract] found bug: AUDIT-04 events logged before later refusal (make_offer, execute_sale); ignored failing tests
-- 2026-10-30T15:44Z [web-ui-tests] done on test/ui @77abb7e: +13 e2e (send validation, popup edge cases, 320px/axe on new pages); fixed FlowShell focus return (WCAG 2.4.3) and Segmented 320px overflow; docs/testing/ui.md. Waiting on contract + core-api before merging
+- 2026-10-30T15:44Z [web-ui-tests] done on test/ui @d9ab92a: +13 e2e (send validation, popup edge cases, 320px/axe on new pages); fixed FlowShell focus return (WCAG 2.4.3) and Segmented 320px overflow; docs/testing/ui.md. Waiting on contract + core-api before merging
 - 2026-10-30T15:46Z [web-ui-tests] done: added send-validation/popup-edge-cases/mobile-and-night-gaps specs (13 tests); fixed FlowShell focus-return (WCAG 2.4.3) and Segmented 320px overflow bugs; wrote docs/testing/ui.md coverage matrix; full suite 237/237 passing (baseline 224, 1 pre-existing flake on responsive.spec.ts:54 did not reproduce on re-run)
-- 2026-10-30T15:47Z [test-core-api] done: audited packages/core + apps/web lib/data/API routes; added nav-pending.test.ts, prices-cache.test.ts, signing-store.test.ts, expanded address-book.test.ts, added test/e2e/api-routes.spec.ts (18 tests, first coverage of the 5 API routes); wrote docs/testing/core-api.md; no bugs found (one non-bug behavioral note documented); branch test/core-api @ 66f75be
+- 2026-10-30T15:47Z [test-core-api] done: audited packages/core + apps/web lib/data/API routes; added nav-pending.test.ts, prices-cache.test.ts, signing-store.test.ts, expanded address-book.test.ts, added test/e2e/api-routes.spec.ts (18 tests, first coverage of the 5 API routes); wrote docs/testing/core-api.md; no bugs found (one non-bug behavioral note documented); branch test/core-api @ 2324f0b
 - 2026-10-30T15:49Z [test-contract] done: unit 177->189 (+2 ignored bugs), sandbox 119->122 (+3 ignored bugs); docs/testing/contract.md
 - 2026-10-30T15:59Z [orchestrator] test audit merged (test/ui, test/core-api, test/contract): e2e 263/263, web unit 531, core 467, tools 92, contract unit 189 (+2 ignored bugs), sandbox 122 (+3 ignored bugs); docs/testing/README.md overview; open: AUDIT-01 (Medium, delegate BTC cap), AUDIT-04, AUDIT-02
 - 2026-10-30T16:18Z [AUDIT-02,AUDIT-04] WIP: fix/audit AUDIT-02 (listings try_from) and AUDIT-04 (emit after last check) committed, unit tests un-ignored; sandbox pending
@@ -123,13 +123,13 @@
 - 2026-10-30T16:30Z [AUDIT-01,AUDIT-02,AUDIT-04] DONE: fix/audit fixes committed; unit 194/0 ignored, sandbox 127/0 ignored, core 472, deep proptests pass, INV-22 OK, wasm 9dd65286 (non-reproducible); not pushed, not deployed
 - 2026-10-30T16:52Z [orchestrator] AUDIT-01/02/04 merged + app one-coin delegate BTC; dev2 redeployed (9dd65286…), state kept; .env.production hash updated; contract unit 194, sandbox 127, core 472, web unit 535, e2e 265, 0 ignored
 - 2026-10-30T17:23Z [orchestrator] test audit round two started: core2 (clean-history merge, validators, retry, live API smoke), ui2 (balance after send, keyboard-only send, reject paths, delegate one-coin, dust, dropdown a11y), contract2 (sandbox on nearcore 2.14, deep differential fuzz, post-fix edges, Q-03/Q-04 pinned, gas)
-- 2026-10-30T18:52Z [test-core2] in-progress: mergeNearSnapshots unit tests added (19 tests, near-merge.test.ts), committed c60efcc
+- 2026-10-30T18:52Z [test-core2] in-progress: mergeNearSnapshots unit tests added (19 tests, near-merge.test.ts), committed f1dcda7
 - 2026-10-30T18:55Z [ui-e2e-round2] plan: wrote round two plan (targets 1-7) into docs/testing/ui.md
-- 2026-10-31T14:41Z [test-core2] in-progress: validate.ts unit tests fixed (3 bad fixtures) and committed fbef0d7, 41 tests passing
-- 2026-10-31T14:42Z [test-core2] in-progress: retry.ts unit tests added (25 tests, retry.test.ts), committed 3ffa3e4
-- 2026-10-31T14:43Z [test-core2] in-progress: bytes.ts unit tests added (49 tests, bytes.test.ts), committed 3111cb4
+- 2026-10-31T14:41Z [test-core2] in-progress: validate.ts unit tests fixed (3 bad fixtures) and committed 4052af3, 41 tests passing
+- 2026-10-31T14:42Z [test-core2] in-progress: retry.ts unit tests added (25 tests, retry.test.ts), committed 604a456
+- 2026-10-31T14:43Z [test-core2] in-progress: bytes.ts unit tests added (49 tests, bytes.test.ts), committed 8b0a5e9
 - 2026-10-31T14:46Z [ui-e2e-round2] target1: refresh-after-send.spec.ts passing (2 tests); found fixture BTC/EVM/SOL balances are static, documented
-- 2026-10-31T14:47Z [test-core2] done: round two complete — core 540 tests (18 files), web unit 601 tests (46 files), tools 92 unchanged; typecheck/lint clean; live smoke against dev2 clean (code hash matched); docs updated. Branch test/core2 @ 3ad5e73, not pushed.
+- 2026-10-31T14:47Z [test-core2] done: round two complete — core 540 tests (18 files), web unit 601 tests (46 files), tools 92 unchanged; typecheck/lint clean; live smoke against dev2 clean (code hash matched); docs updated. Branch test/core2 @ ef8d3df, not pushed.
 - 2026-10-31T14:50Z [ui-e2e-round2] target2: keyboard-send.spec.ts passing (1 test, full keyboard-only Send)
 - 2026-10-31T14:52Z [test/contract2 round two] done: contract test audit round two on test/contract2 (unit 199, sandbox 136 on 2.13.4 and 2.14, 1M-case differential 0 disagreements, gas unchanged by the fixes, no contract bug; R2-01 web Low, Q-03/Q-04 pinned for Razvan)
 - 2026-10-31T14:54Z [ui-e2e-round2] target3: reject-coverage.spec.ts passing (8 tests); found 'timeout' knob is a no-op for plain NEAR calls
@@ -139,5 +139,5 @@
 - 2026-10-31T15:04Z [ui-e2e-round2] docs: wrote round two write-up (targets 1-6, findings); typecheck/lint/unit all pass; full e2e suite running
 - 2026-10-31T15:14Z [ui-e2e-round2] done: full suite 286/286 passing (21 new tests, stale duplicate spec removed); typecheck/lint/unit all clean; no bugs found
 - 2026-10-31T15:30Z [Q-03,Q-04] start: withdraw receiver guard + deny_unknown_fields on ft_on_transfer msgs (branch fix/q03-q04)
-- 2026-10-31T15:48Z [Q-03,Q-04] progress: Q-03 (8b0bca5) and Q-04 (code+tests) committed on fix/q03-q04; unit 202 pass; round2 7/7; next TS mirror/specs/suites
+- 2026-10-31T15:48Z [Q-03,Q-04] progress: Q-03 (daa386d) and Q-04 (code+tests) committed on fix/q03-q04; unit 202 pass; round2 7/7; next TS mirror/specs/suites
 - 2026-10-31T16:11Z [Q-03,Q-04] done: fix/q03-q04 (11 commits, not merged); withdraw_near/withdraw_ft/prepay_storage refuse contract/MPC/USDC; ft msgs deny_unknown_fields; unit 202, sandbox 137, core 540, web 606, INV-22 OK; dev2 redeployed 4dd7cde9… (tx DTRoJfs1…), state kept, live ERR_BAD_RECEIVER verified; .env.production hash updated

@@ -5,19 +5,19 @@
 >
 > | ID | Severity | Status now | Where |
 > |---|---|---|---|
-> | M-01 | Medium | **Fixed** 2026-10-29 | `ensure_solvent` (`contracts/satchel/src/market.rs`), called at the end of `nft_transfer` (`lib.rs`), `execute_sale` (`sale.rs`) and `accept_offer` (`offers.rs`); `tools/monitor.sh` check 4 subtracts `market_totals` escrow; the proof `tests/tests/review.rs::m01_…` is un-ignored and passes. Merged as `32f9467` (`plan/progress/feature-sprint.md`, 21:40Z) |
+> | M-01 | Medium | **Fixed** 2026-10-29 | `ensure_solvent` (`contracts/satchel/src/market.rs`), called at the end of `nft_transfer` (`lib.rs`), `execute_sale` (`sale.rs`) and `accept_offer` (`offers.rs`); `tools/monitor.sh` check 4 subtracts `market_totals` escrow; the proof `tests/tests/review.rs::m01_…` is un-ignored and passes. Merged as `778172a` (`plan/progress/feature-sprint.md`, 21:40Z) |
 > | L-01 | Low | Accepted, documented | `docs/specs/C5.md` §3 |
-> | L-02 | Low | **Fixed** (app) 2026-10-29 | escaped text, hex and a digest flag: `apps/web/src/lib/message.ts`, `components/Clean.tsx`; merged with the C2/C3/C7 UI (`aeba7f3`) |
+> | L-02 | Low | **Fixed** (app) 2026-10-29 | escaped text, hex and a digest flag: `apps/web/src/lib/message.ts`, `components/Clean.tsx`; merged with the C2/C3/C7 UI (`2f2cda8`) |
 > | L-03 | Low | Accepted; docs corrected | spec `docs/specs/C1-C2-C3-C7.md`, kb/90 §14 A-22 |
 > | L-04 | Low | **Fixed** (core) | `evmConfirmationsByChain`, `packages/core/src/clean-history/evm.ts` |
-> | L-05 | Low | **Fixed** (app) 2026-10-29 | `cleanSources` passes `evmByChain` and `mapCoreReport` maps `chain_id`, `erc20` and messages (`apps/web/src/lib/data/clean-live.ts`); merged in `aeba7f3` |
+> | L-05 | Low | **Fixed** (app) 2026-10-29 | `cleanSources` passes `evmByChain` and `mapCoreReport` maps `chain_id`, `erc20` and messages (`apps/web/src/lib/data/clean-live.ts`); merged in `2f2cda8` |
 > | I-01–I-09 | Info | Measured or accepted | as in the table below. I-03 is the same issue as the test audit's AUDIT-03 (documented, no change) |
 >
 > Later contract changes (AUDIT-01/-02/-04 on 2026-10-30, Q-03/Q-04 on 2026-10-31) came from the test audit, not this
 > review: [`docs/testing/contract.md`](../testing/contract.md). The v1 review is [`contract-review.md`](contract-review.md).
 > Shorthand: [docs/GLOSSARY.md](../GLOSSARY.md).
 
-Reviewed on 2026-10-29. Scope: the whole diff `bff1397..e985d82` (the audited baseline of `contract-review.md`, wasm
+Reviewed on 2026-10-29. Scope: the whole diff `5c522f9..2094200` (the audited baseline of `contract-review.md`, wasm
 `aea0b2e9…`, to `main` with every sprint feature merged) over `contracts/`, `tests/`, `packages/core/src/{policy,
 clean-history,near}`, `vectors/` and `tools/vectors/`:
 
@@ -27,7 +27,7 @@ clean-history,near}`, `vectors/` and `tools/vectors/`:
 - C4 offers and C6 NEAR/FT assets held inside a token (`docs/specs/C4-C6.md`).
 
 The code was checked against kb/90 (the INV-xx invariants, clean history), the kb/70 threat model and the three specs.
-Sandbox runs used `cargo near build non-reproducible-wasm` of `e985d82`: **422,562 B, sha256
+Sandbox runs used `cargo near build non-reproducible-wasm` of `2094200`: **422,562 B, sha256
 `bd5d8e0164aea488896a7a45f0f69ec0849d3c1049bf0013a3599283d0d4a1a5`**, INV-22 OK (27 imports; promise actions
 FunctionCall and Transfer only). No contract source was changed by this review. The changes are: one new sandbox file
 (`tests/tests/review.rs`), the L-04 fix in the checker (`packages/core`), and documentation corrections (L-01, L-03).

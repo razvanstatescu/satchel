@@ -32,7 +32,7 @@ end card (2:06).
 | `tools/sfx2/` | The 2.0 SFX library (32 effects) |
 
 Render + master: `ENTRY=src2/index.ts NAME=satchel-2 tools/render-master.sh v5` → `out/satchel-2-v5.mp4` (uses Remotion port 3490; set `PORT=` if busy).
-The v2 source is in git history (`marketing/video/src2` at commit 93dd2e3).
+The v2 source is in git history (`marketing/video/src2` at commit c74a089).
 Preview a scene: `cd video && npx remotion studio src2/index.ts` (compositions `Main`, `H1`…`E1`, galleries under Dev).
 
 ---

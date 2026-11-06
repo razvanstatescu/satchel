@@ -39,4 +39,4 @@ reference.
 
 **App follow-up found on the way** (outside the landing): in mainnet mode (`IS_TESTNET` false), `SatchelCard`'s head
 row should be `items-center`, like the landing card (P13; `design-notes.md` §4). It wasn't built in this round; it
-was built later the same day (commit `f0d37bb`: the pill centres beside a one-line total).
+was built later the same day (commit `5938226`: the pill centres beside a one-line total).

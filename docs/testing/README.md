@@ -113,7 +113,7 @@ build is for the rc. The state was kept (4 Satchels, #1 with 8 signatures). `lis
 
 ## Round two (2026-10-30/31)
 
-Details: [contract.md §7](contract.md#7-round-two-2026-10-30-branch-testcontract2-from-main-3272e4c),
+Details: [contract.md §7](contract.md#7-round-two-2026-10-30-branch-testcontract2-from-main-17850e5),
 [core-api.md "Round two"](core-api.md#round-two), [ui.md "Round two"](ui.md#round-two).
 
 - **Contract.** No contract bug; the contract source is unchanged. 1,000,000 Rust-vs-TS differential cases, 0

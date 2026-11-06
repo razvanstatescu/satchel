@@ -3,9 +3,9 @@
 **Status (2026-11-03, after the audit):** W1 and W2 fixed in `landing.ts` (W2 keeps "spending allowances" and trims
 "come out of" to "come from" to stay at 50 words); W3 fixed in `Market.tsx`, with an e2e regression test in
 `offers.spec.ts` that fails on the old code; N1 checked (no truncation from 320 px up); N2 done (kb/90 §7.7, kb/80);
-N3 fixed on `main` (c535e69); N6 passed to Razvan as a product call.
+N3 fixed on `main` (f63b56c); N6 passed to Razvan as a product call.
 
-**Scope.** The worktree's uncommitted diff against `main` (8d783e4): `landing.ts`, `faq.ts`, `MoreSection.tsx`, the art,
+**Scope.** The worktree's uncommitted diff against `main` (133fd93): `landing.ts`, `faq.ts`, `MoreSection.tsx`, the art,
 and the six app copy modules. Also the server HTML of `/` and
 `/questions` from a local dev server (role `final`, sample data). Each claim is checked
 against `facts.md` and its sources. Paths: **L** `apps/web/src/lib/copy/landing.ts`, **W** `apps/web/src`, **C5**,

@@ -46,7 +46,7 @@ Notes:
     not reproduced by any change in this audit and wasn't investigated further (out of scope: UI-only layout polish
     on a component this audit didn't touch for a feature reason).
 - **After round one**: 237 tests, 224 passed / 1 failed (same pre-existing failure above) — all 13 new tests pass.
-- **Before round two** (this branch's base, `main` at `3272e4c` — later than round one; other work landed meanwhile,
+- **Before round two** (this branch's base, `main` at `17850e5` — later than round one; other work landed meanwhile,
   e.g. the AUDIT-01 contract-side fix and its app-side send change): 265 tests, all passing — the round-one
   `responsive.spec.ts:54` sub-pixel flake did not reproduce in this environment.
 - **After round two**: 286 tests, **all 286 passing** — 21 new tests across 6 new spec files, 0 regressions. (A
@@ -205,7 +205,7 @@ run of this round. Removed; the second full run is clean.
 ### Bugs found this round
 
 No incorrect behaviour. The static fixture balance is deliberate fixture design. BTC's dust refusal was correct but
-showed core's raw text; that copy was fixed after the round (commit `3d770ba`, "Web: bitcoin coin-selection errors
+showed core's raw text; that copy was fixed after the round (commit `d08add6`, "Web: bitcoin coin-selection errors
 read as sentences"), and `dust-amounts.spec.ts` now asserts the new wording.
 
 ## Edge cases explored during this audit

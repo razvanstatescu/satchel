@@ -1,7 +1,7 @@
 # Satchel contract: adversarial security review, round 3
 
-Reviewed on 2026-11-04. Scope: `contracts/satchel/src/**` at `main` `bf32bac` (the contract code is identical to
-`b8ccb5e`; the commits in between only touched comments and docs), plus the parts of the buyer's checker
+Reviewed on 2026-11-04. Scope: `contracts/satchel/src/**` at `main` `4c90ed6` (the contract code is identical to
+`e759526`; the commits in between only touched comments and docs), plus the parts of the buyer's checker
 (`packages/core/src/clean-history`), the web app and `tools/deploy` that a finding depends on.
 
 This round reports only **new** issues, or fixes found incomplete. The baseline is the two earlier rounds,

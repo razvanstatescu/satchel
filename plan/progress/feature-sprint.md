@@ -28,17 +28,17 @@
 ## Status
 | ID | Feature | Owner | Status | Notes |
 |---|---|---|---|---|
-| A1 | A social card per Satchel (OG/Twitter image) | web-share | **merged + pushed** (1571bf5, on origin since bd94fcc) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
-| A2 | Give by link (claim link) | web-flows | **merged + pushed** (94428ea) | `/s/[id]/give-link`, `/claim` (fragment-only secret, local signer); batch fund + nft_transfer with fallback. Needs a real-wallet test |
-| A3 | Empty the Satchel | web-flows | **merged + pushed** (94428ea) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
-| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **removed 2026-10-30 (Razvan)** | was shipped in 1571bf5; taken out of Add coins as unneeded. The sheet keeps the address QR, Copy and Share. Recover from git history if wanted |
-| C1 | `history_digest` view | contract-sign | **contract merged + pushed** (e985d82) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
-| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | USDC balances and sends per network; ETH-for-fee guard; USDC rows in Activity and clean history |
-| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | per-network balances (server HTML), network picker in Send and Add coins, per-chain nonce check, EIP-681 `@chainId`; L-05 fixed (`evmByChain` in the live checker) |
+| A1 | A social card per Satchel (OG/Twitter image) | web-share | **merged + pushed** (735699a, on origin since ffd3a42) | `/s/[id]` opengraph + twitter images, branded fallback; unit + 3 Playwright |
+| A2 | Give by link (claim link) | web-flows | **merged + pushed** (329af75) | `/s/[id]/give-link`, `/claim` (fragment-only secret, local signer); batch fund + nft_transfer with fallback. Needs a real-wallet test |
+| A3 | Empty the Satchel | web-flows | **merged + pushed** (329af75) | `/s/[id]/empty`; per-chain drain, BTC auto-batches ≤10 inputs; hidden while listed |
+| A4 | Request coins (BIP-21 / EIP-681 / Solana Pay) | web-share | **removed 2026-10-30 (Razvan)** | was shipped in 735699a; taken out of Add coins as unneeded. The sheet keeps the address QR, Copy and Share. Recover from git history if wanted |
+| C1 | `history_digest` view | contract-sign | **contract merged + pushed** (2094200) | SHA-256 over immutable record fields; 3 encoders agree on `vectors/history.json`; ~2,500-record view gas limit |
+| C2 | ERC-20 USDC transfers on EVM | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (2f2cda8) | USDC balances and sends per network; ETH-for-fee guard; USDC rows in Activity and clean history |
+| C3 | More EVM testnets | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (2f2cda8) | per-network balances (server HTML), network picker in Send and Add coins, per-chain nonce check, EIP-681 `@chainId`; L-05 fixed (`evmByChain` in the live checker) |
 | C4 | Offers | contract-market → web-market (UI) | **done: contract + M-01 fix + UI + gaps merged and pushed** | offer sheet with NEAR/USDC (storage prepay), accept/cancel, My offers, storage-credit withdraw, Unlisted Satchels on /market; live on dev2: offer, accept and cancel PASS |
 | C5 | Spending allowance (delegated signer) | contract-allowance → web-allowance (UI) | **done: contract + UI + caps merged and pushed** | public allowance facts (no JS), owner add/revoke (max 4 accounts, max 8 caps), caps for BTC, SOL, ETH on 4 networks and USDC on 4 networks; delegate banner lists every cap; cap-gated Send; live on dev2: grant, within-cap, over-cap and revoke PASS |
 | C6 | NEAR-side assets inside | contract-market → web-market (UI) | **done: contract + M-01 fix + UI + gaps merged and pushed** | NEAR, USDC and wNEAR inside (deposit with prepay, owner withdraw, blocked while listed); live on dev2: deposit and withdraw PASS. Ops: register the contract at wrap.testnet (runbook updated) |
-| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (aeba7f3) | `/s/[id]/sign`: escaped text + hex + digest flag (L-02, SR-04), live signature verify, message deposit fixed; "Messages (n)" never blocks Buy |
+| C7 | Message signing (EIP-191; Solana off-chain format) | contract-sign → web-sign (UI) | **contract + UI merged + pushed** (2f2cda8) | `/s/[id]/sign`: escaped text + hex + digest flag (L-02, SR-04), live signature verify, message deposit fixed; "Messages (n)" never blocks Buy |
 
 ## Interface decisions fixed up front (so parallel branches agree)
 Each contract agent first commits `docs/specs/<id>.md` with its exact method signatures and JSON shapes, and logs
@@ -104,30 +104,30 @@ it. Phase-2 UI work builds against those specs.
   the now-loaded role definitions (`satchel-contract` Opus/high, `satchel-web` Sonnet/medium). They are told to
   commit WIP at every milestone, so a session end can't lose work again.
 - 2026-10-29 15:27Z: all three contract specs are committed. Phase-2 UI agents start once each contract branch's TS mirror (core) is final, to avoid rework.
-- 15:55Z: merged `feat/web-share` (A1, A4) into main (1571bf5): web unit 366, Playwright 144/144, tsc and lint clean. **Push to origin was blocked**: pushes need Razvan's explicit yes (CLAUDE.md rule 2), so main stays local until he confirms.
-- 16:00Z: merged `feat/contract-allowance` (C5) into main (24a680b): contract unit 115, core 359, tools 72, vectors agree; the sandbox run on merged main is in progress. Sent the merge notes to contract-market and contract-sign. Spawned web-allowance (Sonnet) for the C5 UI from 24a680b.
-- 16:00Z: Razvan allowed agents to push to the private repo without asking; main pushed (bd94fcc).
+- 15:55Z: merged `feat/web-share` (A1, A4) into main (735699a): web unit 366, Playwright 144/144, tsc and lint clean. **Push to origin was blocked**: pushes need Razvan's explicit yes (CLAUDE.md rule 2), so main stays local until he confirms.
+- 16:00Z: merged `feat/contract-allowance` (C5) into main (fafcc55): contract unit 115, core 359, tools 72, vectors agree; the sandbox run on merged main is in progress. Sent the merge notes to contract-market and contract-sign. Spawned web-allowance (Sonnet) for the C5 UI from fafcc55.
+- 16:00Z: Razvan allowed agents to push to the private repo without asking; main pushed (ffd3a42).
 - 16:04Z: the session restarted again. All work up to the stop was committed:
-  - contract-sign at 873ed43;
-  - contract-market at d04b3f8;
-  - web-flows at a98a53a;
+  - contract-sign at 2e679df;
+  - contract-market at 1469362;
+  - web-flows at 7a04ca0;
   - ui-allowance had no commits yet.
 
   The four agents were resumed from their transcripts, and the sandbox run on main was restarted. The finished web-share and contract-allowance worktrees were removed; their branches are merged.
 - 16:35Z: merged main (A1, A4, C5) verified: sandbox 91/91, wasm 329,320 B `e7ded724…`, INV-22 OK.
-- 16:55Z: merged `feat/web-flows` (A2, A3) into main (94428ea). One import conflict in ReceiveSheet was resolved; web unit 379, Playwright 161/161, typecheck and lint clean. Pushed.
-- 17:05Z: merged `feat/contract-market` (C4, C6) into main (a512d45), clean, since the branch had already merged C5: contract unit 142, core 371, tools 72. The branch-side wasm was 403,886 B `f5527f72…`; the sandbox run on main is in progress. Spawned web-market (Sonnet) for the C4/C6 UI from a512d45. Asked contract-sign to merge main into its branch and resolve the StorageKey order.
+- 16:55Z: merged `feat/web-flows` (A2, A3) into main (329af75). One import conflict in ReceiveSheet was resolved; web unit 379, Playwright 161/161, typecheck and lint clean. Pushed.
+- 17:05Z: merged `feat/contract-market` (C4, C6) into main (2dc4fa6), clean, since the branch had already merged C5: contract unit 142, core 371, tools 72. The branch-side wasm was 403,886 B `f5527f72…`; the sandbox run on main is in progress. Spawned web-market (Sonnet) for the C4/C6 UI from 2dc4fa6. Asked contract-sign to merge main into its branch and resolve the StorageKey order.
 - 16:40Z: session restart #3:
   - contract-sign was mid-merge of main into `feat/contract-sign-on-main`;
-  - ui-allowance had its data layer committed (e002cc7) plus uncommitted copy;
+  - ui-allowance had its data layer committed (99f010e) plus uncommitted copy;
   - ui-market had no commits.
 
-  All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (4349840); a confirmation sandbox run is in progress.
+  All three were resumed. main's contract/tests/core tree is identical to the tested contract-market branch (sandbox 107/107), so main was pushed (eecd3a3); a confirmation sandbox run is in progress.
 - 16:50Z: confirmation run on main (A1–A4, C4, C5, C6): sandbox 107/107, web unit 379, web typecheck clean.
-- 17:00Z: merged `feat/contract-sign` (C1, C2, C3, C7) into main (e985d82), clean, since the branch had already merged main: contract unit 172, core 459, tools 72 with all 7 vector files OK, web unit 379, typecheck OK. Pushed. **All seven contract features are now on main**; the merged wasm is 422,562 B `bd5d8e01…` (the agent's build).
-- 17:05Z: a Claude authentication outage stopped web-sign, web-market and web-allowance, and two spawns (reviewer, docs) failed on worktree races. Empty worktrees were removed; web-allowance (4 commits) and web-market (uncommitted data layer) were resumed and told to commit, then merge main; reviewer (Opus), web-sign (Sonnet) and docs-spec (Sonnet, kb/90 update) were respawned from e985d82. The full verification on main (wasm, sandbox, e2e) is re-running.
+- 17:00Z: merged `feat/contract-sign` (C1, C2, C3, C7) into main (2094200), clean, since the branch had already merged main: contract unit 172, core 459, tools 72 with all 7 vector files OK, web unit 379, typecheck OK. Pushed. **All seven contract features are now on main**; the merged wasm is 422,562 B `bd5d8e01…` (the agent's build).
+- 17:05Z: a Claude authentication outage stopped web-sign, web-market and web-allowance, and two spawns (reviewer, docs) failed on worktree races. Empty worktrees were removed; web-allowance (4 commits) and web-market (uncommitted data layer) were resumed and told to commit, then merge main; reviewer (Opus), web-sign (Sonnet) and docs-spec (Sonnet, kb/90 update) were respawned from 2094200. The full verification on main (wasm, sandbox, e2e) is re-running.
 - 17:15–17:30Z: web-allowance and web-market reported file writes and reads refused with "the user doesn't want to take this action … STOP". The orchestrator paused resumes and asked Razvan.
-- 17:40Z: Razvan said "continue". Session restart #4. All five agents resumed with the PATH fix (this session's shell lacked cargo, node and pnpm): web-allowance (fd6ce38 + 2 uncommitted), web-market (44a0ae9 + 4 uncommitted), reviewer, web-sign and docs-spec (8 uncommitted). The main verification (wasm, sandbox, e2e) is re-running with PATH set.
+- 17:40Z: Razvan said "continue". Session restart #4. All five agents resumed with the PATH fix (this session's shell lacked cargo, node and pnpm): web-allowance (7ad8bfb + 2 uncommitted), web-market (157485e + 4 uncommitted), reviewer, web-sign and docs-spec (8 uncommitted). The main verification (wasm, sandbox, e2e) is re-running with PATH set.
 - 17:50Z: web-sign handed its build to a nested satchel-web agent (running on `feat/ui-sign`, nothing committed yet). Its survey found web gaps on main that the C2/C3/C7 UI must close:
   - `clean-live.ts` passes only Sepolia `evm` sources, so records on the other three chains would be "unknown" and block Buy;
   - `Clean.tsx` drops "message" items;
@@ -137,10 +137,10 @@ it. Phase-2 UI work builds against those specs.
 
   **Release gate:** these must be fixed before the web deploy switches to a contract that has C2, C3 or C7.
 - 18:05Z: the other agents hit the same refusals. The C2/C3/C7 nested agent, web-market and web-allowance all report Read/Edit/Write refused with "the user doesn't want to take this action … STOP", even after Razvan's "continue". All are paused pending Razvan's choice: allow agent file edits, orchestrator does the UI, or stop the UI work.
-  - `feat/ui-allowance`: 531557b, with a **merge of main in progress** (`sim.ts` and `mock-wallet.ts` still conflicted).
-  - `feat/ui-market`: 3999f22 (data layer, copy, server-rendered inside balances; typecheck and lint clean).
+  - `feat/ui-allowance`: 7b18472, with a **merge of main in progress** (`sim.ts` and `mock-wallet.ts` still conflicted).
+  - `feat/ui-market`: c8ec239 (data layer, copy, server-rendered inside balances; typecheck and lint clean).
   - `feat/ui-sign`: one uncommitted types change, plus fixture vectors in the agent's report.
-- 18:10Z: merged `docs/kb90-sprint` (kb/90 §2/§5.4/§5.5/§5.9/§5.17/§6.1/§7/§13/§14, README, judge-snippets) into main. **Corrected its inferred StorageKey order** to the real enum in `lib.rs`: Allowances 8, Inside…StorageCredit 9–16, EvmNonces 17 (eb1f1c6). Pushed.
+- 18:10Z: merged `docs/kb90-sprint` (kb/90 §2/§5.4/§5.5/§5.9/§5.17/§6.1/§7/§13/§14, README, judge-snippets) into main. **Corrected its inferred StorageKey order** to the real enum in `lib.rs`: Allowances 8, Inside…StorageCredit 9–16, EvmNonces 17 (2cfdb49). Pushed.
 - 18:20Z: **the security reviewer reported provisional findings and was then blocked**: its Write of `tests/tests/review.rs` was refused, so nothing is committed yet. The review is about 60% done. It ran contract unit 172/172, the sandbox (exit 0) and a fresh differential fuzz (120k cases, 0 disagreements). Wasm 422,562 B `bd5d8e01…`, INV-22 OK. **No Critical or High.**
   - **M-01 (Medium): contract-paid storage can consume user escrow.** `nft_transfer`, `buy` and `accept_offer` to a new holder cost the contract about 250 B (S-02). Since C4/C6, the balance also holds inside NEAR, NEAR offers, storage credit and NEAR proceeds, so that growth can come out of escrow. I-M1 then breaks, and the last `withdraw_near` hits `LackBalanceForState`. The monitor's free-balance check counts escrow as free.
     - Proposed fix: a `proceeds_near` total, plus `ensure_solvent` (free ≥ inside + offers + credit + NEAR proceeds) at the end of `nft_transfer`, `execute_sale` and `accept_offer`.
@@ -156,8 +156,8 @@ it. Phase-2 UI work builds against those specs.
     - C5 ships (L-01 documented);
     - C7 ships (with L-02 UI hardening);
     - **C4/C6 need the M-01 fix.**
-- 20:00Z (local 22:00): Razvan said "you can continue". Verified main e985d82: wasm 422,562 B `bd5d8e01…`, INV-22 OK, Playwright 161/161 (the sandbox is 112/112 per the reviewer on the same tree). Resumed web-allowance, web-market, the nested web-sign agent (C2/C3/C7 UI, told to wire `evmByChain` and escape message text) and the reviewer (told M-01 is fixed elsewhere). Spawned **contract-fix-m01** (Opus) on `fix/m01-solvency` in a manually created worktree `.claude/worktrees/fix-m01`, since harness worktree creation keeps racing: failing test first, then `ensure_solvent()` plus an escrow-total view, plus a monitor update.
-- 20:30Z: **security review complete** (`docs/security/sprint-review.md`), merged into main (cf70d63) and pushed. No Critical or High.
+- 20:00Z (local 22:00): Razvan said "you can continue". Verified main 2094200: wasm 422,562 B `bd5d8e01…`, INV-22 OK, Playwright 161/161 (the sandbox is 112/112 per the reviewer on the same tree). Resumed web-allowance, web-market, the nested web-sign agent (C2/C3/C7 UI, told to wire `evmByChain` and escape message text) and the reviewer (told M-01 is fixed elsewhere). Spawned **contract-fix-m01** (Opus) on `fix/m01-solvency` in a manually created worktree `.claude/worktrees/fix-m01`, since harness worktree creation keeps racing: failing test first, then `ensure_solvent()` plus an escrow-total view, plus a monitor update.
+- 20:30Z: **security review complete** (`docs/security/sprint-review.md`), merged into main (43a698e) and pushed. No Critical or High.
   - **M-01, Medium:** the escrow solvency issue. The fix is in progress on `fix/m01-solvency`; the proof `review.rs::m01_…` is `#[ignore]`d until it lands.
   - **L-01:** OP-stack L1 fee, documented.
   - **L-02:** message display hardening; assigned to web-sign.
@@ -169,9 +169,9 @@ it. Phase-2 UI work builds against those specs.
   Verdicts: C1, C2, C5 ship; C3 ships (app needs L-05); C7 ships (L-02 UI); **C4/C6 ship with the M-01 fix**.
 
   Suites on the review branch: contract unit 172, sandbox 115 + 1 ignored, core 465, tools 72, differential fuzz 400k with 0 disagreements.
-- 21:05Z: merged `feat/ui-allowance` (C5 UI) into main (1fb28f8). Fixed its reported stale Add-sheet bug (reset form on each <Activity> showing) and replaced the e2e workaround with a regression check. Web unit 396, Playwright 169/169 on merged main. Pushed.
-- 21:40Z: merged `fix/m01-solvency` into main (32f9467). **M-01 is closed**: the reviewer's proof is un-ignored and passes. Contract unit 177, core 467, tools 72, web unit 396. The branch-side sandbox was 119/119 with an identical contract and tests tree. Wasm 423,977 B `10c6a8e9…` (branch build). The root state layout changed again, so deploy to a fresh devN.
-- 21:50Z: merged `feat/ui-sign` (C2, C3, C7 UI, plus review L-02 and L-05) into main (aeba7f3): web unit 422, typecheck and lint clean, Playwright 183/183. Pushed. The sandbox and wasm rebuild on final main are running. **Only web-market (C4/C6 UI) remains.**
+- 21:05Z: merged `feat/ui-allowance` (C5 UI) into main (f080f48). Fixed its reported stale Add-sheet bug (reset form on each <Activity> showing) and replaced the e2e workaround with a regression check. Web unit 396, Playwright 169/169 on merged main. Pushed.
+- 21:40Z: merged `fix/m01-solvency` into main (778172a). **M-01 is closed**: the reviewer's proof is un-ignored and passes. Contract unit 177, core 467, tools 72, web unit 396. The branch-side sandbox was 119/119 with an identical contract and tests tree. Wasm 423,977 B `10c6a8e9…` (branch build). The root state layout changed again, so deploy to a fresh devN.
+- 21:50Z: merged `feat/ui-sign` (C2, C3, C7 UI, plus review L-02 and L-05) into main (2f2cda8): web unit 422, typecheck and lint clean, Playwright 183/183. Pushed. The sandbox and wasm rebuild on final main are running. **Only web-market (C4/C6 UI) remains.**
 - 22:40Z: merged `feat/ui-market` (C4/C6 UI) into main. 5 additive conflicts were resolved by keeping both sides; `MarketTotalsView` gained the M-01 fields. **All sprint features are now merged**:
   - A1–A4;
   - C1–C7 contract and UI;
@@ -187,7 +187,7 @@ it. Phase-2 UI work builds against those specs.
   - The Day-9 reproducible build.
 - 22:55Z: live phase.
   - Deleted `smoke1` (4.0 NEAR back to satchelhq; satchelhq now 19.8 NEAR).
-  - Created **`dev2.satchelhq.testnet`** (5.5 NEAR): wasm `10c6a8e9…` (main 56cd631), init with USDC and base_uri usesatchel.xyz, registered at USDC and wrap.testnet, #1–#3 minted to alice.
+  - Created **`dev2.satchelhq.testnet`** (5.5 NEAR): wasm `10c6a8e9…` (main 915a467), init with USDC and base_uri usesatchel.xyz, registered at USDC and wrap.testnet, #1–#3 minted to alice.
   - Funded dev2 #1 from dev1 #1 through `sign_for`:
     - Sepolia 0.02 ETH, `0x12649022…`, gas 207,391;
     - devnet 0.2 SOL, `4gwTkeub…`;
@@ -195,7 +195,7 @@ it. Phase-2 UI work builds against those specs.
   - **Switching production to dev2 needs Razvan.** Committing `apps/web/.env.production` was blocked by the auto-mode classifier (credential-leakage rule for `.env*`). Vercel's env must be set to `NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet` and `NEXT_PUBLIC_EXPECTED_CODE_HASH=10c6a8e9096b682791f4ebe282861314b0f51b8be0c54e11b7f057c53353614a`, then redeployed. Until then, the live site (on dev1, the pre-sprint contract) will show errors for the new views if it is redeployed from main.
   - Spawned **tools-live** (Sonnet): extends `tools/e2e` (multi-chain/USDC EVM, message, market, allowance, history) and runs it live on dev2 within caps, producing `research/spikes/dev2-live/RESULTS.md`.
   - Spawned **web-gaps** (Sonnet): USDC offers with storage prepay, FT deposits and withdrawals, storage-credit withdraw, `/market` offer entry.
-- 2026-10-30 08:10Z: session restart. Razvan allowed pushing `.env.production` updates. **Production now points at dev2** (0e8bd03: `NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet`, `NEXT_PUBLIC_EXPECTED_CODE_HASH=10c6a8e9…`). Public values only. tools-live and web-gaps had made no changes before the restart (dev2 untouched: `sig_count` 0); both were resumed from scratch. dev2 #1's BTC funding confirmed at block 158101.
+- 2026-10-30 08:10Z: session restart. Razvan allowed pushing `.env.production` updates. **Production now points at dev2** (3415e01: `NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet`, `NEXT_PUBLIC_EXPECTED_CODE_HASH=10c6a8e9…`). Public values only. tools-live and web-gaps had made no changes before the restart (dev2 untouched: `sig_count` 0); both were resumed from scratch. dev2 #1's BTC funding confirmed at block 158101.
 - 08:50Z: merged `feat/tools-live` into main. **Live dev2 run: 20/20 flows PASS** (`research/spikes/dev2-live/RESULTS.md`), with 8 real MPC `sign_for` calls at 5.4–6.1 s each and no timeouts:
   - EVM Sepolia send; Base Sepolia and USDC sign-only;
   - EVM and SOL messages with real verification;

@@ -25,7 +25,7 @@
   only the total, bar and chips, as the app card does.
 
 ## R4. `/questions` answers in the app lane
-- **Done on `main` (8d783e4)**, and the refresh branch includes it:
+- **Done on `main` (133fd93)**, and the refresh branch includes it:
   - `q-what-is` says "only its current owner, or someone the owner lets spend within daily caps";
   - `q-where-arrive` was fixed the same way.
 - **Never edit `copy/questions.ts`.**

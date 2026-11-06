@@ -5,7 +5,7 @@ Inputs:
   `/questions` group title;
 - last round's `copy.md`, `rulings.md` (R1–R9) and `facts.md` (`docs/design/site-refresh/`);
 - `docs/design/satchel-2.0/voice-copy.md` §1 and §5, and `refs-code.md`;
-- the code at fe2e0a6: `landing.ts`, `shell.ts`, `faq.ts`, `lock-facts.ts`, `NavShell.tsx`, `LandingMenu.tsx`, every
+- the code at 7ded620: `landing.ts`, `shell.ts`, `faq.ts`, `lock-facts.ts`, `NavShell.tsx`, `LandingMenu.tsx`, every
   landing section, `art.tsx`, `landing.css`, `layout.tsx`, `(landing)/page.tsx`, the OG images, and every test named
   below;
 - the server HTML of `localhost:3210/` (role dev, fixture), saved as a working file (not kept).
