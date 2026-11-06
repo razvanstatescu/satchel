@@ -280,11 +280,11 @@ export function MintFlow({ from }: { from: string | null }) {
               <Sparkle size={16} className="absolute top-7.5 -left-6" />
             </div>
           ) : null}
-          <SatchelCard tokenId={minted.id} size="md" status="active" owned headingLevel={3} />
+          <SatchelCard tokenId={minted.id} size="md" status="active" owned headingLevel={2} />
           <div ref={lineRef} className="flex flex-col items-center gap-1 text-center">
-            <h3 ref={doneRef} tabIndex={-1} data-testid="mint-done" className="m-0 font-display text-title text-ink outline-none">
+            <h2 ref={doneRef} tabIndex={-1} data-testid="mint-done" className="m-0 font-display text-title text-ink outline-none">
               {copy.mint.done(minted.id)}
-            </h3>
+            </h2>
             {minted.hash ? (
               <p className="m-0 font-sans text-body-sm text-ink-muted">
                 {copy.mint.mintedIn("")}
@@ -298,11 +298,11 @@ export function MintFlow({ from }: { from: string | null }) {
         </div>
       ) : (
         <>
-          <SatchelCard tokenId={null} size="md" status={null} owned variant="mint-preview" chips={chips(null)} headingLevel={3} className="self-center" />
+          <SatchelCard tokenId={null} size="md" status={null} owned variant="mint-preview" chips={chips(null)} headingLevel={2} className="self-center" />
           <section aria-labelledby={youGetId} className="flex flex-col gap-2.5">
-            <h3 id={youGetId} className="m-0 font-sans text-label text-ink">
+            <h2 id={youGetId} className="m-0 font-sans text-label text-ink">
               {copy.mint.youGet}
-            </h3>
+            </h2>
             <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
               {copy.mint.get.map((g) => (
                 <li key={g} className="flex items-start gap-2.5 font-sans text-[0.9375rem] leading-5.5 text-ink">
