@@ -41,11 +41,12 @@ export type { PageAnchor };
 
 export const HACKATHON_URL = "https://nearhackathon.com/";
 
-/** The landing's in-page links, in page order (the header from 1024 and the menu sheet). Section ids: #how, #clean, #questions. */
+/** The landing's in-page links, in page order (the header from 1024 and the menu sheet). Section ids: #how, #clean, #questions.
+ * Written as `/#id` so they also work from the guides that share this header (on `/` the browser just scrolls). */
 export const LANDING_ANCHORS: readonly PageAnchor[] = [
-  { href: "#how", label: copy.nav.anchors.how },
-  { href: "#clean", label: copy.nav.anchors.clean },
-  { href: "#questions", label: copy.nav.anchors.questions },
+  { href: "/#how", label: copy.nav.anchors.how },
+  { href: "/#clean", label: copy.nav.anchors.clean },
+  { href: "/#questions", label: copy.nav.anchors.questions },
 ];
 
 /** Side gutters: 16 · 24 from 768 · 32 from 1024 (design-spec §3.1). */

@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { ChevronRight, Plus } from "lucide-react";
 import { CONTAINER, H2, HEAD_CENTER, SECTION_Y } from "@/components/landing/layout";
-import { JsonLd } from "@/components/JsonLd";
 import { Icon } from "@/components/ui";
-import { faqLd, jsonLdGraph } from "@/lib/seo";
 import { CONTRACT_ROLE } from "@/lib/config";
 import { copy, type SolVariant } from "@/lib/copy";
 import { faqItems, LANDING_SOL, splitLead } from "@/lib/faq";
@@ -22,7 +20,6 @@ export function QuestionsSection({ role = CONTRACT_ROLE, sol = LANDING_SOL }: { 
   const items = faqItems({ role, sol });
   return (
     <section id="questions" aria-labelledby="questions-title" className={SECTION_Y}>
-      <JsonLd data={jsonLdGraph(faqLd(items.map((it) => ({ q: it.q, a: it.a }))))} />
       <div className={CONTAINER}>
         <div className="mx-auto max-w-[51.25rem]">
           <div className={HEAD_CENTER}>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { JsonLd } from "@/components/JsonLd";
 import { Landing } from "@/components/Landing";
-import { APP_URL } from "@/lib/config";
-import { pageMetadata, siteJsonLd } from "@/lib/seo";
-import { LANDING_NAMES_SOL } from "@/lib/faq";
+import { APP_URL, CONTRACT_ROLE } from "@/lib/config";
+import { faqLd, jsonLdGraph, pageMetadata, siteJsonLd } from "@/lib/seo";
+import { faqItems, LANDING_NAMES_SOL, LANDING_SOL } from "@/lib/faq";
 import { copy } from "@/lib/copy";
 
 const description = copy.landing.meta.description(LANDING_NAMES_SOL);
@@ -18,13 +18,15 @@ export const metadata: Metadata = pageMetadata({
   path: "/",
   title: copy.landing.meta.title,
   description,
-  ogTitle: copy.app.name,
+  ogTitle: "Satchel: an NFT that is a wallet",
 });
 
 export default async function Home() {
   return (
     <>
       <JsonLd data={siteJsonLd(APP_URL)} />
+      {/* the landing's visible Q&A, word for word */}
+      <JsonLd data={jsonLdGraph(faqLd(faqItems({ role: CONTRACT_ROLE, sol: LANDING_SOL }).map((it) => ({ q: it.q, a: it.a }))))} />
       <Landing />
     </>
   );

@@ -21,7 +21,8 @@ const ANCHORS = ["how", "clean", "questions"];
  * Questions (320, plus 5 for the who-line the W4 blind test asked for, plus site-refresh F1's 6 words and the "What else
  * it does" strip's 49: site-refresh design notes §1, R9).
  */
-const WORDS = { hero: 61, captions: 10, section: 50, aboveQuestions: 380 };
+// hero 61 -> 71 (and above Questions 380 -> 390): the SEO definition "Satchel is an NFT on NEAR that is a wallet." now opens the lead
+const WORDS = { hero: 71, captions: 10, section: 50, aboveQuestions: 390 };
 const CORAL = "rgb(255, 92, 77)";
 
 const decode = (s: string) =>
@@ -163,7 +164,7 @@ test.describe("landing: server HTML", () => {
       expect.arrayContaining([L.what.h2, L.uses.h2, L.how.h2, L.clean.h2, L.lock.h2, L.questions.h2, L.cta.h2]),
     );
     const header = raw.slice(raw.indexOf("<header"), raw.indexOf("</header>"));
-    const anchors = [...header.matchAll(/href="#([a-z0-9-]+)"/g)].map((m) => m[1]);
+    const anchors = [...header.matchAll(/href="\/#([a-z0-9-]+)"/g)].map((m) => m[1]);
     expect([...new Set(anchors)]).toEqual(ANCHORS);
     expect(raw).toContain(`id="under-the-hood"`);
   });
@@ -218,7 +219,7 @@ test.describe("landing: without JavaScript", () => {
     await page.goto("/");
     const top = page.locator("#top");
     await expect(top.getByRole("heading", { level: 1, name: copy.home.h1 })).toBeVisible();
-    await expect(top.getByText(L.hero.lead(true), { exact: true })).toBeVisible();
+    await expect(top.getByText(L.hero.lead(true))).toBeVisible(); // the lead paragraph opens with the bold definition sentence
     for (const name of [L.hero.cta.primary, L.hero.cta.secondary]) await expect(top.getByRole("link", { name })).toBeVisible();
     // the server frame: for sale, checked, clean; the price tag on; Yours not yet; the third caption showing
     const op = (k: string) => page.locator(`[data-k="${k}"]`).evaluate((el) => getComputedStyle(el).opacity);
@@ -445,10 +446,10 @@ test.describe("landing: budgets", () => {
     }
   });
 
-  test("heights: ≤ 7,000 px at 1280 and ≤ 10,100 px at 390 (site polish round P8), #clean ≤ 900 px at 1280", async ({ page }) => {
+  test("heights: ≤ 7,000 px at 1280 and ≤ 10,300 px at 390 (site polish round P8; +200 for the SEO definition sentence), #clean ≤ 900 px at 1280", async ({ page }) => {
     for (const [w, h, max] of [
       [1280, 900, 7_000],
-      [390, 844, 10_100],
+      [390, 844, 10_300],
     ] as const) {
       await page.setViewportSize({ width: w, height: h });
       await page.goto("/");

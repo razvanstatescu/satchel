@@ -308,8 +308,8 @@ test("mobile landing: the 390 budget, the hero order and the phone layout", asyn
   }
 
   expect(clean, "#clean at 390 (≤ 1,800 px)").toBeLessThanOrEqual(1_800);
-  // site polish round P8: the bento band and the P12 lead-tile fix raise the 390 cap from 9,000 to 10,100.
-  expect(height, "page height at 390 (≤ 10,100 px)").toBeLessThanOrEqual(10_100);
+  // site polish round P8: the bento band and the P12 lead-tile fix raise the 390 cap from 9,000 to 10,100; the SEO definition sentence in the hero lead (+10 words) raises it to 10,300.
+  expect(height, "page height at 390 (≤ 10,300 px)").toBeLessThanOrEqual(10_300);
 });
 
 /**

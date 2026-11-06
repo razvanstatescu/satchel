@@ -203,8 +203,11 @@ test("robots.txt allows every crawler and sitemap.xml lists every minted Satchel
   const sitemap = await request.get("/sitemap.xml");
   expect(sitemap.status()).toBe(200);
   const x = await sitemap.text();
-  // fixture config: next_token_id 8 → Satchels 1 … 7, three tabs each, plus the five public pages
-  expect(x.match(/<url>/g)).toHaveLength(5 + 7 * 3);
+  // fixture config: next_token_id 8 → Satchels 1 … 7 with two tabs each, plus /sale for the Satchels that are listed,
+  // plus the seven public pages (/, /questions, /market, /mint, /contract, /learn and the ready guide /clean-history)
+  const listed = [...(await (await request.get("/market")).text()).matchAll(/data-market-item="(\d+)"/g)].length;
+  expect(listed).toBeGreaterThan(0);
+  expect(x.match(/<url>/g)).toHaveLength(7 + 7 * 2 + listed);
   expect(x).toMatch(/<loc>[^<]*\/s\/7\/activity<\/loc>/);
   expect(x).not.toMatch(/\/s\/8</);
   expect(x).not.toMatch(/\/(send|transfer)</);

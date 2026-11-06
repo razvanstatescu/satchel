@@ -38,7 +38,7 @@ export const marketing = {
     related: "Related guides",
     faq: "Questions and answers",
     cta: {
-      title: "See it on a Satchel",
+      title: "Try it yourself",
       body: "Open a Satchel and read its record, or browse the Satchels for sale.",
       primary: "Look inside a Satchel",
       secondary: "See Satchels for sale",

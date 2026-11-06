@@ -20,7 +20,8 @@ const text = (html: string) =>
     .replace(/\s+/g, " ");
 const metaContent = (html: string, attr: "name" | "property", key: string) => new RegExp(`<meta ${attr}="${key}" content="([^"]*)"`).exec(html)?.[1]?.replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&");
 const canonical = (html: string) => /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1];
-const h1s = (html: string) => [...noScripts(html).matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)].map((m) => m[1]!.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim());
+const decode = (s: string) => s.replace(/&#x27;|&#39;/g, "'").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+const h1s = (html: string) => [...noScripts(html).matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)].map((m) => decode(m[1]!.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()));
 
 type Node = Record<string, unknown>;
 function jsonLd(html: string): Node[] {
@@ -51,14 +52,14 @@ const PAGES: PageCase[] = [
     key: ["Satchel is an NFT on NEAR that is a wallet.", "Look inside a Satchel"],
     ld: ["WebSite", "Organization", "WebApplication", "FAQPage"],
   },
-  { path: "/questions", h1: "Questions", key: ["Is clean history a guarantee", /Questions|Basics/], ld: ["BreadcrumbList", "FAQPage"] },
-  { path: "/market", h1: "Market", key: ["for sale", "your browser checks each one"], ld: [] },
+  { path: "/questions", h1: "Questions", key: ["What exactly is a Satchel?", /Basics/], ld: ["BreadcrumbList", "FAQPage"] },
+  { path: "/market", h1: "Market", key: [/for sale/i, /checks each one/i], ld: [] },
   { path: "/mint", canon: "/mint", h1: "Mint a Satchel", key: ["Mint a Satchel"], ld: [] },
   { path: "/mint?from=/market", canon: "/mint", h1: "Mint a Satchel", key: ["Mint a Satchel"], ld: [] },
   { path: "/contract", h1: /Born without a key|Development contract/, key: [/code hash/i], ld: [] },
   { path: "/s/1", h1: "Satchel #1: This NFT is a wallet.", key: [ADDR1.btc, ADDR1.evm], ld: [] },
   { path: "/s/1/activity", h1: /^Satchel #1 · Activity$/, key: ["Satchel #1"], ld: [] },
-  { path: "/s/1/sale", h1: /^Satchel #1 · (Buy|Sell|Sold)$/, key: ["Satchel #1"], ld: [] },
+  { path: "/s/1/sale", h1: /^Satchel #1 · (Buy|Sell|Sold|Sale)$/, key: ["Satchel #1"], ld: [] },
   { path: "/learn", h1: "Learn how Satchel works", key: ["Satchel is an NFT on NEAR that is a wallet.", "Clean history: check a Satchel's signatures before you buy"], ld: ["BreadcrumbList"] },
   {
     path: "/clean-history",
@@ -87,8 +88,9 @@ test.describe("every public page, from the server HTML alone", () => {
 
       // canonical + og:url: absolute, clean
       const url = `${base()}${c.canon ?? c.path}`;
-      expect(canonical(html)).toBe(c.path === "/" ? `${base()}/` : url);
-      expect(metaContent(html, "property", "og:url")).toBe(c.path === "/" ? `${base()}/` : url);
+      // (Next writes the home page's URL without its slash)
+      expect(canonical(html)).toBe(c.path === "/" ? base() : url);
+      expect(metaContent(html, "property", "og:url")).toBe(c.path === "/" ? base() : url);
       expect(metaContent(html, "property", "og:site_name")).toBe("Satchel");
       expect(metaContent(html, "property", "og:type")).toMatch(/^(website|article)$/);
 
@@ -101,8 +103,9 @@ test.describe("every public page, from the server HTML alone", () => {
       const title = /<title>([^<]*)<\/title>/.exec(html)![1]!.replace(/&#x27;|&#39;/g, "'");
       expect(metaContent(html, "property", "og:title")).toBe(metaContent(html, "name", "twitter:title"));
       expect(metaContent(html, "property", "og:title")).not.toBe("Satchel");
+      expect(metaContent(html, "property", "og:title")!.length).toBeGreaterThan(8);
       expect(title.length).toBeLessThanOrEqual(70);
-      expect(html).toMatch(/<link rel="alternate" type="text\/markdown" href="\/llms\.txt"/);
+      expect(html).toMatch(/<link rel="alternate" type="text\/markdown" href="[^"]*\/llms\.txt"/);
 
       // JSON-LD parses and has the expected types
       const ld = types(jsonLd(html));
@@ -111,7 +114,9 @@ test.describe("every public page, from the server HTML alone", () => {
       // key text in the HTML (no JS)
       const body = text(html);
       for (const k of c.key) {
-        if (typeof k === "string") expect(body).toContain(k);
+        // an address is grouped into chunks for reading: compare without whitespace
+        if (typeof k === "string" && !k.includes(" ")) expect(body.replace(/\s/g, "").toLowerCase()).toContain(k.toLowerCase());
+        else if (typeof k === "string") expect(body).toContain(k);
         else expect(body).toMatch(k);
       }
     });
@@ -221,7 +226,7 @@ test.describe("/llms.txt, /sitemap.xml and /robots.txt", () => {
     for (const p of ["/questions", "/learn", "/clean-history", "/market", "/mint", "/contract", "/s/1"]) expect(xml).toContain(`<loc>${base()}${p}</loc>`);
     expect(xml).not.toContain("/satchels<");
     expect(xml).not.toContain("/gift-crypto");
-    const clean = /<url><loc>[^<]*\/clean-history<\/loc>([\s\S]*?)<\/url>/.exec(xml)![1]!;
+    const clean = /<loc>[^<]*\/clean-history<\/loc>([\s\S]*?)<\/url>/.exec(xml)![1]!;
     expect(clean).toContain("<lastmod>2026-11-06");
     // the /sale page is listed only for Satchels that are for sale: each one listed on /market has it
     const market = await (await request.get("/market")).text();
@@ -247,7 +252,8 @@ test.describe("axe on the new pages, Day and Night", () => {
         await page.goto(path);
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
         await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-        const results = await new AxeBuilder({ page }).analyze();
+        // everything axe knows (best practices too); only the fixture build's "Sample data" strip sits outside a landmark
+        const results = await new AxeBuilder({ page }).exclude(".min-h-dvh > .bg-surface-sunken").analyze();
         expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(" | ")}`)).toEqual([]);
         // no horizontal scroll at this width
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

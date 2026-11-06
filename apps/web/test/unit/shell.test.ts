@@ -47,9 +47,9 @@ describe("the app nav", () => {
 describe("the landing's top bar", () => {
   it("links the landing's sections in page order (the proto ids) and names them from the shell's copy", () => {
     expect(LANDING_ANCHORS).toEqual([
-      { href: "#how", label: "How it works" },
-      { href: "#clean", label: "Clean history" },
-      { href: "#questions", label: "Questions" },
+      { href: "/#how", label: "How it works" },
+      { href: "/#clean", label: "Clean history" },
+      { href: "/#questions", label: "Questions" },
     ]);
     expect(HACKATHON_URL).toMatch(/^https:\/\//);
   });
