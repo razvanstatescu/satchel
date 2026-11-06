@@ -134,3 +134,6 @@ export function diffConfig(cfg: ContractConfigView, expectMpc = MPC_ACCOUNT_TEST
   eq('storage_byte_cost', cfg.storage_byte_cost, STORAGE_BYTE_COST.toString())
   return d
 }
+
+/** wNEAR on testnet (the fungible token Satchel's market accepts besides NEAR and USDC). */
+export const WNEAR_TESTNET = 'wrap.testnet'

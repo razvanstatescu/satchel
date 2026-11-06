@@ -5,7 +5,7 @@
  *   {"token_id":"1","delegate":"bot.alice.testnet","caps":[{"asset":"btc","limit":"100000"}],"expires_at_ms":1794000000000}
  *   {"token_id":"1","delegate":"bot.alice.testnet"}
  */
-import { tokenPath } from '../derive'
+import { tokenPath } from '../derive/path'
 import { validateCaps, type Asset, type CapInput } from '../policy/allowance'
 import { MILLINEAR, ONE_YOCTO, TGAS } from './constants'
 import type { FunctionCallParams } from './sign-request'

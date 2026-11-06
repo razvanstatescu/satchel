@@ -6,11 +6,12 @@
  *             {"deposit":"3"}
  *             {"offer":{"token_id":"3","expected_sig_count":4,"expected_inside_epoch":0,"expires_at_ms":1793000000000}}
  */
-import { tokenPath } from '../derive'
+import { tokenPath } from '../derive/path'
 import { COOLDOWN_BLOCKS, MILLINEAR, ONE_YOCTO, TGAS } from './constants'
 import type { FunctionCallParams } from './sign-request'
 
-export const WNEAR_TESTNET = 'wrap.testnet'
+import { WNEAR_TESTNET } from './constants'
+export { WNEAR_TESTNET }
 export const MAX_OFFERS_PER_ACCOUNT = 20
 export const MAX_OFFER_TTL_MS = 90 * 24 * 3600 * 1000
 

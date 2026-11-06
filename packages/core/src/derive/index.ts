@@ -18,7 +18,9 @@ import { base58, bech32 } from '@scure/base'
 import { bytesToBigIntBE, toHex, utf8 } from '../bytes'
 
 export type Network = 'testnet' | 'mainnet'
-export type ChainSlug = 'btc' | 'evm' | 'sol'
+export type { ChainSlug } from './path'
+export { tokenPath } from './path'
+import { tokenPath, type ChainSlug } from './path'
 
 /** MPC root public keys (NEAR format: base58 of x‖y for secp256k1, of the 32-byte point for ed25519). kb/11 §Live MPC contract facts. */
 export const MPC_ROOT_KEYS = {
@@ -38,14 +40,6 @@ export const MPC_CONTRACT: Record<Network, string> = { testnet: 'v1.signer-prod.
 export const DOMAIN_ID: Record<ChainSlug, 0 | 1> = { btc: 0, evm: 0, sol: 1 }
 
 const TWEAK_PREFIX = 'near-mpc-recovery v0.1.0 epsilon derivation:'
-const CANONICAL_TOKEN_ID = /^[1-9][0-9]*$/
-
-/** "satchel/{id}/{chain}". Token ids are canonical decimals ("1", never "01"), or the address changes (kb/30 §Gotchas). */
-export function tokenPath(tokenId: string, chain: ChainSlug): string {
-  if (!CANONICAL_TOKEN_ID.test(tokenId)) throw new Error(`non-canonical token id: ${JSON.stringify(tokenId)}`)
-  return `satchel/${tokenId}/${chain}`
-}
-
 export function derivationTweak(predecessor: string, path: string): Uint8Array {
   return sha3_256(utf8(`${TWEAK_PREFIX}${predecessor},${path}`))
 }

@@ -8,7 +8,7 @@
  *   {"token_id":"1","request":{"sol_message":{"message":"68656c6c6f"}}}
  */
 import { strip0x, toHex, utf8 } from '../bytes'
-import { tokenPath, type ChainSlug } from '../derive'
+import { tokenPath, type ChainSlug } from '../derive/path'
 import { messageSignAttachDeposit, signAttachDeposit, signAttachGas } from './constants'
 
 export type SignRequest =
