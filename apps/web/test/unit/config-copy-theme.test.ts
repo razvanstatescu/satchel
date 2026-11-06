@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { DEFAULTS, parsePublicEnv } from "@/lib/config";
+import { DEFAULTS } from "@/lib/config";
+import { parsePublicEnv } from "@/lib/config-env";
 
 const FORBIDDEN_RPC_HOST = ["rpc", "testnet", "near", "org"].join(".");
 import manifest from "@/app/manifest";

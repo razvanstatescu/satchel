@@ -1,4 +1,4 @@
-import type { PublicEnv } from "@/lib/config";
+import type { PublicEnv } from "@/lib/config-env";
 import { copy } from "@/lib/copy";
 
 /**

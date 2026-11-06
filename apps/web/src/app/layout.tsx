@@ -3,11 +3,15 @@ import { Funnel_Display, Geist_Mono, Onest } from "next/font/google";
 import { Providers } from "@/components/client/Providers";
 import { PressFeedback } from "@/components/client/PressFeedback";
 import { APP_URL } from "@/lib/config";
+import { validatePublicEnv } from "@/lib/config-env";
 import { copy } from "@/lib/copy";
 import { LLMS_PATH } from "@/lib/seo";
 import { MOTION_HEAD_SCRIPT } from "@/lib/motion-flag";
 import { GROUND, THEME_HEAD_SCRIPT } from "@/lib/theme";
 import "./globals.css";
+
+/** Strict env check (zod) on the server only: the browser bundle keeps the plain resolver in config.ts. */
+validatePublicEnv();
 
 /*
  * Fonts (design-system-impl §3): next/font/google, self-hosted at build time, never the Google CSS link. `weight` is
