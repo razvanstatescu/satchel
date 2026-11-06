@@ -22,7 +22,7 @@ import {
 import { ChainCharm } from "@/components/brand/ChainCharm";
 import { ExternalLink, Icon, ItemPill, cx } from "@/components/ui";
 import { CHAIN_NAME, copy } from "@/lib/copy";
-import { buyEnabled, counts } from "@/lib/data/clean";
+import { buyEnabled, counts } from "@/lib/data/clean-agg";
 import { looksLikeDigest, safeMessage } from "@/lib/message";
 import type { Aggregate, CleanItem, CleanReport, ItemStatus } from "@/lib/data/types";
 import { relativeTime } from "@/lib/format";

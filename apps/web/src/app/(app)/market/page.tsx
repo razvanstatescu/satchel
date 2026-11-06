@@ -1,10 +1,10 @@
 import { overview } from "@/lib/overview";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { connection } from "next/server";
 import { CircleAlert, RefreshCw } from "lucide-react";
-import { GateLine, checkedAgo, hintModel, marketOrder } from "@/components/Clean";
+import { marketOrder } from "@/components/Clean";
 import { SatchelCard } from "@/components/SatchelCard";
+import { HintGateLine } from "@/components/client/HintGateLine";
 import { Banner, Button, EmptyState } from "@/components/ui";
 import { copy } from "@/lib/copy";
 import { marketing } from "@/lib/copy/marketing";
@@ -17,6 +17,9 @@ import { MarketCard } from "./MarketCard";
  * /market (judge route, app-screens §9): blocking SSR of every listing with its card, its price and the SERVER's check,
  * labelled as the server's ("Server check 2 min ago: clean"). Only the buyer's browser check on the Buy tab enables Buy;
  * this page never says "checked in your browser". Buyable listings first, the blocked ones last.
+ *
+ * Prerendered from the cached listings (no request-time render, so it paints at once). The server HTML states the check
+ * time absolutely; the `HintGateLine` island turns it into "N min ago" after hydration.
  */
 export const instant = false;
 
@@ -27,14 +30,7 @@ export const metadata: Metadata = pageMetadata({
   description: marketing.meta.market.description,
 });
 
-/** The request's time: "2 min ago" is measured per request, not when the listings were cached. */
-async function requestTime(): Promise<number> {
-  await connection();
-  return Date.now();
-}
-
 export default async function MarketPage() {
-  const now = await requestTime();
   const [m, unlisted] = await Promise.all([getMarket(), getUnlistedMarket()]);
   const entries = marketOrder(m.entries);
   return (
@@ -72,8 +68,6 @@ export default async function MarketPage() {
           {entries.map((e) => {
             const price = priceText(e.listing.price, e.listing.currency);
             const cardId = `market-card-${e.token_id}`;
-            const t = e.hint ? checkedAgo(e.hint.checked_at, now) : null;
-            const hint = e.hint && t ? hintModel(e.hint.aggregate, t) : null;
             return (
               <li key={e.token_id} data-market-item={e.token_id} className="group/mkt relative flex w-full max-w-100 min-w-0 flex-col gap-3">
                 {/* the card is real content (its name heading and its ledger for assistive tech); the link below
@@ -90,7 +84,7 @@ export default async function MarketPage() {
                     <span className="font-display text-[1.375rem] leading-6.5 font-extrabold tracking-[-0.02em] t-num">{price}</span>{" "}
                     <span className="font-sans text-body-sm text-ink-muted t-num">{copy.market.meta(e.listing.id, e.snapshot.sig_count)}</span>
                   </span>{" "}
-                  {hint ? <GateLine model={hint} /> : null}
+                  {e.hint ? <HintGateLine at={e.hint.checked_at} aggregate={e.hint.aggregate} /> : null}
                 </Link>
               </li>
             );

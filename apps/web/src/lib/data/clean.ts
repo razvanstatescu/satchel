@@ -4,6 +4,7 @@ import { CONTRACT_ROLE } from "@/lib/config";
 import { CHAIN_NAME, copy } from "@/lib/copy";
 import { formatAmount, truncateAddress } from "@/lib/format";
 import type { Aggregate, CleanCheck, CleanItem, CleanReport, ItemStatus, LockFacts } from "@/lib/data/types";
+import { buyEnabled, counts } from "@/lib/data/clean-agg";
 import { fixtureEvidence, fixtureItemStatus } from "@/lib/data/fixtures";
 import { evmNetworkName } from "@/lib/evm-networks";
 import { isMessageDetail, type SigRecordView } from "@/lib/near/types";
@@ -42,7 +43,6 @@ export function aggregate(args: {
   return { aggregate: "clean", unsafeReason: null };
 }
 
-export const buyEnabled = (a: Aggregate) => a === "clean" || a === "empty";
 export const isBlockingItem = (s: ItemStatus | "checking") => s === "checking" || BLOCKING.has(s as ItemStatus);
 
 export function lockChecks(lock: LockFacts, role: "dev" | "rc" | "final"): CleanCheck[] {
@@ -180,9 +180,5 @@ export function unavailableReport(tokenId: string, records: SigRecordView[], loc
   };
 }
 
-/** Counts used by the verdict and GateLine copy. */
-export function counts(items: { status: ItemStatus | "checking" }[]) {
-  const c = { spent: 0, expired: 0, unfunded: 0, foreign: 0, message: 0, settling: 0, unused: 0, unknown: 0, checking: 0 };
-  for (const i of items) c[i.status as keyof typeof c]++;
-  return c;
-}
+
+export { buyEnabled, counts };
