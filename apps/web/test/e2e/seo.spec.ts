@@ -199,11 +199,12 @@ test.describe("/clean-history: the template", () => {
 
   test("/learn lists every ready guide and the footer links to them", async ({ request }) => {
     const html = noScripts(await (await request.get("/learn")).text());
-    expect(html).toMatch(/<a [^>]*href="\/clean-history"/);
-    expect(html).not.toMatch(/href="\/gift-crypto"/); // registered but not ready
     const footer = /<footer[\s\S]*<\/footer>/.exec(html)![0];
+    for (const p of ["/clean-history", "/sell-a-crypto-wallet", "/buy-a-crypto-wallet", "/transfer-a-crypto-wallet", "/gift-crypto", "/erc-6551", "/chain-signatures"]) {
+      expect(html).toMatch(new RegExp(`<a [^>]*href="${p}"`));
+      expect(footer).toContain(`href="${p}"`);
+    }
     expect(footer).toContain('href="/learn"');
-    expect(footer).toContain('href="/clean-history"');
     expect(footer).toContain('href="/llms.txt"');
   });
 });
@@ -218,14 +219,14 @@ test.describe("/llms.txt, /sitemap.xml and /robots.txt", () => {
     for (const p of ["/questions", "/contract", "/learn", "/clean-history", "/market", "/s/1"]) expect(txt).toContain(`](${base()}${p})`);
     expect(txt).toContain("Testnet only");
     expect(txt).not.toContain("github.com/razvanstatescu");
-    expect(txt).not.toContain("/gift-crypto");
+    for (const p of ["/clean-history", "/sell-a-crypto-wallet", "/buy-a-crypto-wallet", "/transfer-a-crypto-wallet", "/gift-crypto", "/erc-6551", "/chain-signatures"]) expect(txt).toContain(`](${base()}${p})`);
   });
 
   test("sitemap.xml lists the marketing pages with lastmod, and not /satchels", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
     for (const p of ["/questions", "/learn", "/clean-history", "/market", "/mint", "/contract", "/s/1"]) expect(xml).toContain(`<loc>${base()}${p}</loc>`);
     expect(xml).not.toContain("/satchels<");
-    expect(xml).not.toContain("/gift-crypto");
+    for (const p of ["/clean-history", "/sell-a-crypto-wallet", "/buy-a-crypto-wallet", "/transfer-a-crypto-wallet", "/gift-crypto", "/erc-6551", "/chain-signatures"]) expect(xml).toContain(`<loc>${base()}${p}</loc>`);
     const clean = /<loc>[^<]*\/clean-history<\/loc>([\s\S]*?)<\/url>/.exec(xml)![1]!;
     expect(clean).toContain("<lastmod>2026-11-06");
     // the /sale page is listed only for Satchels that are for sale: each one listed on /market has it

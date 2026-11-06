@@ -76,10 +76,10 @@ export const MARKETING_PAGES: readonly MarketingPage[] = [
     title: "How to gift crypto to someone without a wallet",
     metaTitle: "Gift crypto to someone without a wallet",
     description:
-      "Give a Satchel by link to someone who has no NEAR account yet. How the link works, what the receiver does, and what to know before you send one.",
+      "How to gift crypto to someone without a wallet: the usual options compared, then a Satchel by link. How the link works and what to know before you send.",
     primaryQuery: "how to gift crypto to someone without a wallet",
     updated: "2026-11-06",
-    ready: false,
+    ready: true,
   },
   {
     slug: "erc-6551",
@@ -90,7 +90,7 @@ export const MARKETING_PAGES: readonly MarketingPage[] = [
       "ERC-6551 gives an NFT an account on one EVM chain. How that compares with a Satchel's native Bitcoin, Ethereum and Solana addresses and its clean history.",
     primaryQuery: "erc 6551 token bound account",
     updated: "2026-11-06",
-    ready: false,
+    ready: true,
   },
   {
     slug: "chain-signatures",
@@ -101,7 +101,7 @@ export const MARKETING_PAGES: readonly MarketingPage[] = [
       "A worked example of NEAR Chain Signatures: how a Satchel contract derives addresses per token and records each signature request before it is made.",
     primaryQuery: "near chain signatures",
     updated: "2026-11-06",
-    ready: false,
+    ready: true,
   },
 ];
 

@@ -24,6 +24,7 @@ const BASE = "https://usesatchel.xyz";
 
 /** A registry with one more page ready, to show the lists follow the flag. */
 const withReady = (slug: string): MarketingPage[] => MARKETING_PAGES.map((p) => (p.slug === slug ? { ...p, ready: true } : p));
+const withoutReady = (slug: string): MarketingPage[] => MARKETING_PAGES.map((p) => (p.slug === slug ? { ...p, ready: false } : p));
 
 describe("robots.txt", () => {
   it("allows every crawler everywhere (judges included) and points at the sitemap", () => {
@@ -54,6 +55,9 @@ describe("sitemap.xml", () => {
       `${BASE}/sell-a-crypto-wallet`,
       `${BASE}/buy-a-crypto-wallet`,
       `${BASE}/transfer-a-crypto-wallet`,
+      `${BASE}/gift-crypto`,
+      `${BASE}/erc-6551`,
+      `${BASE}/chain-signatures`,
       `${BASE}/s/1`,
       `${BASE}/s/1/activity`,
       `${BASE}/s/1/sale`,
@@ -68,8 +72,8 @@ describe("sitemap.xml", () => {
   });
 
   it("reads the registry: a page appears when it is ready and not before", () => {
-    expect(urls(null)).not.toContain(`${BASE}/gift-crypto`);
-    expect(sitemapFor(BASE, null, { pages: withReady("gift-crypto") }).map((e) => e.url)).toContain(`${BASE}/gift-crypto`);
+    expect(sitemapFor(BASE, null, { pages: withoutReady("sell-a-crypto-wallet") }).map((e) => e.url)).not.toContain(`${BASE}/sell-a-crypto-wallet`);
+    expect(sitemapFor(BASE, null, { pages: withReady("sell-a-crypto-wallet") }).map((e) => e.url)).toContain(`${BASE}/sell-a-crypto-wallet`);
     // every registered-but-unready page stays out
     for (const p of MARKETING_PAGES.filter((x) => !x.ready)) expect(urls(null)).not.toContain(`${BASE}/${p.slug}`);
   });
@@ -119,7 +123,7 @@ describe("marketing registry", () => {
       "erc-6551",
       "chain-signatures",
     ]);
-    expect(readyPages().map((p) => p.slug)).toEqual(["clean-history", "sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet"]);
+    expect(readyPages().map((p) => p.slug)).toEqual(["clean-history", "sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet", "gift-crypto", "erc-6551", "chain-signatures"]);
   });
 
   it("keeps titles and descriptions inside search-result limits", () => {
@@ -133,9 +137,9 @@ describe("marketing registry", () => {
   });
 
   it("lists related guides from the ready pages only, never the page itself", () => {
-    expect(relatedPages("clean-history").map((p) => p.slug)).toEqual(["sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet"]);
-    expect(relatedPages("sell-a-crypto-wallet").map((p) => p.slug)).not.toContain("sell-a-crypto-wallet");
-    expect(relatedPages("clean-history", withReady("gift-crypto")).map((p) => p.slug)).toContain("gift-crypto");
+    expect(relatedPages("clean-history").map((p) => p.slug)).toEqual(["sell-a-crypto-wallet", "buy-a-crypto-wallet", "transfer-a-crypto-wallet", "gift-crypto", "erc-6551", "chain-signatures"]);
+    expect(relatedPages("gift-crypto").map((p) => p.slug)).not.toContain("gift-crypto");
+    expect(relatedPages("clean-history", withoutReady("gift-crypto")).map((p) => p.slug)).not.toContain("gift-crypto");
   });
 });
 
@@ -235,8 +239,8 @@ describe("llms.txt", () => {
 
   it("lists the ready guides from the registry and not the others", () => {
     expect(txt).toContain(`(${BASE}/clean-history)`);
-    expect(txt).not.toContain("/gift-crypto");
-    expect(llmsTxt(BASE, withReady("gift-crypto"))).toContain(`(${BASE}/gift-crypto)`);
+    expect(txt).toContain(`(${BASE}/sell-a-crypto-wallet)`);
+    expect(llmsTxt(BASE, withoutReady("sell-a-crypto-wallet"))).not.toContain("/sell-a-crypto-wallet");
   });
 
   it("is short", () => {
