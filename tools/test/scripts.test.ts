@@ -84,7 +84,8 @@ describe('keyless-birth tool', () => {
   const tinyH = createHash('sha256').update(readFileSync(tiny)).digest('hex')
   it('dry run prints the 11 actions and H; refuses --yes; requires H for rc and the final', () => {
     const base = ['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://usesatchel.xyz/api/card/', '--wasm', 'tools/test/fixtures/tiny.wasm']
-    const r = tsx([...base, '--child', 'rc.satchelhq.testnet', '--expected-sha256', tinyH])
+    // --expected-rev: CI checks out without tags, so the default (the rev of the release tag) may not resolve there
+    const r = tsx([...base, '--child', 'rc.satchelhq.testnet', '--expected-sha256', tinyH, '--expected-rev', '843d35334f7fc7a88644fc39424bb137e7460094'])
     // tiny.wasm has no reproducible build_info, so the dry run prints everything, flags it and exits 1
     expect(r.status, r.stderr).toBe(1)
     expect(r.stdout).toMatch(/wasm +PASS +INV-22 import check/)
