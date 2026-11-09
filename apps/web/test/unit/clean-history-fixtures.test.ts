@@ -5,6 +5,7 @@ import { FIXTURE_RECORDS, fixtureListings, fixtureSatchel } from "@/lib/data/fix
 import { eventsForToken, type FastnearTx } from "@/lib/near/history";
 import { cardSvg } from "@/lib/card-svg";
 import type { LockFacts } from "@/lib/data/types";
+import { CONTRACT_ROLE } from "@/lib/config";
 
 const LOCKED: LockFacts = { access_keys: 0, account_exists: true, locked: true, code_hash_hex: "aa", expected_code_hash: "aa", code_matches: true, birth_tx: "B", birth_block: 1 };
 const KEYED: LockFacts = { ...LOCKED, access_keys: 2, locked: false, code_matches: null, expected_code_hash: null };
@@ -52,10 +53,17 @@ describe("fixture world (D-32)", () => {
       expect(l.listing.sig_count).toBe(s.sig_count);
     }
   });
-  it("in dev role a keyed contract only warns", () => {
+  // The role comes from NEXT_PUBLIC_CONTRACT_ROLE (dev unless set), so the suite also runs with the production
+  // (final) settings: one of these two runs, never both.
+  it.skipIf(CONTRACT_ROLE !== "dev")("in dev role a keyed contract only warns", () => {
     const r = fixtureCleanReport("3", FIXTURE_RECORDS["3"], KEYED, 3);
     expect(r.role).toBe("dev");
     expect(r.checks[0]).toMatchObject({ warn: true });
+  });
+  it.skipIf(CONTRACT_ROLE === "dev")("in rc/final role a keyed contract fails closed (unsafe)", () => {
+    const r = fixtureCleanReport("3", FIXTURE_RECORDS["3"], KEYED, 3);
+    expect(r.role).toBe(CONTRACT_ROLE);
+    expect(r.aggregate).toBe("unsafe");
   });
 });
 
