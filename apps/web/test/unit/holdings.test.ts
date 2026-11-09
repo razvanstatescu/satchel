@@ -23,7 +23,7 @@ const EMPTY: Snap = {
   inside: { near: "0", fts: [], inside_epoch: 0 },
 };
 
-function snap(patch: { btc?: string; sepEth?: string; sepUsdc?: string; baseEth?: string; baseUsdc?: string; sol?: string; near?: string; usdc?: string; wnear?: string }): Snap {
+function snap(patch: { unconfirmed?: string; btc?: string; sepEth?: string; sepUsdc?: string; baseEth?: string; baseUsdc?: string; sol?: string; near?: string; usdc?: string; wnear?: string }): Snap {
   const chains = EMPTY.balances.evm_chains!.map((r) => ({ ...r }));
   if (patch.sepUsdc) chains[0].usdc = patch.sepUsdc;
   if (patch.baseEth) chains[1].wei = patch.baseEth;
@@ -35,7 +35,7 @@ function snap(patch: { btc?: string; sepEth?: string; sepUsdc?: string; baseEth?
   ];
   return {
     balances: {
-      btc: { confirmed_sats: patch.btc ?? "0", unconfirmed_sats: "0" },
+      btc: { confirmed_sats: patch.btc ?? "0", unconfirmed_sats: patch.unconfirmed ?? "0" },
       evm: { wei: patch.sepEth ?? "0" },
       sol: { lamports: patch.sol ?? "0" },
       evm_chains: chains,
@@ -43,6 +43,14 @@ function snap(patch: { btc?: string; sepEth?: string; sepUsdc?: string; baseEth?
     inside: { near: patch.near ?? "0", fts, inside_epoch: 0 },
   };
 }
+
+describe("holdings: BTC", () => {
+  it("BTC counts confirmed coins only, minus a send already in the mempool", () => {
+    expect(findHolding(holdings(snap({ btc: "10000", unconfirmed: "50000" })), "btc")!.amount).toBe(10000n);
+    expect(findHolding(holdings(snap({ btc: "10000", unconfirmed: "-4000" })), "btc")!.amount).toBe(6000n);
+    expect(findHolding(holdings(snap({ btc: "1000", unconfirmed: "-5000" })), "btc")!.amount).toBe(0n);
+  });
+});
 
 describe("holdings: one entry per coin per place", () => {
   it("lists every place in the canonical order, with stable keys", () => {

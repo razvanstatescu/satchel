@@ -4,7 +4,7 @@ import { overview } from "@/lib/overview";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from "react";
-import { CircleCheck, Hourglass, Info, Landmark, LoaderCircle, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
+import { CircleCheck, CircleDashed, Hourglass, Info, Landmark, LoaderCircle, RefreshCw, Snowflake, Tag, TriangleAlert, Undo2, Wallet, type LucideIcon } from "lucide-react";
 import {
   GateLine,
   Record,
@@ -19,6 +19,7 @@ import {
   verdictAllowsBuy,
   verdictModel,
   type BuyPhase,
+  type GateModel,
   type ReportMode,
   type VerdictModel,
 } from "@/components/Clean";
@@ -31,6 +32,7 @@ import { SoldReceipt, TxValue, useUsdcRegistration } from "@/components/client/S
 import { ObjCol, ObjMain } from "@/components/SatchelWallet";
 import { announce, toast, usePinnedBar } from "@/components/client/Toaster";
 import { useCleanCheck } from "@/components/client/useCleanCheck";
+import { useVerifiedBalances } from "@/components/client/useVerifiedBalances";
 import { AmountInput, Button, EmptyState, ExternalLink, HelpLink, Icon, Morph, Segmented, buttonClass, cx } from "@/components/ui";
 import { useNow } from "@/lib/clock";
 import { copy, errorCopy } from "@/lib/copy";
@@ -39,7 +41,7 @@ import { buyEnabled, counts } from "@/lib/data/clean";
 import { refreshSnapshot } from "@/lib/data/client";
 import { dataSource } from "@/lib/data/source";
 import type { CleanReport, SatchelSnapshot } from "@/lib/data/types";
-import { formatBlocks, NBSP, parseUnits } from "@/lib/format";
+import { formatAmount, formatBlocks, NBSP, parseUnits } from "@/lib/format";
 import { readMotionMode, subscribeMotionMode } from "@/lib/motion-flag";
 import { EASE, play, stickOnTracks, type Track } from "@/lib/motion/play";
 import { calls, contractViews } from "@/lib/near/contract";
@@ -50,6 +52,7 @@ import type { Currency, Listing } from "@/lib/near/types";
 import { useWallet } from "@/lib/near/wallet";
 import { holdingsSentence, priceText } from "@/lib/view";
 import { holdingText, holdings, splitHoldings } from "@/lib/holdings";
+import { describeLowered } from "@/lib/data/verified-text";
 import { CoinIcon } from "@/components/brand/CoinIcon";
 import { OverviewHeadline, ValueBar } from "@/components/Overview";
 
@@ -319,6 +322,7 @@ function BuyView({ snap, hint, serverNow, onStart, onStop }: { snap: SatchelSnap
   const check = useCleanCheck(id, phase !== "done"); // the 10 s re-check stops once it's bought
   const shownReport = useShownReport(snap, check);
   const st = useReveal(shownReport.report, reduce);
+  const verified = useVerifiedBalances(id, live.balances, live.inside, check.report);
   const root = useRef<HTMLDivElement>(null);
   const gateRef = useRef<HTMLDivElement>(null);
   const [note, setNote] = useState<Note | null>(null);
@@ -340,9 +344,17 @@ function BuyView({ snap, hint, serverNow, onStart, onStop }: { snap: SatchelSnap
   const shown = st.shown;
   const t = shown ? checkedAgo(shown.checked_at, now || shown.checked_at) : "";
   const hintT = hint ? checkedAgo(hint.checked_at, now || serverNow) : "";
-  const buyable = mode === "browser" && st.risen && !!shown && buyEnabled(shown.aggregate) && (phase === "idle" || phase === "refunded");
+  // G-2: Buy waits for the balances to be read fresh at the check's depth, so "You get" never lags the verdict
+  const balancesReady = !!verified.fresh;
+  const buyable = mode === "browser" && st.risen && !!shown && buyEnabled(shown.aggregate) && balancesReady && (phase === "idle" || phase === "refunded");
   const btn = buyButtonModel({ phase, buyable, ready, signedIn: !!accountId && !!wallet, price, connecting });
-  const gate = gateModel(mode, shown, t);
+  const gateBase = gateModel(mode, shown, t);
+  const gate: GateModel =
+    mode === "browser" && st.risen && !!shown && buyEnabled(shown.aggregate) && !balancesReady
+      ? verified.failed
+        ? { ...gateBase, gate: "unknown", tone: "muted", icon: CircleDashed, spin: false, text: copy.buy.gate.balancesFailed }
+        : { ...gateBase, gate: "checking", tone: "frozen", icon: LoaderCircle, spin: true, text: copy.buy.gate.balances }
+      : gateBase;
   const verdict: VerdictModel = {
     ...verdictModel({ mode, report: mode === "hint" ? hint : shown, sigCount: live.sig_count, revealed: st.revealed, t: mode === "hint" ? hintT : t }),
     ...(mode === "browser" && shownReport.failed ? { checked: null } : {}),
@@ -375,6 +387,22 @@ function BuyView({ snap, hint, serverNow, onStart, onStop }: { snap: SatchelSnap
     }
     if (!buyEnabled(r.aggregate)) {
       setPhase("idle"); // the verdict changed: the reveal shows it and announces it
+      onStop();
+      return;
+    }
+    // 1b. re-read the balances the buyer was shown, fresh and at the check's depth (G-2): if any fell, show the
+    // new figure and stop; the buyer confirms with a second press (never a silent buy of less)
+    const bal = await verified.read(r.encumbered_utxos);
+    if (!bal) {
+      setNote({ kind: "error", text: copy.buy.recheckFailed });
+      setPhase("idle");
+      onStop();
+      return;
+    }
+    if (bal.lowered.length) {
+      verified.ack(bal.next);
+      setNote({ kind: "error", text: copy.buy.balanceDropped(describeLowered(bal.lowered)) });
+      setPhase("idle");
       onStop();
       return;
     }
@@ -545,7 +573,7 @@ function BuyView({ snap, hint, serverNow, onStart, onStop }: { snap: SatchelSnap
         ) : liveNow.listing ? (
           <FreezeLine />
         ) : null}
-        <YouGet live={live} encumbered={mode === "browser" && shown ? shown.encumbered_utxos.length : 0} headingId={ids.youGet} />
+        <YouGet live={mode === "browser" && verified.fresh ? { ...live, balances: verified.fresh } : live} fresh={mode === "browser" && !!verified.fresh} excluded={mode === "browser" && verified.fresh ? verified.excluded : 0n} headingId={ids.youGet} />
         {showOffer ? (
           <>
             <Record report={recordSource ?? { checks: [], sources: [] }} rows={rows} tokenId={id} promise={verdictAllowsBuy(mode, shown)} hintLine={hintLine} headingId={ids.record} />
@@ -625,9 +653,9 @@ function FreezeLine() {
 }
 
 /** You get: the native amounts (a summary of the card's ledger), never fiat; unconfirmed deposits never count. */
-function YouGet({ live, encumbered, headingId }: { live: SatchelSnapshot; encumbered: number; headingId: string }) {
+function YouGet({ live, fresh, excluded, headingId }: { live: SatchelSnapshot; fresh: boolean; excluded: bigint; headingId: string }) {
   return (
-    <section aria-labelledby={headingId} className="flex flex-col gap-3">
+    <section aria-labelledby={headingId} data-balances={fresh ? "fresh" : "snapshot"} className="flex flex-col gap-3">
       <div className="flex min-h-11 items-center">
         <h2 id={headingId} className="font-display text-heading text-ink">
           {copy.buy.youGet}
@@ -661,10 +689,10 @@ function YouGet({ live, encumbered, headingId }: { live: SatchelSnapshot; encumb
       <p className="font-sans text-body-sm text-ink-muted">
         {copy.buy.addressesToo} {copy.buy.unconfirmed}
       </p>
-      {encumbered > 0 ? (
+      {excluded > 0n ? (
         <p className="flex items-start gap-2 font-sans text-body-sm text-ink">
           <Icon icon={TriangleAlert} size={16} className="mt-0.5 text-danger" />
-          <span>{copy.buy.encumbered(encumbered)}</span>
+          <span>{copy.buy.excluded(formatAmount(excluded, "BTC"))}</span>
         </p>
       ) : null}
     </section>

@@ -125,8 +125,10 @@ export const commerce = {
     hintLabel: "Server check",
     hintValue: (t: string, word: string) => `${t}: ${word}`,
     youGet: "You get",
-    /** NEW: when the browser check found coins an earlier signature can still spend (they're in the amounts above). */
-    encumbered: (count: number) => `This includes ${n(count, "coin", "coins")} an earlier signature can still spend.`,
+    /** kb/80 `buy.youget.excluded`: Bitcoin an earlier signature can still spend is left out of the amounts above. */
+    excluded: (amount: string) => `${amount} left out: an earlier signature can still spend it.`,
+    /** Right before Buy, a balance fell since the buyer looked (G-2): the new figure is on the page; Buy asks again. */
+    balanceDropped: (changes: string) => `What you get changed: now ${changes}. Nothing was bought. Press Buy again to confirm.`,
     /** NEW (app-screens §5.1): under the You get rows, before `unconfirmed`. */
     addressesToo: "Its addresses come with it.",
     unconfirmed: "Unconfirmed deposits never count.",
@@ -142,6 +144,8 @@ export const commerce = {
       clean: (t: string) => `Clean history · checked ${t}`,
       checking: "Checking history…",
       waiting: "Waiting for your browser's check",
+      balances: "Reading balances…",
+      balancesFailed: "Couldn't read the balances. Trying again…",
       settling: (count: number) => `Confirming: ${n(count, "signature", "signatures")}`,
       blocked: (count: number) => `Blocked: ${n(count, "unused signature", "unused signatures")}`,
       unknown: (count: number) => `Can't verify ${n(count, "signature", "signatures")}`,

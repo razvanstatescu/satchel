@@ -308,6 +308,53 @@ test.describe("mint, transfer, sale gating", () => {
     await expect(page.getByTestId("buy-done").locator("[data-yours]")).toHaveCount(1);
   });
 
+  test("Buy re-reads the balances and the count it checked, and stops when they changed (G-2, U-3)", async ({ page }) => {
+    await useMockWallet(page, CAROL);
+    await page.goto("/s/3/sale");
+    const b3 = page.getByTestId("buy-block");
+    await expect(b3.locator("[data-gate]")).toHaveAttribute("data-gate", "clean", { timeout: 20_000 });
+    await expect(b3.getByTestId("buy")).toHaveAttribute("aria-disabled", "false");
+    // "You get" is the balance the browser just read at the check's depth, not the cached snapshot
+    const youGet = page.locator('section[data-balances]');
+    await expect(youGet).toHaveAttribute("data-balances", "fresh");
+    await expect(youGet.locator('[data-holding="evm"]')).toContainText("0.014979 ETH");
+    // a drain that reached depth lands while the verdict stays clean (the snapshot route still serves the old figure)
+    await page.evaluate(() => {
+      localStorage.setItem("satchel:sim:drained", "1");
+      document.querySelector<HTMLElement>('[data-testid="buy"]')?.click();
+    });
+    await expect(b3.locator('[data-note="error"]')).toContainText("What you get changed", { timeout: 10_000 });
+    await expect(b3.locator('[data-note="error"]')).toContainText("Press Buy again to confirm");
+    await expect(page.getByTestId("buy-done")).toHaveCount(0);
+    expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem("satchel:sim:v1") ?? "{}").owners?.["3"] ?? null)).not.toBe(CAROL);
+    // the new figure is on the page; the second press confirms it
+    await expect(youGet.locator('[data-holding="evm"]')).not.toContainText("0.014979 ETH");
+    await expect(b3.getByTestId("buy")).toHaveAttribute("aria-disabled", "false");
+    await b3.getByTestId("buy").click();
+    await expect(page.getByTestId("buy-done")).toContainText("Satchel #3 is yours.", { timeout: 20_000 });
+  });
+
+  test("Buy stops when a signature was recorded while the re-check ran (U-3)", async ({ page }) => {
+    await useMockWallet(page, CAROL);
+    await page.goto("/s/3/sale");
+    const b3 = page.getByTestId("buy-block");
+    await expect(b3.locator("[data-gate]")).toHaveAttribute("data-gate", "clean", { timeout: 20_000 });
+    await expect(b3.getByTestId("buy")).toHaveAttribute("aria-disabled", "false");
+    await b3.getByTestId("buy").click();
+    // the fixture re-check reads the contract, then waits 700 ms (useCleanCheck.ts): a record lands in between
+    await page.evaluate((owner) => {
+      const key = "satchel:sim:v1";
+      const s = JSON.parse(sessionStorage.getItem(key) ?? "null") ?? { startedAt: Date.now() };
+      const now = Date.now();
+      const record = { tokenId: "3", seq: 99, chain: "evm", payload: "", detail: { evm_message: { message: "6869" } }, requester: owner, createdAt: now, height: 1, resolveAt: now, outcome: "signed" };
+      sessionStorage.setItem(key, JSON.stringify({ ...s, records: [...(s.records ?? []), record] }));
+    }, ALICE);
+    await expect(page.getByTestId("buy-done")).toHaveCount(0);
+    await expect(b3.getByTestId("buy")).toHaveAttribute("aria-disabled", "true", { timeout: 20_000 });
+    const owner = await page.evaluate(() => JSON.parse(sessionStorage.getItem("satchel:sim:v1") ?? "{}").owners?.["3"] ?? null);
+    expect(owner).not.toBe(CAROL);
+  });
+
   test("the browser's other verdicts keep Buy off: confirming, can't verify (with Check again), unsafe", async ({ page }) => {
     await useMockWallet(page, CAROL);
     await page.goto("/s/3/sale");
