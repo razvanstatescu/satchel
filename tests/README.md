@@ -51,6 +51,7 @@ print measurements; add `-- --nocapture` to see them.
 | `storage.rs` | Exact storage charging read from receipt Transfer actions (INV-18); `on_signed` never grows storage (INV-29) |
 | `gas.rs` | The prepaid-gas floor `30 + 18·n` Tgas and ≥ 15 Tgas forwarded to every MPC `sign` (INV-19) |
 | `transfer.rs` | Ownership paths: control moves with the NFT, no approvals, `nft_transfer_call` disabled, records survive a transfer, a transfer while a signature is in flight, refused receivers, exactly 1 yocto |
+| `transfer_path.rs` | Every ownership path (gift, NEAR buy, USDC buy, accepted offer) takes every power from the old owner and its delegates; sales whose payouts are still in flight, the overlap proved from block heights: a resale before the first `on_payout`, a resale during a failed payout's re-credit, `withdraw_proceeds` in the block of a resale, inside assets moving while the payout is pending, an offer accepted or a gift made in the buy's own receipt, a delist racing a buy |
 | `sale.rs` | NEAR sale: quiet period and freeze while listed, buy bound to `listing_id` and `sig_count`, payout and the proceeds fallback |
 | `usdc.rs` | USDC sale through `ft_transfer_call`: happy path, every refusal refunded 100 %, direct-call attack, proceeds for a seller who can't receive USDC, `usdc: None` |
 | `views.rs` | `config()` equals the compiled constants (INV-27) and the exact JSON shapes of kb/90 §5.14 |
