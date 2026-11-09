@@ -1295,6 +1295,17 @@ unchanged.
 sandboxed wallets, … scam detection") fits Satchel's capped allowances and the clean-history check. Default: keep
 `["nfts","open"]` unless Razvan adds it (H-02, by Nov 12).
 
+## D-55 · Satchel #4 on the final contract gets exactly one signature (2026-11-09, Razvan)
+
+**Context.** The standing rule was "never sign anything with Satchel #4 on any contract". The demo state for #4 (D-32,
+E-04), described in the README, `docs/security-model.md` and the marketing copy, is one Ethereum transaction signed at
+nonce = current + 1 and never broadcast, so its listing always shows "Blocked: 1 unused signature".
+
+**Decision (option A).** After the final birth, #4 on `satchel.satchelhq.testnet` gets exactly one `sign_for`: that
+nonce + 1 Sepolia transfer, made with `tools/e2e/evm.ts --sign-only` and never broadcast. #4 may also receive coins
+so that the blocked listing has value behind it. Every other signature with #4, on any contract, stays forbidden,
+and nobody ever sends from #4.
+
 ## Decisions that need the human (Razvan / team)
 
 Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into the existing H-xx. Every row has a default and a deadline. "Default" means what happens if nobody objects by the deadline. H-02 and the payout account have no default, because an agent may never fill them in.
