@@ -480,6 +480,48 @@ async fn offer_cancel_and_expiry() -> Result<()> {
     Ok(())
 }
 
+/// U-2 (docs/security/seller-threat-model.md): one offer's escrow is spent exactly once whatever the order. Accept
+/// then cancel, accept twice, cancel then accept: the second call always fails `ERR_NO_OFFER` and pays no one, and
+/// the solvency invariants (I-M1..I-M3, real balances) hold after every step.
+#[tokio::test]
+async fn offer_escrow_spent_once_in_any_order() -> Result<()> {
+    let env = setup().await?;
+    let accts = [env.alice.id(), env.bob.id(), env.carol.id()];
+    let exp = now_ms(&env).await? + 3_600_000;
+    // accept, then cancel, then accept again (bob, now the owner)
+    let o1 = make_offer_ok(&env, &env.bob, "1", ONE_NEAR, exp).await?;
+    let r = offer_call(&env, &env.alice, "accept_offer", o1).await?;
+    assert_ok(&r);
+    assert_eq!(transfers_to(&env, &r, env.alice.id(), env.alice.id()).await?, vec![ONE_NEAR], "seller paid once");
+    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string());
+    check_solvency(&env, &["1"], &accts).await?;
+    let r = offer_call(&env, &env.bob, "cancel_offer", o1).await?;
+    assert_fails_with(&r, "ERR_NO_OFFER");
+    assert!(transfers_to(&env, &r, env.bob.id(), env.bob.id()).await?.is_empty(), "no refund after the accept");
+    let r = offer_call(&env, &env.bob, "accept_offer", o1).await?;
+    assert_fails_with(&r, "ERR_NO_OFFER");
+    assert!(transfers_to(&env, &r, env.bob.id(), env.bob.id()).await?.is_empty());
+    let r = offer_call(&env, &env.alice, "accept_offer", o1).await?;
+    assert_fails_with(&r, "ERR_NO_OFFER");
+    assert!(transfers_to(&env, &r, env.alice.id(), env.alice.id()).await?.is_empty(), "no second payout");
+    check_solvency(&env, &["1"], &accts).await?;
+    // cancel, then accept
+    let o2 = make_offer_ok(&env, &env.carol, "1", 2 * ONE_NEAR, exp).await?;
+    let r = offer_call(&env, &env.carol, "cancel_offer", o2).await?;
+    assert_ok(&r);
+    assert_eq!(transfers_to(&env, &r, env.carol.id(), env.carol.id()).await?, vec![2 * ONE_NEAR], "refunded once");
+    let r = offer_call(&env, &env.bob, "accept_offer", o2).await?;
+    assert_fails_with(&r, "ERR_NO_OFFER");
+    assert!(transfers_to(&env, &r, env.bob.id(), env.bob.id()).await?.is_empty(), "nothing paid for a cancelled offer");
+    assert_eq!(owner_of(&env, "1").await?, env.bob.id().to_string(), "a cancelled offer moves nothing");
+    let r = offer_call(&env, &env.carol, "cancel_offer", o2).await?;
+    assert_fails_with(&r, "ERR_NO_OFFER");
+    assert!(transfers_to(&env, &r, env.carol.id(), env.carol.id()).await?.is_empty(), "no second refund");
+    assert_eq!(num(&view(&env, "market_totals", json!({})).await?["offers_near"]), 0);
+    check_solvency(&env, &["1"], &accts).await?;
+    Ok(())
+}
+
 /// A failed refund (the offerer deleted their account) is credited to proceeds and withdrawable later; nothing is
 /// orphaned.
 #[tokio::test]

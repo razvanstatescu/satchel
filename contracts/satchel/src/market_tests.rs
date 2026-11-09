@@ -1960,3 +1960,209 @@ fn q03_caller_chosen_receivers_refuse_the_contract_mpc_and_usdc() {
         expect_err(ERR_BAD_RECEIVER, || c.withdraw_near(id.clone(), U128(1), Some(r)));
     }
 }
+
+// ── U-2 (docs/security/seller-threat-model.md): one offer's escrow is spent exactly once, in any order ─────────
+// Accept then cancel, accept twice, cancel then accept, and accept after the token was sold to someone else, for NEAR
+// and USDC offers. Each payout or refund is counted across every call; refused calls must create no receipt.
+
+/// Every NEAR transfer and USDC `ft_transfer` the last call created, as (currency, receiver, amount).
+fn u2_payouts() -> Vec<(&'static str, AccountId, u128)> {
+    let mut v: Vec<_> = transfers().into_iter().map(|(r, a)| ("near", r, a)).collect();
+    for (rcv, method, args, _, _) in calls() {
+        if rcv == usdc() && method == "ft_transfer" {
+            v.push(("usdc", args["receiver_id"].as_str().unwrap().parse().unwrap(), args["amount"].as_str().unwrap().parse().unwrap()));
+        }
+    }
+    v
+}
+
+/// The NEAR books: `offers_near` equals the open NEAR offers on `ids`, `proceeds_near` is what failed payouts left
+/// owed, and escrow is the sum of its parts (the I-M2 identity the model test checks after every step).
+fn u2_books(c: &Contract, ids: &[&String], proceeds_near: u128) {
+    let open: u128 =
+        ids.iter().flat_map(|id| c.offers_for((*id).clone(), 0, 50)).filter(|o| o.currency == Currency::Near).map(|o| o.amount.0).sum();
+    let t = c.market_totals();
+    assert_eq!(t.offers_near.0, open, "offers_near tracks the open NEAR offers");
+    assert_eq!(t.proceeds_near.0, proceeds_near, "proceeds_near");
+    assert_eq!(t.escrow_near.0, t.inside_near.0 + t.offers_near.0 + t.storage_credit.0 + t.proceeds_near.0);
+}
+
+/// `who` (1 yocto, at `ms`) calls `f`, which must refuse with `code` and change nothing: no receipt, same owner,
+/// same open offers, same totals.
+fn u2_refuse(c: &mut Contract, id: &String, who: AccountId, ms: u64, code: &str, f: impl FnOnce(&mut Contract)) {
+    let ids = |c: &Contract| c.offers_for(id.clone(), 0, 50).into_iter().map(|o| o.id).collect::<Vec<_>>();
+    let before = (c.owner_of(id), ids(c), totals(c));
+    Ctx::new(who).dep(1).ms(ms).set();
+    expect_err(code, || f(&mut *c));
+    assert!(get_created_receipts().is_empty(), "{code}: a refused call creates no receipt");
+    assert_eq!((c.owner_of(id), ids(c), totals(c)), before, "{code}: a refused call changes nothing");
+}
+
+/// Resolves the payout callback the last accept/cancel/withdraw scheduled.
+fn u2_resolve(c: &mut Contract, to: AccountId, cur: Currency, amount: u128, ok: bool) {
+    Ctx::new(me()).results(vec![if ok { PromiseResult::Successful(vec![]) } else { PromiseResult::Failed }]).set();
+    c.on_payout(to, cur, U128(amount));
+}
+
+#[test]
+fn offer_escrow_is_spent_once_in_any_order() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let mut paid = vec![];
+    // 1. accept, then cancel: by the offerer, and by anyone after the expiry
+    let o1 = near_offer(&mut c, bob(), &id, ONE_NEAR);
+    u2_books(&c, &[&id], 0);
+    Ctx::new(alice()).dep(1).set();
+    c.accept_offer(o1);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, alice(), Currency::Near, ONE_NEAR, true);
+    assert_eq!(c.owner_of(&id), bob());
+    u2_books(&c, &[&id], 0);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o1));
+    u2_refuse(&mut c, &id, carol(), T0 + DAY, ERR_NO_OFFER, |c| c.cancel_offer(o1));
+    // 2. accept twice: by the new owner (bob, also the offerer) and by the old one
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(o1));
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NO_OFFER, |c| c.accept_offer(o1));
+    // 3. cancel, then accept (and cancel again)
+    let o2 = near_offer(&mut c, carol(), &id, 2 * ONE_NEAR);
+    u2_books(&c, &[&id], 0);
+    Ctx::new(carol()).dep(1).set();
+    c.cancel_offer(o2);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, carol(), Currency::Near, 2 * ONE_NEAR, true);
+    u2_books(&c, &[&id], 0);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(o2));
+    u2_refuse(&mut c, &id, carol(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o2));
+    u2_refuse(&mut c, &id, alice(), T0 + DAY, ERR_NO_OFFER, |c| c.cancel_offer(o2));
+    assert_eq!(c.owner_of(&id), bob());
+    assert_eq!(totals(&c)["offers_near"], "0");
+    assert_eq!(paid, vec![("near", alice(), ONE_NEAR), ("near", carol(), 2 * ONE_NEAR)], "one payout, one refund");
+    assert_eq!(events("offer_accepted").len() + events("offer_cancelled").len(), 0, "the last call was a refusal");
+    // 4. a failed payout is owed exactly once: credited to proceeds, the offer stays gone, one withdrawal pays it
+    let o3 = near_offer(&mut c, alice(), &id, 3 * ONE_NEAR);
+    Ctx::new(bob()).dep(1).set();
+    c.accept_offer(o3);
+    assert_eq!(u2_payouts(), vec![("near", bob(), 3 * ONE_NEAR)]);
+    u2_resolve(&mut c, bob(), Currency::Near, 3 * ONE_NEAR, false);
+    u2_books(&c, &[&id], 3 * ONE_NEAR);
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NO_OFFER, |c| c.accept_offer(o3));
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o3));
+    Ctx::new(bob()).dep(1).set();
+    c.withdraw_proceeds(Currency::Near);
+    assert_eq!(u2_payouts(), vec![("near", bob(), 3 * ONE_NEAR)]);
+    u2_resolve(&mut c, bob(), Currency::Near, 3 * ONE_NEAR, true);
+    u2_books(&c, &[&id], 0);
+    Ctx::new(bob()).dep(1).set();
+    expect_err(ERR_NOTHING_OWED, || c.withdraw_proceeds(Currency::Near));
+    assert!(get_created_receipts().is_empty());
+    assert_eq!(c.owner_of(&id), alice());
+}
+
+#[test]
+fn usdc_offer_escrow_is_spent_once_in_any_order() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    for p in [bob(), carol()] {
+        Ctx::new(p).dep(10 * MILLI).set();
+        c.prepay_storage(None);
+    }
+    let usdc_offer = |c: &mut Contract, who: AccountId, amount: u128| {
+        let (sc, ep) = (c.token_state(&id).sig_count, c.inside_epoch(&id));
+        ft_call(c, usdc(), who, amount, offer_msg(&id, sc, ep, T0 + DAY));
+        c.market_config().next_offer_id - 1
+    };
+    let mut paid = vec![];
+    let near_before = totals(&c);
+    // accept, then cancel, then accept again
+    let o1 = usdc_offer(&mut c, bob(), 5_000_000);
+    Ctx::new(alice()).dep(1).set();
+    c.accept_offer(o1);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, alice(), Currency::Usdc, 5_000_000, true);
+    assert_eq!(c.owner_of(&id), bob());
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o1));
+    u2_refuse(&mut c, &id, carol(), T0 + DAY, ERR_NO_OFFER, |c| c.cancel_offer(o1));
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(o1));
+    // cancel, then accept
+    let o2 = usdc_offer(&mut c, carol(), 7_000_000);
+    Ctx::new(carol()).dep(1).set();
+    c.cancel_offer(o2);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, carol(), Currency::Usdc, 7_000_000, true);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(o2));
+    u2_refuse(&mut c, &id, carol(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o2));
+    assert_eq!(c.owner_of(&id), bob());
+    assert_eq!(paid, vec![("usdc", alice(), 5_000_000), ("usdc", carol(), 7_000_000)], "one ft_transfer per offer");
+    assert!(c.offers_for(id.clone(), 0, 50).is_empty());
+    assert!(c.proceeds_of(alice()).iter().chain(c.proceeds_of(carol()).iter()).all(|p| p.amount.0 == 0), "nothing owed");
+    // the USDC offers never touched the NEAR books (storage came from the prepaid credit)
+    assert_eq!(totals(&c)["offers_near"], near_before["offers_near"]);
+    assert_eq!(totals(&c)["proceeds_near"], "0");
+    u2_books(&c, &[&id], 0);
+}
+
+#[test]
+fn offer_accept_after_the_token_was_sold_pays_only_the_current_owner_once() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    let mut paid = vec![];
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(3 * ONE_NEAR), Currency::Near);
+    let o_bob = near_offer(&mut c, bob(), &id, ONE_NEAR);
+    let o_dave = near_offer(&mut c, acc("dave.testnet"), &id, 2 * ONE_NEAR);
+    u2_books(&c, &[&id], 0);
+    // carol buys the listing: only the price moves, both offers stay escrowed
+    Ctx::new(carol()).dep(3 * ONE_NEAR).set();
+    c.buy(id.clone(), lid, 0);
+    assert_eq!(transfers(), vec![(alice(), 3 * ONE_NEAR)], "the sale pays the seller the price only");
+    assert_eq!(c.owner_of(&id), carol());
+    u2_books(&c, &[&id], 0);
+    assert_eq!(totals(&c)["offers_near"], (3 * ONE_NEAR).to_string());
+    // the seller can no longer accept either offer
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NOT_OWNER, |c| c.accept_offer(o_bob));
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NOT_OWNER, |c| c.accept_offer(o_dave));
+    // the buyer accepts bob's offer: paid once, to the buyer
+    Ctx::new(carol()).dep(1).set();
+    c.accept_offer(o_bob);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, carol(), Currency::Near, ONE_NEAR, true);
+    assert_eq!(c.owner_of(&id), bob());
+    u2_books(&c, &[&id], 0);
+    u2_refuse(&mut c, &id, carol(), T0, ERR_NO_OFFER, |c| c.accept_offer(o_bob));
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NO_OFFER, |c| c.accept_offer(o_bob));
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.cancel_offer(o_bob));
+    // dave's offer survives a second sale; the old owners can't take it, and once cancelled no one can accept it
+    u2_refuse(&mut c, &id, carol(), T0, ERR_NOT_OWNER, |c| c.accept_offer(o_dave));
+    Ctx::new(acc("dave.testnet")).dep(1).set();
+    c.cancel_offer(o_dave);
+    paid.extend(u2_payouts());
+    u2_resolve(&mut c, acc("dave.testnet"), Currency::Near, 2 * ONE_NEAR, true);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(o_dave));
+    assert_eq!(paid, vec![("near", carol(), ONE_NEAR), ("near", acc("dave.testnet"), 2 * ONE_NEAR)]);
+    assert_eq!(totals(&c)["offers_near"], "0");
+    u2_books(&c, &[&id], 0);
+}
+
+#[test]
+fn offer_made_by_the_later_buyer_is_refunded_once_never_self_accepted() {
+    let mut c = setup();
+    let id = mint_to(&mut c, alice());
+    Ctx::new(alice()).dep(10 * MILLI).set();
+    let lid = c.list(id.clone(), U128(3 * ONE_NEAR), Currency::Near);
+    let oid = near_offer(&mut c, bob(), &id, ONE_NEAR);
+    // bob buys the listing outright; his own offer is still escrowed
+    Ctx::new(bob()).dep(3 * ONE_NEAR).set();
+    c.buy(id.clone(), lid, 0);
+    assert_eq!(c.owner_of(&id), bob());
+    u2_books(&c, &[&id], 0);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_SELF_BUY, |c| c.accept_offer(oid));
+    u2_refuse(&mut c, &id, alice(), T0, ERR_NOT_OWNER, |c| c.accept_offer(oid));
+    Ctx::new(bob()).dep(1).set();
+    c.cancel_offer(oid);
+    assert_eq!(u2_payouts(), vec![("near", bob(), ONE_NEAR)]);
+    u2_resolve(&mut c, bob(), Currency::Near, ONE_NEAR, true);
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.accept_offer(oid));
+    u2_refuse(&mut c, &id, bob(), T0, ERR_NO_OFFER, |c| c.cancel_offer(oid));
+    assert_eq!(totals(&c)["offers_near"], "0");
+    u2_books(&c, &[&id], 0);
+}

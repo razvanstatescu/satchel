@@ -466,3 +466,61 @@ describe('clean history: BTC foreign prevouts (review S-07)', () => {
   })
 })
 
+
+// U-1 (docs/security/seller-threat-model.md): a record's status and signature come from the UX-only callback. A
+// request that timed out (`failed`), is still waiting (`pending`) or whose answer did not parse (`unparsed`) may still
+// have produced a valid signature somewhere, so the check must judge it exactly like a `signed` record of the same
+// payload: by the chain state its nonce, outpoint or blockhash names.
+describe('clean history: record status is never trusted', () => {
+  const NOT_SIGNED = ['failed', 'pending', 'unparsed'] as const
+  const SECP_SIG = { r: '11'.repeat(32), s: '22'.repeat(32), recovery_id: 1 }
+  const ED_SIG = { signature: '33'.repeat(64) }
+
+  it.each(NOT_SIGNED)('EVM: an unused nonce-0 record with status %s blocks Buy, exactly like a signed one', async (status) => {
+    const signed = await checkCleanHistory(input([evmRecord(0, kb31Nonce(0), { signature: SECP_SIG })]), recorded())
+    const r = await checkCleanHistory(input([evmRecord(0, kb31Nonce(0), { status, signature: null })]), recorded())
+    expect(r.items[0]).toMatchObject({ chain: 'evm', status: 'unused', reason: 'nonce_not_used', nonce: '0', sources: 2 })
+    expect(r.aggregate).toBe('blocked')
+    expect(r.buy_enabled).toBe(false)
+    expect(r.expected_sig_count).toBeNull()
+    expect(r).toEqual(signed)
+  })
+
+  it.each(NOT_SIGNED)('BTC: a record with status %s on the kb/30 LIVE outpoint stays unused and blocks Buy', async (status) => {
+    const signed = await checkCleanHistory(input([btcRecord(0, 0, 0, TX.live, 0, { signature: SECP_SIG })]), { ...recorded(), btc: recordedBtcSources() })
+    const r = await checkCleanHistory(input([btcRecord(0, 0, 0, TX.live, 0, { status, signature: null })]), { ...recorded(), btc: recordedBtcSources() })
+    expect(r.items[0]).toMatchObject({ chain: 'btc', status: 'unused', reason: 'outpoint_unspent', sources: 2 })
+    expect(r.aggregate).toBe('blocked')
+    expect(r.buy_enabled).toBe(false)
+    expect(r.encumbered_outpoints).toEqual([`${TX.live}:0`])
+    expect(r).toEqual(signed)
+  })
+
+  it.each(NOT_SIGNED)('SOL: a 30 s old record with status %s is unused (young) and blocks Buy', async (status) => {
+    const hex = 'cd'.repeat(32)
+    const signed = await checkCleanHistory(input([solRecord(0, hex, NOW - 30_000, { signature: ED_SIG })]), recorded())
+    const r = await checkCleanHistory(input([solRecord(0, hex, NOW - 30_000, { status, signature: null })]), recorded())
+    expect(r.items[0]).toMatchObject({ chain: 'sol', status: 'unused', reason: 'young' })
+    expect(r.aggregate).toBe('blocked')
+    expect(r.buy_enabled).toBe(false)
+    expect(r).toEqual(signed)
+  })
+
+  it('the same holds the other way: a not-signed record whose nonce, outpoint or blockhash is dead is dead (Buy enabled)', async () => {
+    for (const status of NOT_SIGNED) {
+      const recs = [btcRecord(0, 0, 0, TX.dead, 429, { status }), solRecord(1, KB32_BLOCKHASH_HEX, NOW - DAY, { status }), btcRecord(2, 2, 0, TX.fake, 3, { status })]
+      const r = await checkCleanHistory(input(recs), recorded())
+      expect(r.items.map((i) => i.status), status).toEqual(['spent', 'expired', 'unfunded'])
+      expect(r, status).toMatchObject({ aggregate: 'clean', buy_enabled: true, expected_sig_count: 3, sig_count: 3 })
+    }
+  })
+
+  it('a mixed history: one unused not-signed record among dead signed ones still blocks Buy', async () => {
+    for (const status of NOT_SIGNED) {
+      const recs = [btcRecord(0, 0, 0, TX.dead, 429, { signature: SECP_SIG }), solRecord(1, KB32_BLOCKHASH_HEX, NOW - DAY, { signature: ED_SIG }), btcRecord(2, 2, 0, TX.live, 0, { status })]
+      const r = await checkCleanHistory(input(recs), recorded())
+      expect(r.items.map((i) => i.status), status).toEqual(['spent', 'expired', 'unused'])
+      expect(r, status).toMatchObject({ aggregate: 'blocked', buy_enabled: false, expected_sig_count: null })
+    }
+  })
+})
