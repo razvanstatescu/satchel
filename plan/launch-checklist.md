@@ -78,9 +78,9 @@
 
 | # | Owner | Task | Done when |
 |---|---|---|---|
-| D-01 | **Claude** | Freeze the contract; tag `contract-v1.0.0-rc1`; reproducible build → **H** | H fixed |
-| D-02 | **Claude** | **rc keyless birth**: `tools/deploy/keyless-birth.ts` (dry run → review → send) for `rc.satchelhq.testnet` (10 NEAR, same init args as the final) | proofs 1–6 pass on rc (`keyless-birth.md` §3) |
-| D-03 | **Claude** | `tools/e2e/clean-history.ts --role rc` (the 4-step scenario) + e2e on rc with the strict gate (`NEXT_PUBLIC_CONTRACT_ROLE=rc`, `EXPECTED_CODE_HASH=H`) | all green |
+| D-01 | **Claude** | Freeze the contract; tag `contract-v1.0.0-rc1`; reproducible build → **H** | H fixed · **DONE 2026-11-09:** tag on `843d353`; CI built H = `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa` twice; sandbox suite on that wasm all green |
+| D-02 | **Claude** | **rc keyless birth**: `tools/deploy/keyless-birth.ts` (dry run → review → send) for `rc.satchelhq.testnet` (10 NEAR, same init args as the final) | proofs 1–6 pass on rc (`keyless-birth.md` §3) · **DONE 2026-11-09:** birth tx `Fcki1yA5yNWcfGdjYmBKyeKRQfZYQW7BnoDhJMXXWcU3`, block A 276924233; verify-birth ALL PASS; evidence `docs/evidence/birth-rc.satchelhq.testnet.json` |
+| D-03 | **Claude** | `tools/e2e/clean-history.ts --role rc` (the 4-step scenario) + e2e on rc with the strict gate (`NEXT_PUBLIC_CONTRACT_ROLE=rc`, `EXPECTED_CODE_HASH=H`) | all green · **DONE 2026-11-09:** clean-history steps 1–4 PASS (step 4 after the BTC confirmation), strict-gate app and judge-snippets on rc PASS. DP6 holds: go for the final |
 
 ## E. Day 10 (Tue Nov 10, by 12:00 UTC): final birth, irreversible
 
