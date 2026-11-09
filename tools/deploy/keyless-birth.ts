@@ -24,7 +24,7 @@ import { formatNear, formatTgas, parseNear, TGAS } from '../lib/units'
 /** MPC versions whose `sign` interface was verified live (A-01). Add one only after a sign-only check passes. */
 export const MPC_VERIFIED_VERSIONS: readonly string[] = ['3.17.0', '3.18.0']
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
 export interface BirthOptions {
   parent: string
@@ -280,7 +280,7 @@ function checker(ctx: Ctx, tag: string): { line: Line; ok: () => boolean } {
 }
 
 /** `git rev-parse <tag>^{commit}` in the repo, or null (no git, no tag). */
-function gitRev(ref: string): string | null {
+export function gitRev(ref: string): string | null {
   try {
     return execFileSync('git', ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null
   } catch {
