@@ -84,8 +84,13 @@ snippet() {
   for need in "$@"; do
     if tbd "$need"; then echo "  SKIP   ($need)"; SKIP=$((SKIP + 1)); return 0; fi
   done
-  local out
-  out="$(bash -c "$cmd" 2>&1)"
+  local out try
+  # A public RPC that rate-limits (HTTP 429, "exceeded the rate limit") is not a failed claim: wait and retry, twice.
+  for try in 1 2 3; do
+    out="$(bash -c "$cmd" 2>&1)"
+    grep -Eiq 'rate limit|too many requests|HTTP[/ 0-9.]* 429|"code": ?429' <<<"$out" || break
+    [[ $try -lt 3 ]] && { echo "  note:  rate-limited by the RPC; retrying in $((try * 5)) s"; sleep $((try * 5)); }
+  done
   echo "$out" | sed 's/^/  got:   /' | head -12
   if [[ "$expect" == INFO ]]; then echo "  INFO   (a live value to compare with the app, not a pass/fail claim)"; INFO=$((INFO + 1)); return 0; fi
   local ok=1
