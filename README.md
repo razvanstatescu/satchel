@@ -82,6 +82,40 @@ The contract accepts only plain transfers and plain-text messages, and hashes th
 so its record always says exactly what was signed. Details, the buying flow and every feature:
 [docs/how-it-works.md](docs/how-it-works.md).
 
+## When a Satchel changes hands
+
+Ownership moves in three places only: `nft_transfer` (a gift), `buy` (NEAR, or USDC through `ft_on_transfer`) and
+`accept_offer`. Each is a single receipt, so there is no moment when both people, or neither, control the Satchel. In
+that receipt the contract:
+
+1. moves the NEP-171 token to the new owner;
+2. clears every spending allowance the old owner granted;
+3. ends the listing, if there is one, and starts paying the seller;
+4. keeps the NEAR, USDC and wNEAR held inside the Satchel, and its signature records, with the token.
+
+Nothing else has to change, because the old owner never had a key. Each address belongs to a key that NEAR's MPC
+network derives from (this contract, `satchel/{id}/{chain}`). The MPC signs for that path only when the contract asks,
+and the contract asks only from `sign_for`, which checks the caller against the current owner on every call. So from
+the receipt of the hand-off on:
+
+| The old owner tries to… | What happens |
+|---|---|
+| Sign with the Satchel | `sign_for` refuses: not the owner |
+| Keep spending through a delegate they added | The allowance was cleared in the same receipt |
+| Withdraw the NEAR, USDC or wNEAR inside it | Refused: not the owner |
+| List it, give it or accept an offer for it | Refused: not the owner |
+| Use a copy of the key or a seed phrase | There is none. No key exists outside the MPC network, and the contract account has no key either |
+
+What the old owner can still hold is a signature made **before** the hand-off. That is what the rest of the design is
+for: the record is written before every signature, signing freezes while a Satchel is listed, and the buyer's browser
+checks every record before Buy turns on (next section). Paying the seller is detached from the hand-off: if the
+payment fails, the buyer still gets the Satchel and the money waits in the seller's `proceeds_of`.
+
+Every row above is tested on each of the four ownership paths, against the compiled contract in a local sandbox:
+[`tests/tests/transfer_path.rs`](tests/tests/transfer_path.rs) `old_owner_loses_every_power_on_every_ownership_path`.
+The same file resells a Satchel while the first sale's payment is still in flight, and after it failed, and checks
+that each seller is paid exactly once and that nobody else is credited.
+
 ## Buying safely
 
 <p align="center">

@@ -35,11 +35,33 @@ NEP-178 approval and no leftover delegate. And nobody holds a key to the contrac
 | Move the token outside the sale, through an approval or `nft_transfer_call` | NEP-178 is not implemented, `nft_transfer_call` always fails, and transfers are refused while listed | `tests/tests/transfer.rs` `no_approvals_surface`, `transfer_call_disabled` |
 | Get the contract changed after the sale | Nobody can: the account has no key, and its code cannot deploy code or add a key | `tests/tests/release.rs`; INV-22 |
 
-**Mid-flight cases.**
+**After the hand-off, the old owner has no powers left.** On each of the four ownership paths (gift, NEAR buy, USDC
+buy, accepted offer), the old owner's `sign_for`, `list`, `delist`, `nft_transfer`, `set_allowance`,
+`revoke_allowance`, `withdraw_near`, `withdraw_ft` and `accept_offer` all fail and change nothing, their delegate's
+`sign_for` fails, and the new owner can do every one of them (`transfer_path.rs`
+`old_owner_loses_every_power_on_every_ownership_path`).
+
+**Mid-flight cases.** Paying the seller is a separate receipt from the hand-off, so the next sale can run before it
+lands. The tests below check, from each receipt's block height, that the receipts really did overlap.
 - A transfer while a signature is still pending completes normally. The signature still lands in the record, which
   names the old owner as the requester (`transfer.rs` `transfer_during_inflight_sign`).
 - If paying the seller fails in the middle of a sale, the buyer still gets the Satchel, and the seller's money is
   credited to `proceeds_of` (`sale.rs` `payout_failure_recredit`).
+- The buyer resells while the first seller's payment is still in flight, in NEAR or USDC: each seller is paid
+  exactly once, nobody's `proceeds_of` grows, and the contract stays solvent (`transfer_path.rs`
+  `resale_while_first_payout_in_flight_pays_each_seller_once`, `usdc_resale_while_first_payout_in_flight_pays_each_seller_once`).
+- The first seller's payment fails and the Satchel is resold before the money is re-credited: the credit goes to the
+  first seller only, who can withdraw it exactly once (`resale_during_failed_payout_recredits_only_the_first_seller`,
+  `usdc_resale_after_failed_payout_recredits_only_the_first_seller`).
+- The seller sends `withdraw_proceeds` twice in the block of a resale: one pays, the other finds nothing owed
+  (`withdraw_proceeds_racing_a_resale_pays_once`).
+- The seller tries to withdraw the coins held inside the Satchel in the block of the sale and while their payment is
+  pending: every attempt fails, and the buyer withdraws them (`inside_assets_go_to_the_buyer_while_the_payout_is_in_flight`).
+- The buyer accepts an offer, or gives the Satchel away, in the same receipt as the purchase: each seller is paid
+  once, and only the last owner can sign (`accept_offer_in_the_buy_receipt_pays_both_sellers`,
+  `gift_in_the_buy_receipt_leaves_the_buyer_nothing`).
+- The seller delists in the same block as a buy: exactly one of them succeeds, and the contract keeps none of the
+  buyer's NEAR (`delist_racing_a_buy_settles_one_way`).
 
 What this does not stop is listed under "What it does not cover" in [security-model.md](security-model.md), for
 example a testnet4 reorg.

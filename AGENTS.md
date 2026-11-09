@@ -56,6 +56,8 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 | Signing and transfers freeze while listed; listing needs 250 quiet blocks | `sale.rs`, `sign.rs` | `tests/tests/sale.rs` `quiet_period_and_freeze`, `quiet_period_exact_boundary` |
 | `buy` fails if the history changed since listing | `sale.rs` (`expected_sig_count`) | `tests/tests/sale.rs` `buy_guards` |
 | The NFT moves control of the addresses; records survive transfers | `lib.rs` (`nft_transfer`) | `tests/tests/transfer.rs` `transfer_moves_control`, `records_survive_transfer` |
+| After a gift, a sale or an accepted offer, the old owner has no power left over the Satchel | `lib.rs` (`move_token`, `on_owner_change`), `sale.rs`, `offers.rs` | `tests/tests/transfer_path.rs` `old_owner_loses_every_power_on_every_ownership_path` |
+| A resale while the seller's payment is in flight, or after it failed, pays each seller exactly once | `sale.rs` (`payout`, `on_payout`, `withdraw_proceeds`) | `tests/tests/transfer_path.rs` `resale_while_first_payout_in_flight_pays_each_seller_once`, `resale_during_failed_payout_recredits_only_the_first_seller`, `withdraw_proceeds_racing_a_resale_pays_once` |
 | The release contract can never add a key, deploy code or delete itself | keyless birth (`tools/deploy/keyless-birth.md`) | `tools/check-wasm-imports.sh` (INV-22); `tests/tests/release.rs` `keyless_birth_batch` |
 | The contract's rules and the TypeScript mirror agree | `parse/` and `packages/core/src/policy/` | `vectors/*.json`, run by `cargo test -p satchel --lib` and `pnpm --filter @satchel/core test` |
 | The buyer's check marks every record spent, expired or blocking | `packages/core/src/clean-history/` | `packages/core/test/clean-history.test.ts`, `gate.test.ts` |

@@ -141,3 +141,8 @@
 - 2026-10-31T15:30Z [Q-03,Q-04] start: withdraw receiver guard + deny_unknown_fields on ft_on_transfer msgs (branch fix/q03-q04)
 - 2026-10-31T15:48Z [Q-03,Q-04] progress: Q-03 (daa386d) and Q-04 (code+tests) committed on fix/q03-q04; unit 202 pass; round2 7/7; next TS mirror/specs/suites
 - 2026-10-31T16:11Z [Q-03,Q-04] done: fix/q03-q04 (11 commits, not merged); withdraw_near/withdraw_ft/prepay_storage refuse contract/MPC/USDC; ft msgs deny_unknown_fields; unit 202, sandbox 137, core 540, web 606, INV-22 OK; dev2 redeployed 4dd7cde9… (tx DTRoJfs1…), state kept, live ERR_BAD_RECEIVER verified; .env.production hash updated
+- 2026-11-06T11:01Z [SEO-1] done: SEO/GEO foundation (template, /learn, /clean-history, llms.txt, metadata, JSON-LD) on branch worktree-agent-ab1568da6f4d11fc9; unit and full e2e green
+- 2026-11-06T11:14Z [perf] done: public pages 98-100 Lighthouse at 12x CPU (live build), JS on / 445->174 KB br; web unit 677, core 549, e2e 315 pass; branch worktree-agent-a75beb82db2fe5a7a
+- 2026-11-06T11:15Z [seo-guides-ownership] done: sell/buy/transfer guides committed on worktree-agent-a459707c8161e62e5; unit, e2e and Lighthouse 100x4 pass
+- 2026-11-06T11:19Z [seo-guides-chains] done: gift-crypto, erc-6551, chain-signatures committed; e2e and unit green, Lighthouse 100 x4
+- 2026-11-09T09:15Z [transfer-path tests] done: tests/tests/transfer_path.rs (10 sandbox tests, all pass; transfer/sale/usdc re-run green), 5bb6298 on main
