@@ -21,6 +21,9 @@ import { FIXTURE_BALANCES, fixtureEvmChains } from "@/lib/data/fixtures";
 import { simOverlay, simSolBlockhashHex, simSolHeight, simSolLife } from "@/lib/data/sim";
 import { evmRpcs, SEPOLIA } from "@/lib/evm-networks";
 import { satchelAddresses } from "@/lib/derive";
+import { dataSource } from "@/lib/data/source";
+import { contractViews } from "@/lib/near/contract";
+import type { ViewFn } from "@/lib/near/contract";
 import type { SigRecordView, SignRequest } from "@/lib/near/types";
 import type { PendingIntent } from "@/lib/signing/types";
 
@@ -105,6 +108,34 @@ function fixtureUtxos(tokenId: string, spent: ReadonlySet<string> = new Set()): 
 /** mempool.space/testnet4 primary + the configured fallbacks (core `MempoolClient`, kb/90 §8.3). */
 export const mempoolClient = () => new MempoolClient({ primary: BTC_APIS[0], fallbacks: BTC_APIS.slice(1) });
 
+/** Which Satchel (token id) owns this Bitcoin address, among ids 1 … nextTokenId − 1? Null when none (kb/90 T12). */
+export function satchelIdForBtcAddress(address: string, nextTokenId: number): string | null {
+  const want = address.trim().toLowerCase();
+  for (let i = 1; i < nextTokenId; i++) {
+    if (satchelAddresses(String(i)).btc.toLowerCase() === want) return String(i);
+  }
+  return null;
+}
+
+/**
+ * kb/90 T12 / §8: a send into another Satchel must also avoid the txids that Satchel's records reference. Returns that
+ * Satchel's records, [] when `to` isn't a Satchel's address. Fails closed: a failed lookup throws, it never skips.
+ */
+export async function recipientRecordsFor(to: string, view: ViewFn = dataSource().view): Promise<SigRecordView[]> {
+  try {
+    const views = contractViews(view);
+    const cfg = await views.config();
+    if (!cfg || typeof cfg.next_token_id !== "number") throw new Error("no config");
+    const id = satchelIdForBtcAddress(to, cfg.next_token_id);
+    if (!id) return [];
+    const s = await views.satchel(id);
+    if (!s) throw new Error("no satchel");
+    return await views.allSigRecords(id, s.sig_count);
+  } catch {
+    throw Object.assign(new Error(copy.send.val.recipientRecords), { problem: "recipient_records" });
+  }
+}
+
 export async function prepareSend(a: PrepareArgs): Promise<PreparedSend> {
   const addr = satchelAddresses(a.tokenId);
   if (a.chain === "sol") return prepareSol(a, addr.sol);
@@ -124,7 +155,9 @@ export async function prepareSend(a: PrepareArgs): Promise<PreparedSend> {
   }
   const reuse = a.reuse?.btcInputs?.length ? utxos.filter((u) => a.reuse!.btcInputs!.includes(`${u.txid}:${u.vout}`)) : undefined;
   if (a.reuse?.btcInputs?.length && reuse?.length !== a.reuse.btcInputs.length) throw new Error("the earlier coins are no longer available");
-  const forbidden = new Set<string>([...referencedTxids(a.records), ...referencedTxids(a.recipientTokenRecords ?? [])]);
+  // a Satchel recipient's records too (G-1): the caller may pass them, otherwise they are looked up here
+  const recipientRecords = a.recipientTokenRecords ?? (await recipientRecordsFor(a.to));
+  const forbidden = new Set<string>([...referencedTxids(a.records), ...referencedTxids(recipientRecords)]);
   const build = (inputs?: Utxo[]) => buildBtcSend({ from: { address: addr.btc, pubkey: addr.btcPubkey }, to: a.to, amount: a.amount, utxos, feeRate, forbiddenTxids: forbidden, inputs });
   let built: ReturnType<typeof buildBtcSend>;
   if (a.oneInput && !reuse) {

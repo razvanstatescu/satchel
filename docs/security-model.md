@@ -53,8 +53,10 @@ It also checked that the Ethereum address has no delegated code and that the Sol
 - Signatures made after you buy.
 - Testnet4 reorgs: anyone who mines two difficulty-1 blocks can undo one confirmation on testnet4.
 - Coins that another wallet later sends to an outpoint an old signature already spends. The app marks them
-  "encumbered". Satchel's own sends cannot create such outpoints, because the app refuses to build any transaction
-  whose id an old record already references.
+  "encumbered". A send made in the Satchel app, from one Satchel into another, cannot create such an outpoint: the app
+  refuses to build any transaction whose id a record of the sending Satchel or of the receiving Satchel already
+  references (and refuses to build it at all if it cannot read the receiving Satchel's records). A send from any other
+  wallet is not checked, which is why the coin is marked "encumbered" instead.
 
 ### Demo token #4 is blocked on purpose
 

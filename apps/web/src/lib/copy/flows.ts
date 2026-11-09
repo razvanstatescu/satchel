@@ -48,6 +48,7 @@ export const flows = {
       solRent: "A new Solana account needs at least 0.00065024 SOL. Send more.",
       btcDust: (min: string) => `Bitcoin can't send that little to this address. Send at least ${min}.`,
       btcTooSmall: "What's left after the network fee is too little to send. Send more.",
+      recipientRecords: "Couldn't check that Satchel's signing history, so this wasn't built. Nothing was signed. Try again.",
       btcTooManyCoins: "This needs too many coins for one transaction. Send a smaller amount.",
     },
     sol: {
