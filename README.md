@@ -256,5 +256,6 @@ Q-001), so there is no baseline.
 ## License
 
 The contracts in [`contracts/`](contracts/) are **MIT** ([`contracts/LICENSE`](contracts/LICENSE)). Everything else is
-**AGPL-3.0-only** ([`LICENSE`](LICENSE)). Third-party files keep their own licenses: the copies under
-`research/**/vendor/` and the OFL fonts. The repository stays public through judging (Q-014).
+**AGPL-3.0-only** ([`LICENSE`](LICENSE)). Third-party files keep their own licenses: the OFL fonts, the research copies
+under `research/**/vendor/` and the generated media are listed in [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+The repository stays public through judging (Q-014).
