@@ -34,8 +34,8 @@ it is imported by the product code (`contracts/`, `packages/`, `apps/`, `tools/`
 
 - **Images** in `marketing/video/public/images/` were generated for this project with OpenAI image models
   (`marketing/tools/images/`, log in `gen-log.jsonl`).
-- **Voice-over and music** in `marketing/tools/audio-v3/` were generated for this project with ElevenLabs
-  (`marketing/tools/audio-v3/config.mjs` names the voice and models).
+- **Voice-over and music** in `marketing/tools/audio-v3/` were generated for this project with ElevenLabs on a paid
+  plan, which grants commercial use of the output (`marketing/tools/audio-v3/config.mjs` names the voice and models).
 - The interface screenshots in `marketing/` and `docs/` are of Satchel itself.
 
 They are used under those services' terms. The Satchel mark (the "Sticker S" in `brand/`) is Satchel's own. Bitcoin,
