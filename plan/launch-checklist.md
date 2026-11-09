@@ -42,7 +42,7 @@
 | A-12 | **You** | Optional: a **FastNEAR API key** (dashboard.fastnear.com) for the server and monitor | our shared IP hit the free-tier limits | `FASTNEAR_API_KEY` set in Vercel |
 | A-13 | **You** | **Video**: listen through `marketing/out/satchel-2-v2.mp4`. At **2:14 it fits X's 2:20 non-Premium limit**, even though the marketing README says "Needs X Premium", so confirm. Check that nothing on screen implies mainnet funds, since the app is testnet only | X post on Day 13 | approved |
 | A-14 | **You** | **Mainnet payout account** (`<name>.near`). HACKATHON.md: an agent must never create or invent it | submission field | exists by Nov 10 |
-| A-15 | **You** | Submission fields: project name, lead name, email (the Satchel team's own), size `"2 - 4"`, tracks `["nfts","open"]`. The repo URL can be submitted only once | one-shot submission | written down outside the repo |
+| A-15 | **You** | Submission fields: project name, lead name, email (the Satchel team's own), size `"1"` (H-02: Razvan is the solo builder), tracks `["nfts","open"]` (HACKATHON.md: "every track the project fits"; see D-54 on `security`). The repo URL can be submitted only once | one-shot submission | written down outside the repo |
 
 ---
 
@@ -110,9 +110,10 @@
 |---|---|---|---|
 | G-01 | **Claude** | `check_rules.sh` one last time; secret scan of the repo history (`gitleaks`) | clean |
 | G-02 | **You** | **Make the repo public** (by ~10:00 UTC) | public |
-| G-03 | **You** | **Post on X** with the video, "built at NEAR HACKATHON", and the repo link (~13:00 UTC). Save the post URL | URL saved |
-| G-04 | **Claude** → **You** | Build the submission payload; `research/spikes/hackathon/validate_payload.py`; print it; read the consent text to you; **you type "yes"**; one `POST /api/applications`. A 409 now means the repo was already submitted | **201** saved (outside git) |
+| G-03 | **You** | **Post on X** with the video, "built at NEAR HACKATHON", **@NEARProtocol** and **#NEARHackathon** (optional @NearLegion, @NearBuilders), the demo and repo links (~13:00 UTC). Save the post URL | URL saved |
+| G-04 | **Claude** → **You** | Build the submission payload; `research/spikes/hackathon/validate_payload.py`; print it; read the consent text to you; **you type "yes"**; one `POST /api/applications`. A 409 now means the repo was already submitted. Generate `requestId` once and keep it (outside git): a retry after a network error or 503 reuses it. The saved project then appears in the public directory on nearhackathon.com (name, tracks, demo link) | **201** saved (outside git) |
 | G-05 | **Claude** | After the repo is public: `near contract verify deployed-at satchel.satchelhq.testnet` (and optionally NearBlocks "Verify and Publish") | "…are the same" |
+| G-06 | **You** (Claude helps gather values) | **Only if the saved submission has a mistake:** never submit again (same repo → 409; a new link counts as another project). Request changes at https://nearhackathon.com/request-changes: enter the email, payout account and repo link exactly as submitted, tick each field to change with its new value, and leave a Discord or Telegram handle. The organizers apply it by hand | change applied |
 
 ## H. Nov 14–25: keep alive (judging Nov 16–18; Q-012: hosted demo up to at least Nov 18, ideally Nov 25)
 

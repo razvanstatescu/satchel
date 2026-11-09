@@ -1271,6 +1271,30 @@ MIT, so the wasm and its hash do not change.
 
 **Human:** decided by Razvan.
 
+## D-54 · HACKATHON.md re-read on 2026-11-09: what changed and what we do (2026-11-09, Claude; tracks need Razvan)
+
+**Context.** `check_rules.sh` found the live rules changed since the 2026-10-29 baseline (now
+`snapshots/HACKATHON.raw.md`, sha256 `903794f4…d9aed`). Dates, prizes, the submission contract and Q-001–Q-017 are
+unchanged.
+
+**What changed, and what we do.**
+- **Request changes** (new step 5 and §4): a saved submission is fixed at https://nearhackathon.com/request-changes,
+  never by submitting again. Added as G-06 in `plan/launch-checklist.md`.
+- **X post:** the tags @NEARProtocol and #NEARHackathon are now in the required steps, @NearLegion and
+  @NearBuilders optional, plus advice for a good demo post. F-06 and G-03 already follow it.
+- **Example prompts per track** (github.com/nearai/near-hackathon-prompt-examples) and its `SUBMITTING.md`
+  checklist. The `nfts` prompt asks for a README section on how control passes on transfer, transfer-path tests
+  including a sale during a payout, a seller threat model (all done 2026-11-09: README "When a Satchel changes hands",
+  `tests/tests/transfer_path.rs`, `docs/security/seller-threat-model.md`), a holder-gated page and a per-NFT history
+  view (`/s/{id}/activity`, `/s/{id}/transactions`). The prompts are starting points, not requirements.
+- **A public project directory** on nearhackathon.com lists each saved submission's name, tracks and demo link.
+- Q-000 (NEAR AI credits), new resource links (DevHub videos, nearbuilders.org, Telegram) and three partners. Nothing
+  for Satchel to do.
+
+**For Razvan.** HACKATHON.md asks for every track the project fits. `security` ("spending limits, policy engines,
+sandboxed wallets, … scam detection") fits Satchel's capped allowances and the clean-history check. Default: keep
+`["nfts","open"]` unless Razvan adds it (H-02, by Nov 12).
+
 ## Decisions that need the human (Razvan / team)
 
 Merged from rev 1 and review §7 (questions 1–12), with duplicates folded into the existing H-xx. Every row has a default and a deadline. "Default" means what happens if nobody objects by the deadline. H-02 and the payout account have no default, because an agent may never fill them in.
