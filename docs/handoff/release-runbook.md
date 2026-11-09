@@ -193,8 +193,8 @@ An agent runs all of these, in this order. Each one ends in a line you can compa
    - `/api/contract`: `'account_id': 'rc.satchelhq.testnet', 'role': 'rc', 'locked': True, 'access_keys': 0,
      'code_matches': True, 'any_signer_tx_count': 0, 'birth_tx': '<RC_TX>'` and `AddKey in birth: False`;
    - `/api/clean-history/2`: `rc clean None`;
-   - snippets: S1, S4, S6, S7, S8, S9, S10 and S13 `PASS`, S11 and S12 `INFO`, and no `FAIL`. S2, S3 and S5 `SKIP`
-     because the script runs its lock checks on the final contract only. Steps 2–3 above cover the same facts for rc.
+   - snippets: the header says `lock checks on`; S1–S10 and S13 `PASS`, S11 and S12 `INFO`, and no `FAIL` or `SKIP`.
+     The lock and birth checks (S2–S6) run on rc too, given `SATCHEL_BIRTH_TX` and `SATCHEL_BIRTH_BLOCK` as above.
    This build leaves an rc build in `apps/web/.next`. The next fixture Playwright run rebuilds it. The same commands
    were run against dev2 with role `rc`. The build reads the exported values over `.env.production`, and
    the strict gate fails closed on a contract with a key: `/api/clean-history/2` answered `rc unsafe keys`.
