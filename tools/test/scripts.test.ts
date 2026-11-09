@@ -30,6 +30,7 @@ describe('e2e scripts: offline dry runs print the plan and sign nothing', () => 
     ['e2e/sale-near.ts', []],
     ['e2e/sale-usdc.ts', ['--refund-only']],
     ['e2e/clean-history.ts', ['--role', 'rc']],
+    ['e2e/clean-history.ts', ['--role', 'rc', '--from-step', '3', '--btc-token', '1']],
     ['e2e/message.ts', ['--chain', 'evm']],
     ['e2e/message.ts', ['--chain', 'sol']],
     ['e2e/allowance.ts', ['--action', 'set', '--token', '1', '--delegate', 'bob', '--asset', 'btc', '--limit', '50000']],

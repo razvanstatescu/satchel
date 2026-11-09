@@ -10,7 +10,7 @@ import { parseUtxoFlag, pickInputs, simulateSpend } from '../e2e/btc'
 import { buyRefFrom } from '../e2e/sale-near'
 import type { SatchelView } from '../e2e/common'
 import { wrongRef } from '../e2e/sale-usdc'
-import { staleRef } from '../e2e/clean-history'
+import { parseFromStep, staleRef, strictGateProblem } from '../e2e/clean-history'
 import { TGAS } from '../lib/units'
 import { b64 } from './helpers'
 
@@ -150,5 +150,20 @@ describe('NFT and sale plans (spec §5.7 attachments)', () => {
     expect(() => buyRefFrom({ ...view, sig_count: 5 })).toThrow(/ERR_LISTING_CHANGED/)
     expect(wrongRef(ref).listingId).not.toBe(7)
     expect(staleRef(ref).expectedSigCount).toBe(3)
+  })
+})
+
+describe('clean-history scenario guards (D-03)', () => {
+  it('--from-step accepts 1..4 only', () => {
+    expect(parseFromStep(undefined)).toBe(1)
+    expect(parseFromStep('3')).toBe(3)
+    for (const bad of ['0', '5', 'two', '2.5']) expect(() => parseFromStep(bad)).toThrow(/--from-step must be/)
+  })
+  it('an rc/final --send without H refuses to start; a dry run only warns; dev never needs H', () => {
+    expect(strictGateProblem('rc', true, null)).toMatch(/needs SATCHEL_EXPECTED_CODE_HASH=<H> before --send/)
+    expect(strictGateProblem('final', true, null)).toMatch(/before --send/)
+    expect(strictGateProblem('rc', false, null)).toMatch(/strict gate will say "unsafe"/)
+    expect(strictGateProblem('rc', true, 'ab'.repeat(32))).toBeNull()
+    expect(strictGateProblem('dev', true, null)).toBeNull()
   })
 })
