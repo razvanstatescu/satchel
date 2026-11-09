@@ -71,7 +71,7 @@
 | C-06 | **Both** | **Real wallets**: run one `sign_for` on each chain (BTC, ETH, SOL; D-46), one transfer, one list and one buy through the UI with **Meteor** and **Intear** (80–260 Tgas + deposits; partial outcomes; A-04) | each flow completes in each wallet |
 | C-07 | **Both** | **Clean history live**: an unused EVM signature blocks Buy; settle it → clean; the BTC `spent` row; the `foreign` status | the UI matches the checker |
 | C-08 | **Claude** | **Gas re-measure on testnet** (n = 1, 2, 4, 10 BTC inputs) against the `30 + 18·n` floor (A-02) | the formulas hold, or are adjusted before the freeze |
-| C-09 | **Claude** | **Reproducible build** of the workspace (Docker, `cargo near build reproducible-wasm`) twice → identical **H**; sandbox suite + `check-wasm-imports.sh` on that artifact; `near contract verify --use-contract-source-code-path` against a devN deploy of it (R-11, A-10) | H recorded; verify says "the same" |
+| C-09 | **Claude** | **Reproducible build** of the workspace (Docker, `cargo near build reproducible-wasm`) twice → identical **H**. The image is linux/amd64 only and crashes under emulation on this Apple Silicon machine (2026-11-09), so take H from the CI `reproducible` job (two runs on the same commit) or a Linux x86_64 host; sandbox suite + `check-wasm-imports.sh` on that artifact; `near contract verify --use-contract-source-code-path` against a devN deploy of it (R-11, A-10) | H recorded; verify says "the same" |
 | C-10 | **You** | Visual review of the live app on a real phone (Day/Night), plus the card SVG in Meteor and Intear | sign-off |
 
 ## D. Day 9 (Mon Nov 9): rehearse the final, contract freeze

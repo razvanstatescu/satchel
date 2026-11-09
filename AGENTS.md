@@ -87,6 +87,12 @@ cargo test -p satchel-tests                # sandbox suite (needs the three wasm
 `tools/judge-snippets.sh` (no `--print`) runs the read-only on-chain checks over the network, and `tools/proofs.sh`
 verifies every live proof in [`docs/evidence/`](docs/evidence/README.md) (one testnet transaction per action).
 
+Times on a warm Apple Silicon machine: the unit and library suites take seconds to a minute each; the sandbox suite
+about 8 minutes (longer on first run, which downloads the NEAR node binary and compiles nearcore crates); the
+end-to-end suite about 7 minutes including its app build. For a fast pass over the headline claims, run
+`cargo test -p satchel-tests --test transfer_path --test sign --test sale` after building the three wasm files, and
+`tools/proofs.sh` for the live transactions.
+
 ## Status
 
 - Contract: complete and reviewed internally (three rounds); the freeze is set for Nov 9. Until the final birth

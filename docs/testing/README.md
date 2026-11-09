@@ -24,9 +24,8 @@ merged into `main`. Every audit count below was measured on the merged `main`, n
 ## Run everything
 
 Every command runs from the repo root. You need Node 22.22.2 (`.nvmrc`) with pnpm 11, and Rust 1.93.0 with the wasm32
-target and cargo-near 0.22.0 (`rust-toolchain.toml`). On the original dev machine (macOS, nvm) each shell needed
-`export PATH="$HOME/.cargo/bin:$HOME/.nvm/versions/node/v22.22.2/bin:/opt/homebrew/bin:/usr/local/bin:$PATH";` first.
-Heavy suites share the machine's CPU: run one at a time (`CLAUDE.md`, "CPU budget").
+target and cargo-near 0.22.0 (`rust-toolchain.toml`); install steps are in [`docs/development.md`](../development.md).
+Run the heavy suites one at a time.
 
 | Suite | Command | Needs |
 |---|---|---|
@@ -37,7 +36,7 @@ Heavy suites share the machine's CPU: run one at a time (`CLAUDE.md`, "CPU budge
 | Core live checks (read-only, real networks; opt-in) | `pnpm --filter @satchel/core test:network` | network access |
 | Web unit tests | `pnpm --filter web test` | nothing |
 | Tools unit tests | `pnpm --filter @satchel/tools test:unit` (`test` also checks that `vectors/*.json` are fresh) | nothing |
-| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port (the default is 3340); **never 3100** (reserved on the dev machine) |
+| Web end to end (fixture mode: mock wallet plus an in-browser chain simulation, no testnet) | `CI=1 E2E_PORT=3330 pnpm --filter web test:e2e` | a free port (the default is 3340) |
 | Typecheck and lint | `pnpm --filter web typecheck`, `pnpm --filter web lint` | nothing |
 | Live signing without funds (real MPC on testnet) | `pnpm --filter @satchel/tools e2e:evm -- --sign-only` (also `e2e:btc`, `e2e:sol`; scripts in `tools/e2e/`) | testnet keys in `~/.near-credentials` |
 
@@ -53,13 +52,13 @@ round-three review fixes (branch `fix/r3-findings`, [`security/review-round-3.md
 
 | Suite | Latest recorded result | Date | Source |
 |---|---|---|---|
-| Contract unit, `cargo test -p satchel --lib` | 232 passed, 3 ignored; the 3 ignored (slow `review3_*` proofs) pass with `--ignored` | 2026-11-04 (integration of `fix/r3-findings`) | this file, "Round three integration" |
-| Contract sandbox, nearcore 2.13.4 | **139 passed, 0 ignored** (20 files, `review3.rs` included), on the cargo-near wasm `3a73b492…` | 2026-11-04 | this file, "Round three integration" |
-| Wasm import check | INV-22 OK on the cargo-near (non-reproducible) wasm `3a73b492…`; the reproducible rc artifact still needs its own check | 2026-11-04 | this file |
-| Core | 549 passed | 2026-11-04 | this file |
-| Tools (`test`) | 94 passed; vectors regenerate byte-identical | 2026-11-04 | this file |
-| Web unit (vitest) | 673 passed | 2026-11-04 | this file |
-| Web end to end (Playwright, fixture) | **308 passed** (full suite, mobile and desktop) | 2026-11-04 | this file |
+| Contract unit, `cargo test -p satchel --lib` | 236 passed, 3 ignored; the 3 ignored (slow `review3_*` proofs) pass with `--ignored` | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal, `docs/handoff/screening-2026-11-09.md` |
+| Contract sandbox | **150 passed, 0 ignored** (21 files, `transfer_path.rs` included) | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
+| Wasm import check | INV-22 OK on the cargo-near (non-reproducible) wasm `d4730d3f…` built from `fa8e0f7`; the reproducible artifact gets its own check in the CI `reproducible` job | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
+| Core | 560 passed, plus the browser-bundle check | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
+| Tools (`test`) | 94 passed; vectors regenerate byte-identical | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
+| Web unit (vitest) | 795 passed | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
+| Web end to end (Playwright, fixture) | **366 passed** (full suite, mobile and desktop) | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
 | Deep Rust-vs-TS differential | 1,000,000 cases, 0 disagreements | 2026-10-30/31 | [contract.md §7.2](contract.md#72-results-filled-in-as-each-run-finishes) |
 
 ## Round three integration (2026-11-04)
@@ -95,7 +94,7 @@ grown since ("Latest recorded counts" above).
 | Contract unit | 177 passed | 189 passed, 2 ignored (known bugs) | 194 passed, 0 ignored | 199 passed, 0 ignored | **202 passed, 0 ignored** |
 | Contract sandbox (2.13.4) | 119 passed (16 files) | 122 passed, 3 ignored (17 files) | 127 passed, 0 ignored | 136 passed, 0 ignored (19 files) | **137 passed, 0 ignored** (20 files) |
 | Contract sandbox (2.14.0-rc.5) | not run | not run | not run | 136 passed (one file at a time) | not re-run |
-| Core | 467 | 467 | 472 | 540 | **540** |
+| Core | 560 passed, plus the browser-bundle check | 2026-11-09 (fresh clone at `fa8e0f7`) | the screening rehearsal |
 | Web unit | 486 | 531 | 535 | 606 | **606** |
 | Tools unit | 92 | 92 | 92 | 92 | **92** |
 | Web end to end | 224 | 263 | 265 | 286 (+21) | **286** (app unchanged) |

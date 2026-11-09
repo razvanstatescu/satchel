@@ -65,6 +65,7 @@ things. They are dated records; the current test counts are in the root README.
 | [`handoff/contract.md`](handoff/contract.md) | `contracts/satchel`: public interface, classifier check order, storage, gas |
 | [`handoff/core.md`](handoff/core.md) | `packages/core`, the shared vectors and their schema |
 | [`handoff/sandbox.md`](handoff/sandbox.md) | The sandbox suite (`tests/`), the mock signer and mock FT, the invariant-to-test map |
+| [`handoff/screening-2026-11-09.md`](handoff/screening-2026-11-09.md) | A rehearsal of the AI screening on fresh clones: what passed, what was found and fixed, what waits for the final contract |
 | [`handoff/web.md`](handoff/web.md) | `apps/web`: routes, data modes, wallet flows, what judges see in server HTML |
 | [`handoff/release.md`](handoff/release.md) | Testnet scripts, the keyless-birth runbook, CI, README checks |
 

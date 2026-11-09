@@ -85,14 +85,17 @@ curl -s -X POST https://tx.test.fastnear.com/v0/account -H 'content-type: applic
 Expected: the first entry is `"transaction_hash":"[TBD: birth tx hash]"` at `"tx_block_height":[TBD: block A]`.
 
 **6. The deployed code is this repository's code.** You need Rust (pinned by `rust-toolchain.toml`), cargo-near and
-Docker; the build itself runs in the Docker image pinned in `contracts/satchel/Cargo.toml`:
+Docker; the build itself runs in the Docker image pinned in `contracts/satchel/Cargo.toml`. That image is linux/amd64
+only: run it on Linux x86_64. On Apple Silicon it crashes under emulation; use the CI job instead (below).
 ```sh
 git checkout contract-v1.0.0
 cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml
 sha256sum target/near/satchel/satchel.wasm        # Linux
 shasum -a 256 target/near/satchel/satchel.wasm    # macOS
 ```
-Expected: `[TBD: H]`, the same hash as in step 2. After the repo is public:
+Expected: `[TBD: H]`, the same hash as in step 2. Without an x86_64 machine: the `reproducible` job in
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the same build on every push to `main`, prints the
+SHA-256 in its summary and keeps the wasm as an artifact. After the repo is public:
 `near contract verify deployed-at satchel.satchelhq.testnet network-config testnet-fastnear now` → "…are the same".
 
 **7. Contract constants and the MPC it depends on**

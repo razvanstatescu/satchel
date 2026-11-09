@@ -5,14 +5,26 @@
 Prerequisites, the dev server, every test suite and what it covers, and the testnet scripts.
 
 
-Prerequisites: Node (version in `.nvmrc`) with pnpm (corepack), plus Rust with the wasm32 target and cargo-near for
-the contracts (`rust-toolchain.toml` pins the toolchain). The sandbox suite needs Linux or Apple Silicon.
+Prerequisites, installed once (the versions are the ones CI uses):
 
 ```sh
+corepack enable                                    # pnpm, at the version pinned in package.json
+# Node: the version in .nvmrc. Rust: rustup reads rust-toolchain.toml (toolchain and wasm32 target) on first use.
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/download/cargo-near-v0.22.0/cargo-near-installer.sh | sh
 pnpm install --frozen-lockfile
+pnpm --filter web exec playwright install chromium # only for the end-to-end suite
+```
+
+The sandbox suite needs Linux or Apple Silicon (its NEAR node binary is downloaded on first run). The reproducible
+contract build needs Docker on Linux x86_64; see [verify.md](verify.md) step 6.
+
+```sh
 pnpm --filter web dev                        # http://localhost:3000, fixture data (no chain reads) by default
 NEXT_PUBLIC_DATA_MODE=live pnpm --filter web dev   # live testnet reads; see .env.example for every variable
 ```
+
+Until the final contract is born on Nov 10, live mode needs the development contract too:
+`NEXT_PUBLIC_DATA_MODE=live NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet pnpm --filter web dev`.
 
 Tests, all offline. Every suite must pass in full; what each one covers is in
 [`docs/testing/README.md`](testing/README.md), which also keeps the dated results of each run:
