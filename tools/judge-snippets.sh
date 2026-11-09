@@ -15,6 +15,7 @@
 #                                dev2.satchelhq.testnet). Lock checks run on the final contract only.
 #   SATCHEL_TOKEN  SATCHEL_OWNER token id (default 1) and its expected owner (default alice.satchelhq.testnet)
 #   SATCHEL_EXPECTED_CODE_HASH   expected wasm SHA-256 (H)       SATCHEL_BIRTH_TX   the birth transaction hash
+#   SATCHEL_BIRTH_BLOCK          the birth transaction's block height (block A)
 #   SATCHEL_BTC_ADDRESS  SATCHEL_EVM_ADDRESS   the token's addresses (default: the final #1's, else read from the app)
 #   SATCHEL_APP_URL  SATCHEL_RPC  SATCHEL_RPC_FALLBACK  SATCHEL_TX_API  SATCHEL_WASM
 # Example, the development contract: SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh
@@ -26,6 +27,7 @@ C="${SATCHEL_CONTRACT:-$FINAL}"
 T="${SATCHEL_TOKEN:-1}"
 OWNER="${SATCHEL_OWNER:-alice.${TEAM}.testnet}"
 BIRTH_TX="${SATCHEL_BIRTH_TX:-[TBD: birth tx hash]}"
+BLOCK_A="${SATCHEL_BIRTH_BLOCK:-[TBD: block A]}"
 H="${SATCHEL_EXPECTED_CODE_HASH:-[TBD: reproducible wasm SHA-256]}"
 APP="${SATCHEL_APP_URL:-https://usesatchel.xyz}"
 RPC="${SATCHEL_RPC:-https://near-testnet.drpc.org}"
@@ -51,7 +53,7 @@ case "${1:-}" in
   --print) MODE=print ;;
   --offline) MODE=offline ;;
   --live | "") MODE=live ;;
-  -h | --help) sed -n '2,24p' "$0"; exit 0 ;;
+  -h | --help) sed -n '2,25p' "$0"; exit 0 ;;
   *) echo "unknown option $1" >&2; exit 2 ;;
 esac
 
@@ -155,7 +157,7 @@ print(\"AddKey actions =\", kinds.count(\"AddKey\"))
 print(\"block =\", t[\"execution_outcome\"][\"block_height\"])'" \
 "signer = $TEAM.testnet receiver = $C
 actions = CreateAccount Transfer DeployContract FunctionCall FunctionCall FunctionCall FunctionCall FunctionCall FunctionCall FunctionCall FunctionCall
-AddKey actions = 0" "$BIRTH_TX"
+AddKey actions = 0$(tbd "$BLOCK_A" || printf '\nblock = %s' "$BLOCK_A")" "$BIRTH_TX"
 
 snippet S5 "The contract never signed a transaction, delegated ones included (FastNEAR is_any_signer)" \
 "curl -s -X POST $TXAPI/v0/account -H 'content-type: application/json' -d '{\"account_id\":\"$C\",\"is_any_signer\":true}'" \
@@ -164,7 +166,7 @@ snippet S5 "The contract never signed a transaction, delegated ones included (Fa
 
 snippet S6 "Its history starts at the birth tx (no earlier incarnation of the id)" \
 "curl -s -X POST $TXAPI/v0/account -H 'content-type: application/json' -d '{\"account_id\":\"$C\",\"desc\":false,\"limit\":1}' | python3 -c 'import sys,json; t=json.load(sys.stdin)[\"account_txs\"][0]; print(\"oldest tx =\", t[\"transaction_hash\"], \"block\", t[\"tx_block_height\"])'" \
-"oldest tx = $BIRTH_TX block" "$ACCT" "$BIRTH_TX"
+"oldest tx = $BIRTH_TX block$(tbd "$BLOCK_A" || printf ' %s' "$BLOCK_A")" "$ACCT" "$BIRTH_TX"
 
 CFG_ARGS=$(printf '{}' | base64 | tr -d '\n')
 snippet S7 "Contract constants: 250-block quiet period, the MPC signer, 4 EVM testnets (config view)" \

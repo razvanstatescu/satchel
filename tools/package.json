@@ -25,6 +25,7 @@
     "e2e:history": "tsx e2e/history.ts",
     "e2e:proofs": "tsx e2e/proofs.ts",
     "deploy:keyless-birth": "tsx deploy/keyless-birth.ts",
+    "fill-final": "tsx deploy/fill-final.ts",
     "onboarding:report": "tsx onboarding-report.ts"
   },
   "dependencies": {

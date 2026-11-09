@@ -23,7 +23,7 @@ SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh
 On a development contract the lock checks (2 and 4 below) skip, because a development contract keeps its key, and so
 do the birth checks (3 and 5), which belong to the final contract. The
 token's addresses come from the app when it serves that contract. Every other value can be overridden too:
-`SATCHEL_TOKEN`, `SATCHEL_OWNER`, `SATCHEL_EXPECTED_CODE_HASH`, `SATCHEL_BIRTH_TX`, `SATCHEL_BTC_ADDRESS`,
+`SATCHEL_TOKEN`, `SATCHEL_OWNER`, `SATCHEL_EXPECTED_CODE_HASH`, `SATCHEL_BIRTH_TX`, `SATCHEL_BIRTH_BLOCK`, `SATCHEL_BTC_ADDRESS`,
 `SATCHEL_EVM_ADDRESS`, `SATCHEL_APP_URL`, `SATCHEL_RPC` (the full list is in `tools/judge-snippets.sh --help`).
 
 **1. Who owns Satchel #1** (NEP-171 `nft_token`)
