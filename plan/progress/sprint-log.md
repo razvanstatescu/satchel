@@ -146,3 +146,6 @@
 - 2026-11-06T11:15Z [seo-guides-ownership] done: sell/buy/transfer guides committed on worktree-agent-a459707c8161e62e5; unit, e2e and Lighthouse 100x4 pass
 - 2026-11-06T11:19Z [seo-guides-chains] done: gift-crypto, erc-6551, chain-signatures committed; e2e and unit green, Lighthouse 100 x4
 - 2026-11-09T09:15Z [transfer-path tests] done: tests/tests/transfer_path.rs (10 sandbox tests, all pass; transfer/sale/usdc re-run green), 5bb6298 on main
+- 2026-11-09T09:23Z [G-1] done: prepareSend looks up a Satchel recipient's records (fail closed)
+- 2026-11-09T09:28Z [U-1,U-2] done: clean-history status-agnostic tests (core) + offer escrow spent-once tests (unit + sandbox market.rs); release wasm byte-identical; commit c2463fc
+- 2026-11-09T09:30Z [G-2,U-3,U-4] done: Buy tab You get read fresh at check depth, excludes encumbered/unconfirmed, re-read before Buy
