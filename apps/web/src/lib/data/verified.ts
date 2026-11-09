@@ -68,6 +68,18 @@ async function rpc(chainId: number, method: string, params: unknown[]): Promise<
 const big = (hex: string) => BigInt(hex === "0x" ? "0x0" : hex).toString();
 
 async function liveEvmChain(chainId: number, evm: string): Promise<EvmChainBalance> {
+  if (chainId !== SEPOLIA) {
+    // An L2 that doesn't answer reads as unavailable (null), never as a failed read: only Bitcoin and Sepolia fail closed.
+    try {
+      return await readEvmChain(chainId, evm);
+    } catch {
+      return { chain_id: chainId, wei: null, usdc: null };
+    }
+  }
+  return readEvmChain(chainId, evm);
+}
+
+async function readEvmChain(chainId: number, evm: string): Promise<EvmChainBalance> {
   const tip = BigInt(await rpc(chainId, "eth_blockNumber", []));
   const tag = `0x${evmReadBlock(tip, chainId).toString(16)}`;
   const data = `0x70a08231${evm.slice(2).toLowerCase().padStart(64, "0")}`;
@@ -101,6 +113,25 @@ export interface VerifiedRead {
   excluded_sats: bigint;
 }
 
+type BtcStats = { mempool_stats: { funded_txo_sum: number; spent_txo_sum: number } };
+
+/** The three Bitcoin reads from one provider, trying each configured provider in turn (all three from the same one). */
+async function readBtc(address: string): Promise<[BtcUtxo[], number, BtcStats]> {
+  let last: unknown;
+  for (const api of BTC_APIS) {
+    try {
+      return (await Promise.all([
+        fetchJson(`${api}/address/${address}/utxo`),
+        fetchJson(`${api}/blocks/tip/height`),
+        fetchJson(`${api}/address/${address}`),
+      ])) as [BtcUtxo[], number, BtcStats];
+    } catch (e) {
+      last = e;
+    }
+  }
+  throw last ?? new Error("bitcoin balance");
+}
+
 export async function readVerifiedBalances(tokenId: string, encumbered: string[], base: VerifiedBalances): Promise<VerifiedRead> {
   if (IS_FIXTURE) {
     const addr = satchelAddresses(tokenId);
@@ -108,13 +139,7 @@ export async function readVerifiedBalances(tokenId: string, encumbered: string[]
     return { balances: simDrained({ btc: b.btc, evm: b.evm, sol: base.sol, ...(b.evm_chains ? { evm_chains: b.evm_chains } : {}) }), excluded_sats: 0n };
   }
   const addr = satchelAddresses(tokenId);
-  const api = BTC_APIS[0];
-  const [utxos, tip, stats, chains] = await Promise.all([
-    fetchJson(`${api}/address/${addr.btc}/utxo`) as Promise<BtcUtxo[]>,
-    fetchJson(`${api}/blocks/tip/height`) as Promise<number>,
-    fetchJson(`${api}/address/${addr.btc}`) as Promise<{ mempool_stats: { funded_txo_sum: number; spent_txo_sum: number } }>,
-    Promise.all(EVM_IDS.map((id) => liveEvmChain(id, addr.evm))),
-  ]);
+  const [[utxos, tip, stats], chains] = await Promise.all([readBtc(addr.btc), Promise.all(EVM_IDS.map((id) => liveEvmChain(id, addr.evm)))]);
   const unconfirmed = BigInt(stats.mempool_stats.funded_txo_sum) - BigInt(stats.mempool_stats.spent_txo_sum);
   const sep = chains.find((c) => c.chain_id === SEPOLIA);
   const btc = verifiedBtc(utxos, encumbered, Number(tip), unconfirmed);
