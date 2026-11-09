@@ -170,6 +170,10 @@ build), that its birth transaction had no AddKey, that it has never signed a tra
 the MPC it depends on, and it prints the balances of #1's addresses to compare with the app. Each command with its expected output:
 [docs/verify.md](docs/verify.md).
 
+Every Satchel action has also happened on testnet: mint, gift, sends on Sepolia, testnet4 and devnet, messages, list, buy, offers,
+a delegate's allowance, and the refusals. `tools/proofs.sh` checks each of those transactions read-only and prints
+PASS or FAIL with its explorer link. The list, and what to look for in each: [docs/evidence/](docs/evidence/README.md).
+
 ## Run it locally
 
 ```sh

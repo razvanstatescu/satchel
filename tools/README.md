@@ -39,10 +39,34 @@ pnpm --filter @satchel/tools e2e:evm --token 1 --to final#2 --value 0.001 --send
 | `e2e/history.ts` (`e2e:history`) | C1, read-only: recompute `history_digest(token_id)` from every `sig_records` row and compare with the on-chain view |
 | `e2e/market.ts` (`e2e:market`) | C4 and C6, by `--action`: deposit, withdraw and read NEAR inside a Satchel; make, accept and cancel offers; contract totals |
 | `e2e/allowance.ts` (`e2e:allowance`) | C5: `set_allowance`, a delegate's `sign_for` within the cap (`--sign-only`), a refused over-cap request, `revoke_allowance` |
+| `e2e/proofs.ts` (`e2e:proofs`) | The live proof set: performs every action once on a contract (mint, gift, sends on Sepolia, testnet4 and devnet, messages, list, buy, offers, inside NEAR and wNEAR, the allowance, and every refusal) and writes `docs/evidence/proofs.json` plus the table in `docs/evidence/README.md`. See below |
 
 Shared modules (no script of their own): `e2e/common.ts` (views and helpers), `e2e/plans.ts` (pure tx plans for the
 NFT and sale flows), `e2e/checker.ts` (runs `@satchel/core/clean-history` from Node as the buyer's browser does),
 `e2e/funding.ts` (the per-address amounts for `--fanout`).
+
+### The live proof set (`e2e/proofs.ts`, `proofs.sh`)
+
+`e2e/proofs.ts` makes one testnet transaction per action and writes `docs/evidence/proofs.json`. Like every script
+here it is a dry run by default; the chain steps call `evm.ts`, `btc.ts` and `sol.ts` and pass `--send` on only in
+send mode. It mints fresh Satchels for everything that changes hands (the sale Satchel, the inside/USDC Satchel, the
+BTC multi-input Satchel), sends coins from `--chain-token` (default 1, which must be funded on the three chains) into
+the sale Satchel, and leaves that Satchel listed with a clean history at the end. MPC timeouts are retried (EVM with
+the same nonce). Each entry is built from the transaction as the FastNEAR tx API serves it, and a step whose
+transaction does not prove it (wrong method, missing event, wrong error code, no signature) stops the run.
+
+```bash
+pnpm --filter @satchel/tools e2e:proofs --contract dev2.satchelhq.testnet                 # dry run
+pnpm --filter @satchel/tools e2e:proofs --contract satchel.satchelhq.testnet --send --yes  # after the final birth only
+pnpm --filter @satchel/tools e2e:proofs --use btc-send=<hash> ...                         # adopt an earlier tx as a proof
+pnpm --filter @satchel/tools e2e:proofs --only buy-usdc --merge --send --yes              # add one proof to the file
+pnpm --filter @satchel/tools e2e:proofs --render                                           # rewrite the README table
+tools/proofs.sh                                                                            # then verify, read-only
+```
+
+After the final birth (Nov 10), the same command on `satchel.satchelhq.testnet` regenerates the whole set there; it
+needs `--chain-token` funded on Sepolia, testnet4 and devnet, NEAR on alice, bob and carol, and, for `buy-usdc`, USDC
+on NEAR testnet for carol (Circle faucet, human only; the step is skipped without it).
 
 ### `deploy/`: the keyless birth (kb/90 §5.16)
 
@@ -75,6 +99,7 @@ See `vectors/README.md` for each output file and who runs it.
 |---|---|
 | `check-wasm-imports.sh` | INV-22: fails if the release wasm imports a host function that could add a key, deploy code or delete the account. Needs only bash and python3 |
 | `judge-snippets.sh` | Every `docs/verify.md` command with its expected output. `--print` (no network), `--offline` (plus local wasm hashes), default `--live` against testnet |
+| `proofs.sh` | Verifies every proof in `docs/evidence/proofs.json`: the NEAR tx (FastNEAR tx API, RPC fallback), its outcome or `ERR_` code, its events, the signature against the Satchel's address, and the Sepolia / testnet4 / devnet tx it became. `--print` (no network), `--self-test` (offline vectors and recorded answers). Logic in `lib/proofs.py` (python3 standard library only) |
 | `monitor.sh` | Daily keep-alive checks: the README commands, the no-JS judge pages, the JSON routes, the contract's spare NEAR, the MPC version, the wallet manifest, the endpoints. `--offline`, `--quick` |
 | `onboarding-report.ts` (`onboarding:report`) | A read-out of the onboarding survey from Upstash Redis (same env vars as `POST /api/onboarding`) |
 

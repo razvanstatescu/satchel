@@ -63,6 +63,7 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
 | The release contract can never add a key, deploy code or delete itself | keyless birth (`tools/deploy/keyless-birth.md`) | `tools/check-wasm-imports.sh` (INV-22); `tests/tests/release.rs` `keyless_birth_batch` |
 | The contract's rules and the TypeScript mirror agree | `parse/` and `packages/core/src/policy/` | `vectors/*.json`, run by `cargo test -p satchel --lib` and `pnpm --filter @satchel/core test` |
 | The buyer's check marks every record spent, expired or blocking | `packages/core/src/clean-history/` | `packages/core/test/clean-history.test.ts`, `gate.test.ts` |
+| Every action has really happened on testnet, refusals included | `tools/e2e/proofs.ts` (makes the set, writes `docs/evidence/proofs.json`) | `tools/proofs.sh` (read-only: each tx, its events or `ERR_` code, the signature against the Satchel's address, the matching Sepolia / testnet4 / devnet tx); list: [`docs/evidence/`](docs/evidence/README.md) |
 | Judge pages render their facts without JavaScript | `apps/web/src/app/(app)/s/[id]/page.tsx`, `contract/page.tsx` | `curl -s https://usesatchel.xyz/api/satchels/1`; `curl -s https://usesatchel.xyz/s/1` |
 
 Security reviews and their findings, all closed or accepted with reasons: [`docs/security/`](docs/security/).
@@ -73,6 +74,8 @@ Every suite and what it covers is in [`docs/development.md`](docs/development.md
 
 ```sh
 tools/judge-snippets.sh --print            # lists every on-chain check from the README, no network
+tools/proofs.sh --print                    # lists every live proof (docs/evidence) with its tx and what must hold
+tools/proofs.sh --self-test                # the proof checker's crypto against known vectors and recorded answers
 cargo test -p satchel --lib                # contract unit tests + shared vectors (toolchain pinned)
 pnpm install --frozen-lockfile && pnpm --filter @satchel/core test
 pnpm --filter @satchel/tools test
@@ -81,7 +84,8 @@ for c in satchel mock-signer mock-ft; do cargo near build non-reproducible-wasm 
 cargo test -p satchel-tests                # sandbox suite (needs the three wasm files above), slow
 ```
 
-`tools/judge-snippets.sh` (no `--print`) runs the read-only on-chain checks over the network.
+`tools/judge-snippets.sh` (no `--print`) runs the read-only on-chain checks over the network, and `tools/proofs.sh`
+verifies every live proof in [`docs/evidence/`](docs/evidence/README.md) (one testnet transaction per action).
 
 ## Status
 

@@ -3,6 +3,8 @@
 > Part of the Satchel docs. Start at the [README](../README.md); a guide for AI reviewers is in [`AGENTS.md`](../AGENTS.md).
 
 Each command reads public chain data; nothing needs a key or a wallet. `tools/judge-snippets.sh` runs them all.
+For a live testnet transaction of every Satchel action (mint, gift, sends, list, buy, offers, refusals), see
+[docs/evidence/](evidence/README.md); `tools/proofs.sh` verifies them all.
 
 
 `tools/judge-snippets.sh` runs every command below and compares the output (`--print` lists them without network).

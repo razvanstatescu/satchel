@@ -149,3 +149,5 @@
 - 2026-11-09T09:23Z [G-1] done: prepareSend looks up a Satchel recipient's records (fail closed)
 - 2026-11-09T09:28Z [U-1,U-2] done: clean-history status-agnostic tests (core) + offer escrow spent-once tests (unit + sandbox market.rs); release wasm byte-identical; commit c2463fc
 - 2026-11-09T09:30Z [G-2,U-3,U-4] done: Buy tab You get read fresh at check depth, excludes encumbered/unconfirmed, re-read before Buy
+- 2026-11-09T09:56Z [proofs] start: live testnet proof set (docs/evidence/proofs.json, tools/proofs.sh, tools/e2e/proofs.ts) on dev2
+- 2026-11-09T10:25Z [proofs] done: docs/evidence (34 live testnet proofs on dev2, all PASS with tools/proofs.sh), tools/e2e/proofs.ts generator, lib/proofs.py stdlib verifier + self-test; buy-usdc skipped (no NEAR-testnet USDC); #5 (NEAR) and #6 (USDC) left listed

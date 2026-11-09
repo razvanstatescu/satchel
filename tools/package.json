@@ -23,6 +23,7 @@
     "e2e:market": "tsx e2e/market.ts",
     "e2e:allowance": "tsx e2e/allowance.ts",
     "e2e:history": "tsx e2e/history.ts",
+    "e2e:proofs": "tsx e2e/proofs.ts",
     "deploy:keyless-birth": "tsx deploy/keyless-birth.ts",
     "onboarding:report": "tsx onboarding-report.ts"
   },

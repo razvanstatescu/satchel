@@ -1,0 +1,570 @@
+{
+  "schema": "satchel-proofs/1",
+  "network": "testnet",
+  "contract": "dev2.satchelhq.testnet",
+  "contract_role": "dev",
+  "note": "Recorded fixture for tools/lib/proofs.py self-test (real dev2 transactions).",
+  "generated_at": "2026-11-09",
+  "satchels": {
+    "1": {
+      "evm": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+      "btc": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq",
+      "sol": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo"
+    },
+    "2": {
+      "evm": "0x1b2E04d7bB8fB00C92F7923b717CAc398eAFf3d3",
+      "btc": "tb1q0dzshdwp8wqqfm5x7kqsxfh60x43qeuxceaa5e",
+      "sol": "7RbAqKKncnLcaNkiuFsfUSu8Jo7wGwvFz4DyjZ7fQaqq"
+    },
+    "3": {
+      "evm": "0x7aC729086AE74Ec0Dc28eEc31B34403ffD99f1e7",
+      "btc": "tb1q9v9t4ay7ssgry9l7s9yf7hs6s39uhxtd8f6gs3",
+      "sol": "Da8HNPy47aiQhoKLUvptvXF5WXmmuhJsfjxa63zViRhh"
+    }
+  },
+  "proofs": [
+    {
+      "id": "evm-message",
+      "group": "Sign",
+      "action": "Sign an EIP-191 message",
+      "shows": "The owner signs a plain-text message with the Satchel's EVM key. The signature recovers to the Satchel's EVM address.",
+      "token_id": "1",
+      "tx": "CWZGe4sFjQx9F3q29Xz3xTfBLvxhHgsVAuMviJ3CfcNH",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424340,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "evm",
+            "path": "satchel/1/evm",
+            "first_seq": 3,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 3,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/CWZGe4sFjQx9F3q29Xz3xTfBLvxhHgsVAuMviJ3CfcNH",
+      "signature": {
+        "chain": "evm",
+        "kind": "evm_message",
+        "path": "satchel/1/evm",
+        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "message_text": "Satchel live demo: dev2 #1 EVM message"
+      }
+    },
+    {
+      "id": "sol-message",
+      "group": "Sign",
+      "action": "Sign a Solana off-chain message",
+      "shows": "The owner signs a Solana off-chain message. The ed25519 signature verifies against the Satchel's SOL address.",
+      "token_id": "1",
+      "tx": "dr6u4tRpEtZ7y7fj39wakERpox5K4GrcvgY8QGLBHiG",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424365,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "sol",
+            "path": "satchel/1/sol",
+            "first_seq": 4,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 4,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/dr6u4tRpEtZ7y7fj39wakERpox5K4GrcvgY8QGLBHiG",
+      "signature": {
+        "chain": "sol",
+        "kind": "sol_message",
+        "path": "satchel/1/sol",
+        "address": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo",
+        "message_text": "Satchel live demo: dev2 #1 SOL message"
+      }
+    },
+    {
+      "id": "evm-send",
+      "group": "Send",
+      "action": "Send ETH on Sepolia",
+      "shows": "The contract parses the unsigned Sepolia transaction, hashes it itself, records it, and the MPC signs it. The same signature is the one on Sepolia.",
+      "token_id": "1",
+      "tx": "DuNMM3cGLqmvE6ipbpGvYsoACBkbD3snYT1ZcfU7u4sc",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424241,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "evm",
+            "path": "satchel/1/evm",
+            "first_seq": 0,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 0,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/DuNMM3cGLqmvE6ipbpGvYsoACBkbD3snYT1ZcfU7u4sc",
+      "signature": {
+        "chain": "evm",
+        "kind": "evm_tx",
+        "path": "satchel/1/evm",
+        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "chain_id": 11155111
+      },
+      "external": {
+        "chain": "sepolia",
+        "tx": "0x4a2771dc8712150e1b7667002c359473af5f2e580972039e7cb2c268249c1785",
+        "explorer": "https://sepolia.etherscan.io/tx/0x4a2771dc8712150e1b7667002c359473af5f2e580972039e7cb2c268249c1785",
+        "from": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "nonce": 0,
+        "status": "confirmed"
+      }
+    },
+    {
+      "id": "btc-send",
+      "group": "Send",
+      "action": "Send BTC on testnet4",
+      "shows": "One sign_for carries the BIP 143 preimage. The contract hashes it, and the MPC signature is the one in the Bitcoin transaction's witness.",
+      "token_id": "1",
+      "tx": "3zSswR2VmAsoWhp5nfKSG3hLcksKSvjnUi1RnrwRKXVn",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424439,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "btc",
+            "path": "satchel/1/btc",
+            "first_seq": 6,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 6,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/3zSswR2VmAsoWhp5nfKSG3hLcksKSvjnUi1RnrwRKXVn",
+      "signature": {
+        "chain": "btc",
+        "kind": "btc_tx",
+        "path": "satchel/1/btc",
+        "address": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq"
+      },
+      "external": {
+        "chain": "bitcoin-testnet4",
+        "tx": "f4db80ecd509bdd0655e1cc4f89c35b810b055bdd047fe761f650cf3f131908c",
+        "explorer": "https://mempool.space/testnet4/tx/f4db80ecd509bdd0655e1cc4f89c35b810b055bdd047fe761f650cf3f131908c",
+        "from": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq",
+        "status": "confirmed"
+      }
+    },
+    {
+      "id": "sol-send",
+      "group": "Send",
+      "action": "Send SOL on devnet",
+      "shows": "A Solana System transfer. The ed25519 signature the MPC returns is the Solana transaction id.",
+      "token_id": "1",
+      "tx": "3bh1pDhvYi7DTcK3TdSinDzvyZPyyGi7dMTWCw9kV6n8",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424412,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "sol",
+            "path": "satchel/1/sol",
+            "first_seq": 5,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 5,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/3bh1pDhvYi7DTcK3TdSinDzvyZPyyGi7dMTWCw9kV6n8",
+      "signature": {
+        "chain": "sol",
+        "kind": "sol_tx",
+        "path": "satchel/1/sol",
+        "address": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo"
+      },
+      "external": {
+        "chain": "solana-devnet",
+        "tx": "3jP9S3hug5tdNrnw3LS3WBwQQaFAc7tihFGJAZa7ddN85JV6Nof62Y1UM6CvBRSZxVkcEAx9fCu4H6jBxcGJpDwH",
+        "explorer": "https://explorer.solana.com/tx/3jP9S3hug5tdNrnw3LS3WBwQQaFAc7tihFGJAZa7ddN85JV6Nof62Y1UM6CvBRSZxVkcEAx9fCu4H6jBxcGJpDwH?cluster=devnet",
+        "from": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo",
+        "status": "confirmed"
+      }
+    },
+    {
+      "id": "offer-accept",
+      "group": "Sell",
+      "action": "Accept an offer",
+      "shows": "The owner accepts. The Satchel goes to the buyer and the escrowed NEAR goes to the seller in the same receipt.",
+      "token_id": "2",
+      "tx": "De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "accept_offer",
+      "args": {
+        "offer_id": 1
+      },
+      "block_height": 275424649,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "nep171:nft_transfer",
+          "data": {
+            "old_owner_id": "alice.satchelhq.testnet",
+            "new_owner_id": "carol.satchelhq.testnet",
+            "token_ids": [
+              "2"
+            ]
+          }
+        },
+        {
+          "event": "satchel:offer_accepted",
+          "data": {
+            "offer_id": 1,
+            "token_id": "2",
+            "seller_id": "alice.satchelhq.testnet",
+            "buyer_id": "carol.satchelhq.testnet",
+            "amount": "200000000000000000000000"
+          }
+        },
+        {
+          "event": "satchel:payout",
+          "data": {
+            "account_id": "alice.satchelhq.testnet",
+            "currency": "near",
+            "amount": "200000000000000000000000",
+            "ok": true
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD"
+    },
+    {
+      "id": "allowance-sign",
+      "group": "Delegate",
+      "action": "The delegate signs within the cap",
+      "shows": "The delegate (not the owner) gets a BTC spend signed. The contract debits the cap by the amount that leaves the Satchel.",
+      "token_id": "1",
+      "tx": "FAFuuaY5WECmD2xZgWLpiw6ByKz9jfy3xGJUtHrW38cg",
+      "signer": "bob.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424840,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "btc",
+            "path": "satchel/1/btc",
+            "first_seq": 7,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 7,
+            "statuses": [
+              "signed"
+            ]
+          }
+        },
+        {
+          "event": "satchel:allowance_spent",
+          "data": {
+            "token_id": "1",
+            "delegate_id": "bob.satchelhq.testnet",
+            "debits": [
+              {
+                "asset": "btc",
+                "amount": "10282"
+              }
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/FAFuuaY5WECmD2xZgWLpiw6ByKz9jfy3xGJUtHrW38cg",
+      "note": "signed only: the input is synthetic, so this signature can never move coins (it shows the cap accounting)",
+      "signature": {
+        "chain": "btc",
+        "kind": "btc_tx",
+        "path": "satchel/1/btc",
+        "address": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq"
+      }
+    },
+    {
+      "id": "allowance-over-cap",
+      "group": "Refusals",
+      "action": "The delegate asks for more than the cap",
+      "shows": "A delegate request above what is left of the cap is refused before anything is recorded.",
+      "token_id": "1",
+      "tx": "86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
+      "signer": "bob.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424868,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "failure",
+        "error": "ERR_ALLOWANCE_EXCEEDED"
+      },
+      "absent_events": [
+        "satchel:sign_requested"
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht"
+    },
+    {
+      "id": "tampered-address",
+      "group": "Sign",
+      "action": "Sign an EIP-191 message",
+      "shows": "The owner signs a plain-text message with the Satchel's EVM key. The signature recovers to the Satchel's EVM address.",
+      "token_id": "1",
+      "tx": "CWZGe4sFjQx9F3q29Xz3xTfBLvxhHgsVAuMviJ3CfcNH",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424340,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "evm",
+            "path": "satchel/1/evm",
+            "first_seq": 3,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 3,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/CWZGe4sFjQx9F3q29Xz3xTfBLvxhHgsVAuMviJ3CfcNH",
+      "signature": {
+        "chain": "evm",
+        "kind": "evm_message",
+        "path": "satchel/1/evm",
+        "address": "0x0000000000000000000000000000000000000001",
+        "message_text": "Satchel live demo: dev2 #1 EVM message"
+      },
+      "_fixture_expect": "FAIL"
+    },
+    {
+      "id": "tampered-error",
+      "group": "Refusals",
+      "action": "The delegate asks for more than the cap",
+      "shows": "A delegate request above what is left of the cap is refused before anything is recorded.",
+      "token_id": "1",
+      "tx": "86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
+      "signer": "bob.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424868,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "failure",
+        "error": "ERR_FROZEN"
+      },
+      "absent_events": [
+        "satchel:sign_requested"
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
+      "_fixture_expect": "FAIL"
+    },
+    {
+      "id": "tampered-nonce",
+      "group": "Send",
+      "action": "Send ETH on Sepolia",
+      "shows": "The contract parses the unsigned Sepolia transaction, hashes it itself, records it, and the MPC signs it. The same signature is the one on Sepolia.",
+      "token_id": "1",
+      "tx": "DuNMM3cGLqmvE6ipbpGvYsoACBkbD3snYT1ZcfU7u4sc",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "dev2.satchelhq.testnet",
+      "method": "sign_for",
+      "args": {
+        "token_id": "1"
+      },
+      "block_height": 275424241,
+      "date": "2026-10-30",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:sign_requested",
+          "data": {
+            "token_id": "1",
+            "owner_id": "alice.satchelhq.testnet",
+            "chain": "evm",
+            "path": "satchel/1/evm",
+            "first_seq": 0,
+            "count": 1
+          }
+        },
+        {
+          "event": "satchel:sign_resolved",
+          "data": {
+            "token_id": "1",
+            "first_seq": 0,
+            "statuses": [
+              "signed"
+            ]
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/DuNMM3cGLqmvE6ipbpGvYsoACBkbD3snYT1ZcfU7u4sc",
+      "signature": {
+        "chain": "evm",
+        "kind": "evm_tx",
+        "path": "satchel/1/evm",
+        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "chain_id": 11155111
+      },
+      "external": {
+        "chain": "sepolia",
+        "tx": "0x4a2771dc8712150e1b7667002c359473af5f2e580972039e7cb2c268249c1785",
+        "explorer": "https://sepolia.etherscan.io/tx/0x4a2771dc8712150e1b7667002c359473af5f2e580972039e7cb2c268249c1785",
+        "from": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "nonce": 7,
+        "status": "confirmed"
+      },
+      "_fixture_expect": "FAIL"
+    }
+  ]
+}
