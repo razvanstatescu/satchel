@@ -24,3 +24,29 @@ payload.json
 # Python bytecode
 __pycache__/
 *.pyc
+
+# Third-party checkouts used by the Phase 0 spikes (nested git repos, never tracked: cargo-near clones this repo
+# with libgit2, and dangling gitlinks made `cargo near build reproducible-wasm` fail).
+/research/spikes/btc/vendor/chainsig.js/
+/research/spikes/btc/vendor/cypherfaucet/
+/research/spikes/btc/vendor/mpc/
+/research/spikes/chains/vendor/chainsig.js/
+/research/spikes/chains/vendor/near-multichain/
+/research/spikes/hackathon/vendor/ika/
+/research/spikes/hackathon/vendor/lit-peer/
+/research/spikes/hackathon/vendor/multichain-gas-station-contract/
+/research/spikes/hackathon/vendor/tokenbound-contracts/
+/research/spikes/mpc/vendor/mpc/
+/research/spikes/sdk/repro-hello/
+/research/spikes/sec/vendor/mpc/
+/research/spikes/sec/vendor/near-sdk-rs/
+/research/spikes/sec/vendor/solana-sdk/
+/research/spikes/web/vendor/create-near-app/
+/research/spikes/web/vendor/intear-wallet/
+/research/spikes/web/vendor/near-api-js/
+/research/spikes/web/vendor/near-connect-hooks/
+/research/spikes/web/vendor/near-docs/
+/research/spikes/web/vendor/near-selector/
+/research/spikes/web/vendor/nearcore/
+/research/spikes/web/vendor/wallet-selector/
+/research/spikes/web/vendor/yield-resume/

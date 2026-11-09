@@ -1,5 +1,6 @@
 # Satchel CI (kb/90 §12.6). No secrets, no keys, no transactions: every job is offline or read-only.
 #   contracts  build the three wasm files, unit + sandbox tests, INV-22 import check, wasm size and SHA-256
+#   reproducible  `cargo near build reproducible-wasm` in the pinned linux/amd64 image: the SHA-256 to compare with H
 #   web        install, typecheck, lint, vitest (non-network), next build, the near.org RPC grep
 #   smoke      manual or scheduled: Playwright judge checks + tools/monitor.sh against the hosted app (read-only)
 name: ci
@@ -87,6 +88,38 @@ jobs:
           ls -l target/near/*/*.wasm
           sha256sum target/near/satchel/satchel.wasm
           bash tools/judge-snippets.sh --offline | sed -n '/\[S13\]/,/\[S14\]/p'
+
+  reproducible:
+    # The pinned build image is linux/amd64 only, so this is the place to get H without an x86_64 machine.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rust ${{ env.RUST_TOOLCHAIN }} + wasm32 (pinned by rust-toolchain.toml)
+        run: rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal --target wasm32-unknown-unknown
+
+      - name: Install cargo-near ${{ env.CARGO_NEAR_VERSION }}
+        run: |
+          curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/near/cargo-near/releases/download/cargo-near-v${CARGO_NEAR_VERSION}/cargo-near-installer.sh" | sh
+          cargo near --version
+
+      - name: Reproducible build (image and digest pinned in contracts/satchel/Cargo.toml)
+        run: cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml
+
+      - name: SHA-256 of the reproducible wasm
+        run: |
+          sha256sum target/near/satchel/satchel.wasm | tee -a "$GITHUB_STEP_SUMMARY"
+          bash tools/check-wasm-imports.sh --list target/near/satchel/satchel.wasm
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: satchel-reproducible-wasm-${{ github.sha }}
+          path: target/near/satchel/satchel.wasm
+          if-no-files-found: error
 
   web:
     if: github.event_name != 'schedule'
