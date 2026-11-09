@@ -105,6 +105,10 @@ The tool prints commands 1–4 with the hash filled in:
 6. The first `sig_records(id, 0, 1).height` is greater than **A**. Check this once records exist.
 
 `tools/judge-snippets.sh` runs proofs 1–4 automatically once `SATCHEL_BIRTH_TX` and `SATCHEL_EXPECTED_CODE_HASH` are set.
+It runs the lock checks (S2, S3, S5) on `satchel.<team>.testnet` only. For rc, and for every proof in one command,
+use `pnpm --filter @satchel/tools exec tsx deploy/verify-birth.ts --child <child> --expected-sha256 <H>`: proofs 1–4
+and 6, config, NEP-330 and the two registrations, with PASS/FAIL per line, exiting 1 on any FAIL. The copy-paste
+order for the whole release is `docs/handoff/release-runbook.md`.
 
 ## 4. After the birth
 

@@ -68,6 +68,7 @@ things. They are dated records; the current test counts are in the root README.
 | [`handoff/screening-2026-11-09.md`](handoff/screening-2026-11-09.md) | A rehearsal of the AI screening on fresh clones: what passed, what was found and fixed, what waits for the final contract |
 | [`handoff/web.md`](handoff/web.md) | `apps/web`: routes, data modes, wallet flows, what judges see in server HTML |
 | [`handoff/release.md`](handoff/release.md) | Testnet scripts, the keyless-birth runbook, CI, README checks |
+| [`handoff/release-runbook.md`](handoff/release-runbook.md) | The copy-paste order for the rc rehearsal and the final keyless birth: CI wasm check, dry runs, the rc checks with expected output, the go/no-go, the final send and the `contract-v1.0.0` tag; marks the steps that need Razvan |
 
 ## design/
 
