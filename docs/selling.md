@@ -63,6 +63,9 @@ lands. The tests below check, from each receipt's block height, that the receipt
 - The seller delists in the same block as a buy: exactly one of them succeeds, and the contract keeps none of the
   buyer's NEAR (`delist_racing_a_buy_settles_one_way`).
 
+The full threat model, which also covers the NEAR, USDC and wNEAR held inside a Satchel, the buyer's payment, offers,
+claim links and the Buy page itself, is [security/seller-threat-model.md](security/seller-threat-model.md).
+
 What this does not stop is listed under "What it does not cover" in [security-model.md](security-model.md), for
 example a testnet4 reorg.
 

@@ -17,6 +17,8 @@ buyer's browser proves that no old signature can still move the coins ("clean hi
      NEP-141, the keyless sub-account, NEP-330), how it is used and where the code is;
    - [`docs/selling.md`](docs/selling.md): how control passes on transfer, and every way a seller could try to keep
      the coins, each with its test;
+   - [`docs/security/seller-threat-model.md`](docs/security/seller-threat-model.md): the full seller threat model,
+     each threat with the code that stops it and its test;
    - [`docs/verify.md`](docs/verify.md): copy-paste on-chain checks with expected output;
    - [`docs/security-model.md`](docs/security-model.md): what clean history checks and trusts, and the limitations;
    - [`docs/development.md`](docs/development.md): running the app and every test suite.

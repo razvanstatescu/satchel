@@ -125,7 +125,8 @@ that each seller is paid exactly once and that nobody else is credited.
 
 The check runs in the buyer's browser, not on Satchel's server. The purchase then names the listing and the number
 of records the buyer checked, and fails if either has changed. Every way a seller could try to keep the coins, and
-the test that stops each one: [docs/selling.md](docs/selling.md).
+the test that stops each one: [docs/selling.md](docs/selling.md). The full threat model also covers the money held
+inside a Satchel, the buyer's payment, offers and claim links: [docs/security/seller-threat-model.md](docs/security/seller-threat-model.md).
 
 ## Built on NEAR
 
@@ -196,6 +197,7 @@ What the check proves, what it trusts and what it does not cover:
 | [How it works](docs/how-it-works.md) | Signing, buying, and every feature with its route and contract method |
 | [How Satchel uses NEAR](docs/near.md) | Chain Signatures, the NFT and token standards, the keyless account, and more |
 | [Selling and the threat model](docs/selling.md) | How control passes on transfer, and every way a seller could try to keep the coins |
+| [Seller threat model, in full](docs/security/seller-threat-model.md) | Every way a seller could try to keep the coins, the money held inside, or the buyer's payment: what stops each one, and its test |
 | [Verify on-chain](docs/verify.md) | Copy-paste commands with expected output |
 | [Security model](docs/security-model.md) | What clean history checks and trusts, and the limitations |
 | [Development](docs/development.md) | Running the app, the test suites, the testnet scripts |
