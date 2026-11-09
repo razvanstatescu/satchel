@@ -5,11 +5,20 @@
  */
 import { describe, expect, it } from 'vitest'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { keccak_256 } from '@noble/hashes/sha3.js'
 import {
+  appContractOf,
+  archivePrevious,
   buildEntry,
+  historyFiles,
+  predictedNextId,
+  proofTokenProblems,
+  renderContract,
+  renderReadme,
+  renderStatus,
   externalTxOf,
   mpcSignatures,
   parseUse,
@@ -135,5 +144,100 @@ describe('tools/e2e/proofs.ts (generator)', () => {
     const doc = `intro\n${TABLE_START}\nold\n${TABLE_END}\noutro`
     expect(replaceTable(doc, table)).toBe(`intro\n${TABLE_START}\n${table}\n${TABLE_END}\noutro`)
     expect(replaceTable('no markers', table)).toBe('no markers')
+  })
+})
+
+describe('proofs on the final contract (D-32 demo states, #4, the README)', () => {
+  const FINAL = 'satchel.satchelhq.testnet'
+  const realReadme = readFileSync(join(ROOT, 'docs', 'evidence', 'README.md'), 'utf8')
+  const realDoc = JSON.parse(readFileSync(join(ROOT, 'docs', 'evidence', 'proofs.json'), 'utf8')) as ProofsDoc
+  // the committed set, as if it had been made in one run on the final contract with fresh Satchels #8 (sale), #9 (USDC)
+  const fresh: Record<string, string> = { '5': '8', '6': '9', '7': '10' }
+  const finalDoc: ProofsDoc = {
+    ...realDoc,
+    contract: FINAL,
+    contract_role: 'final',
+    proofs: realDoc.proofs.map(({ adopted: _a, ...p }) => ({ ...p, ...(p.token_id ? { token_id: fresh[p.token_id] ?? p.token_id } : {}) })),
+  }
+
+  it('never signs with #4; on the final contract never touches the staged demo Satchels', () => {
+    expect(proofTokenProblems('dev', '4', {})).toEqual([expect.stringMatching(/#4 is the blocked demo/)])
+    expect(proofTokenProblems('final', '4', {})).toHaveLength(1)
+    expect(proofTokenProblems('dev', '1', { sale: '4' })).toEqual([expect.stringMatching(/sale=4: #4 is the blocked demo/)])
+    for (const t of ['2', '3', '5']) expect(proofTokenProblems('final', t, {})).toEqual([expect.stringMatching(/staged demo Satchel/)])
+    for (const t of ['1', '6', '7', '12']) expect(proofTokenProblems('final', t, {})).toEqual([])
+    expect(proofTokenProblems('dev', '2', {})).toEqual([])
+    expect(proofTokenProblems('final', '1', { sale: '5', inside: '7', btc: '8' })).toHaveLength(2)
+    expect(proofTokenProblems('final', '1', { sale: '8', inside: '9', btc: '10' })).toEqual([])
+    expect(proofTokenProblems('dev', '1', { sale: '5', inside: '6' })).toEqual([])
+  })
+
+  it('predicts the fresh Satchels after the birth mints (#8 on), not #1, when the contract cannot be read yet', () => {
+    expect(predictedNextId('final')).toBe(8)
+    expect(predictedNextId('rc')).toBe(8)
+    expect(predictedNextId('dev')).toBe(1)
+  })
+
+  it('a dry run on the final signs the L2 transaction with a fresh Satchel, never the chain token (#1)', () => {
+    const tsx = join(TOOLS, 'node_modules', '.bin', 'tsx')
+    const r = spawnSync(tsx, [join(TOOLS, 'e2e', 'proofs.ts'), '--contract', FINAL, '--offline', '--only', 'evm-l2-sign'], { encoding: 'utf8', env: { ...process.env, NEAR_CREDENTIALS_DIR: join(tmpdir(), 'no-keys-here') } })
+    expect(r.status, r.stdout + r.stderr).toBe(0)
+    expect(r.stdout).toContain('(role final)')
+    expect(r.stdout).toMatch(/btc Satchel = #8 \(predicted/)
+    expect(r.stdout).toContain('satchel/8/evm')
+    expect(r.stdout).not.toContain('satchel/1/evm')
+    expect(r.stdout).toContain('DRY RUN: nothing was signed')
+    const bad = spawnSync(tsx, [join(TOOLS, 'e2e', 'proofs.ts'), '--contract', FINAL, '--offline', '--chain-token', '4'], { encoding: 'utf8' })
+    expect(bad.status).toBe(1)
+    expect(bad.stderr).toMatch(/refusing these Satchels[\s\S]*#4 is the blocked demo/)
+  })
+
+  it('the README blocks describe the final contract, with no development-contract wording', () => {
+    const out = renderReadme(realReadme, finalDoc, ['dev2.satchelhq.testnet.json'], FINAL)
+    const blocks = [out.slice(out.indexOf('proofs:contract:start'), out.indexOf('proofs:contract:end')), out.slice(out.indexOf('proofs:status:start'), out.indexOf('proofs:status:end'))].join('\n')
+    expect(blocks).toContain('the release contract the hosted app reads')
+    expect(blocks).toContain('Every proof was made for this page')
+    expect(blocks).toContain('https://usesatchel.xyz/api/clean-history/8')
+    expect(blocks).toContain('**Satchel #9**, listed for USDC')
+    expect(blocks).toMatch(/Demo Satchel #4 is blocked on purpose/)
+    expect(blocks).toContain('SATCHEL_PROOFS=docs/evidence/history/dev2.satchelhq.testnet.json tools/proofs.sh')
+    expect(blocks).not.toMatch(/development contract|keeps its access key|Nov 10|will then|until the final/i)
+    expect(out).not.toContain('/s/5 (the page)')
+  })
+
+  it('links the app only when it reads the set\'s contract (after the switch, dev2\'s #5 is not the app\'s #5)', () => {
+    const dev = renderStatus(realDoc, FINAL)
+    expect(dev).not.toContain('usesatchel.xyz')
+    expect(dev).toContain(`The hosted app reads \`${FINAL}\` now`)
+    expect(renderStatus(realDoc, realDoc.contract)).toContain('https://usesatchel.xyz/api/clean-history/5')
+    expect(renderContract(realDoc)).toMatch(/marked \*earlier\*/)
+    const timedOut = renderStatus({ ...finalDoc, mpc_timeouts: ['3r5zp3ucdPAmizKQmULoG53fdL1Ybj7n5Xo8LLjHnDht'] })
+    expect(timedOut).toContain('## Timed-out MPC requests')
+    expect(timedOut).not.toContain('none did during this run')
+    expect(renderStatus(finalDoc)).toContain('none did during this run')
+  })
+
+  it('the committed README is exactly what the generator renders from the committed proofs.json', () => {
+    expect(renderReadme(realReadme, realDoc, historyFiles(join(ROOT, 'docs', 'evidence', 'proofs.json')), appContractOf(ROOT))).toBe(realReadme)
+  })
+
+  it('a run on another contract keeps the previous set as history/<contract>.json first (a copy, idempotent)', () => {
+    const d = mkdtempSync(join(tmpdir(), 'proofs-hist-'))
+    try {
+      const out = join(d, 'proofs.json')
+      expect(archivePrevious(out, FINAL)).toBeNull()
+      writeFileSync(out, JSON.stringify(realDoc))
+      expect(archivePrevious(out, realDoc.contract)).toBeNull()
+      const dest = archivePrevious(out, FINAL)!
+      expect(dest).toBe(join(d, 'history', `${realDoc.contract}.json`))
+      expect(readFileSync(dest, 'utf8')).toBe(readFileSync(out, 'utf8'))
+      expect(existsSync(out)).toBe(true)
+      expect(archivePrevious(out, FINAL)).toBe(dest)
+      expect(historyFiles(out)).toEqual([`${realDoc.contract}.json`])
+      writeFileSync(out, JSON.stringify({ ...realDoc, note: 'changed' }))
+      expect(() => archivePrevious(out, FINAL)).toThrow(/exists already with other content/)
+    } finally {
+      rmSync(d, { recursive: true, force: true })
+    }
   })
 })

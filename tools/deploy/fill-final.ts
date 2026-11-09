@@ -10,6 +10,7 @@
  *   pnpm --filter @satchel/tools fill-final --h … --birth-tx … --block … --verify                   # + read-only on-chain check
  *   pnpm --filter @satchel/tools fill-final --h … --birth-tx … --block … --verify --write           # apply
  *   pnpm --filter @satchel/tools fill-final --h … --birth-tx … --block … --env --write              # + the E-03 production switch
+ *   pnpm --filter @satchel/tools fill-final --from-evidence --verify                                # values from the birth record
  *
  * Every edit is an exact string with an expected count. If any target is missing or appears a different number of
  * times, nothing is written and every problem is listed (a doc changed since this script was written, or the values
@@ -302,6 +303,18 @@ export function applyFill(root: string, plans: FilePlan[]): void {
   for (const p of plans) writeFileSync(join(root, p.file), p.after)
 }
 
+/**
+ * The values from the record `deploy:keyless-birth --send` writes (docs/evidence/birth-<child>.json): tx_hash,
+ * block_height, wasm_sha256. Only a final birth (`satchel.<team>.testnet`) record is accepted.
+ */
+export function valuesFromEvidence(path: string): { h?: string; birthTx?: string; block?: string } {
+  if (!existsSync(path)) throw new Error(`no birth record at ${path} (pass --h, --birth-tx and --block instead)`)
+  const e = JSON.parse(readFileSync(path, 'utf8')) as { kind?: string; child?: string; parent?: string; tx_hash?: string; block_height?: number | null; wasm_sha256?: string }
+  if (e.kind !== 'keyless-birth') throw new Error(`${path} is not a keyless-birth record`)
+  if (!e.child || e.child !== `satchel.${e.parent}`) throw new Error(`${path} records the birth of ${e.child}, not of the final contract satchel.${e.parent}`)
+  return { h: e.wasm_sha256, birthTx: e.tx_hash, block: e.block_height == null ? undefined : String(e.block_height) }
+}
+
 // ------------------------------------------------------------------------------------------------ residual [TBD]
 
 /** Not judge-facing, or [TBD] on purpose: planning, history, design rules, throwaway spikes, video notes, fixtures. */
@@ -392,6 +405,8 @@ export async function verifyOnChain(v: FinalValues, d: VerifyDeps): Promise<{ ok
 // ------------------------------------------------------------------------------------------------ main
 
 const HELP = `tools/deploy/fill-final.ts: fill H, the birth tx and block A after the final keyless birth.
+  --from-evidence     read H, the tx and block A from the birth record that deploy:keyless-birth --send writes
+                      (docs/evidence/birth-satchel.<team>.testnet.json, or --evidence <file>); flags override it
   --h <hex64>         SHA-256 of the deployed reproducible wasm (H)
   --birth-tx <hash>   the birth transaction hash (base58)
   --block <height>    the birth transaction's block (block A)
@@ -408,6 +423,8 @@ async function main(): Promise<void> {
       h: { type: 'string' },
       'birth-tx': { type: 'string' },
       block: { type: 'string' },
+      'from-evidence': { type: 'boolean', default: false },
+      evidence: { type: 'string' },
       verify: { type: 'boolean', default: false },
       env: { type: 'boolean', default: false },
       write: { type: 'boolean', default: false },
@@ -418,8 +435,12 @@ async function main(): Promise<void> {
     strict: true,
   })
   if (values.help) return void console.log(HELP)
-  const v = validateValues({ h: values.h, birthTx: values['birth-tx'], block: values.block })
   const root = resolve(values.root ?? REPO_ROOT)
+  const fromFile =
+    values['from-evidence'] || values.evidence
+      ? valuesFromEvidence(values.evidence ? resolve(values.evidence) : join(root, 'docs', 'evidence', `birth-satchel.${values.team ?? 'satchelhq'}.testnet.json`))
+      : {}
+  const v = validateValues({ h: values.h ?? fromFile.h, birthTx: values['birth-tx'] ?? fromFile.birthTx, block: values.block ?? fromFile.block })
   console.log(`== fill-final · ${values.write ? 'WRITE' : 'DRY RUN'} · root ${root}`)
   console.log(`   H        ${v.h}\n   birth tx ${v.birthTx}\n   block A  ${v.block}`)
   if (values.verify) {

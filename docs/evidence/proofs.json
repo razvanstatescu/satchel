@@ -424,7 +424,8 @@
         "explorer": "https://mempool.space/testnet4/tx/f4db80ecd509bdd0655e1cc4f89c35b810b055bdd047fe761f650cf3f131908c",
         "from": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq",
         "status": "confirmed"
-      }
+      },
+      "adopted": true
     },
     {
       "id": "sol-send",
@@ -561,7 +562,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/AGtWKMHA6RPkbbvuYQRVhAVJQBrKwgT1zDUeTERPFqse"
+      "explorer": "https://testnet.nearblocks.io/txns/AGtWKMHA6RPkbbvuYQRVhAVJQBrKwgT1zDUeTERPFqse",
+      "adopted": true
     },
     {
       "id": "withdraw-bad-receiver",
@@ -586,7 +588,8 @@
       "absent_events": [
         "satchel:inside_withdraw"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/BiAn6me7z48iUXsaJduFv3RYU5Yk8NE2Wja64wbgJxT5"
+      "explorer": "https://testnet.nearblocks.io/txns/BiAn6me7z48iUXsaJduFv3RYU5Yk8NE2Wja64wbgJxT5",
+      "adopted": true
     },
     {
       "id": "inside-withdraw",
@@ -625,7 +628,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/4zCS9dx2cPZ1pv9QWKPFagPhJpVn6AQJrRf9nZnbwCK4"
+      "explorer": "https://testnet.nearblocks.io/txns/4zCS9dx2cPZ1pv9QWKPFagPhJpVn6AQJrRf9nZnbwCK4",
+      "adopted": true
     },
     {
       "id": "wnear-deposit",
@@ -793,7 +797,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/2rartXFgezBw74DPhPGHXVjwJ6BS7KzBY9ujDhTaAjVF"
+      "explorer": "https://testnet.nearblocks.io/txns/2rartXFgezBw74DPhPGHXVjwJ6BS7KzBY9ujDhTaAjVF",
+      "adopted": true
     },
     {
       "id": "offer-accept",
@@ -844,7 +849,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD"
+      "explorer": "https://testnet.nearblocks.io/txns/De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD",
+      "adopted": true
     },
     {
       "id": "offer-cancel",
@@ -884,7 +890,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/CnSevEmfRw4sQGextGSTP7tqEN4uYkai6Vsf2UG9E7om"
+      "explorer": "https://testnet.nearblocks.io/txns/CnSevEmfRw4sQGextGSTP7tqEN4uYkai6Vsf2UG9E7om",
+      "adopted": true
     },
     {
       "id": "allowance-set",
@@ -927,7 +934,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/GTaoWcfGTqaEkex4cx3zNv4skRSxEB2c2Z37pTk9HAYC"
+      "explorer": "https://testnet.nearblocks.io/txns/GTaoWcfGTqaEkex4cx3zNv4skRSxEB2c2Z37pTk9HAYC",
+      "adopted": true
     },
     {
       "id": "allowance-sign",
@@ -990,7 +998,8 @@
         "kind": "btc_tx",
         "path": "satchel/1/btc",
         "address": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq"
-      }
+      },
+      "adopted": true
     },
     {
       "id": "allowance-over-cap",
@@ -1014,7 +1023,8 @@
       "absent_events": [
         "satchel:sign_requested"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht"
+      "explorer": "https://testnet.nearblocks.io/txns/86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
+      "adopted": true
     },
     {
       "id": "allowance-revoke",
@@ -1045,7 +1055,8 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/7o9DGFd2Hz5DYWjcTXm4SPj92seJehrVXBXXEywrpcms"
+      "explorer": "https://testnet.nearblocks.io/txns/7o9DGFd2Hz5DYWjcTXm4SPj92seJehrVXBXXEywrpcms",
+      "adopted": true
     },
     {
       "id": "btc-multi-input",

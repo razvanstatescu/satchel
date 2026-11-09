@@ -51,16 +51,22 @@ NFT and sale flows), `e2e/checker.ts` (runs `@satchel/core/clean-history` from N
 here it is a dry run by default; the chain steps call `evm.ts`, `btc.ts` and `sol.ts` and pass `--send` on only in
 send mode. It mints fresh Satchels for everything that changes hands (the sale Satchel, the inside/USDC Satchel, the
 BTC multi-input Satchel), sends coins from `--chain-token` (default 1, which must be funded on the three chains) into
-the sale Satchel, and leaves that Satchel listed with a clean history at the end. MPC timeouts are retried (EVM with
-the same nonce). Each entry is built from the transaction as the FastNEAR tx API serves it, and a step whose
-transaction does not prove it (wrong method, missing event, wrong error code, no signature) stops the run.
+the sale Satchel, and leaves that Satchel listed with a clean history at the end. The signed-only Arbitrum Sepolia
+transaction, whose record stays unused for good, is signed by the fresh BTC Satchel, so no demo Satchel is blocked by
+it. It refuses #4 (the blocked demo Satchel) as the chain token or a role, and on the final contract also the staged
+demo Satchels #2, #3 and #5 as the chain token and the seven birth Satchels as roles. MPC timeouts are retried (EVM
+with the same nonce) and listed in the file. Each entry is built from the transaction as the FastNEAR tx API serves
+it, and a step whose transaction does not prove it (wrong method, missing event, wrong error code, no signature) stops
+the run. A send-mode run on another contract than the one in `proofs.json` first keeps the old set as
+`docs/evidence/history/<contract>.json`, still verifiable with `SATCHEL_PROOFS=<that file> tools/proofs.sh`. The
+evidence README's generated blocks (which contract, the table, what is still for sale) follow `proofs.json`.
 
 ```bash
 pnpm --filter @satchel/tools e2e:proofs --contract dev2.satchelhq.testnet                 # dry run
 pnpm --filter @satchel/tools e2e:proofs --contract satchel.satchelhq.testnet --send --yes  # after the final birth only
 pnpm --filter @satchel/tools e2e:proofs --use btc-send=<hash> ...                         # adopt an earlier tx as a proof
 pnpm --filter @satchel/tools e2e:proofs --only buy-usdc --merge --send --yes              # add one proof to the file
-pnpm --filter @satchel/tools e2e:proofs --render                                           # rewrite the README table
+pnpm --filter @satchel/tools e2e:proofs --render                                           # rewrite the README blocks
 tools/proofs.sh                                                                            # then verify, read-only
 ```
 
@@ -74,6 +80,7 @@ on NEAR testnet for carol (Circle faucet, human only; the step is skipped withou
 |---|---|
 | `deploy/keyless-birth.ts` (`deploy:keyless-birth`) | One transaction from `<team>.testnet`: CreateAccount, Transfer, DeployContract, `new`, `nft_mint` ×7, and no AddKey, so the contract account never has a key. Dry run by default; `--send` needs a typed `yes` in an interactive terminal. The final `satchel.<team>.testnet` birth also needs the human's explicit "yes" (H-15) |
 | `deploy/keyless-birth.md` | The runbook: preconditions, review checklist, send, proofs, after-birth steps, failure handling |
+| `deploy/fill-final.ts` (`fill-final`) | After the final birth: fills H, the birth tx and block A into the docs and the read-only scripts' defaults, and turns the "until the birth" notes into their final wording. Exact strings with expected counts (it refuses if one is missing or duplicated); dry run by default, `--write` applies, `--verify` checks the values on-chain read-only first, `--env` also switches `apps/web/.env.production` to the final contract. Signs nothing |
 
 ### `vectors/`: shared Rust/TS test vectors (kb/90 §12.2)
 

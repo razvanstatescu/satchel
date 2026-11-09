@@ -19,6 +19,7 @@ import {
   planFill,
   residualTbd,
   validateValues,
+  valuesFromEvidence,
   verifyOnChain,
   type FinalValues,
   type VerifyDeps,
@@ -194,6 +195,26 @@ describe('planFill refuses drifted files (synthetic tree)', () => {
       expect(msg).toMatch(/tools\/monitor\.sh: \[H\] .* appears 2×, expected 1×/)
       expect(msg).toMatch(/docs\/GLOSSARY\.md: missing/)
       expect(readFileSync(join(d, 'README.md'), 'utf8')).toBe(snapshot)
+    } finally {
+      rmSync(d, { recursive: true, force: true })
+    }
+  })
+})
+
+describe('valuesFromEvidence (the record keyless-birth --send writes)', () => {
+  it('reads H, the tx and block A from a final birth record, and refuses an rc one or another kind', () => {
+    const d = mkdtempSync(join(tmpdir(), 'fill-final-ev-'))
+    try {
+      const rec = (o: Record<string, unknown>) => {
+        const p = join(d, `${Math.random()}.json`)
+        writeFileSync(p, JSON.stringify({ kind: 'keyless-birth', parent: 'satchelhq.testnet', child: 'satchel.satchelhq.testnet', tx_hash: TX, block_height: V.block, wasm_sha256: H, ...o }))
+        return p
+      }
+      expect(validateValues(valuesFromEvidence(rec({})))).toEqual(V)
+      expect(() => valuesFromEvidence(rec({ child: 'rc.satchelhq.testnet' }))).toThrow(/not of the final contract/)
+      expect(() => valuesFromEvidence(rec({ kind: 'other' }))).toThrow(/not a keyless-birth record/)
+      expect(valuesFromEvidence(rec({ block_height: null })).block).toBeUndefined()
+      expect(() => valuesFromEvidence(join(d, 'missing.json'))).toThrow(/no birth record/)
     } finally {
       rmSync(d, { recursive: true, force: true })
     }

@@ -11,11 +11,15 @@
  * Fresh Satchels are minted for everything that changes hands or gets listed (the gift/sale Satchel, the USDC and
  * inside Satchel, the BTC multi-input Satchel), so demo Satchels are never sold or drained. Chain sends come from
  * `--chain-token` (default 1), which must be funded on Sepolia, testnet4 and devnet; they go into the gift/sale
- * Satchel, which is left listed (for sale, clean history) at the end. Every entry is built from the transaction as
- * the FastNEAR tx API serves it, the same source the verifier reads.
+ * Satchel, which is left listed (for sale, clean history) at the end. The signed-only L2 transaction, whose record
+ * stays unused for good, is signed by the fresh BTC Satchel, never by a demo Satchel. #4 (the blocked demo, D-32) is
+ * refused everywhere; on the final contract so are the other demo states (#2, #3, #5) as the chain token and every
+ * birth Satchel (#1–#7) as a fresh-token role. Every entry is built from the transaction as the FastNEAR tx API
+ * serves it, the same source the verifier reads. A run on another contract than the one in --out first copies the old
+ * set to docs/evidence/history/<contract>.json, so earlier proofs stay verifiable and clearly labelled.
  */
 import { spawn } from 'node:child_process'
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { keccak256, parseTransaction, serializeTransaction, type Hex } from 'viem'
@@ -40,6 +44,7 @@ import {
   type SignRequest,
 } from '@satchel/core/near'
 import { roleOfContract } from '../lib/config'
+import { BIRTH_DEFAULTS } from '../deploy/keyless-birth'
 import { banner, bool, executePlan, isMain, makeCtx, parseCli, runMain, str, type Ctx, type Sent } from '../lib/run'
 import { functionCall, type TxPlan } from '../lib/tx'
 import { TGAS, parseNear } from '../lib/units'
@@ -105,6 +110,8 @@ export interface ProofEntry {
   external?: { chain: Chain; tx: string; explorer: string; from: string; nonce?: number; status: 'confirmed' | 'broadcast'; spends?: string[] }
   explorer: string
   note?: string
+  /** an earlier transaction adopted with --use, not one made by this run */
+  adopted?: boolean
 }
 export interface ProofsDoc {
   schema: 'satchel-proofs/1'
@@ -114,6 +121,8 @@ export interface ProofsDoc {
   note: string
   generated_at: string
   app_clean_history?: string[]
+  /** MPC requests that timed out during the run and were retried (each stays recorded on its Satchel) */
+  mpc_timeouts?: string[]
   satchels: Record<string, { evm: string; btc: string; sol: string }>
   proofs: ProofEntry[]
 }
@@ -336,7 +345,7 @@ class Runner {
     if (this.tokens[role]) return this.tokens[role]!
     if (!this.ctx.send) {
       // dry run: predict the ids the mints would get, without printing a mint for every step
-      if (this.nextId === null) this.nextId = this.ctx.offline ? 1 : ((await this.view<{ next_token_id: number }>('config').catch(() => null))?.next_token_id ?? 1)
+      if (this.nextId === null) this.nextId = (this.ctx.offline ? null : (await this.view<{ next_token_id: number }>('config').catch(() => null))?.next_token_id) ?? predictedNextId(this.cfg.role)
       this.tokens[role] = String(this.nextId++)
       this.ctx.log(`    token     ${role} Satchel = #${this.tokens[role]} (predicted; a dry run mints nothing)`)
       return this.tokens[role]!
@@ -379,6 +388,31 @@ class Runner {
 export function scriptModeFlags(ctx: Pick<Ctx, 'send' | 'yes' | 'offline'>): string[] {
   if (!ctx.send) return ctx.offline ? ['--offline'] : []
   return ctx.yes ? ['--send', '--yes'] : ['--send']
+}
+
+/** The id the next mint gets when the contract cannot be read yet: after a birth's mints on rc/final, else 1. */
+export const predictedNextId = (role: string): number => (role === 'final' || role === 'rc' ? BIRTH_DEFAULTS.mints + 1 : 1)
+
+/** #4 is the blocked demo Satchel (D-32): its one unbroadcast record is the negative case. Nothing here signs with it. */
+export const BLOCKED_DEMO_TOKEN = '4'
+/** On the final contract #2, #3 and #5 hold staged demo histories (D-32); the chain sends must not touch them. */
+export const FINAL_DEMO_STATE_TOKENS = ['2', '3', '5']
+
+/**
+ * The Satchels a proof run may not use: #4 anywhere (neither as the chain token nor as a role), and on the final
+ * contract the demo states as the chain token and every Satchel minted at the birth (#1–#7) as a fresh-token role
+ * (the roles are given away, sold, listed and drained).
+ */
+export function proofTokenProblems(role: string, chainToken: string, tokens: Partial<Record<'sale' | 'inside' | 'btc', string>>): string[] {
+  const out: string[] = []
+  if (chainToken === BLOCKED_DEMO_TOKEN) out.push(`--chain-token ${chainToken}: #4 is the blocked demo Satchel (D-32); it never signs here`)
+  else if (role === 'final' && FINAL_DEMO_STATE_TOKENS.includes(chainToken)) out.push(`--chain-token ${chainToken}: a staged demo Satchel on the final contract (D-32); use #1 (or a retake Satchel)`)
+  for (const [k, id] of Object.entries(tokens)) {
+    if (!id) continue
+    if (id === BLOCKED_DEMO_TOKEN) out.push(`--tokens ${k}=${id}: #4 is the blocked demo Satchel (D-32)`)
+    else if (role === 'final' && Number(id) <= BIRTH_DEFAULTS.mints) out.push(`--tokens ${k}=${id}: a demo Satchel minted at the final birth; the ${k} role is given away, sold or drained`)
+  }
+  return out
 }
 
 class DryRun extends Error {
@@ -555,10 +589,14 @@ export const STEPS: StepSpec[] = [
   },
   {
     id: 'evm-l2-sign', group: 'Send', action: 'Sign an Arbitrum Sepolia transaction', method: 'sign_for', sig: 'evm_tx',
-    shows: 'The same EVM key signs for another testnet (chain id 421614). Signed only, not broadcast.',
-    events: SIGN_EVENTS, argKeys: ['token_id'], note: 'signed only (the address holds no Arbitrum Sepolia ETH); the record stays unused until that nonce is spent',
+    shows: 'A Satchel\'s one EVM key also signs for another testnet (chain id 421614). Signed only, not broadcast.',
+    events: SIGN_EVENTS, argKeys: ['token_id'],
+    note: 'signed only (the address holds no Arbitrum Sepolia ETH), by a Satchel that is not for sale: the record stays unused until that nonce is spent',
+    // Not the chain token: an unbroadcast record blocks its Satchel's clean history for good, and the chain token is
+    // a demo Satchel (#1 on the final contract). The fresh BTC Satchel is never listed.
     run: async (r) => {
-      const h = await retryScript(r, 'evm', ['--token', r.opts.chainToken, '--chain-id', '421614', '--sign-only', '--to', r.addr(await r.token('sale')).evm, '--value', '0.0001', '--gas', '21000'])
+      const t = await r.token('btc')
+      const h = await retryScript(r, 'evm', ['--token', t, '--chain-id', '421614', '--sign-only', '--to', r.addr(await r.token('sale')).evm, '--value', '0.0001', '--gas', '21000'])
       return h[h.length - 1]!
     },
   },
@@ -969,7 +1007,7 @@ const CHAIN_NAME: Record<Chain, string> = { sepolia: 'Sepolia', 'bitcoin-testnet
 export function renderTable(doc: Pick<ProofsDoc, 'proofs'>): string {
   const rows = ['| Action | Transaction | What to look for |', '|---|---|---|']
   for (const p of doc.proofs) {
-    const tx = [`NEAR [${short(p.tx)}](${p.explorer})`]
+    const tx = [`NEAR [${short(p.tx)}](${p.explorer})${p.adopted ? ' *earlier*' : ''}`]
     if (p.external) tx.push(`${CHAIN_NAME[p.external.chain]} [${short(p.external.tx)}](${p.external.explorer})${p.external.status === 'broadcast' ? ' (broadcast)' : ''}`)
     const look: string[] = []
     if (p.expect.outcome === 'failure') look.push(`Refused with \`${p.expect.error}\`; no ${(p.absent_events ?? []).map((e) => `\`${e.split(':')[1]}\``).join(' or ') || 'change'}.`)
@@ -986,10 +1024,161 @@ export const TABLE_START = '<!-- proofs:table:start (generated by tools/e2e/proo
 export const TABLE_END = '<!-- proofs:table:end -->'
 
 export function replaceTable(readme: string, table: string): string {
-  const a = readme.indexOf(TABLE_START)
-  const b = readme.indexOf(TABLE_END)
+  return replaceBlock(readme, TABLE_START, TABLE_END, table)
+}
+
+export const CONTRACT_START = '<!-- proofs:contract:start (generated by tools/e2e/proofs.ts from proofs.json) -->'
+export const CONTRACT_END = '<!-- proofs:contract:end -->'
+export const STATUS_START = '<!-- proofs:status:start (generated by tools/e2e/proofs.ts from proofs.json) -->'
+export const STATUS_END = '<!-- proofs:status:end -->'
+
+export function replaceBlock(readme: string, start: string, end: string, body: string): string {
+  const a = readme.indexOf(start)
+  const b = readme.indexOf(end)
   if (a < 0 || b < a) return readme
-  return `${readme.slice(0, a + TABLE_START.length)}\n${table}\n${readme.slice(b)}`
+  return `${readme.slice(0, a + start.length)}\n${body}\n${readme.slice(b)}`
+}
+
+const APP = 'https://usesatchel.xyz'
+const FINAL_OF = (contract: string) => `satchel.${contract.split('.').slice(-2).join('.')}`
+
+/** "Which contract": what the set was made on, what that contract is, the adopted proofs and the archived sets. */
+export function renderContract(doc: Pick<ProofsDoc, 'contract' | 'contract_role' | 'proofs'>, history: string[] = []): string {
+  const c = `\`${doc.contract}\``
+  const out: string[] = []
+  if (doc.contract_role === 'final') {
+    out.push(`These proofs were made on **${c}**, the release contract the hosted app reads. It was born keyless in one`)
+    out.push('transaction and has no access key, so nobody can change its code or sign for it outside its own rules;')
+    out.push('[verify.md](../verify.md) checks that read-only.')
+  } else {
+    const what = doc.contract_role === 'rc' ? 'the release-candidate rehearsal of the keyless birth' : 'a development contract'
+    out.push(`These proofs were made on **${c}**, ${what}. ${doc.contract_role === 'rc' ? 'It is a rehearsal, not the contract the app reads.' : 'A development contract keeps its access key, so it is for testing, not for trust.'}`)
+    const final = FINAL_OF(doc.contract)
+    out.push(`The release contract is \`${final}\`, born keyless; the same proof set is made there with one command`)
+    out.push(`(\`pnpm --filter @satchel/tools e2e:proofs --contract ${final} --send --yes\`), and this page then points to it.`)
+  }
+  const adopted = doc.proofs.filter((p) => p.adopted)
+  out.push('')
+  out.push(
+    adopted.length
+      ? 'Most proofs were made for this page. The ones marked *earlier* are older transactions on the same contract that still prove their point. Each entry in `proofs.json` has its date and block.'
+      : 'Every proof was made for this page, in one run. Each entry in `proofs.json` has its date and block.',
+  )
+  if (history.length) {
+    out.push('')
+    out.push('Earlier proof sets are kept as history, each labelled with its contract and verifiable the same way:')
+    for (const h of history) out.push(`- [\`history/${h}\`](history/${h}): \`SATCHEL_PROOFS=docs/evidence/history/${h} tools/proofs.sh\``)
+  }
+  return out.join('\n')
+}
+
+/**
+ * "Still for sale" and "Not here yet", from what the set contains. `appContract` is the contract the hosted app reads
+ * (apps/web/.env.production): the app links are given only when it is this set's contract, since after the switch to
+ * the final contract https://usesatchel.xyz/s/5 is another Satchel than a development contract's #5.
+ */
+export function renderStatus(doc: Pick<ProofsDoc, 'contract' | 'contract_role' | 'proofs' | 'mpc_timeouts'>, appContract: string | null = doc.contract): string {
+  const by = new Map(doc.proofs.map((p) => [p.id, p]))
+  const inApp = appContract === doc.contract
+  const listed: string[] = []
+  const sale = by.get('for-sale-now')?.token_id
+  if (sale) {
+    // only the coins this run sent into the sale Satchel (an adopted send went somewhere else)
+    const coins = ([['evm-send', 'ETH'], ['usdc-send', 'USDC'], ['btc-send', 'BTC'], ['sol-send', 'SOL']] as const).filter(([id]) => by.get(id) && !by.get(id)!.adopted).map(([, c]) => c as string)
+    const holds = coins.length ? `, and it holds the ${coins.length > 1 ? `${coins.slice(0, -1).join(', ')} and ${coins[coins.length - 1]}` : coins[0]} sent above` : ''
+    listed.push(
+      `- **Satchel #${sale}**, listed for NEAR by its new owner. It was given, signed messages, was sold and signed again${holds}.` +
+        ` Its signatures are all messages, which never block a sale, so its verdict is clean${inApp ? `: ${APP}/api/clean-history/${sale} (JSON) and ${APP}/s/${sale} (the page)` : ''}.`,
+    )
+  }
+  const usdc = by.get('list-usdc')?.token_id
+  if (usdc && !by.get('buy-usdc')) {
+    listed.push(`- **Satchel #${usdc}**, listed for USDC. It has never signed, so its verdict is \`empty\`, the clean case for a Satchel with no history${inApp ? `: ${APP}/api/clean-history/${usdc} and ${APP}/s/${usdc}` : ''}.`)
+  }
+  const out: string[] = []
+  if (listed.length) {
+    out.push('## Still for sale', '')
+    const n = listed.length === 1
+    out.push(
+      inApp
+        ? `${n ? 'One Satchel' : 'Two Satchels'} from these proofs ${n ? 'is' : 'are'} still listed, so the market shows ${n ? 'it' : 'them'} with ${n ? 'its' : 'their'} live clean-history verdict:`
+        : `${n ? 'One Satchel' : 'Two Satchels'} from these proofs ${n ? 'was' : 'were'} left listed on \`${doc.contract}\`. The hosted app reads \`${appContract ?? 'another contract'}\` now, so ${n ? 'it is' : 'they are'} not on its market; \`tools/proofs.sh\` still checks every transaction above:`,
+      '',
+    )
+    out.push(...listed)
+    if (doc.contract_role === 'final') {
+      out.push('')
+      out.push('The seven Satchels minted at the birth keep their demo roles: the proofs use Satchels minted for them, and only')
+      out.push(`Satchel #${by.get('evm-send')?.token_id ?? '1'}'s coins pay for the chain sends. Demo Satchel #4 is blocked on purpose ([why](../security-model.md#demo-token-4-is-blocked-on-purpose)).`)
+    }
+    out.push('')
+  }
+  const missing: string[] = []
+  if (!by.get('buy-usdc')) {
+    missing.push(
+      '- **A buy with USDC.** It needs USDC on NEAR testnet, and the only source is Circle\'s faucet, which a person must' +
+        `\n  use in a browser.${usdc ? ` Satchel #${usdc} stays listed for USDC until then.` : ''} The fake-payment refusal above already shows that` +
+        '\n  only the USDC contract can pay for it. To add the buy: `e2e:proofs --only buy-usdc --merge --send --yes`.',
+    )
+  }
+  const timeouts = doc.mpc_timeouts ?? []
+  if (!timeouts.length) {
+    missing.push(
+      '- **A timed-out MPC request.** Testnet MPC requests sometimes time out under load, but none did during this run,' +
+        '\n  and a timeout is not forced on purpose. The behaviour is covered by the sandbox tests (`timeout_never_sticks`).',
+    )
+  }
+  if (missing.length) out.push('## Not here yet', '', ...missing, '')
+  if (timeouts.length) {
+    out.push('## Timed-out MPC requests', '')
+    out.push('These requests timed out during this run and were retried. Each one stays recorded on its Satchel (status')
+    out.push('failed), because the record is written before the MPC is asked:')
+    out.push('')
+    for (const h of timeouts) out.push(`- NEAR [${short(h)}](${nearExplorer(h)})`)
+    out.push('')
+  }
+  return out.join('\n').replace(/\n+$/, '')
+}
+
+/** The archived proof sets next to `out` (docs/evidence/history/*.json), by file name. */
+export function historyFiles(outPath: string): string[] {
+  const dir = join(dirname(outPath), 'history')
+  return existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.json')).sort() : []
+}
+
+/** Rewrite every generated block of the evidence README from the doc. */
+export function renderReadme(readme: string, doc: ProofsDoc, history: string[], appContract: string | null = doc.contract): string {
+  let r = replaceTable(readme, renderTable(doc))
+  r = replaceBlock(r, CONTRACT_START, CONTRACT_END, renderContract(doc, history))
+  r = replaceBlock(r, STATUS_START, STATUS_END, renderStatus(doc, appContract))
+  return r
+}
+
+/** The contract the hosted app reads: NEXT_PUBLIC_SATCHEL_CONTRACT in apps/web/.env.production (null if unknown). */
+export function appContractOf(root = resolve(HERE, '..', '..')): string | null {
+  const p = join(root, 'apps', 'web', '.env.production')
+  if (!existsSync(p)) return null
+  return /^NEXT_PUBLIC_SATCHEL_CONTRACT=(\S+)\s*$/m.exec(readFileSync(p, 'utf8'))?.[1] ?? null
+}
+
+/**
+ * Before a run on another contract than the one in `out`: copy the old set to history/<contract>.json, so it stays
+ * verifiable (`SATCHEL_PROOFS=… tools/proofs.sh`) and is never mixed with the new one. Returns the archive path.
+ */
+export function archivePrevious(outPath: string, contract: string): string | null {
+  if (!existsSync(outPath)) return null
+  const old = JSON.parse(readFileSync(outPath, 'utf8')) as ProofsDoc
+  if (old.contract === contract) return null
+  const dest = join(dirname(outPath), 'history', `${old.contract}.json`)
+  const text = readFileSync(outPath, 'utf8')
+  if (existsSync(dest)) {
+    if (readFileSync(dest, 'utf8') === text) return dest // archived by an earlier attempt of this run
+    throw new Error(`${dest} exists already with other content: move it away before archiving ${outPath}`)
+  }
+  mkdirSync(dirname(dest), { recursive: true })
+  // a copy: the first new proof overwrites `out`, so a run that fails before it leaves the old set in place
+  copyFileSync(outPath, dest)
+  return dest
 }
 
 // ------------------------------------------------------------------------------------------------------- main
@@ -1006,7 +1195,7 @@ export function parseUse(values: string[] | undefined): Map<string, string> {
   return m
 }
 
-function writeDoc(path: string, ctx: Ctx, entries: Map<string, ProofEntry>, note: string, tokens: Set<string>, clean: string[]): void {
+function writeDoc(path: string, ctx: Ctx, entries: Map<string, ProofEntry>, note: string, tokens: Set<string>, clean: string[], timeouts: string[]): void {
   const proofs = STEP_IDS.filter((id) => entries.has(id)).map((id) => entries.get(id)!)
   for (const p of entries.values()) if (!STEP_IDS.includes(p.id)) proofs.push(p)
   const satchels: ProofsDoc['satchels'] = {}
@@ -1022,12 +1211,13 @@ function writeDoc(path: string, ctx: Ctx, entries: Map<string, ProofEntry>, note
     note,
     generated_at: new Date().toISOString().slice(0, 10),
     ...(clean.length ? { app_clean_history: clean } : {}),
+    ...(timeouts.length ? { mpc_timeouts: timeouts } : {}),
     satchels,
     proofs,
   }
   writeFileSync(path, `${JSON.stringify(doc, null, 2)}\n`)
   const readme = join(dirname(path), 'README.md')
-  if (existsSync(readme)) writeFileSync(readme, replaceTable(readFileSync(readme, 'utf8'), renderTable(doc)))
+  if (existsSync(readme)) writeFileSync(readme, renderReadme(readFileSync(readme, 'utf8'), doc, historyFiles(path), appContractOf()))
 }
 
 async function main(): Promise<void> {
@@ -1037,8 +1227,8 @@ async function main(): Promise<void> {
     const path = str(v, 'out') ?? DEFAULT_OUT
     const doc = JSON.parse(readFileSync(path, 'utf8')) as ProofsDoc
     const readme = join(dirname(path), 'README.md')
-    writeFileSync(readme, replaceTable(readFileSync(readme, 'utf8'), renderTable(doc)))
-    return void console.log(`rewrote the table in ${readme} (${doc.proofs.length} proofs)`)
+    writeFileSync(readme, renderReadme(readFileSync(readme, 'utf8'), doc, historyFiles(path), appContractOf()))
+    return void console.log(`rewrote the generated blocks in ${readme} (${doc.proofs.length} proofs)`)
   }
   const ctx = makeCtx(v)
   banner(ctx, 'e2e/proofs')
@@ -1054,8 +1244,19 @@ async function main(): Promise<void> {
     if ((role !== 'sale' && role !== 'inside' && role !== 'btc') || !id || !/^[1-9]\d*$/.test(id)) throw new Error(`--tokens ${part}: want sale|inside|btc=<id>`)
     runner.tokens[role] = id
   }
+  const role = roleOfContract(ctx.cfg.contract, ctx.cfg.team) ?? ctx.cfg.role
+  const bad = proofTokenProblems(role, runner.opts.chainToken, runner.tokens)
+  if (bad.length) throw new Error(`refusing these Satchels:\n  ${bad.join('\n  ')}`)
+  if (ctx.send && !bool(v, 'merge')) {
+    const moved = archivePrevious(out, ctx.cfg.contract)
+    if (moved) ctx.log(`    history   the previous set is kept as ${moved} (still verifiable: SATCHEL_PROOFS=${moved} tools/proofs.sh)`)
+  } else if (!ctx.send && existsSync(out) && !bool(v, 'merge')) {
+    const old = (JSON.parse(readFileSync(out, 'utf8')) as ProofsDoc).contract
+    if (old !== ctx.cfg.contract) ctx.log(`    history   with --send, the current set (${old}) is first kept as ${join(dirname(out), 'history', `${old}.json`)}`)
+  }
   const entries = new Map<string, ProofEntry>()
   const keptClean: string[] = []
+  const keptTimeouts: string[] = []
   let note = str(v, 'note') ?? `Made on ${ctx.cfg.contract} with tools/e2e/proofs.ts.`
   if (bool(v, 'merge') && existsSync(out)) {
     const old = JSON.parse(readFileSync(out, 'utf8')) as ProofsDoc
@@ -1063,6 +1264,7 @@ async function main(): Promise<void> {
     for (const p of old.proofs) entries.set(p.id, p)
     note = str(v, 'note') ?? old.note
     keptClean.push(...(old.app_clean_history ?? []))
+    keptTimeouts.push(...(old.mpc_timeouts ?? []))
   }
   const steps = STEPS.filter((s) => (!only || only.includes(s.id)) && !skip.has(s.id))
   const skipped: string[] = []
@@ -1071,7 +1273,8 @@ async function main(): Promise<void> {
   for (const step of steps) {
     ctx.log(`\n## [${step.id}] ${step.action}`)
     let hash: string | null
-    if (use.has(step.id)) {
+    const adopted = use.has(step.id)
+    if (adopted) {
       hash = use.get(step.id)!
       ctx.log(`    adopt     ${hash} (an earlier transaction)`)
     } else if (!ctx.send) {
@@ -1089,18 +1292,19 @@ async function main(): Promise<void> {
       continue
     }
     const entry = await buildEntry(ctx, step, hash)
+    if (adopted) entry.adopted = true
     entries.set(step.id, entry)
     if ((step.id === 'for-sale-now' || (step.id === 'list-usdc' && !entries.has('buy-usdc'))) && entry.token_id) {
       const url = `https://usesatchel.xyz/api/clean-history/${entry.token_id}`
       if (!clean.includes(url)) clean.push(url)
     }
     ctx.log(`    proof     ${step.id} → ${hash}${entry.external ? ` · ${entry.external.chain} ${entry.external.tx}` : ''}`)
-    if (ctx.send || use.size) writeDoc(out, ctx, entries, note, tokens, clean)
+    if (ctx.send || use.size) writeDoc(out, ctx, entries, note, tokens, clean, [...keptTimeouts, ...runner.timeouts])
   }
   for (const h of runner.timeouts) ctx.log(`    timeout   MPC request ${h} timed out and stays recorded (status failed); see sig_records`)
   Object.values(runner.tokens).forEach((t) => t && tokens.add(t))
   if (ctx.send || use.size) {
-    writeDoc(out, ctx, entries, note, tokens, clean)
+    writeDoc(out, ctx, entries, note, tokens, clean, [...keptTimeouts, ...runner.timeouts])
     ctx.log(`\nwrote ${out}: ${entries.size} proofs${skipped.length ? `; skipped ${skipped.join(', ')}` : ''}. Verify: tools/proofs.sh`)
   } else ctx.log('\nDRY RUN: nothing was signed and proofs.json was not written. Add --send to make the proofs.')
 }

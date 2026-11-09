@@ -91,10 +91,13 @@ export interface ConfigFlags {
  */
 export function loadConfig(flags: ConfigFlags = {}, env: Env = process.env): ToolConfig {
   const team = assertAccountId(flags.team ?? env.SATCHEL_TEAM ?? DEFAULT_TEAM, 'team')
-  const roleRaw = flags.role ?? env.SATCHEL_ROLE ?? env.NEXT_PUBLIC_CONTRACT_ROLE ?? 'dev'
+  const explicitContract = flags.contract ?? env.SATCHEL_CONTRACT
+  // No role given: a contract named like the final (`satchel.<team>.testnet`) or an rc gets that role, so a script
+  // pointed at the final contract runs with the final's strict rules and labels without a separate --role final.
+  const roleRaw = flags.role ?? env.SATCHEL_ROLE ?? env.NEXT_PUBLIC_CONTRACT_ROLE ?? (explicitContract ? roleOfContract(explicitContract, team) : null) ?? 'dev'
   if (roleRaw !== 'dev' && roleRaw !== 'rc' && roleRaw !== 'final') throw new Error(`--role must be dev|rc|final, got ${roleRaw}`)
   const role: Role = roleRaw
-  const contract = assertAccountId(flags.contract ?? env.SATCHEL_CONTRACT ?? contractForRole(role, team), 'contract')
+  const contract = assertAccountId(explicitContract ?? contractForRole(role, team), 'contract')
   const persona = (name: 'alice' | 'bob' | 'carol', flag?: string) =>
     assertAccountId(flag ?? env[`SATCHEL_${name.toUpperCase()}`] ?? `${name}.${team}.testnet`, name)
   const nearRpcs = list(env.SATCHEL_NEAR_RPCS ?? env.NEXT_PUBLIC_NEAR_RPCS, DEFAULT_NEAR_RPCS)

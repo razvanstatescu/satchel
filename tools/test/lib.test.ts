@@ -41,6 +41,14 @@ describe('config', () => {
     expect(resolveAccount(c, 'team')).toBe('acme.testnet')
     expect(loadConfig({ role: 'final' }, env).contract).toBe('satchel.acme.testnet')
   })
+  it('without a role, a final or rc contract id brings its role; an explicit role still wins', () => {
+    expect(loadConfig({ contract: 'satchel.satchelhq.testnet' }, {}).role).toBe('final')
+    expect(loadConfig({}, { SATCHEL_CONTRACT: 'rc.satchelhq.testnet' }).role).toBe('rc')
+    expect(loadConfig({ contract: 'dev2.satchelhq.testnet' }, {}).role).toBe('dev')
+    expect(loadConfig({ contract: 'other.testnet' }, {}).role).toBe('dev')
+    expect(loadConfig({ contract: 'satchel.satchelhq.testnet', role: 'dev' }, {}).role).toBe('dev')
+    expect(loadConfig({ contract: 'satchel.satchelhq.testnet' }, { NEXT_PUBLIC_CONTRACT_ROLE: 'rc' }).role).toBe('rc')
+  })
   it('refuses the deprecated near.org RPC anywhere', () => {
     expect(isForbiddenRpc(`https://${NEAR_ORG}`)).toBe(true)
     expect(isForbiddenRpc('https://near-testnet.drpc.org')).toBe(false)
