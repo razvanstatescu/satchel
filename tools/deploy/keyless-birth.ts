@@ -11,6 +11,7 @@
  *
  *   pnpm --filter @satchel/tools deploy:keyless-birth --child rc.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/
  */
+import { execFileSync, spawnSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -76,6 +77,86 @@ export function usdcMetadataProblem(meta: unknown): string | null {
   return null
 }
 
+/** The contract's compile-time quiet period (`COOLDOWN_BLOCKS` in contracts/satchel/src/lib.rs); bound by H, read back from `config`. */
+export const EXPECTED_COOLDOWN_BLOCKS = 250
+
+/** The tag whose commit the rc and final wasm must be built from (cargo-near embeds the rev in NEP-330 build_info). */
+export const RELEASE_TAG = 'contract-v1.0.0-rc1'
+
+/** rc and the final both carry H and must go through the reproducible-build checks; dev children never use this tool. */
+export const isReleaseChild = (child: string, parent: string): boolean => isFinalChild(child, parent) || /^rc\d*\./.test(child)
+
+export interface SourceMetadata {
+  version?: string
+  link?: string
+  standards?: unknown
+  build_info?: { build_environment?: string; build_command?: string[]; contract_path?: string; source_code_snapshot?: string } | null
+}
+
+/**
+ * The NEP-330 JSON that near-sdk embeds as a static string in the wasm (what `contract_source_metadata` returns).
+ * null when there is none. Reads the bytes as latin1 and brace-matches from `{"version":`, respecting JSON strings.
+ */
+export function sourceMetadataFromWasm(wasm: Uint8Array): SourceMetadata | null {
+  const s = Buffer.from(wasm).toString('latin1')
+  for (let start = s.indexOf('{"version":'); start !== -1; start = s.indexOf('{"version":', start + 1)) {
+    let depth = 0
+    let inStr = false
+    for (let i = start; i < s.length; i++) {
+      const c = s[i]
+      if (inStr) {
+        if (c === '\\') i++
+        else if (c === '"') inStr = false
+      } else if (c === '"') inStr = true
+      else if (c === '{') depth++
+      else if (c === '}' && --depth === 0) {
+        try {
+          const m = JSON.parse(Buffer.from(s.slice(start, i + 1), 'latin1').toString('utf8')) as SourceMetadata
+          if ('build_info' in m && 'standards' in m) return m
+        } catch {
+          /* not the metadata blob; keep looking */
+        }
+        break
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * The reproducible-build binding (D-01, SAT-081): build_info must name the release commit and the pinned image digest.
+ * null when it does, else what is wrong. `imageDigest` is the `image_digest` from contracts/satchel/Cargo.toml.
+ */
+export function buildInfoProblem(meta: SourceMetadata | null, want: { rev: string; imageDigest?: string | null }): string | null {
+  if (!meta) return 'no NEP-330 contract_source_metadata in the wasm'
+  const bi = meta.build_info
+  if (!bi) return 'build_info is null: this is a non-reproducible build, not the CI reproducible artifact'
+  const snap = bi.source_code_snapshot ?? ''
+  const m = /[?&]rev=([0-9a-f]{40})\b/.exec(snap)
+  if (!m) return `source_code_snapshot ${JSON.stringify(snap)} has no full commit rev`
+  if (m[1] !== want.rev.toLowerCase()) return `source_code_snapshot rev ${m[1]} != ${want.rev} (${RELEASE_TAG})`
+  if (want.imageDigest && !(bi.build_environment ?? '').endsWith(`@${want.imageDigest}`))
+    return `build_environment ${JSON.stringify(bi.build_environment)} is not the pinned image @${want.imageDigest}`
+  return null
+}
+
+/**
+ * What a born contract's `config` view must say; [] when everything matches. `mints` checks next_token_id = mints + 1
+ * (right after the birth); leave it out for a contract that may have minted since (the rc twin, checked on Day 10).
+ */
+export function configProblems(config: unknown, o: Pick<BirthOptions, 'mpc' | 'usdc' | 'baseUri'> & { mints?: number }): string[] {
+  if (config === null || typeof config !== 'object') return ['config unreadable']
+  const c = config as Record<string, unknown>
+  const want: [string, unknown][] = [
+    ['mpc_contract_id', o.mpc],
+    ['usdc_contract_id', o.usdc],
+    ['base_uri', o.baseUri],
+    ['cooldown_blocks', EXPECTED_COOLDOWN_BLOCKS],
+    ...(o.mints === undefined ? [] : ([['next_token_id', o.mints + 1]] as [string, unknown][])),
+  ]
+  return want.filter(([k, v]) => c[k] !== v).map(([k, v]) => `${k} ${JSON.stringify(c[k])} != ${JSON.stringify(v)}`)
+}
+
 export function validateBirth(o: BirthOptions): string {
   assertAccountId(o.parent, 'parent')
   assertAccountId(o.child, 'child')
@@ -99,8 +180,8 @@ export function validateBirth(o: BirthOptions): string {
   if (o.wasm[0] !== 0x00 || o.wasm[1] !== 0x61 || o.wasm[2] !== 0x73 || o.wasm[3] !== 0x6d) throw new Error('not a wasm file (bad magic)')
   const h = sha256Hex(o.wasm)
   if (o.expectedSha256 !== undefined && o.expectedSha256.toLowerCase() !== h) throw new Error(`wasm sha256 ${h} != --expected-sha256 ${o.expectedSha256}`)
-  if (isFinalChild(o.child, o.parent) && o.expectedSha256 === undefined)
-    throw new Error('the final birth requires --expected-sha256 <H> (the reproducible build hash recorded twice, SAT-081)')
+  if (isReleaseChild(o.child, o.parent) && o.expectedSha256 === undefined)
+    throw new Error(`the ${isFinalChild(o.child, o.parent) ? 'final' : 'rc'} birth requires --expected-sha256 <H> (the CI reproducible build hash, SAT-081): rc and final run the same H`)
   if (o.transfer <= 0n) throw new Error('--transfer must be > 0')
   return h
 }
@@ -160,6 +241,7 @@ const OPTIONS = {
   child: { type: 'string' },
   wasm: { type: 'string', default: 'target/near/satchel/satchel.wasm' },
   'expected-sha256': { type: 'string' },
+  'expected-rev': { type: 'string' },
   mpc: { type: 'string', default: MPC_TESTNET },
   usdc: { type: 'string', default: USDC_TESTNET },
   'no-usdc': { type: 'boolean', default: false },
@@ -174,7 +256,8 @@ const HELP = `tools/deploy/keyless-birth.ts: one tx, CreateAccount · Transfer �
   --child <acct>            REQUIRED: rc.<team>.testnet (Day 9) or satchel.<team>.testnet (Day 10)
   --parent <acct>           default <team>.testnet (signer; key from ~/.near-credentials)
   --wasm <path>             default target/near/satchel/satchel.wasm (the reproducible artifact on rc/final)
-  --expected-sha256 <H>     required for the final; must equal sha256(wasm)
+  --expected-sha256 <H>     required for rc and the final; must equal sha256(wasm)
+  --expected-rev <commit>   rc/final: the commit NEP-330 build_info must name (default: git rev of ${RELEASE_TAG})
   --base-uri <url>          REQUIRED: https://<app-host>/api/card/ (immutable)
   --mpc <acct>              default ${MPC_TESTNET}
   --usdc <acct> | --no-usdc default Circle testnet USDC; --no-usdc if H-26 chose usdc: null
@@ -184,12 +267,71 @@ const HELP = `tools/deploy/keyless-birth.ts: one tx, CreateAccount · Transfer �
   --send                    sign and send (asks for a typed "yes" in a terminal; --yes is not accepted)
   --offline                 skip the read-only pre-checks`
 
-async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions): Promise<boolean> {
+type Line = (pass: boolean | null, s: string) => void
+function checker(ctx: Ctx, tag: string): { line: Line; ok: () => boolean } {
   let ok = true
-  const line = (pass: boolean | null, s: string) => {
-    ctx.log(`    pre       ${pass === null ? 'INFO' : pass ? 'PASS' : 'FAIL'}  ${s}`)
-    if (pass === false) ok = false
+  return {
+    line: (pass, s) => {
+      ctx.log(`    ${tag.padEnd(9)} ${pass === null ? 'INFO' : pass ? 'PASS' : 'FAIL'}  ${s}`)
+      if (pass === false) ok = false
+    },
+    ok: () => ok,
   }
+}
+
+/** `git rev-parse <tag>^{commit}` in the repo, or null (no git, no tag). */
+function gitRev(ref: string): string | null {
+  try {
+    return execFileSync('git', ['rev-parse', '--verify', '--quiet', `${ref}^{commit}`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() || null
+  } catch {
+    return null
+  }
+}
+
+/** `image_digest` pinned in contracts/satchel/Cargo.toml [package.metadata.near.reproducible_build]. */
+function pinnedImageDigest(): string | null {
+  try {
+    return /^image_digest\s*=\s*"([^"]+)"/m.exec(readFileSync(join(ROOT, 'contracts/satchel/Cargo.toml'), 'utf8'))?.[1] ?? null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Local checks of the artifact itself; they run even with --offline, and a FAIL blocks --send.
+ * INV-22 (tools/check-wasm-imports.sh) for every child; the NEP-330 build_info binding for rc and the final.
+ */
+function wasmChecks(ctx: Ctx, o: BirthOptions, wasmPath: string, rev: string | null): boolean {
+  const { line, ok } = checker(ctx, 'wasm')
+  const imp = spawnSync('bash', [join(ROOT, 'tools/check-wasm-imports.sh'), wasmPath], { encoding: 'utf8' })
+  line(imp.status === 0, `INV-22 import check (tools/check-wasm-imports.sh): ${imp.status === 0 ? 'no AddKey/DeployContract/DeleteAccount host imports' : (imp.stdout + imp.stderr).trim().split('\n').pop()}`)
+  const meta = sourceMetadataFromWasm(o.wasm)
+  ctx.log(`    nep330    version ${meta?.version ?? '?'} · build_info ${meta?.build_info ? (meta.build_info.source_code_snapshot ?? '?') : 'null'}`)
+  if (isReleaseChild(o.child, o.parent)) {
+    if (!rev) line(false, `cannot resolve ${RELEASE_TAG} to a commit: pass --expected-rev <commit>`)
+    else {
+      const p = buildInfoProblem(meta, { rev, imageDigest: pinnedImageDigest() })
+      line(p === null, `reproducible build_info names rev ${rev} and the pinned image${p ? `: ${p}` : ''}`)
+    }
+  } else line(null, 'build_info binding not checked (not an rc/final child)')
+  return ok()
+}
+
+/** Day 10 (DP6): the final is born only after rc proved the same H and init args on chain. */
+async function rcTwinChecks(ctx: Ctx, line: Line, o: BirthOptions, sha256: string): Promise<void> {
+  const twin = `rc.${o.parent}`
+  const acct = await ctx.rpc.viewAccount(twin)
+  if (!acct) return line(false, `${twin} does not exist: rehearse on rc first (D-02)`)
+  const code = Buffer.from(base58.decode(acct.code_hash)).toString('hex')
+  line(code === sha256, `${twin} runs H (code ${code === sha256 ? 'matches' : `is ${code}`})`)
+  const keys = (await ctx.rpc.viewAccessKeyList(twin)).keys.length
+  line(keys === 0, `${twin} has 0 access keys (${keys})`)
+  const probs = configProblems(await ctx.rpc.view<unknown>(twin, 'config').catch(() => null), o)
+  line(probs.length === 0, `${twin} config has the same mpc, usdc, base_uri and cooldown ${EXPECTED_COOLDOWN_BLOCKS}${probs.length ? `: ${probs.join('; ')}` : ''}`)
+}
+
+async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions, sha256: string): Promise<boolean> {
+  const { line, ok } = checker(ctx, 'pre')
   const child = await ctx.rpc.viewAccount(o.child)
   line(child === null, `${o.child} does not exist yet (view_account → UNKNOWN_ACCOUNT)`)
   const parent = await ctx.rpc.viewAccount(o.parent)
@@ -198,7 +340,7 @@ async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions): Promise<boole
   const need = requiredParentBalance(plan, gasPrice)
   if (parent) {
     const bal = BigInt(parent.amount)
-    line(bal > need.total, `${o.parent} balance ${formatNear(bal)} ≥ ${formatNear(need.total)} (deposits ${formatNear(need.deposits)} + gas hold ${formatNear(need.gasHold)} at ${gasPrice} yocto/gas)`)
+    line(bal >= need.total, `${o.parent} balance ${formatNear(bal)} ≥ ${formatNear(need.total)} (deposits ${formatNear(need.deposits)} + gas hold ${formatNear(need.gasHold)} at ${gasPrice} yocto/gas)`)
   } else line(null, `needs ≥ ${formatNear(need.total)} up front (deposits + 10× gas hold)`)
   const v = await ctx.rpc.view<string>(o.mpc, 'version').catch(() => null)
   // A-01: only versions whose `sign` interface was checked live (3.18.0: EVM and SOL sign-only on dev2, 2026-11-05).
@@ -209,19 +351,34 @@ async function preChecks(ctx: Ctx, plan: TxPlan, o: BirthOptions): Promise<boole
     line(problem === null, `USDC contract ${o.usdc} is USDC with 6 decimals (ft_metadata)${problem ? `: ${problem}` : ''}`)
   }
   line((await ctx.rpc.viewAccount(o.mintTo)) !== null, `mint receiver ${o.mintTo} exists`)
-  return ok
+  if (isFinalChild(o.child, o.parent)) await rcTwinChecks(ctx, line, o, sha256)
+  return ok()
 }
 
-async function verifyBirth(ctx: Ctx, o: BirthOptions, sha256: string): Promise<Record<string, unknown>> {
+/** Read the born contract back; every check must PASS, or the tool exits non-zero after writing the evidence. */
+async function verifyBirth(ctx: Ctx, o: BirthOptions, sha256: string, rev: string | null): Promise<Record<string, unknown> & { problems: string[] }> {
+  const { line } = checker(ctx, 'verify')
+  const problems: string[] = []
+  const check = (pass: boolean, s: string) => (line(pass, s), pass || problems.push(s))
   const acct = await ctx.rpc.viewAccount(o.child)
+  check(acct !== null, `${o.child} exists`)
   const keys = acct ? (await ctx.rpc.viewAccessKeyList(o.child)).keys.length : null
+  check(keys === 0, `0 access keys (${keys})`)
   const codeHex = acct ? Buffer.from(base58.decode(acct.code_hash)).toString('hex') : null
+  check(codeHex === sha256, `code = H (${codeHex})`)
   const owners: (string | null)[] = []
-  for (let i = 1; i <= o.mints; i++) owners.push((await ctx.rpc.view<{ owner_id: string } | null>(o.child, 'nft_token', { token_id: String(i) }))?.owner_id ?? null)
-  const config = await ctx.rpc.view(o.child, 'config').catch(() => null)
-  const r = { exists: acct !== null, access_keys: keys, code_sha256: codeHex, code_ok: codeHex === sha256, owners, config }
-  ctx.log(`    verify    exists ${r.exists} · access keys ${keys} · code ${codeHex === sha256 ? 'matches H' : `MISMATCH ${codeHex}`} · owners ${owners.join(',')}`)
-  return r
+  for (let i = 1; i <= o.mints; i++)
+    owners.push(acct ? ((await ctx.rpc.view<{ owner_id: string } | null>(o.child, 'nft_token', { token_id: String(i) }).catch(() => null))?.owner_id ?? null) : null)
+  check(owners.every((x) => x === o.mintTo), `ids 1–${o.mints} owned by ${o.mintTo} (${owners.join(',')})`)
+  const config = acct ? await ctx.rpc.view(o.child, 'config').catch(() => null) : null
+  const cp = configProblems(config, o)
+  check(cp.length === 0, `config mpc/usdc/base_uri/cooldown ${EXPECTED_COOLDOWN_BLOCKS}/next_token_id ${o.mints + 1}${cp.length ? `: ${cp.join('; ')}` : ''}`)
+  const source = acct ? await ctx.rpc.view<SourceMetadata>(o.child, 'contract_source_metadata').catch(() => null) : null
+  if (isReleaseChild(o.child, o.parent) && rev) {
+    const p = buildInfoProblem(source, { rev, imageDigest: pinnedImageDigest() })
+    check(p === null, `contract_source_metadata names rev ${rev}${p ? `: ${p}` : ''}`)
+  }
+  return { exists: acct !== null, access_keys: keys, code_sha256: codeHex, code_ok: codeHex === sha256, owners, config, contract_source_metadata: source, problems }
 }
 
 async function main(): Promise<void> {
@@ -256,6 +413,7 @@ async function main(): Promise<void> {
     mintDeposit: BIRTH_DEFAULTS.mintDeposit,
   }
   const { plan, sha256 } = buildBirthPlan(o)
+  const rev = str(v, 'expected-rev')?.toLowerCase() ?? gitRev(RELEASE_TAG)
   ctx.log(`== deploy/keyless-birth · ${ctx.send ? 'SEND MODE' : 'DRY RUN'}${isFinalChild(child, parent) ? ' · FINAL CONTRACT (H-15: needs the human\'s explicit "yes")' : ''}`)
   ctx.log(`    wasm      ${o.wasmPath} · ${o.wasm.length} bytes`)
   ctx.log(`    H         ${sha256}`)
@@ -263,8 +421,13 @@ async function main(): Promise<void> {
   ctx.log(`    init      new ${JSON.stringify(initArgs(o))}`)
   ctx.log(`    actions   ${actionKinds(plan).join(' · ')}  (no AddKey: checked)`)
   ctx.log(`    gas       ${formatTgas(totalGas(plan))} prepaid in FunctionCalls (measured 72–78 Tgas burnt in sandbox/spike)`)
-  const pre = ctx.offline ? true : await preChecks(ctx, plan, o)
-  if (ctx.send && !pre) throw new Error('pre-checks failed: nothing was signed')
+  const wasmOk = wasmChecks(ctx, o, wasmPath, rev)
+  const pre = ctx.offline ? true : await preChecks(ctx, plan, o, sha256)
+  if (ctx.send && !(pre && wasmOk)) throw new Error('pre-checks failed: nothing was signed')
+  if (!(pre && wasmOk)) {
+    ctx.log('    NOTE      a check above is FAIL: --send would refuse to sign (exit 1)')
+    process.exitCode = 1
+  }
   const sent = await executePlan(ctx, plan, {
     allow: { deploy: true, createAccount: true },
     requireTty: true,
@@ -276,7 +439,7 @@ async function main(): Promise<void> {
   proofCommands(child, sent?.hash ?? null, ctx.cfg.nearTxApi).forEach((c, i) => ctx.log(`      ${i + 1}. ${c}`))
   if (!sent) return
   if (!sent.ok) throw new Error(`birth failed (${sent.errors.join(', ') || 'see the tx'}); the batch is atomic, so ${child} does not exist. Fix and re-run.`)
-  const verify = await verifyBirth(ctx, o, sha256)
+  const verify = await verifyBirth(ctx, o, sha256, rev)
   const blockHash = sent.outcome.transaction_outcome?.block_hash ?? null
   const block = blockHash ? await ctx.rpc.call<{ header: { height: number } }>('block', { block_id: blockHash }).catch(() => null) : null
   const evidence = {
@@ -298,6 +461,8 @@ async function main(): Promise<void> {
   mkdirSync(dirname(out), { recursive: true })
   writeFileSync(out, `${JSON.stringify(evidence, null, 2)}\n`)
   ctx.log(`    evidence  ${out}`)
+  ctx.log(`    record    birth tx ${sent.hash} · block A = ${evidence.block_height ?? '(read it from proof 4)'}`)
+  if (verify.problems.length) throw new Error(`the birth landed but ${verify.problems.length} check(s) FAILED: ${verify.problems.join(' | ')}. A wrong argument is permanent: see keyless-birth.md §5.`)
 }
 
 if (isMain(import.meta.url)) runMain(main)

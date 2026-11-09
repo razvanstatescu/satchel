@@ -51,3 +51,24 @@ export function tempCredentials(accounts: string[], layout: 'file' | 'folder' = 
   }
   return { dir, keys }
 }
+
+/** A wasm with one custom section carrying `payload`, the way near-sdk's static NEP-330 JSON sits in a data segment. */
+export function wasmWith(payload: string): Uint8Array {
+  const leb = (n: number) => { const o: number[] = []; do { let b = n & 0x7f; n >>>= 7; if (n) b |= 0x80; o.push(b) } while (n); return o }
+  const name = [...Buffer.from('x')]
+  const body = [...leb(name.length), ...name, ...Buffer.from(payload, 'utf8')]
+  return new Uint8Array([0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x00, ...leb(body.length), ...body])
+}
+
+export const reproMeta = (rev = '843d35334f7fc7a88644fc39424bb137e7460094', digest = 'sha256:c9655eaf7436b90c87ea8b25739f91063032c5c30ba24cfeafe72c142943b5bb') => JSON.stringify({
+  version: '1.0.0',
+  link: `https://github.com/razvanstatescu/satchel/tree/${rev}`,
+  standards: [{ standard: 'nep171', version: '1.0.0' }, { standard: 'nep330', version: '1.3.0' }],
+  build_info: {
+    build_environment: `sourcescan/cargo-near:0.22.0-rust-1.99.1@${digest}`,
+    build_command: ['cargo', 'near', 'build', 'non-reproducible-wasm', '--locked'],
+    contract_path: 'contracts/satchel',
+    source_code_snapshot: `git+https://github.com/razvanstatescu/satchel?rev=${rev}`,
+    output_wasm_path: null,
+  },
+})

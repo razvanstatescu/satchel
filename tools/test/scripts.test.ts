@@ -4,8 +4,11 @@
  */
 import { describe, expect, it } from 'vitest'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
+import { reproMeta, wasmWith } from './helpers'
 import { load } from 'js-yaml'
 
 const TOOLS = resolve(import.meta.dirname, '..')
@@ -76,10 +79,16 @@ describe('e2e scripts that always read live state (market, allowance view/sign, 
 })
 
 describe('keyless-birth tool', () => {
-  it('dry run prints the 11 actions and H; refuses --yes; requires H for the final', () => {
+  const tiny = join(TOOLS, 'test/fixtures/tiny.wasm')
+  const tinyH = createHash('sha256').update(readFileSync(tiny)).digest('hex')
+  it('dry run prints the 11 actions and H; refuses --yes; requires H for rc and the final', () => {
     const base = ['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://usesatchel.xyz/api/card/', '--wasm', 'tools/test/fixtures/tiny.wasm']
-    const r = tsx([...base, '--child', 'rc.satchelhq.testnet'])
-    expect(r.status, r.stderr).toBe(0)
+    const r = tsx([...base, '--child', 'rc.satchelhq.testnet', '--expected-sha256', tinyH])
+    // tiny.wasm has no reproducible build_info, so the dry run prints everything, flags it and exits 1
+    expect(r.status, r.stderr).toBe(1)
+    expect(r.stdout).toMatch(/wasm +PASS +INV-22 import check/)
+    expect(r.stdout).toMatch(/wasm +FAIL +reproducible build_info/)
+    expect(r.stdout).toContain('--send would refuse to sign')
     expect(r.stdout).toContain('CreateAccount · Transfer · DeployContract · FunctionCall')
     expect(r.stdout).toContain('(no AddKey: checked)')
     expect(r.stdout).toMatch(/H {9}[0-9a-f]{64}/)
@@ -87,7 +96,32 @@ describe('keyless-birth tool', () => {
     expect(r.stdout).toContain('sha256sum')
     expect(r.stdout).toContain('DRY RUN')
     expect(tsx([...base, '--child', 'rc.satchelhq.testnet', '--send', '--yes']).stderr).toMatch(/--yes is not accepted/)
-    expect(tsx([...base, '--child', 'satchel.satchelhq.testnet']).stderr).toMatch(/requires --expected-sha256/)
+    expect(tsx([...base, '--child', 'rc.satchelhq.testnet']).stderr).toMatch(/rc birth requires --expected-sha256/)
+    expect(tsx([...base, '--child', 'satchel.satchelhq.testnet']).stderr).toMatch(/final birth requires --expected-sha256/)
+    const bad = tsx([...base, '--child', 'rc.satchelhq.testnet', '--expected-sha256', 'ab'.repeat(32)])
+    expect(bad.status).toBe(1)
+    expect(bad.stderr).toMatch(/wasm sha256 [0-9a-f]{64} != --expected-sha256 (ab){32}/)
+    expect(bad.stdout).not.toContain('TX  KEYLESS BIRTH')
+  })
+  it('a wasm with the release build_info passes every local check (exit 0)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'satchel-birth-'))
+    try {
+      const wasm = join(dir, 'repro.wasm')
+      const rev = '843d35334f7fc7a88644fc39424bb137e7460094'
+      const digest = /^image_digest\s*=\s*"([^"]+)"/m.exec(readFileSync(join(ROOT, 'contracts/satchel/Cargo.toml'), 'utf8'))![1]!
+      writeFileSync(wasm, wasmWith(reproMeta(rev, digest)))
+      const h = createHash('sha256').update(readFileSync(wasm)).digest('hex')
+      const r = tsx(['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://usesatchel.xyz/api/card/', '--wasm', wasm, '--child', 'rc.satchelhq.testnet', '--expected-sha256', h, '--expected-rev', rev])
+      expect(r.status, r.stdout + r.stderr).toBe(0)
+      expect(r.stdout).toMatch(new RegExp(`wasm +PASS +reproducible build_info names rev ${rev}`))
+      expect(r.stdout).not.toMatch(/FAIL/)
+      // the same artifact against another commit is refused
+      const other = tsx(['deploy/keyless-birth.ts', '--offline', '--base-uri', 'https://usesatchel.xyz/api/card/', '--wasm', wasm, '--child', 'satchel.satchelhq.testnet', '--expected-sha256', h, '--expected-rev', 'f'.repeat(40)])
+      expect(other.status).toBe(1)
+      expect(other.stdout).toMatch(/wasm +FAIL +reproducible build_info.*!= f{40}/)
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
 })
 
@@ -175,10 +209,10 @@ describe('repo hygiene for release files', () => {
       expect(keys, k).toContain(k)
     expect(lines.every((l) => l.endsWith('='))).toBe(true)
   })
-  it('ci.yml has the contracts / web / smoke jobs of spec §12.6 and needs no secrets', () => {
+  it('ci.yml has the contracts / reproducible / web / smoke jobs (spec §12.6) and needs no secrets', () => {
     const text = readFileSync(join(ROOT, '.github/workflows/ci.yml'), 'utf8')
-    const y = load(text) as { jobs: Record<string, { steps: { run?: string; uses?: string }[] }>; permissions: Record<string, string> }
-    expect(Object.keys(y.jobs)).toEqual(['contracts', 'web', 'smoke'])
+    const y = load(text) as { jobs: Record<string, { steps: { run?: string; uses?: string; with?: Record<string, unknown> }[] }>; permissions: Record<string, string> }
+    expect(Object.keys(y.jobs)).toEqual(['contracts', 'reproducible', 'web', 'smoke'])
     expect(y.permissions).toEqual({ contents: 'read' })
     expect(text).not.toMatch(/secrets\./)
     const runs = (job: string) => y.jobs[job]!.steps.map((s) => s.run ?? '').join('\n')
@@ -190,5 +224,11 @@ describe('repo hygiene for release files', () => {
     expect(runs('web')).toContain('pnpm --filter web build')
     expect(runs('web')).toContain('rpc[.]testnet[.]near[.]org')
     expect(runs('smoke')).toContain('playwright test test/e2e/judge.spec.ts')
+    // H for rc and the final comes from this job (the pinned linux/amd64 image): build, hash, INV-22, upload
+    expect(runs('reproducible')).toContain('cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml')
+    expect(runs('reproducible')).toContain('sha256sum target/near/satchel/satchel.wasm')
+    expect(runs('reproducible')).toContain('tools/check-wasm-imports.sh')
+    const upload = y.jobs.reproducible!.steps.find((st) => st.uses?.startsWith('actions/upload-artifact'))
+    expect(upload?.with?.name).toBe('satchel-reproducible-wasm-${{ github.sha }}')
   })
 })

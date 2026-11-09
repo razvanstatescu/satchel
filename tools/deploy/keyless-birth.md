@@ -47,11 +47,11 @@ Approvals:
 ## 1. Dry run and review (no key needed)
 
 ```bash
-# rc (Day 9)
+# rc (Day 9): --expected-sha256 is mandatory for rc too (rc and final run the same H)
 pnpm --filter @satchel/tools deploy:keyless-birth \
   --child rc.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/ \
   --expected-sha256 <H>
-# final (Day 10): --expected-sha256 is mandatory
+# final (Day 10)
 pnpm --filter @satchel/tools deploy:keyless-birth \
   --child satchel.satchelhq.testnet --base-uri https://usesatchel.xyz/api/card/ \
   --expected-sha256 <H>
@@ -66,7 +66,15 @@ Review the printout line by line:
 - [ ] `new` args = `{"mpc":"v1.signer-prod.testnet","usdc":"3e2210e1…b8af"|null,"base_uri":"https://<host>/api/card/"}`,
   byte-identical to rc's;
 - [ ] 7 × `nft_mint {"receiver_id":"alice.satchelhq.testnet"}` at 20 Tgas and 0.02 NEAR each; 170 Tgas in total;
-- [ ] every pre-check is `PASS`.
+- [ ] every `wasm` and `pre` line is `PASS`, and the dry run exits 0. A `FAIL` makes the dry run exit 1 and `--send`
+  refuse to sign. The `wasm` lines run even with `--offline`:
+  - INV-22: `tools/check-wasm-imports.sh` finds no AddKey, DeployContract or DeleteAccount host import;
+  - NEP-330: `build_info` is not null, `source_code_snapshot` names the full commit of `contract-v1.0.0-rc1`
+    (override with `--expected-rev`), and `build_environment` ends with the `image_digest` pinned in
+    `contracts/satchel/Cargo.toml`. A local `cargo near build non-reproducible-wasm` artifact has `build_info: null`
+    and fails here on purpose;
+- [ ] final only, the rc-twin pre-checks: `rc.satchelhq.testnet` runs H, has 0 access keys, and its `config` has the same
+  `mpc_contract_id`, `usdc_contract_id`, `base_uri` and `cooldown_blocks` 250.
 
 ## 2. Send
 
@@ -76,8 +84,10 @@ pnpm --filter @satchel/tools deploy:keyless-birth --child <child> --base-uri <ur
 
 - The tool fetches the nonce and block hash, prints the tx hash, then asks for `yes`. Only a typed `yes` signs.
 - It submits with `send_tx` `wait_until: INCLUDED` and tracks the tx to `FINAL` by hash.
-- On success it verifies the result: the account exists, it has 0 access keys, its code = **H**, and ids 1–7 belong
-  to alice. It then writes `docs/evidence/birth-<child>.json`.
+- On success it verifies the result: the account exists, it has 0 access keys, its code = **H**, ids 1–7 belong
+  to alice, `config` has the init args, `cooldown_blocks` 250 and `next_token_id` 8, and `contract_source_metadata`
+  names the release rev. It writes `docs/evidence/birth-<child>.json` and prints `record birth tx … · block A = …`.
+  If any verify line is `FAIL` it still writes the evidence, then exits 1 (see §5).
 - Record the tx hash and block **A** in the team channel.
 
 ## 3. Proofs (kb/90 §5.16 1–6; `docs/verify.md`)
