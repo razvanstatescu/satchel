@@ -144,7 +144,7 @@ export const EDITS: Edit[] = [
       `- That contract was born keyless in one transaction (\`${v.birthTx}\`, block ${v.block}) with no AddKey,\n` +
       `  and runs the code with SHA-256 \`${v.h}\`, reproducible at that tag.\n` +
       '  `tools/judge-snippets.sh` checks all of it read-only. The development contracts (`dev1`, `dev2.satchelhq.testnet`)\n' +
-      '  keep their keys: they are for testing, not for trust (the lock checks apply to the release contract only).\n',
+      '  keep their keys: they are for testing, not for trust (the lock checks skip there).\n',
   },
   // ── docs/GLOSSARY.md ──
   {

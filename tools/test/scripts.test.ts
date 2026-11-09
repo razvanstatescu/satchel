@@ -137,6 +137,17 @@ describe('shell scripts', () => {
     expect(out).toContain('Account is locked (no access keys)')
     expect(out.match(/expect: /g)!.length).toBeGreaterThanOrEqual(13)
   })
+  it('judge-snippets: lock checks run on the final and on rc; rc birth checks never borrow the final\'s birth tx', () => {
+    const print = (env: Record<string, string>) => execFileSync('bash', [join(TOOLS, 'judge-snippets.sh'), '--print'], { encoding: 'utf8', env: { ...process.env, SATCHEL_BIRTH_TX: '', SATCHEL_BIRTH_BLOCK: '', ...env } })
+    expect(print({})).toMatch(/contract satchel\.satchelhq\.testnet · token 1 · lock checks on/)
+    const rc = print({ SATCHEL_CONTRACT: 'rc.satchelhq.testnet' })
+    expect(rc).toMatch(/contract rc\.satchelhq\.testnet · token 1 · lock checks on/)
+    expect(rc).toContain('[TBD: SATCHEL_BIRTH_TX for rc.satchelhq.testnet]')
+    const rcTx = print({ SATCHEL_CONTRACT: 'rc.satchelhq.testnet', SATCHEL_BIRTH_TX: 'RcBirthTx', SATCHEL_BIRTH_BLOCK: '276000001' })
+    expect(rcTx).toContain('oldest tx = RcBirthTx block 276000001')
+    expect(rcTx).toContain('receiver = rc.satchelhq.testnet')
+    expect(print({ SATCHEL_CONTRACT: 'dev2.satchelhq.testnet' })).toMatch(/lock checks skip/)
+  })
   it('monitor --offline lists the checks without network', () => {
     const out = execFileSync('bash', [join(TOOLS, 'monitor.sh'), '--offline'], { encoding: 'utf8' })
     expect(out).toContain('nothing was fetched')

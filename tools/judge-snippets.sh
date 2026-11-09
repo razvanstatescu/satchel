@@ -12,7 +12,8 @@
 # A check SKIPs (never FAILs) when what it reads does not exist yet: the final contract before its birth, a [TBD]
 # value. Overrides (env vars):
 #   SATCHEL_CONTRACT             contract to check (default satchel.satchelhq.testnet; the dev contract is
-#                                dev2.satchelhq.testnet). Lock checks run on the final contract only.
+#                                dev2.satchelhq.testnet). Lock checks run on the keyless births only (final, rc);
+#                                on rc the birth checks need SATCHEL_BIRTH_TX / SATCHEL_BIRTH_BLOCK (the defaults are the final's).
 #   SATCHEL_TOKEN  SATCHEL_OWNER token id (default 1) and its expected owner (default alice.satchelhq.testnet)
 #   SATCHEL_EXPECTED_CODE_HASH   expected wasm SHA-256 (H)       SATCHEL_BIRTH_TX   the birth transaction hash
 #   SATCHEL_BIRTH_BLOCK          the birth transaction's block height (block A)
@@ -45,7 +46,15 @@ else
 fi
 MPC="v1.signer-prod.testnet"
 # Only the final contract is locked; a development contract keeps its key (D-48), so the lock checks skip there.
-if [[ "$C" == "$FINAL" ]]; then LOCK=ok; else LOCK="[TBD: lock checks apply to $FINAL only; $C keeps its key]"; fi
+RC="rc.${TEAM}.testnet"
+# The keyless births (final, and its rc rehearsal) have no key; a development contract keeps its key (D-48), so the
+# lock checks skip there.
+if [[ "$C" == "$FINAL" || "$C" == "$RC" ]]; then LOCK=ok; else LOCK="[TBD: lock checks apply to $FINAL and $RC only; $C keeps its key]"; fi
+# The default birth tx and block A are the final's: another contract's birth checks need their own values.
+if [[ "$C" != "$FINAL" ]]; then
+  [[ -n "${SATCHEL_BIRTH_TX:-}" ]] || BIRTH_TX="[TBD: SATCHEL_BIRTH_TX for $C]"
+  [[ -n "${SATCHEL_BIRTH_BLOCK:-}" ]] || BLOCK_A="[TBD: SATCHEL_BIRTH_BLOCK for $C]"
+fi
 ACCT=ok
 
 MODE=live
@@ -117,7 +126,7 @@ except Exception: pass' "$C" 2>/dev/null)
   fi
 fi
 
-echo "Satchel judge snippets · mode $MODE · contract $C · token $T"
+echo "Satchel judge snippets · mode $MODE · contract $C · token $T · lock checks $(tbd "$LOCK" && echo skip || echo on)"
 echo "RPC $RPC (fallback $RPC2) · tx API $TXAPI"
 
 ARGS=$(printf '{"token_id":"%s"}' "$T" | base64 | tr -d '\n')
