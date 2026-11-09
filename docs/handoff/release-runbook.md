@@ -291,3 +291,159 @@ has run.
 8. Next: E-03, the production switch, in `apps/web/.env.production` and Vercel:
    `NEXT_PUBLIC_SATCHEL_CONTRACT=satchel.satchelhq.testnet`, `NEXT_PUBLIC_CONTRACT_ROLE=final`,
    `NEXT_PUBLIC_EXPECTED_CODE_HASH=$H`. Then demo staging (E-04).
+
+## (f) Post-birth: fill, production switch, proofs, rehearsal (E-03, E-05, F-01, F-03, F-07)
+
+Starts when (e) 1–7 are done: the birth evidence is committed, `vb` says `ALL PASS`, the tag is pushed. Same
+terminal setup as step 0 (`$H`, `$WASM`, `$FINAL_TX`, `$FINAL_A`). No step here signs anything except (f) 6, the
+proof set, which uses the persona keys (D-48) and never Satchel #4.
+
+**How production deploys.** The Vercel project `satchel` (root `apps/web`) is linked to this repo: **every push to
+`main` builds and promotes a production deploy** of https://usesatchel.xyz, in about a minute. The Vercel env holds
+no `NEXT_PUBLIC_*` variable (only the Upstash KV ones), so the build takes the public settings from the committed
+`apps/web/.env.production`. Pushing that file *is* the switch: never push the `--env` change before the birth is
+verified. Server data is cached 15–60 s, so pages follow the chain within a minute.
+
+1. **Fill: dry run, checked against the chain** (read-only):
+   ```bash
+   pnpm --silent --filter @satchel/tools fill-final --from-evidence --verify --env | tee target/release-logs/fill-dry.txt
+   ```
+   `--from-evidence` reads H, the birth tx and block A from `docs/evidence/birth-satchel.satchelhq.testnet.json`
+   (or pass `--h $H --birth-tx $FINAL_TX --block $FINAL_A`). Expect:
+   - `H        $H`, `birth tx $FINAL_TX`, `block A  $FINAL_A`;
+   - under `-- on-chain (read-only)`, `PASS` on every line: exists, code_hash = H, no access keys, the tx API knows
+     the tx, signer `satchelhq.testnet`, receiver the final, no AddKey, the birth shape (FunctionCall ×8), block = A,
+     the history starts at the birth tx, never signed;
+   - one `-- <file>` block per file with `-`/`+` lines: `README.md`, `docs/verify.md`, `docs/security-model.md`,
+     `AGENTS.md`, `docs/GLOSSARY.md`, `docs/development.md`, `tools/judge-snippets.sh`, `tools/monitor.sh`,
+     `apps/web/.env.production`;
+   - `-- [TBD] left in judge-facing files after this fill: 0`, then `DRY RUN: nothing was written.`
+   A `refusing to fill` error lists each placeholder or note that moved since fill-final was written: fix the
+   matching entry in `EDITS` in `tools/deploy/fill-final.ts` (or the doc), never edit around it by hand.
+
+   The `apps/web/.env.production` block must read exactly (only these lines change):
+   ```
+   -   11: # Until Day 9 the app runs on a dev contract (it keeps its key; D-48). dev2 (2026-10-29) carries every …
+   -   12: # (C1–C7 + the M-01 fix); dev1 is the pre-sprint contract and can't be upgraded in place (the state …
+   -   13: # Day 9: rc.satchelhq.testnet + ROLE=rc. Day 10: satchel.satchelhq.testnet + ROLE=final (launch checklist E-03).
+   -   14: NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet
+   -   15: NEXT_PUBLIC_CONTRACT_ROLE=dev
+   +       (three comment lines on the release contract)
+   +       NEXT_PUBLIC_SATCHEL_CONTRACT=satchel.satchelhq.testnet
+   +       NEXT_PUBLIC_CONTRACT_ROLE=final
+   -   19–22: the dev2 code-hash comment
+   -   23: NEXT_PUBLIC_EXPECTED_CODE_HASH=3a73b492d4142db92e9fd733447df63499d0a74563b2091ac870f7ac8a2f2361
+   +       (two comment lines on H)
+   +       NEXT_PUBLIC_EXPECTED_CODE_HASH=<H>
+   ```
+   `NEXT_PUBLIC_DATA_MODE=live`, `NEXT_PUBLIC_NETWORK=testnet`, the MPC and USDC ids, `NEXT_PUBLIC_APP_URL=https://usesatchel.xyz`
+   (it must stay equal to the contract's `base_uri` host), the SOL flags and the empty endpoint lists are unchanged, and
+   `FASTNEAR_API_KEY=` stays empty. Nothing else is required: the app has no other hardcoded hash or birth value
+   (it reads the birth tx and block from the chain).
+2. **Optional, before the push: stage #4 (E-04).** `/learn`-style pages and the buy guide call [Satchel #4](/s/4/sale)
+   "the demo built to fail" (one unbroadcast record, Buy off). Until #4 has that record and is listed, that sentence
+   is not true on the final. Stage #4 first (its `evm.ts --sign-only` record, the 250-block quiet period, `list`) to
+   avoid the window, or accept a window that lasts until staging. Everything else renders correctly on unstaged,
+   unfunded Satchels: zero balances, no records, an empty market.
+3. **Apply, re-render, test, push (= the production deploy).** Check first that no heavy run is going:
+   `ps aux | grep -E "vitest|playwright|next (build|start)|cargo (test|near)" | grep -v grep` prints nothing.
+   ```bash
+   pnpm --silent --filter @satchel/tools fill-final --from-evidence --verify --env --write | tee target/release-logs/fill.txt
+   pnpm --filter @satchel/tools e2e:proofs --render     # dev2's proof page drops its app links: the app reads the final now
+   pnpm --filter @satchel/tools test 2>&1 | grep -E "Test Files|Tests "
+   NEXT_PUBLIC_CONTRACT_ROLE=final NEXT_PUBLIC_SATCHEL_CONTRACT=satchel.satchelhq.testnet NEXT_PUBLIC_EXPECTED_CODE_HASH=$H \
+     pnpm --filter web test 2>&1 | grep -E "Test Files|Tests "
+   bash tools/judge-snippets.sh --print | grep -c '\[TBD: \(H\|birth\|block\|reproducible\)'    # expect 0
+   git add README.md AGENTS.md docs/verify.md docs/security-model.md docs/GLOSSARY.md docs/development.md \
+     tools/judge-snippets.sh tools/monitor.sh apps/web/.env.production docs/evidence/README.md
+   git commit -m "Final contract: fill H, the birth tx and block A; production reads satchel.satchelhq.testnet (E-03)" \
+     -- README.md AGENTS.md docs/verify.md docs/security-model.md docs/GLOSSARY.md docs/development.md \
+     tools/judge-snippets.sh tools/monitor.sh apps/web/.env.production docs/evidence/README.md
+   git pull --rebase --autostash && git push
+   ```
+   Expect `wrote 9 files`, both suites with every file passing (the fill-final tests on the real files skip once the
+   placeholders are gone), and `0`.
+4. **Watch the deploy, then check the live switch:**
+   ```bash
+   vercel ls satchel 2>/dev/null | sed -n '1,6p'          # newest row: Production, ● Ready (optional; needs the CLI login)
+   until curl -s https://usesatchel.xyz/api/contract | grep -q '"account_id":"satchel.satchelhq.testnet"'; do sleep 15; done
+   curl -s https://usesatchel.xyz/api/contract | python3 -c 'import json,sys;d=json.load(sys.stdin);print({k:d[k] for k in ("account_id","role","data_mode","locked","access_keys","code_matches","any_signer_tx_count","birth_tx","birth_block")});print("AddKey in birth:",any("AddKey" in a for a in d["birth_actions"]))'
+   curl -s https://usesatchel.xyz/api/satchels/1 | python3 -c 'import json,sys;s=json.load(sys.stdin);print(s["contract"],s["owner"],s["addresses"]["btc"])'
+   curl -s https://usesatchel.xyz/contract | grep -o 'Keyless since birth' | head -1
+   ```
+   Expect `'account_id': 'satchel.satchelhq.testnet', 'role': 'final', 'data_mode': 'live', 'locked': True,
+   'access_keys': 0, 'code_matches': True, 'any_signer_tx_count': 0, 'birth_tx': '<FINAL_TX>', 'birth_block': <FINAL_A>`,
+   `AddKey in birth: False`, then `satchel.satchelhq.testnet alice.satchelhq.testnet tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`
+   and `Keyless since birth`. If the deploy fails or shows wrong facts: **[Razvan]** Vercel → Deployments → the
+   previous one → Instant Rollback, then `git revert` the commit and push.
+5. **Judge snippets against the final, no overrides** (the defaults are the final's values now):
+   ```bash
+   SATCHEL_WASM="$WASM" bash tools/judge-snippets.sh | tee target/release-logs/final-snippets.txt | grep -E '^\[S|PASS|FAIL|SKIP|INFO|summary'
+   bash tools/monitor.sh --quick
+   ```
+   Expect the header `contract satchel.satchelhq.testnet · token 1 · lock checks on`; S1–S10 and S13 `PASS` (S3
+   needs the near CLI; S13 `PASS   local wasm == H` needs `$WASM`, the CI artifact); S11 and S12 `INFO`; and
+   `summary: <n> pass · 0 fail · 0 skip · 2 info`. S1 expects alice as #1's owner and S9 reads #1's live state, so run
+   it again after demo staging. The monitor ends with no `FAIL`.
+6. **Regenerate the live proofs on the final (E-05).** Run it when no demo-staging send from Satchel #1 is in flight:
+   the proofs' chain sends come from #1 and share its EVM nonce. #1 needs Sepolia ETH for two sends plus gas, 1 USDC on
+   Sepolia, two confirmed testnet4 coins of at least 50,000 sats in all, and some devnet SOL; alice, bob and carol
+   need NEAR. The run waits out two 250-block quiet periods and the MPC retries, so give it time.
+   ```bash
+   pnpm --filter @satchel/tools e2e:proofs --contract satchel.satchelhq.testnet > target/release-logs/proofs-dry.txt 2>&1; echo "exit $?"
+   grep -E '\(role final\)|^    history|predicted' target/release-logs/proofs-dry.txt
+   grep -oE 'MPC path  satchel/[0-9]+/[a-z]+' target/release-logs/proofs-dry.txt | sort | uniq -c
+   grep -c 'satchel/4/' target/release-logs/proofs-dry.txt
+   pnpm --filter @satchel/tools e2e:proofs --contract satchel.satchelhq.testnet --send --yes 2>&1 | tee target/release-logs/proofs.txt
+   ```
+   Dry run: `exit 0`; `(role final)`; `history   with --send, the current set (dev2.satchelhq.testnet) is first kept as
+   …/docs/evidence/history/dev2.satchelhq.testnet.json`; the fresh Satchels predicted from the contract's
+   `next_token_id` (#8, #9, #10 when nothing else was minted: sale, btc, inside); MPC paths only `satchel/1/…` (the
+   chain sends) and the fresh ids; `0` for `satchel/4/`. The tool refuses #4, the staged #2/#3/#5 as `--chain-token`
+   and #1–#7 as `--tokens` roles. Send: one `proof <id> → <hash>` line per step and finally `wrote …/proofs.json: <n>
+   proofs; skipped buy-usdc` (unless carol holds Circle testnet USDC on NEAR: **[Razvan]** optional, faucet.circle.com).
+   If it stops on a testnet hiccup, resume with the ids it printed: `… --send --yes --merge --tokens
+   sale=<id>,inside=<id>,btc=<id> --only <the ids not written yet>`.
+   Then verify and commit:
+   ```bash
+   tools/proofs.sh | tail -3                                                            # every proof PASS, exit 0
+   SATCHEL_PROOFS=docs/evidence/history/dev2.satchelhq.testnet.json tools/proofs.sh | tail -1   # the archived set still verifies
+   grep -n 'dev2' docs/evidence/README.md                                               # only the history line
+   pnpm --filter @satchel/tools exec vitest run test/proofs.test.ts 2>&1 | grep -E "Tests "
+   git add docs/evidence/proofs.json docs/evidence/README.md docs/evidence/history/dev2.satchelhq.testnet.json
+   git commit -m "Live proofs regenerated on the final contract; the dev2 set kept as history" \
+     -- docs/evidence/proofs.json docs/evidence/README.md docs/evidence/history/dev2.satchelhq.testnet.json
+   git pull --rebase --autostash && git push
+   ```
+   The evidence page then says the proofs were made on the release contract, links the still-listed fresh Satchels in
+   the app, and lists the dev2 set under history.
+7. **No `[TBD]` left (F-01):**
+   ```bash
+   git grep -nI "TBD" -- . ':!research' ':!plan' ':!marketing' ':!kb' ':!docs/handoff' ':!docs/design' ':!tools/test' \
+     ':!tools/judge-snippets.sh' ':!tools/monitor.sh' ':!tools/deploy/fill-final.ts' ':!*.png' ':!*.mp3'
+   grep -n ':-\[TBD: \(birth\|block\|reproducible\)' tools/judge-snippets.sh tools/monitor.sh
+   grep -c "TBD" README.md
+   git grep -nI -e "until the final contract is" -e "is born keyless on" -e "Until then the README" -- README.md AGENTS.md 'docs/*.md'
+   ```
+   Expect no output, no output, `0`, no output. The `[TBD: …]` strings still in the two scripts are their skip
+   mechanism (an unset override, a development contract's lock), not placeholders.
+8. **Fresh-clone rehearsal as a screening agent (F-07, Q-017).** Heavy: one step at a time, with the `ps` check
+   before each suite. Follow only the README and `docs/development.md`, in a throwaway clone:
+   ```bash
+   D=$(mktemp -d)/satchel && git clone "$(git remote get-url origin)" "$D" && cd "$D"
+   git log --oneline -1                                     # the commit you just pushed
+   pnpm install --frozen-lockfile
+   bash tools/judge-snippets.sh --print > /dev/null && echo print-ok
+   tools/proofs.sh --self-test | tail -1
+   cargo test -p satchel --lib 2>&1 | grep "test result"
+   pnpm --filter @satchel/core test 2>&1 | grep -E "Tests "
+   pnpm --filter @satchel/tools test 2>&1 | grep -E "Tests "
+   pnpm --filter web test 2>&1 | grep -E "Tests "
+   bash tools/judge-snippets.sh | grep summary
+   tools/proofs.sh | tail -1
+   cd - && rm -rf "$(dirname "$D")"
+   ```
+   Expect the commit, `print-ok`, `self-test: all pass`, `test result: ok`, every suite passing, the same snippets
+   summary as step 5 and every proof PASS. Then run the README's "Try it" table by hand (curl `/api/satchels/1`,
+   `/api/clean-history/1`, open `/contract`) and the [verify.md](../verify.md) steps 1–5 and 7: each output must match
+   the text, with the filled values. Fix anything that does not reproduce in the docs, not in the clone.
