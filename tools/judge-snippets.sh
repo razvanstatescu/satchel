@@ -56,18 +56,19 @@ case "${1:-}" in
 esac
 
 cd "$(dirname "$0")/.." || exit 2
-PASS=0; FAIL=0; SKIP=0
+PASS=0; FAIL=0; SKIP=0; INFO=0
 tbd() { [[ "$1" == "[TBD:"* ]]; }
 
 # snippet ID TITLE COMMAND EXPECT [NEEDS...]
 #   COMMAND is printed exactly as a judge would paste it, then run with bash -c.
 #   EXPECT is literal text; every line must appear in the output (the word ANY matches anything).
+#   EXPECT = INFO: the output is a live value to read (a balance), not a claim; it counts as INFO, never as PASS.
 snippet() {
   local id="$1" title="$2" cmd="$3" expect="$4"; shift 4
   echo
   echo "[$id] $title"
   printf '  $ %s\n' "$cmd"
-  echo "$expect" | sed '1s/^/  expect: /;2,$s/^/          /'
+  if [[ "$expect" == INFO ]]; then echo "  expect: a live value to read (informational)"; else echo "$expect" | sed '1s/^/  expect: /;2,$s/^/          /'; fi
   [[ "$MODE" == live ]] || return 0
   for need in "$@"; do
     if tbd "$need"; then echo "  SKIP   ($need)"; SKIP=$((SKIP + 1)); return 0; fi
@@ -75,6 +76,7 @@ snippet() {
   local out
   out="$(bash -c "$cmd" 2>&1)"
   echo "$out" | sed 's/^/  got:   /' | head -12
+  if [[ "$expect" == INFO ]]; then echo "  INFO   (a live value to compare with the app, not a pass/fail claim)"; INFO=$((INFO + 1)); return 0; fi
   local ok=1
   while IFS= read -r want; do
     [[ -z "$want" ]] && continue
@@ -187,14 +189,14 @@ btc = $BTC_ADDR" "$ACCT" "$APP" "$BTC_ADDR"
 
 snippet S11 "Bitcoin testnet4 balance of Satchel #$T's address (mempool.space API)" \
 "curl -s https://mempool.space/testnet4/api/address/$BTC_ADDR | python3 -c 'import sys,json; s=json.load(sys.stdin)[\"chain_stats\"]; print(\"confirmed sats =\", s[\"funded_txo_sum\"]-s[\"spent_txo_sum\"])'" \
-"confirmed sats = " "$BTC_ADDR"
+"INFO" "$ACCT" "$BTC_ADDR"
 
 snippet S12 "Sepolia ETH balance of Satchel #$T's address (public JSON-RPC)" \
 "curl -s https://ethereum-sepolia-rpc.publicnode.com -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"eth_getBalance\",\"params\":[\"$EVM_ADDR\",\"latest\"]}' | python3 -c 'import sys,json; print(\"wei =\", int(json.load(sys.stdin)[\"result\"],16))'" \
-"wei = " "$EVM_ADDR"
+"INFO" "$ACCT" "$EVM_ADDR"
 
 echo
-echo "[S13] Rebuild the contract and compare the hash (needs Rust 1.93 + cargo-near 0.22.0 + Docker)"
+echo "[S13] Rebuild the contract and compare the hash (needs Docker and cargo-near 0.22.0; the build image pins Rust 1.99.1 in contracts/satchel/Cargo.toml)"
 echo "    \$ git checkout contract-v1.0.0 && cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml"
 echo "    \$ sha256sum $WASM          # Linux"
 echo "    \$ shasum -a 256 $WASM      # macOS"
@@ -219,7 +221,7 @@ echo "    \$ cargo test -p satchel-tests                    # sandbox suite, Lin
 
 echo
 if [[ "$MODE" == live ]]; then
-  echo "summary: $PASS pass · $FAIL fail · $SKIP skip ([TBD] values are skipped until they exist)"
+  echo "summary: $PASS pass · $FAIL fail · $SKIP skip · $INFO info ([TBD] values are skipped until they exist)"
   [[ $FAIL == 0 ]] || exit 1
 else
   echo "summary: printed (mode $MODE); run without flags for the live read-only checks"

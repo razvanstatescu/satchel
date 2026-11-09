@@ -47,7 +47,8 @@ coins, and no NFT-wallet design we know of provides it.
 |---|---|
 | Open https://usesatchel.xyz/s/1 | The owner, the three addresses (BTC `tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5`, ETH `0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad`, SOL `AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd` on the final contract), live balances and the signature count. Server-rendered, so it reads the same with JavaScript off |
 | `curl -s https://usesatchel.xyz/api/satchels/1` | The same facts as JSON: `owner`, `addresses`, `balances`, `sig_count`, `listing`, `status` |
-| Open https://usesatchel.xyz/market | Each listing with its clean-history verdict. Demo Satchel #4 is blocked on purpose ([why](docs/security-model.md#demo-token-4-is-blocked-on-purpose)) |
+| `curl -s https://usesatchel.xyz/api/clean-history/1` | The clean-history check for Satchel #1 as JSON, computed by the server from live chain data: each signature record, what it names (nonce, coin or blockhash), whether it can still move coins, and the overall verdict. Labelled a hint: only the buyer's browser can turn Buy on |
+| Open https://usesatchel.xyz/market | Each listing with its clean-history verdict. On the final contract, demo Satchel #4 is blocked on purpose ([why](docs/security-model.md#demo-token-4-is-blocked-on-purpose)) |
 | Open https://usesatchel.xyz/contract | The lock facts: no access keys, the birth transaction `[TBD]`, the code hash `[TBD: H]` and the MPC version |
 | With a testnet wallet (Meteor or Intear), open `/mint` | A new Satchel with three fresh addresses. Fund one from a faucet, then use Send |
 
@@ -134,8 +135,8 @@ inside a Satchel, the buyer's payment, offers and claim links: [docs/security/se
 |---|---|
 | `open` · **CHAIN ABSTRACTION** | NEAR Chain Signatures signs native Bitcoin, Ethereum (Sepolia, Base, Arbitrum, OP) and Solana transactions for each token, from one NEAR contract |
 | `nfts` · **NEP-171** | The wallet is an ordinary NEP-171 token (plus NEP-177, NEP-181, NEP-297 events). Transferring it hands over the coins |
-| `nfts` · **DYNAMIC NFTS** | The token's image is drawn from contract state: its status and how many signatures it has issued |
-| `nfts` · **SUB-ACCOUNTS** | The contract is the sub-account `satchel.satchelhq.testnet`, born in one transaction with no access key, so its code can never change |
+| `nfts` · **DYNAMIC NFTS** | The token's image is drawn from contract state: its status and how many signatures it has issued. The contract's `base_uri` points at the app, which renders the card from that state (`/api/card/{id}.svg`) |
+| `nfts` · **SUB-ACCOUNTS** | The contract is the sub-account `satchel.satchelhq.testnet`, born in one transaction with no access key, so its code can never change. The tokens are not sub-accounts: each one's addresses are derived under that one account |
 | `open` · **EXPERIMENTAL** | Clean history: records written before signing, a freeze while listed, a buy bound to the checked history |
 | also | NEP-141 for USDC and wNEAR payments and deposits; NEP-330 source metadata; FastNEAR RPC and transactions API; near-connect wallets |
 
@@ -166,7 +167,7 @@ tools/judge-snippets.sh --print    # lists the commands without running them
 
 It checks who owns Satchel #1, that the contract has no access keys and runs this repository's code (reproducible
 build), that its birth transaction had no AddKey, that it has never signed a transaction itself, its constants and
-the MPC it depends on, and the balances of #1's addresses. Each command with its expected output:
+the MPC it depends on, and it prints the balances of #1's addresses to compare with the app. Each command with its expected output:
 [docs/verify.md](docs/verify.md).
 
 ## Run it locally

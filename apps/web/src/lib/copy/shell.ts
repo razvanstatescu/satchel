@@ -192,6 +192,13 @@ export const shell = {
       oldest: "Its oldest transaction is the birth",
       birth: "The birth: created, deployed, initialized and minted, with no AddKey",
       build: "Rebuild the code and compare its hash",
+      /** The same commands on a development contract, which has keys: labels that describe, never claim. */
+      dev: {
+        summary: "The account's access keys",
+        signer: "Transactions the account signed itself",
+        oldest: "Its oldest transaction",
+        birth: "The transaction that created it",
+      },
       copy: "Copy command",
       copied: "Command copied",
     },

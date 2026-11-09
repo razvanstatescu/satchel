@@ -29,8 +29,8 @@ export const metadata: Metadata = pageMetadata({
 
 const F = copy.contract.facts;
 
-function commands(account: string, birthTx: string | null): { what: string; cmd: string }[] {
-  const c = copy.contract.cmd;
+function commands(account: string, birthTx: string | null, strict: boolean): { what: string; cmd: string }[] {
+  const c = strict ? copy.contract.cmd : { ...copy.contract.cmd, ...copy.contract.cmd.dev };
   return [
     { what: c.summary, cmd: `near account view-account-summary ${account} network-config testnet-fastnear now` },
     {
@@ -180,7 +180,7 @@ export default async function ContractPage() {
           {copy.contract.verifyTitle}
         </h2>
         <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-          {commands(f.account_id, f.birth_tx).map((c) => (
+          {commands(f.account_id, f.birth_tx, strict).map((c) => (
             <li key={c.cmd} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-2 rounded-md border border-line bg-surface py-3 pr-3 pl-4">
               <p className="col-span-full m-0 font-sans text-body-sm font-semibold text-ink-muted">{c.what}</p>
               <code className="pt-3 font-mono text-[0.8125rem] leading-5 font-[450] wrap-anywhere text-ink">{c.cmd}</code>
