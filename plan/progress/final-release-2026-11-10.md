@@ -63,7 +63,7 @@ in `docs/evidence/history/` and still verifies (8e3c188). No MPC timeouts.
 
 ## Left
 
-- F-07 fresh-clone rehearsal (running as a separate screening pass).
+- F-07 fresh-clone rehearsal: done; three findings fixed (S13 skip count, #4 wording, development.md notes).
 - CI on the pushed commits: confirm green on GitHub (no `gh` CLI on this machine).
 - `FASTNEAR_API_KEY` in Vercel or the `.env.production` comment; the `security` track (H-02, by Nov 12); re-shoot
   `docs/assets/readme/activity.png` (it shows dev2); repo public on Day 13 (needs a yes); submission (needs a yes).
