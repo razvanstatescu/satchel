@@ -1295,6 +1295,10 @@ unchanged.
 sandboxed wallets, … scam detection") fits Satchel's capped allowances and the clean-history check. Default: keep
 `["nfts","open"]` unless Razvan adds it (H-02, by Nov 12).
 
+**Re-check 2026-11-10 (before the final birth).** One change: Q-000 now says the $10 NEAR Builders credits are claimed
+at nearbuilders.org/dashboard as a separate API key, and the resources table links that dashboard. Nothing for
+Satchel to do. The new copy is the baseline (`snapshots/HACKATHON.raw.md`); the 2026-11-09 copy is kept beside it.
+
 ## D-55 · Satchel #4 on the final contract gets exactly one signature (2026-11-09, Razvan)
 
 **Context.** The standing rule was "never sign anything with Satchel #4 on any contract". The demo state for #4 (D-32,

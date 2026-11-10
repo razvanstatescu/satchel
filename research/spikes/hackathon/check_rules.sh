@@ -12,7 +12,7 @@ curl -sS -L -o "$OUT/HACKATHON.md" https://nearhackathon.com/HACKATHON.md
 curl -sS -L -o "$OUT/index.html" https://nearhackathon.com/
 curl -sS -o "$OUT/count.json" https://nearhackathon.com/api/applications
 
-echo "== HACKATHON.md sha256 (baseline 903794f4...d9aed, 2026-11-09 rules with Q-000..Q-017 and "4. Request changes"; older copies: snapshots/HACKATHON.2026-10-29.raw.md, snapshots/HACKATHON.2026-10-21.raw.md)"
+echo "== HACKATHON.md sha256 (baseline 6dd0c1ff...4868d, 2026-11-10 rules: Q-000 credits clarified; older copies: snapshots/HACKATHON.2026-11-09.raw.md, snapshots/HACKATHON.2026-10-29.raw.md, snapshots/HACKATHON.2026-10-21.raw.md)"
 shasum -a 256 "$OUT/HACKATHON.md"
 if diff -u snapshots/HACKATHON.raw.md "$OUT/HACKATHON.md" > "$OUT/HACKATHON.diff"; then
   echo "HACKATHON.md unchanged"
