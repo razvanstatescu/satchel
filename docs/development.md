@@ -37,7 +37,7 @@ Tests, all offline. Every suite must pass in full; what each one covers is in
 | `pnpm --filter @satchel/core test` | The shared TypeScript library: derivation, transaction builders, the TS mirror of the contract's rules, the clean-history checker, and a browser-bundle check |
 | `pnpm --filter @satchel/tools test` | The testnet scripts' dry runs and a check that the shared vectors are up to date |
 | `pnpm --filter web test` / `test:e2e` (fixture mode) | The app's unit tests, and Playwright user journeys with accessibility checks |
-| `tools/check-wasm-imports.sh` | INV-22: the release wasm cannot add a key, deploy code or delete the account |
+| `tools/check-wasm-imports.sh [wasm]` | INV-22: the release wasm cannot add a key, deploy code or delete the account. It reads `target/near/satchel/satchel.wasm` by default, so build first (`cargo near build`) or pass the CI artifact's path |
 
 The end-to-end suite builds the app in fixture mode and starts it on port 3340. If that port is taken, pick another
 with `E2E_PORT`. `CI=1` makes Playwright start a fresh server instead of reusing one already running on that port:
@@ -52,5 +52,5 @@ CI: `.github/workflows/ci.yml` runs the contract build and tests, the web build 
 Testnet scripts (`tools/e2e`, `tools/deploy`) default to a **dry run** that prints exactly what would be signed.
 They sign only with `--send` and a typed `yes`, using keys from `~/.near-credentials` (never from the repo).
 
-The images in this file are rendered by `apps/web/scripts/readme-assets.mjs` from the app and the brand files; see
+The README's images are rendered by `apps/web/scripts/readme-assets.mjs` from the app and the brand files; see
 [`docs/assets/readme/`](assets/readme/README.md).

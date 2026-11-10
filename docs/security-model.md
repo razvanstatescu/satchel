@@ -62,7 +62,9 @@ It also checked that the Ethereum address has no delegated code and that the Sol
 
 Satchel #4's only record is an Ethereum transaction signed with nonce = current + 1 and never broadcast. It cannot be
 mined while the current nonce is unused, and only the Satchel's own key (through `sign_for` by the owner) could use
-that nonce. The record therefore stays "unused" forever, and #4's listing always shows "Blocked: 1 unused signature".
+that nonce. The record therefore stays "unused" forever. Once the buyer's browser has run its check, #4's listing
+shows "Blocked: 1 unused signature"; the server's hint in the page HTML says "needs attention", and
+`/api/clean-history/4` reports `"aggregate": "blocked"`.
 This is the negative case of the clean-history check. Nobody will ever send from #4.
 
 ## Limitations

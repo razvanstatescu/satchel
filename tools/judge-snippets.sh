@@ -226,7 +226,7 @@ if [[ "$MODE" != print ]]; then
     if tbd "$H"; then echo "  INFO   H is not published yet; a host (non-reproducible) build will differ from H anyway"
     elif [[ "${a:-$b}" == "$H" ]]; then echo "  PASS   local wasm == H"; PASS=$((PASS + 1))
     else echo "  INFO   local wasm != H (expected unless this is the reproducible artifact at tag contract-v1.0.0)"; fi
-  else echo "  SKIP   $WASM not built"; fi
+  else echo "  SKIP   $WASM not built"; SKIP=$((SKIP + 1)); fi
 fi
 
 echo
