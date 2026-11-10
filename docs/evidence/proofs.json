@@ -1,44 +1,34 @@
 {
   "schema": "satchel-proofs/1",
   "network": "testnet",
-  "contract": "dev2.satchelhq.testnet",
-  "contract_role": "dev",
-  "note": "Made on the development contract dev2.satchelhq.testnet, which the hosted app reads until the final keyless contract is born; some proofs are earlier transactions on the same contract (adopted with --use).",
-  "generated_at": "2026-11-09",
+  "contract": "satchel.satchelhq.testnet",
+  "contract_role": "final",
+  "note": "Made on satchel.satchelhq.testnet with tools/e2e/proofs.ts.",
+  "generated_at": "2026-11-10",
   "app_clean_history": [
-    "https://usesatchel.xyz/api/clean-history/6",
-    "https://usesatchel.xyz/api/clean-history/5"
+    "https://usesatchel.xyz/api/clean-history/10",
+    "https://usesatchel.xyz/api/clean-history/8"
   ],
   "satchels": {
     "1": {
-      "evm": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
-      "btc": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq",
-      "sol": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo"
+      "evm": "0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad",
+      "btc": "tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5",
+      "sol": "AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd"
     },
-    "2": {
-      "evm": "0x1b2E04d7bB8fB00C92F7923b717CAc398eAFf3d3",
-      "btc": "tb1q0dzshdwp8wqqfm5x7kqsxfh60x43qeuxceaa5e",
-      "sol": "7RbAqKKncnLcaNkiuFsfUSu8Jo7wGwvFz4DyjZ7fQaqq"
+    "8": {
+      "evm": "0x986fa4b9c95bfCA3BAD7aB82A03075c49872DBE9",
+      "btc": "tb1qfzadtfgjfyg55ksd03xgyarwpw22gflnwh9742",
+      "sol": "EmPUSWm76CvvQZVGajaDUvvGqSXiFgEudGmKd5AYum52"
     },
-    "3": {
-      "evm": "0x7aC729086AE74Ec0Dc28eEc31B34403ffD99f1e7",
-      "btc": "tb1q9v9t4ay7ssgry9l7s9yf7hs6s39uhxtd8f6gs3",
-      "sol": "Da8HNPy47aiQhoKLUvptvXF5WXmmuhJsfjxa63zViRhh"
+    "9": {
+      "evm": "0x14F77107A91EFE1483531449C86b9AedE52819A5",
+      "btc": "tb1qu33l9thuyc2wnnh4l40x496u5tmnptxrvpqppd",
+      "sol": "6ayCLA5fCYte3tYWDFPkxiuMun6tfE3TbjfKR8vpVWks"
     },
-    "5": {
-      "evm": "0x4B576529669814D73b8F9C0f7Dd817902bFd0eaA",
-      "btc": "tb1qp5zc6c7hs2kqugh8nvxrdljzcnfhmh3ww66x9q",
-      "sol": "2k2iJjVLdrcMfNrR4XPgorwiRoheNwAYtQwGpr4s8UER"
-    },
-    "6": {
-      "evm": "0x128CC622F64CA273CCDBE13A8896d931F4ee3167",
-      "btc": "tb1qnrzftj807wlesq3p0f3t96jy95d3z6mjt9807j",
-      "sol": "CH1vkCrJwkweMzQnza4GdnVKWV1Z1DA4ALkero2pX61R"
-    },
-    "7": {
-      "evm": "0x386880354642a5B2DEDb9Fc4c63d966A506937D4",
-      "btc": "tb1qfsg3n2vjvlaezwars8rzzwn37ngzwzkjhlusew",
-      "sol": "8pKhNYEP3LzMCRYoBY7nE6CaCYkRLGjp6bEqWjCoodw7"
+    "10": {
+      "evm": "0xEB80Ad11460Ec20b00Bb5Dd13070BDDf5c54766d",
+      "btc": "tb1qh250kq8qfyglxz8dd8mhgy80v4xd9j55saarp0",
+      "sol": "BqLvW9EyS7sSeJ7p9Mp9GjCorgSWtWFctHhzcuVmwvuK"
     }
   },
   "proofs": [
@@ -47,16 +37,16 @@
       "group": "Own",
       "action": "Mint a Satchel",
       "shows": "A new Satchel is minted to its first owner. Its three addresses exist from this moment.",
-      "token_id": "5",
-      "tx": "3r5zp3ucdPAmizKQmULoG53fdL1Ybj7n5Xo8LLjHnDht",
+      "token_id": "8",
+      "tx": "7p1STZxYENMmT9w9YqesXkkvbuCBHPULLCBJAkc8ApQe",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "nft_mint",
       "args": {
         "receiver_id": "alice.satchelhq.testnet"
       },
-      "block_height": 276906744,
-      "date": "2026-11-09",
+      "block_height": 277054926,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -66,29 +56,29 @@
           "data": {
             "owner_id": "alice.satchelhq.testnet",
             "token_ids": [
-              "5"
+              "8"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/3r5zp3ucdPAmizKQmULoG53fdL1Ybj7n5Xo8LLjHnDht"
+      "explorer": "https://testnet.nearblocks.io/txns/7p1STZxYENMmT9w9YqesXkkvbuCBHPULLCBJAkc8ApQe"
     },
     {
       "id": "gift",
       "group": "Own",
       "action": "Give a Satchel (nft_transfer)",
       "shows": "The owner gives the Satchel away. Control of every coin inside moves with the NFT in one NEAR transaction.",
-      "token_id": "5",
-      "tx": "9qWypQu2SWdeEUsD5kaZSVdUmRTPu3t7bL8NcJMHFCAi",
+      "token_id": "8",
+      "tx": "5BVUhwqRNskkRbkMoZfpY31SAgWqWm9md8FbRP7HP92",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "nft_transfer",
       "args": {
-        "token_id": "5",
+        "token_id": "8",
         "receiver_id": "bob.satchelhq.testnet"
       },
-      "block_height": 276906757,
-      "date": "2026-11-09",
+      "block_height": 277054934,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -99,28 +89,28 @@
             "old_owner_id": "alice.satchelhq.testnet",
             "new_owner_id": "bob.satchelhq.testnet",
             "token_ids": [
-              "5"
+              "8"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/9qWypQu2SWdeEUsD5kaZSVdUmRTPu3t7bL8NcJMHFCAi"
+      "explorer": "https://testnet.nearblocks.io/txns/5BVUhwqRNskkRbkMoZfpY31SAgWqWm9md8FbRP7HP92"
     },
     {
       "id": "sign-not-owner",
       "group": "Refusals",
       "action": "A stranger asks the Satchel to sign",
       "shows": "Someone who does not own the Satchel calls sign_for. The contract refuses before anything is recorded or sent to the MPC.",
-      "token_id": "5",
-      "tx": "BH241i4ApmzpNfyDAfqyW4ukrriiXvSDfZQtrbM6hrRw",
+      "token_id": "8",
+      "tx": "4V8T8nrww2RewKpZWtY5RGaCH9NWkuQ9ajqGPwzpb5Va",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276906763,
-      "date": "2026-11-09",
+      "block_height": 277054940,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_NOT_OWNER"
@@ -128,23 +118,23 @@
       "absent_events": [
         "satchel:sign_requested"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/BH241i4ApmzpNfyDAfqyW4ukrriiXvSDfZQtrbM6hrRw"
+      "explorer": "https://testnet.nearblocks.io/txns/4V8T8nrww2RewKpZWtY5RGaCH9NWkuQ9ajqGPwzpb5Va"
     },
     {
       "id": "evm-message",
       "group": "Sign",
       "action": "Sign an EIP-191 message",
       "shows": "The owner signs a plain-text message with the Satchel's EVM key. The signature recovers to the Satchel's EVM address.",
-      "token_id": "5",
-      "tx": "3hQpbf5AH5KwKT3Acg9DfVF9wv5RZBjQJedtzfY4659C",
+      "token_id": "8",
+      "tx": "CFjQRDRi3zZJ2DqR97HReJmk3uSUbt6oJBaeUkaQFpDq",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276906770,
-      "date": "2026-11-09",
+      "block_height": 277054953,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -152,10 +142,10 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "owner_id": "bob.satchelhq.testnet",
             "chain": "evm",
-            "path": "satchel/5/evm",
+            "path": "satchel/8/evm",
             "first_seq": 0,
             "count": 1
           }
@@ -163,7 +153,7 @@
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "first_seq": 0,
             "statuses": [
               "signed"
@@ -171,13 +161,13 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/3hQpbf5AH5KwKT3Acg9DfVF9wv5RZBjQJedtzfY4659C",
+      "explorer": "https://testnet.nearblocks.io/txns/CFjQRDRi3zZJ2DqR97HReJmk3uSUbt6oJBaeUkaQFpDq",
       "signature": {
         "chain": "evm",
         "kind": "evm_message",
-        "path": "satchel/5/evm",
-        "address": "0x4B576529669814D73b8F9C0f7Dd817902bFd0eaA",
-        "message_text": "Satchel proof on dev2.satchelhq.testnet: #5 EIP-191 message"
+        "path": "satchel/8/evm",
+        "address": "0x986fa4b9c95bfCA3BAD7aB82A03075c49872DBE9",
+        "message_text": "Satchel proof on satchel.satchelhq.testnet: #8 EIP-191 message"
       }
     },
     {
@@ -185,16 +175,16 @@
       "group": "Sign",
       "action": "Sign a Solana off-chain message",
       "shows": "The owner signs a Solana off-chain message. The ed25519 signature verifies against the Satchel's SOL address.",
-      "token_id": "5",
-      "tx": "3soHtnKu9C469yRLAJngnheaEL57mTQMBoi6yh9hHDDS",
+      "token_id": "8",
+      "tx": "6GoXnkE3GLkRZ3TWzC3feUpJDrSA25Uhn9nUT2rFt31Y",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276906791,
-      "date": "2026-11-09",
+      "block_height": 277054974,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -202,10 +192,10 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "owner_id": "bob.satchelhq.testnet",
             "chain": "sol",
-            "path": "satchel/5/sol",
+            "path": "satchel/8/sol",
             "first_seq": 1,
             "count": 1
           }
@@ -213,7 +203,7 @@
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "first_seq": 1,
             "statuses": [
               "signed"
@@ -221,13 +211,13 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/3soHtnKu9C469yRLAJngnheaEL57mTQMBoi6yh9hHDDS",
+      "explorer": "https://testnet.nearblocks.io/txns/6GoXnkE3GLkRZ3TWzC3feUpJDrSA25Uhn9nUT2rFt31Y",
       "signature": {
         "chain": "sol",
         "kind": "sol_message",
-        "path": "satchel/5/sol",
-        "address": "2k2iJjVLdrcMfNrR4XPgorwiRoheNwAYtQwGpr4s8UER",
-        "message_text": "Satchel proof on dev2.satchelhq.testnet: #5 Solana message"
+        "path": "satchel/8/sol",
+        "address": "EmPUSWm76CvvQZVGajaDUvvGqSXiFgEudGmKd5AYum52",
+        "message_text": "Satchel proof on satchel.satchelhq.testnet: #8 Solana message"
       }
     },
     {
@@ -235,16 +225,16 @@
       "group": "Refusals",
       "action": "List right after signing (quiet period)",
       "shows": "A Satchel cannot be listed until 250 blocks after its last signature, so nothing can still be in flight when it goes on sale.",
-      "token_id": "5",
-      "tx": "4ES3SQaD58Crpz57Xv4jNLR2X6pEWAx46vgHFkdnyW8H",
+      "token_id": "8",
+      "tx": "5ovwVYFkvoXXfaHqP3EN8d4SqVY4gvwXXAmQsYzVnjVW",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "list",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276906811,
-      "date": "2026-11-09",
+      "block_height": 277054994,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_QUIET_PERIOD"
@@ -252,7 +242,7 @@
       "absent_events": [
         "satchel:listed"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/4ES3SQaD58Crpz57Xv4jNLR2X6pEWAx46vgHFkdnyW8H"
+      "explorer": "https://testnet.nearblocks.io/txns/5ovwVYFkvoXXfaHqP3EN8d4SqVY4gvwXXAmQsYzVnjVW"
     },
     {
       "id": "evm-send",
@@ -260,15 +250,15 @@
       "action": "Send ETH on Sepolia",
       "shows": "The contract parses the unsigned Sepolia transaction, hashes it itself, records it, and the MPC signs it. The same signature is the one on Sepolia.",
       "token_id": "1",
-      "tx": "29vBUCxMP4PeHFkv1ATYh8nv1H5eEbFrL4c8bpucaXaC",
+      "tx": "6QuzggBPP4WXHDUb9PBiKL9v3wzciLkdm9sJ6uKJGVYx",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
         "token_id": "1"
       },
-      "block_height": 276906407,
-      "date": "2026-11-09",
+      "block_height": 277055003,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -280,7 +270,7 @@
             "owner_id": "alice.satchelhq.testnet",
             "chain": "evm",
             "path": "satchel/1/evm",
-            "first_seq": 11,
+            "first_seq": 0,
             "count": 1
           }
         },
@@ -288,27 +278,27 @@
           "event": "satchel:sign_resolved",
           "data": {
             "token_id": "1",
-            "first_seq": 11,
+            "first_seq": 0,
             "statuses": [
               "signed"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/29vBUCxMP4PeHFkv1ATYh8nv1H5eEbFrL4c8bpucaXaC",
+      "explorer": "https://testnet.nearblocks.io/txns/6QuzggBPP4WXHDUb9PBiKL9v3wzciLkdm9sJ6uKJGVYx",
       "signature": {
         "chain": "evm",
         "kind": "evm_tx",
         "path": "satchel/1/evm",
-        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "address": "0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad",
         "chain_id": 11155111
       },
       "external": {
         "chain": "sepolia",
-        "tx": "0x6375c59c7049d14ffe0a910f1ceb6e13679eeceba9298e03306615bfae64382b",
-        "explorer": "https://sepolia.etherscan.io/tx/0x6375c59c7049d14ffe0a910f1ceb6e13679eeceba9298e03306615bfae64382b",
-        "from": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
-        "nonce": 1,
+        "tx": "0x8aec0c0642d43aae7a514ffaf99f0053c30e2af0a39bbd04bb9d083a08dd232b",
+        "explorer": "https://sepolia.etherscan.io/tx/0x8aec0c0642d43aae7a514ffaf99f0053c30e2af0a39bbd04bb9d083a08dd232b",
+        "from": "0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad",
+        "nonce": 0,
         "status": "confirmed"
       }
     },
@@ -318,15 +308,15 @@
       "action": "Send USDC on Sepolia",
       "shows": "An ERC-20 USDC transfer, signed the same way. The record shows the token, the recipient and the amount.",
       "token_id": "1",
-      "tx": "4TJbYWCw9aiU74LbRP4RTH3zuvijbWdCNFXteDmsnY2B",
+      "tx": "2ejpdAhEhDP2NTE5BpAiw3165bh7V23Zun86KX5PSmWG",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
         "token_id": "1"
       },
-      "block_height": 276906431,
-      "date": "2026-11-09",
+      "block_height": 277055042,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -338,7 +328,7 @@
             "owner_id": "alice.satchelhq.testnet",
             "chain": "evm",
             "path": "satchel/1/evm",
-            "first_seq": 12,
+            "first_seq": 1,
             "count": 1
           }
         },
@@ -346,27 +336,27 @@
           "event": "satchel:sign_resolved",
           "data": {
             "token_id": "1",
-            "first_seq": 12,
+            "first_seq": 1,
             "statuses": [
               "signed"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/4TJbYWCw9aiU74LbRP4RTH3zuvijbWdCNFXteDmsnY2B",
+      "explorer": "https://testnet.nearblocks.io/txns/2ejpdAhEhDP2NTE5BpAiw3165bh7V23Zun86KX5PSmWG",
       "signature": {
         "chain": "evm",
         "kind": "evm_tx",
         "path": "satchel/1/evm",
-        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "address": "0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad",
         "chain_id": 11155111
       },
       "external": {
         "chain": "sepolia",
-        "tx": "0x8c6281e3e9ee72a24037e3474d52261c99ce3f28382e400e2ffbf3c58ead3463",
-        "explorer": "https://sepolia.etherscan.io/tx/0x8c6281e3e9ee72a24037e3474d52261c99ce3f28382e400e2ffbf3c58ead3463",
-        "from": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
-        "nonce": 2,
+        "tx": "0xbe3965feb3c9ccbfcbce7fd433fd8dc47305386484f2454bae95fbe1e6d91867",
+        "explorer": "https://sepolia.etherscan.io/tx/0xbe3965feb3c9ccbfcbce7fd433fd8dc47305386484f2454bae95fbe1e6d91867",
+        "from": "0xD0CdbF830B82FaBf6aee04D1a2633A51F6b2d5ad",
+        "nonce": 1,
         "status": "confirmed"
       }
     },
@@ -376,15 +366,15 @@
       "action": "Send BTC on testnet4",
       "shows": "One sign_for carries the BIP 143 preimage. The contract hashes it, and the MPC signature is the one in the Bitcoin transaction's witness.",
       "token_id": "1",
-      "tx": "3zSswR2VmAsoWhp5nfKSG3hLcksKSvjnUi1RnrwRKXVn",
+      "tx": "FQDtZRtGpGZspVrXeFBjWPfkdtx25Q54xayQfabdpviH",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
         "token_id": "1"
       },
-      "block_height": 275424439,
-      "date": "2026-10-30",
+      "block_height": 277055065,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -396,7 +386,7 @@
             "owner_id": "alice.satchelhq.testnet",
             "chain": "btc",
             "path": "satchel/1/btc",
-            "first_seq": 6,
+            "first_seq": 2,
             "count": 1
           }
         },
@@ -404,28 +394,28 @@
           "event": "satchel:sign_resolved",
           "data": {
             "token_id": "1",
-            "first_seq": 6,
+            "first_seq": 2,
             "statuses": [
               "signed"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/3zSswR2VmAsoWhp5nfKSG3hLcksKSvjnUi1RnrwRKXVn",
+      "explorer": "https://testnet.nearblocks.io/txns/FQDtZRtGpGZspVrXeFBjWPfkdtx25Q54xayQfabdpviH",
       "signature": {
         "chain": "btc",
         "kind": "btc_tx",
         "path": "satchel/1/btc",
-        "address": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq"
+        "address": "tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5"
       },
       "external": {
         "chain": "bitcoin-testnet4",
-        "tx": "f4db80ecd509bdd0655e1cc4f89c35b810b055bdd047fe761f650cf3f131908c",
-        "explorer": "https://mempool.space/testnet4/tx/f4db80ecd509bdd0655e1cc4f89c35b810b055bdd047fe761f650cf3f131908c",
-        "from": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq",
-        "status": "confirmed"
+        "tx": "f4e2754b29797360030fcdf4f415b0a9bd1f6a97c37c08716ed3aaeec7b6fbde",
+        "explorer": "https://mempool.space/testnet4/tx/f4e2754b29797360030fcdf4f415b0a9bd1f6a97c37c08716ed3aaeec7b6fbde",
+        "from": "tb1qtf95jlrryxd2kfrs2ug03p4awlwwm2wfrjcwy5",
+        "status": "broadcast"
       },
-      "adopted": true
+      "note": "broadcast; testnet4 blocks can be hours apart, so it was recorded before its first confirmation"
     },
     {
       "id": "sol-send",
@@ -433,15 +423,15 @@
       "action": "Send SOL on devnet",
       "shows": "A Solana System transfer. The ed25519 signature the MPC returns is the Solana transaction id.",
       "token_id": "1",
-      "tx": "7tbBC4TpWPXBjMyMjDr5cbBnAGBN9wRS8A1DVMA2tvyQ",
+      "tx": "8fzc6Gr443TEmtfWUKPLEHPr4fCaS8CPPQSS14zuuuL4",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
         "token_id": "1"
       },
-      "block_height": 276906499,
-      "date": "2026-11-09",
+      "block_height": 277055087,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -453,7 +443,7 @@
             "owner_id": "alice.satchelhq.testnet",
             "chain": "sol",
             "path": "satchel/1/sol",
-            "first_seq": 14,
+            "first_seq": 3,
             "count": 1
           }
         },
@@ -461,25 +451,25 @@
           "event": "satchel:sign_resolved",
           "data": {
             "token_id": "1",
-            "first_seq": 14,
+            "first_seq": 3,
             "statuses": [
               "signed"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/7tbBC4TpWPXBjMyMjDr5cbBnAGBN9wRS8A1DVMA2tvyQ",
+      "explorer": "https://testnet.nearblocks.io/txns/8fzc6Gr443TEmtfWUKPLEHPr4fCaS8CPPQSS14zuuuL4",
       "signature": {
         "chain": "sol",
         "kind": "sol_tx",
         "path": "satchel/1/sol",
-        "address": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo"
+        "address": "AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd"
       },
       "external": {
         "chain": "solana-devnet",
-        "tx": "5EZagPg6146Av8V1PXdRomCs7JqhvaLqt7u1Be7f9rUpzjkC6N1JqHPVsx3PXNX3ubJ6gSuvxbhgZDda4nLBfWyH",
-        "explorer": "https://explorer.solana.com/tx/5EZagPg6146Av8V1PXdRomCs7JqhvaLqt7u1Be7f9rUpzjkC6N1JqHPVsx3PXNX3ubJ6gSuvxbhgZDda4nLBfWyH?cluster=devnet",
-        "from": "2jgCnruxgsWMP2EwbtjYdG8gqepRNkBE7T3qJAA71Afo",
+        "tx": "2VFACRbGK4AdbSGFe5hmffEdcMVtdADbL49eXERK4ndnYsQXdsMSB6YXFeQjJx8VCe22GAf4vYMG1q2ySedEgihF",
+        "explorer": "https://explorer.solana.com/tx/2VFACRbGK4AdbSGFe5hmffEdcMVtdADbL49eXERK4ndnYsQXdsMSB6YXFeQjJx8VCe22GAf4vYMG1q2ySedEgihF?cluster=devnet",
+        "from": "AGSUq86qgpp1eB53UaL8iRscRjJzsQfrNKsKoxPXTXTd",
         "status": "confirmed"
       }
     },
@@ -487,17 +477,17 @@
       "id": "evm-l2-sign",
       "group": "Send",
       "action": "Sign an Arbitrum Sepolia transaction",
-      "shows": "The same EVM key signs for another testnet (chain id 421614). Signed only, not broadcast.",
-      "token_id": "1",
-      "tx": "DMYWNYYmRsJVD8fJT4coVPf2xWSEACz7hCD993iPF7r5",
+      "shows": "A Satchel's one EVM key also signs for another testnet (chain id 421614). Signed only, not broadcast.",
+      "token_id": "9",
+      "tx": "FTJdnNvToY7NrHE4kA6GRMC4HfssmaZ3GCf3gKxeFKHR",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "1"
+        "token_id": "9"
       },
-      "block_height": 276906531,
-      "date": "2026-11-09",
+      "block_height": 277055117,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -505,32 +495,32 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "1",
+            "token_id": "9",
             "owner_id": "alice.satchelhq.testnet",
             "chain": "evm",
-            "path": "satchel/1/evm",
-            "first_seq": 15,
+            "path": "satchel/9/evm",
+            "first_seq": 0,
             "count": 1
           }
         },
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "1",
-            "first_seq": 15,
+            "token_id": "9",
+            "first_seq": 0,
             "statuses": [
               "signed"
             ]
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/DMYWNYYmRsJVD8fJT4coVPf2xWSEACz7hCD993iPF7r5",
-      "note": "signed only (the address holds no Arbitrum Sepolia ETH); the record stays unused until that nonce is spent",
+      "explorer": "https://testnet.nearblocks.io/txns/FTJdnNvToY7NrHE4kA6GRMC4HfssmaZ3GCf3gKxeFKHR",
+      "note": "signed only (the address holds no Arbitrum Sepolia ETH), by a Satchel that is not for sale: the record stays unused until that nonce is spent",
       "signature": {
         "chain": "evm",
         "kind": "evm_tx",
-        "path": "satchel/1/evm",
-        "address": "0x2f63B9eAa9F225aaD72Db4391e024761c9613Fe8",
+        "path": "satchel/9/evm",
+        "address": "0x14F77107A91EFE1483531449C86b9AedE52819A5",
         "chain_id": 421614
       }
     },
@@ -539,16 +529,16 @@
       "group": "Inside",
       "action": "Put NEAR inside a Satchel",
       "shows": "NEAR is held inside the Satchel by the contract. Whoever owns the Satchel owns it.",
-      "token_id": "2",
-      "tx": "AGtWKMHA6RPkbbvuYQRVhAVJQBrKwgT1zDUeTERPFqse",
+      "token_id": "10",
+      "tx": "DE4h8SMTKf7CjkeyP27RTWnUCupKqFC1XaceW6gPpor1",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "deposit_near",
       "args": {
-        "token_id": "2"
+        "token_id": "10"
       },
-      "block_height": 275424477,
-      "date": "2026-10-30",
+      "block_height": 277055148,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -556,31 +546,30 @@
         {
           "event": "satchel:inside_deposit",
           "data": {
-            "token_id": "2",
+            "token_id": "10",
             "sender_id": "alice.satchelhq.testnet",
-            "amount": "99300000000000000000000"
+            "amount": "19290000000000000000000"
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/AGtWKMHA6RPkbbvuYQRVhAVJQBrKwgT1zDUeTERPFqse",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/DE4h8SMTKf7CjkeyP27RTWnUCupKqFC1XaceW6gPpor1"
     },
     {
       "id": "withdraw-bad-receiver",
       "group": "Refusals",
       "action": "Withdraw inside NEAR to the MPC account",
       "shows": "A withdrawal to an account that would strand the money (the contract, the MPC, USDC) is refused.",
-      "token_id": "3",
-      "tx": "BiAn6me7z48iUXsaJduFv3RYU5Yk8NE2Wja64wbgJxT5",
+      "token_id": "10",
+      "tx": "5exebCctCFhnBVeKgQUK648sMhJhzNhnhQTvkg9cDcHL",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "withdraw_near",
       "args": {
-        "token_id": "3",
+        "token_id": "10",
         "receiver_id": "v1.signer-prod.testnet"
       },
-      "block_height": 275622055,
-      "date": "2026-10-31",
+      "block_height": 277055162,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_BAD_RECEIVER"
@@ -588,25 +577,24 @@
       "absent_events": [
         "satchel:inside_withdraw"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/BiAn6me7z48iUXsaJduFv3RYU5Yk8NE2Wja64wbgJxT5",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/5exebCctCFhnBVeKgQUK648sMhJhzNhnhQTvkg9cDcHL"
     },
     {
       "id": "inside-withdraw",
       "group": "Inside",
       "action": "Take NEAR out of a Satchel",
       "shows": "The owner takes NEAR out. The inside epoch goes up, so any offer priced on the old contents goes stale.",
-      "token_id": "2",
-      "tx": "4zCS9dx2cPZ1pv9QWKPFagPhJpVn6AQJrRf9nZnbwCK4",
-      "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "token_id": "10",
+      "tx": "GkT8YAdrebEXSjwTX31pHVv8PidZPZsjhSf75prp3VU5",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "withdraw_near",
       "args": {
-        "token_id": "2",
-        "amount": "99300000000000000000000"
+        "token_id": "10",
+        "amount": "10000000000000000000000"
       },
-      "block_height": 275424677,
-      "date": "2026-10-30",
+      "block_height": 277055177,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -614,40 +602,39 @@
         {
           "event": "satchel:inside_withdraw",
           "data": {
-            "token_id": "2",
-            "owner_id": "carol.satchelhq.testnet",
-            "receiver_id": "carol.satchelhq.testnet",
-            "amount": "99300000000000000000000"
+            "token_id": "10",
+            "owner_id": "alice.satchelhq.testnet",
+            "receiver_id": "alice.satchelhq.testnet",
+            "amount": "10000000000000000000000"
           }
         },
         {
           "event": "satchel:inside_withdraw_resolved",
           "data": {
-            "token_id": "2",
+            "token_id": "10",
             "ok": true
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/4zCS9dx2cPZ1pv9QWKPFagPhJpVn6AQJrRf9nZnbwCK4",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/GkT8YAdrebEXSjwTX31pHVv8PidZPZsjhSf75prp3VU5"
     },
     {
       "id": "wnear-deposit",
       "group": "Inside",
       "action": "Put wNEAR inside a Satchel",
       "shows": "A NEP-141 token (wNEAR) is sent into the Satchel with ft_transfer_call and the message {\"deposit\": id}.",
-      "token_id": "6",
-      "tx": "HzDxEx2L2ESYfmQ1ryJ9BARegRKsPHQS1yFGk97yNbxU",
+      "token_id": "10",
+      "tx": "561DKBprtMp2wPbV5ePAs3H6zw7aY8Ve6EMb4zAcqytj",
       "signer": "alice.satchelhq.testnet",
       "receiver": "wrap.testnet",
       "method": "ft_transfer_call",
       "args": {
-        "receiver_id": "dev2.satchelhq.testnet",
+        "receiver_id": "satchel.satchelhq.testnet",
         "amount": "10000000000000000000000",
-        "msg": "{\"deposit\":\"6\"}"
+        "msg": "{\"deposit\":\"10\"}"
       },
-      "block_height": 276906845,
-      "date": "2026-11-09",
+      "block_height": 277055202,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -655,32 +642,32 @@
         {
           "event": "satchel:inside_deposit",
           "data": {
-            "token_id": "6",
+            "token_id": "10",
             "sender_id": "alice.satchelhq.testnet",
             "ft": "wrap.testnet",
             "amount": "10000000000000000000000"
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/HzDxEx2L2ESYfmQ1ryJ9BARegRKsPHQS1yFGk97yNbxU"
+      "explorer": "https://testnet.nearblocks.io/txns/561DKBprtMp2wPbV5ePAs3H6zw7aY8Ve6EMb4zAcqytj"
     },
     {
       "id": "wnear-withdraw",
       "group": "Inside",
       "action": "Take wNEAR out of a Satchel",
       "shows": "The owner takes the wNEAR out again.",
-      "token_id": "6",
-      "tx": "C58zwtvYpjNfBAvvrQ2RQe9t8rGHV4XCqNDeK9gDRqxW",
+      "token_id": "10",
+      "tx": "2MZzRJMQrBeZ9nzTGDVYu5jWtaW9naUtFBgB9s2g6r4a",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "withdraw_ft",
       "args": {
-        "token_id": "6",
+        "token_id": "10",
         "ft": "wrap.testnet",
         "amount": "10000000000000000000000"
       },
-      "block_height": 276906860,
-      "date": "2026-11-09",
+      "block_height": 277055216,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -688,7 +675,7 @@
         {
           "event": "satchel:inside_withdraw",
           "data": {
-            "token_id": "6",
+            "token_id": "10",
             "owner_id": "alice.satchelhq.testnet",
             "ft": "wrap.testnet",
             "amount": "10000000000000000000000"
@@ -697,30 +684,30 @@
         {
           "event": "satchel:inside_withdraw_resolved",
           "data": {
-            "token_id": "6",
+            "token_id": "10",
             "ok": true
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/C58zwtvYpjNfBAvvrQ2RQe9t8rGHV4XCqNDeK9gDRqxW"
+      "explorer": "https://testnet.nearblocks.io/txns/2MZzRJMQrBeZ9nzTGDVYu5jWtaW9naUtFBgB9s2g6r4a"
     },
     {
       "id": "list-usdc",
       "group": "Sell",
       "action": "List a Satchel for USDC",
       "shows": "The owner lists the Satchel priced in USDC. The listing records the signature count it was listed at.",
-      "token_id": "6",
-      "tx": "95KSRPpo4Y5FY6WndaFg9rDC62qNWBWQAgLCXRhhQvYx",
+      "token_id": "10",
+      "tx": "Fa3TJHxwH2jG2K6X8s6sVqzf7B8mHkt6EoztSky8Sc8Y",
       "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "list",
       "args": {
-        "token_id": "6",
+        "token_id": "10",
         "price": "10000",
         "currency": "usdc"
       },
-      "block_height": 276906875,
-      "date": "2026-11-09",
+      "block_height": 277055232,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -728,8 +715,8 @@
         {
           "event": "satchel:listed",
           "data": {
-            "token_id": "6",
-            "listing_id": 1,
+            "token_id": "10",
+            "listing_id": 4,
             "seller_id": "alice.satchelhq.testnet",
             "price": "10000",
             "currency": "usdc",
@@ -737,23 +724,23 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/95KSRPpo4Y5FY6WndaFg9rDC62qNWBWQAgLCXRhhQvYx"
+      "explorer": "https://testnet.nearblocks.io/txns/Fa3TJHxwH2jG2K6X8s6sVqzf7B8mHkt6EoztSky8Sc8Y"
     },
     {
       "id": "usdc-fake-payment",
       "group": "Refusals",
       "action": "Fake a USDC payment (call ft_on_transfer directly)",
       "shows": "Only the USDC contract can pay for a USDC listing. Calling ft_on_transfer yourself, with no USDC behind it, is refused.",
-      "tx": "DGHwp7u8VfYGWTJKRGQC64Djk51dHZVfFNWj3nJ5sD9h",
+      "tx": "CJqfM7t4cYfX835xSTDNwHFA4u9PLZG5Ke9mbam3Xzxh",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "ft_on_transfer",
       "args": {
         "sender_id": "bob.satchelhq.testnet",
         "amount": "10000"
       },
-      "block_height": 276906882,
-      "date": "2026-11-09",
+      "block_height": 277055239,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_WRONG_TOKEN"
@@ -762,59 +749,25 @@
         "satchel:sold",
         "nep171:nft_transfer"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/DGHwp7u8VfYGWTJKRGQC64Djk51dHZVfFNWj3nJ5sD9h"
+      "explorer": "https://testnet.nearblocks.io/txns/CJqfM7t4cYfX835xSTDNwHFA4u9PLZG5Ke9mbam3Xzxh"
     },
     {
-      "id": "offer-make",
+      "id": "buy-usdc",
       "group": "Sell",
-      "action": "Make an offer on a Satchel",
-      "shows": "A buyer escrows NEAR against a Satchel that is not listed. The offer is bound to its signature count and inside epoch.",
-      "token_id": "2",
-      "tx": "2rartXFgezBw74DPhPGHXVjwJ6BS7KzBY9ujDhTaAjVF",
+      "action": "Buy a Satchel with USDC (ft_transfer_call)",
+      "shows": "The buyer pays with USDC through ft_transfer_call, bound to the listing id and the signature count. The NFT and the payout move in one receipt.",
+      "token_id": "10",
+      "tx": "3gug6w7jLaspH8URhHhZBFdY6BZmwmwEFDFKwWeb4PE9",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
-      "method": "make_offer",
+      "receiver": "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af",
+      "method": "ft_transfer_call",
       "args": {
-        "token_id": "2",
-        "expected_sig_count": 0
+        "receiver_id": "satchel.satchelhq.testnet",
+        "amount": "10000",
+        "msg": "{\"buy\":{\"token_id\":\"10\",\"listing_id\":4,\"expected_sig_count\":0}}"
       },
-      "block_height": 275424631,
-      "date": "2026-10-30",
-      "expect": {
-        "outcome": "success"
-      },
-      "events": [
-        {
-          "event": "satchel:offer_made",
-          "data": {
-            "offer_id": 1,
-            "token_id": "2",
-            "offerer_id": "carol.satchelhq.testnet",
-            "amount": "200000000000000000000000",
-            "currency": "near",
-            "expected_sig_count": 0,
-            "expected_inside_epoch": 0
-          }
-        }
-      ],
-      "explorer": "https://testnet.nearblocks.io/txns/2rartXFgezBw74DPhPGHXVjwJ6BS7KzBY9ujDhTaAjVF",
-      "adopted": true
-    },
-    {
-      "id": "offer-accept",
-      "group": "Sell",
-      "action": "Accept an offer",
-      "shows": "The owner accepts. The Satchel goes to the buyer and the escrowed NEAR goes to the seller in the same receipt.",
-      "token_id": "2",
-      "tx": "De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD",
-      "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
-      "method": "accept_offer",
-      "args": {
-        "offer_id": 1
-      },
-      "block_height": 275424649,
-      "date": "2026-10-30",
+      "block_height": 277055252,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -825,7 +778,85 @@
             "old_owner_id": "alice.satchelhq.testnet",
             "new_owner_id": "carol.satchelhq.testnet",
             "token_ids": [
-              "2"
+              "10"
+            ]
+          }
+        },
+        {
+          "event": "satchel:sold",
+          "data": {
+            "token_id": "10",
+            "listing_id": 4,
+            "seller_id": "alice.satchelhq.testnet",
+            "buyer_id": "carol.satchelhq.testnet",
+            "price": "10000",
+            "currency": "usdc"
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/3gug6w7jLaspH8URhHhZBFdY6BZmwmwEFDFKwWeb4PE9"
+    },
+    {
+      "id": "offer-make",
+      "group": "Sell",
+      "action": "Make an offer on a Satchel",
+      "shows": "A buyer escrows NEAR against a Satchel that is not listed. The offer is bound to its signature count and inside epoch.",
+      "token_id": "9",
+      "tx": "9qvLimGWFzGPyGbQCGX9wrk2cRCZCprKZGURkBZuyvxY",
+      "signer": "carol.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
+      "method": "make_offer",
+      "args": {
+        "token_id": "9",
+        "expected_sig_count": 1
+      },
+      "block_height": 277055268,
+      "date": "2026-11-10",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "satchel:offer_made",
+          "data": {
+            "offer_id": 1,
+            "token_id": "9",
+            "offerer_id": "carol.satchelhq.testnet",
+            "amount": "20000000000000000000000",
+            "currency": "near",
+            "expected_sig_count": 1,
+            "expected_inside_epoch": 0
+          }
+        }
+      ],
+      "explorer": "https://testnet.nearblocks.io/txns/9qvLimGWFzGPyGbQCGX9wrk2cRCZCprKZGURkBZuyvxY"
+    },
+    {
+      "id": "offer-accept",
+      "group": "Sell",
+      "action": "Accept an offer",
+      "shows": "The owner accepts. The Satchel goes to the buyer and the escrowed NEAR goes to the seller in the same receipt.",
+      "token_id": "9",
+      "tx": "Fw4yPWrwoyk8eDJx7Ff6U4X2Lk6KXSJjyaLDH18NTP4v",
+      "signer": "alice.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
+      "method": "accept_offer",
+      "args": {
+        "offer_id": 1
+      },
+      "block_height": 277055519,
+      "date": "2026-11-10",
+      "expect": {
+        "outcome": "success"
+      },
+      "events": [
+        {
+          "event": "nep171:nft_transfer",
+          "data": {
+            "old_owner_id": "alice.satchelhq.testnet",
+            "new_owner_id": "carol.satchelhq.testnet",
+            "token_ids": [
+              "9"
             ]
           }
         },
@@ -833,10 +864,10 @@
           "event": "satchel:offer_accepted",
           "data": {
             "offer_id": 1,
-            "token_id": "2",
+            "token_id": "9",
             "seller_id": "alice.satchelhq.testnet",
             "buyer_id": "carol.satchelhq.testnet",
-            "amount": "200000000000000000000000"
+            "amount": "20000000000000000000000"
           }
         },
         {
@@ -844,29 +875,28 @@
           "data": {
             "account_id": "alice.satchelhq.testnet",
             "currency": "near",
-            "amount": "200000000000000000000000",
+            "amount": "20000000000000000000000",
             "ok": true
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/De4asMuL8BG4eHzes95gTaywBkRxuqhMbGQEgSCZeXKD",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/Fw4yPWrwoyk8eDJx7Ff6U4X2Lk6KXSJjyaLDH18NTP4v"
     },
     {
       "id": "offer-cancel",
       "group": "Sell",
       "action": "Cancel an offer",
       "shows": "An offerer takes an open offer back and the escrow is paid back.",
-      "token_id": "3",
-      "tx": "CnSevEmfRw4sQGextGSTP7tqEN4uYkai6Vsf2UG9E7om",
+      "token_id": "9",
+      "tx": "EG86mBwe9TGfTJjHmxzt3DV4b6bnV875QpHj6SaDRomX",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "cancel_offer",
       "args": {
         "offer_id": 2
       },
-      "block_height": 275424716,
-      "date": "2026-10-30",
+      "block_height": 277055542,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -875,9 +905,9 @@
           "event": "satchel:offer_cancelled",
           "data": {
             "offer_id": 2,
-            "token_id": "3",
+            "token_id": "9",
             "offerer_id": "bob.satchelhq.testnet",
-            "amount": "50000000000000000000000"
+            "amount": "10000000000000000000000"
           }
         },
         {
@@ -885,26 +915,25 @@
           "data": {
             "account_id": "bob.satchelhq.testnet",
             "currency": "near",
-            "amount": "50000000000000000000000",
+            "amount": "10000000000000000000000",
             "ok": true
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/CnSevEmfRw4sQGextGSTP7tqEN4uYkai6Vsf2UG9E7om",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/EG86mBwe9TGfTJjHmxzt3DV4b6bnV875QpHj6SaDRomX"
     },
     {
       "id": "allowance-set",
       "group": "Delegate",
       "action": "Give a delegate a capped allowance",
       "shows": "The owner lets another account sign spends up to a cap (here 20,000 sats of BTC), until an expiry.",
-      "token_id": "1",
-      "tx": "GTaoWcfGTqaEkex4cx3zNv4skRSxEB2c2Z37pTk9HAYC",
-      "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "token_id": "9",
+      "tx": "Ai2KeV8vJpQP7zpPzWJusxrg4XPv62Y6FoeaZ5VvbSnk",
+      "signer": "carol.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "set_allowance",
       "args": {
-        "token_id": "1",
+        "token_id": "9",
         "delegate": "bob.satchelhq.testnet",
         "caps": [
           {
@@ -913,8 +942,8 @@
           }
         ]
       },
-      "block_height": 275424774,
-      "date": "2026-10-30",
+      "block_height": 277055559,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -922,8 +951,8 @@
         {
           "event": "satchel:allowance_set",
           "data": {
-            "token_id": "1",
-            "owner_id": "alice.satchelhq.testnet",
+            "token_id": "9",
+            "owner_id": "carol.satchelhq.testnet",
             "delegate_id": "bob.satchelhq.testnet",
             "caps": [
               {
@@ -934,24 +963,23 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/GTaoWcfGTqaEkex4cx3zNv4skRSxEB2c2Z37pTk9HAYC",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/Ai2KeV8vJpQP7zpPzWJusxrg4XPv62Y6FoeaZ5VvbSnk"
     },
     {
       "id": "allowance-sign",
       "group": "Delegate",
       "action": "The delegate signs within the cap",
       "shows": "The delegate (not the owner) gets a BTC spend signed. The contract debits the cap by the amount that leaves the Satchel.",
-      "token_id": "1",
-      "tx": "FAFuuaY5WECmD2xZgWLpiw6ByKz9jfy3xGJUtHrW38cg",
+      "token_id": "9",
+      "tx": "7yLjooxW3G4Pbd1GBw3kvjwhwtT5oD3rQLjEGCLeMdG4",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "1"
+        "token_id": "9"
       },
-      "block_height": 275424840,
-      "date": "2026-10-30",
+      "block_height": 277055567,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -959,19 +987,19 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "1",
-            "owner_id": "alice.satchelhq.testnet",
+            "token_id": "9",
+            "owner_id": "carol.satchelhq.testnet",
             "chain": "btc",
-            "path": "satchel/1/btc",
-            "first_seq": 7,
+            "path": "satchel/9/btc",
+            "first_seq": 1,
             "count": 1
           }
         },
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "1",
-            "first_seq": 7,
+            "token_id": "9",
+            "first_seq": 1,
             "statuses": [
               "signed"
             ]
@@ -980,7 +1008,7 @@
         {
           "event": "satchel:allowance_spent",
           "data": {
-            "token_id": "1",
+            "token_id": "9",
             "delegate_id": "bob.satchelhq.testnet",
             "debits": [
               {
@@ -991,31 +1019,30 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/FAFuuaY5WECmD2xZgWLpiw6ByKz9jfy3xGJUtHrW38cg",
+      "explorer": "https://testnet.nearblocks.io/txns/7yLjooxW3G4Pbd1GBw3kvjwhwtT5oD3rQLjEGCLeMdG4",
       "note": "signed only: the input is synthetic, so this signature can never move coins (it shows the cap accounting)",
       "signature": {
         "chain": "btc",
         "kind": "btc_tx",
-        "path": "satchel/1/btc",
-        "address": "tb1qnqe0734xrsnpm5yt36r627g6kdkt4u9wjrrnaq"
-      },
-      "adopted": true
+        "path": "satchel/9/btc",
+        "address": "tb1qu33l9thuyc2wnnh4l40x496u5tmnptxrvpqppd"
+      }
     },
     {
       "id": "allowance-over-cap",
       "group": "Refusals",
       "action": "The delegate asks for more than the cap",
       "shows": "A delegate request above what is left of the cap is refused before anything is recorded.",
-      "token_id": "1",
-      "tx": "86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
+      "token_id": "9",
+      "tx": "Btn82FfCyzie5ZyHpH644xyjDJwSGqgrBbWaTYiaYwQo",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "1"
+        "token_id": "9"
       },
-      "block_height": 275424868,
-      "date": "2026-10-30",
+      "block_height": 277055589,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_ALLOWANCE_EXCEEDED"
@@ -1023,25 +1050,24 @@
       "absent_events": [
         "satchel:sign_requested"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/86eBA5ZqyN62jKw6vuXEu4zkrYD7ScDfJ6vx1VGkdJht",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/Btn82FfCyzie5ZyHpH644xyjDJwSGqgrBbWaTYiaYwQo"
     },
     {
       "id": "allowance-revoke",
       "group": "Delegate",
       "action": "Revoke the allowance",
       "shows": "The owner removes the delegate.",
-      "token_id": "1",
-      "tx": "7o9DGFd2Hz5DYWjcTXm4SPj92seJehrVXBXXEywrpcms",
-      "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "token_id": "9",
+      "tx": "Cp4RD5juFHjikRqcz3tjJ8LxTz871TRAGjHDN6PbobWw",
+      "signer": "carol.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "revoke_allowance",
       "args": {
-        "token_id": "1",
+        "token_id": "9",
         "delegate": "bob.satchelhq.testnet"
       },
-      "block_height": 275424886,
-      "date": "2026-10-30",
+      "block_height": 277055596,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1049,30 +1075,29 @@
         {
           "event": "satchel:allowance_revoked",
           "data": {
-            "token_id": "1",
-            "owner_id": "alice.satchelhq.testnet",
+            "token_id": "9",
+            "owner_id": "carol.satchelhq.testnet",
             "delegate_id": "bob.satchelhq.testnet"
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/7o9DGFd2Hz5DYWjcTXm4SPj92seJehrVXBXXEywrpcms",
-      "adopted": true
+      "explorer": "https://testnet.nearblocks.io/txns/Cp4RD5juFHjikRqcz3tjJ8LxTz871TRAGjHDN6PbobWw"
     },
     {
       "id": "btc-multi-input",
       "group": "Send",
       "action": "Send BTC from two coins in one sign_for",
       "shows": "One sign_for carries two BIP 143 preimages. The contract fans out one MPC call per input, and both signatures are in the Bitcoin transaction.",
-      "token_id": "7",
-      "tx": "AQEGhVGzPb3paTbCiXk7nEXLmD5bEpeGQ66iHbsZNC3g",
-      "signer": "alice.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "token_id": "9",
+      "tx": "HnoHh8YnLPW5UiLoW2yvSmEQwabR9Suph7PFEkvsqxFP",
+      "signer": "carol.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "7"
+        "token_id": "9"
       },
-      "block_height": 276906926,
-      "date": "2026-11-09",
+      "block_height": 277055639,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1080,18 +1105,18 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "7",
+            "token_id": "9",
             "chain": "btc",
-            "path": "satchel/7/btc",
-            "first_seq": 0,
+            "path": "satchel/9/btc",
+            "first_seq": 2,
             "count": 2
           }
         },
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "7",
-            "first_seq": 0,
+            "token_id": "9",
+            "first_seq": 2,
             "count": 2,
             "statuses": [
               "signed",
@@ -1100,38 +1125,39 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/AQEGhVGzPb3paTbCiXk7nEXLmD5bEpeGQ66iHbsZNC3g",
+      "explorer": "https://testnet.nearblocks.io/txns/HnoHh8YnLPW5UiLoW2yvSmEQwabR9Suph7PFEkvsqxFP",
       "signature": {
         "chain": "btc",
         "kind": "btc_tx",
-        "path": "satchel/7/btc",
-        "address": "tb1qfsg3n2vjvlaezwars8rzzwn37ngzwzkjhlusew"
+        "path": "satchel/9/btc",
+        "address": "tb1qu33l9thuyc2wnnh4l40x496u5tmnptxrvpqppd"
       },
       "external": {
         "chain": "bitcoin-testnet4",
-        "tx": "0f9da1f61b7585802bff988958828d71a0995cbfbdd75318d9744b69451346d7",
-        "explorer": "https://mempool.space/testnet4/tx/0f9da1f61b7585802bff988958828d71a0995cbfbdd75318d9744b69451346d7",
-        "from": "tb1qfsg3n2vjvlaezwars8rzzwn37ngzwzkjhlusew",
-        "status": "confirmed"
-      }
+        "tx": "56cd32750c405a2335650f86fa065f8fd3ad2efc34bed348aa04ae66a70e1403",
+        "explorer": "https://mempool.space/testnet4/tx/56cd32750c405a2335650f86fa065f8fd3ad2efc34bed348aa04ae66a70e1403",
+        "from": "tb1qu33l9thuyc2wnnh4l40x496u5tmnptxrvpqppd",
+        "status": "broadcast"
+      },
+      "note": "broadcast; testnet4 blocks can be hours apart, so it was recorded before its first confirmation"
     },
     {
       "id": "list",
       "group": "Sell",
       "action": "List a Satchel for NEAR",
       "shows": "The owner lists the Satchel. The listing records its signature count; from now on the Satchel cannot sign.",
-      "token_id": "5",
-      "tx": "DMrKWA18z8N4i1ZmkwtEg6T8BRXViABnXie4hqy4LYjM",
+      "token_id": "8",
+      "tx": "12dd21vSszEdoP4hnwNKoSCa2MqkSscWanxCfNQcHPBo",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "list",
       "args": {
-        "token_id": "5",
+        "token_id": "8",
         "price": "50000000000000000000000",
         "currency": "near"
       },
-      "block_height": 276907057,
-      "date": "2026-11-09",
+      "block_height": 277055668,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1139,8 +1165,8 @@
         {
           "event": "satchel:listed",
           "data": {
-            "token_id": "5",
-            "listing_id": 2,
+            "token_id": "8",
+            "listing_id": 5,
             "seller_id": "bob.satchelhq.testnet",
             "price": "50000000000000000000000",
             "currency": "near",
@@ -1148,23 +1174,23 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/DMrKWA18z8N4i1ZmkwtEg6T8BRXViABnXie4hqy4LYjM"
+      "explorer": "https://testnet.nearblocks.io/txns/12dd21vSszEdoP4hnwNKoSCa2MqkSscWanxCfNQcHPBo"
     },
     {
       "id": "sign-while-listed",
       "group": "Refusals",
       "action": "Sign while listed",
       "shows": "A listed Satchel is frozen: even its owner cannot sign, so its history cannot change under a buyer.",
-      "token_id": "5",
-      "tx": "9Qs4eem2rhqt6aajCzVAm8AP1meWVZZbwrUjfAz2B2iJ",
+      "token_id": "8",
+      "tx": "H14UBozBVyLNBvuXfMqNXRAmTzjGAeGS5Emi6sYKbfkh",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276907064,
-      "date": "2026-11-09",
+      "block_height": 277055675,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_FROZEN"
@@ -1172,23 +1198,23 @@
       "absent_events": [
         "satchel:sign_requested"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/9Qs4eem2rhqt6aajCzVAm8AP1meWVZZbwrUjfAz2B2iJ"
+      "explorer": "https://testnet.nearblocks.io/txns/H14UBozBVyLNBvuXfMqNXRAmTzjGAeGS5Emi6sYKbfkh"
     },
     {
       "id": "delist",
       "group": "Sell",
       "action": "Stop selling (delist)",
       "shows": "The owner takes the Satchel off the market.",
-      "token_id": "5",
-      "tx": "8bK3nKkSK5zP5WcGpm2FcSkLVnfX9ZmXVtD9iszNtnwG",
+      "token_id": "8",
+      "tx": "5kVUSWkxANwyvVjyfyqXktaBVhzpkmxetbvcSsc76372",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "delist",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276907071,
-      "date": "2026-11-09",
+      "block_height": 277055689,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1196,31 +1222,31 @@
         {
           "event": "satchel:delisted",
           "data": {
-            "token_id": "5",
-            "listing_id": 2,
+            "token_id": "8",
+            "listing_id": 5,
             "seller_id": "bob.satchelhq.testnet"
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/8bK3nKkSK5zP5WcGpm2FcSkLVnfX9ZmXVtD9iszNtnwG"
+      "explorer": "https://testnet.nearblocks.io/txns/5kVUSWkxANwyvVjyfyqXktaBVhzpkmxetbvcSsc76372"
     },
     {
       "id": "buy-stale",
       "group": "Refusals",
       "action": "Buy with a stale signature count",
       "shows": "The buyer's view says one signature fewer than the Satchel has. The buy is refused and the NEAR goes back.",
-      "token_id": "5",
-      "tx": "HzBWema4dhn67bGZiV6ne2FWtfdjDffknR9h2jqe9U2o",
+      "token_id": "8",
+      "tx": "5ekrFZJCayTizawUVoWEiGghcJPKY1HsMt5mWELucCJ3",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "buy",
       "args": {
-        "token_id": "5",
-        "listing_id": 3,
+        "token_id": "8",
+        "listing_id": 6,
         "expected_sig_count": 1
       },
-      "block_height": 276907084,
-      "date": "2026-11-09",
+      "block_height": 277055702,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_LISTING_CHANGED"
@@ -1229,25 +1255,25 @@
         "satchel:sold",
         "nep171:nft_transfer"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/HzBWema4dhn67bGZiV6ne2FWtfdjDffknR9h2jqe9U2o"
+      "explorer": "https://testnet.nearblocks.io/txns/5ekrFZJCayTizawUVoWEiGghcJPKY1HsMt5mWELucCJ3"
     },
     {
       "id": "buy-near",
       "group": "Sell",
       "action": "Buy a Satchel with NEAR",
       "shows": "The buyer pays the price, bound to the listing id and the signature count they checked. The NFT moves and the seller is paid in the same receipt.",
-      "token_id": "5",
-      "tx": "8GmtGLnzFvyWdg9CCUNDWv976kvSTrda33C4DpYCqKEf",
+      "token_id": "8",
+      "tx": "u5oF5XxqxvZErU1oDMFuhbBqkCYXiyu3VziVPzPNCDd",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "buy",
       "args": {
-        "token_id": "5",
-        "listing_id": 3,
+        "token_id": "8",
+        "listing_id": 6,
         "expected_sig_count": 2
       },
-      "block_height": 276907092,
-      "date": "2026-11-09",
+      "block_height": 277055709,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1258,15 +1284,15 @@
             "old_owner_id": "bob.satchelhq.testnet",
             "new_owner_id": "carol.satchelhq.testnet",
             "token_ids": [
-              "5"
+              "8"
             ]
           }
         },
         {
           "event": "satchel:sold",
           "data": {
-            "token_id": "5",
-            "listing_id": 3,
+            "token_id": "8",
+            "listing_id": 6,
             "seller_id": "bob.satchelhq.testnet",
             "buyer_id": "carol.satchelhq.testnet",
             "price": "50000000000000000000000",
@@ -1283,23 +1309,23 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/8GmtGLnzFvyWdg9CCUNDWv976kvSTrda33C4DpYCqKEf"
+      "explorer": "https://testnet.nearblocks.io/txns/u5oF5XxqxvZErU1oDMFuhbBqkCYXiyu3VziVPzPNCDd"
     },
     {
       "id": "sign-old-owner",
       "group": "Refusals",
       "action": "The old owner tries to sign after the sale",
       "shows": "The seller lost every key with the NFT. Their sign_for is refused.",
-      "token_id": "5",
-      "tx": "AJbwfaV9uvixw5E3SCzxnaxLJ7B8UU3ztEaYqnA9p9yM",
+      "token_id": "8",
+      "tx": "9q73iF32rT2cLpUKnC9BsLk9Ebo1PJ7dHpMiaJFYNWBH",
       "signer": "bob.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276907159,
-      "date": "2026-11-09",
+      "block_height": 277055726,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "failure",
         "error": "ERR_NOT_OWNER"
@@ -1307,23 +1333,23 @@
       "absent_events": [
         "satchel:sign_requested"
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/AJbwfaV9uvixw5E3SCzxnaxLJ7B8UU3ztEaYqnA9p9yM"
+      "explorer": "https://testnet.nearblocks.io/txns/9q73iF32rT2cLpUKnC9BsLk9Ebo1PJ7dHpMiaJFYNWBH"
     },
     {
       "id": "sign-new-owner",
       "group": "Sign",
       "action": "The new owner signs",
       "shows": "The buyer now controls the same addresses: their sign_for succeeds and recovers to the same EVM address.",
-      "token_id": "5",
-      "tx": "AVAM9yvzpVSmyKiNx5vg2VRNhzqb4kHFVEcsDCJ63D6Z",
+      "token_id": "8",
+      "tx": "Gq1iDtAJoqNK2GVvg7ssCQA5Srn2n87qWgybrjrc5NqJ",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "sign_for",
       "args": {
-        "token_id": "5"
+        "token_id": "8"
       },
-      "block_height": 276907167,
-      "date": "2026-11-09",
+      "block_height": 277055733,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1331,10 +1357,10 @@
         {
           "event": "satchel:sign_requested",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "owner_id": "carol.satchelhq.testnet",
             "chain": "evm",
-            "path": "satchel/5/evm",
+            "path": "satchel/8/evm",
             "first_seq": 2,
             "count": 1
           }
@@ -1342,7 +1368,7 @@
         {
           "event": "satchel:sign_resolved",
           "data": {
-            "token_id": "5",
+            "token_id": "8",
             "first_seq": 2,
             "statuses": [
               "signed"
@@ -1350,13 +1376,13 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/AVAM9yvzpVSmyKiNx5vg2VRNhzqb4kHFVEcsDCJ63D6Z",
+      "explorer": "https://testnet.nearblocks.io/txns/Gq1iDtAJoqNK2GVvg7ssCQA5Srn2n87qWgybrjrc5NqJ",
       "signature": {
         "chain": "evm",
         "kind": "evm_message",
-        "path": "satchel/5/evm",
-        "address": "0x4B576529669814D73b8F9C0f7Dd817902bFd0eaA",
-        "message_text": "Satchel proof on dev2.satchelhq.testnet: #5 new owner"
+        "path": "satchel/8/evm",
+        "address": "0x986fa4b9c95bfCA3BAD7aB82A03075c49872DBE9",
+        "message_text": "Satchel proof on satchel.satchelhq.testnet: #8 new owner"
       }
     },
     {
@@ -1364,18 +1390,18 @@
       "group": "Sell",
       "action": "Listed now, with a clean history",
       "shows": "The new owner lists the Satchel again after the quiet period. It is still for sale: open its live clean-history verdict in the app.",
-      "token_id": "5",
-      "tx": "4H7EJGWNTfT3rytcUz7DTarmJL96ePaMsDXcUnxcHXJf",
+      "token_id": "8",
+      "tx": "5qwuhWdwnaXGrNG6qfhPbk8srGgXC6NNzcXCdW2YpC5t",
       "signer": "carol.satchelhq.testnet",
-      "receiver": "dev2.satchelhq.testnet",
+      "receiver": "satchel.satchelhq.testnet",
       "method": "list",
       "args": {
-        "token_id": "5",
+        "token_id": "8",
         "price": "50000000000000000000000",
         "currency": "near"
       },
-      "block_height": 276907431,
-      "date": "2026-11-09",
+      "block_height": 277055995,
+      "date": "2026-11-10",
       "expect": {
         "outcome": "success"
       },
@@ -1383,8 +1409,8 @@
         {
           "event": "satchel:listed",
           "data": {
-            "token_id": "5",
-            "listing_id": 4,
+            "token_id": "8",
+            "listing_id": 7,
             "seller_id": "carol.satchelhq.testnet",
             "price": "50000000000000000000000",
             "currency": "near",
@@ -1392,7 +1418,7 @@
           }
         }
       ],
-      "explorer": "https://testnet.nearblocks.io/txns/4H7EJGWNTfT3rytcUz7DTarmJL96ePaMsDXcUnxcHXJf"
+      "explorer": "https://testnet.nearblocks.io/txns/5qwuhWdwnaXGrNG6qfhPbk8srGgXC6NNzcXCdW2YpC5t"
     }
   ]
 }
