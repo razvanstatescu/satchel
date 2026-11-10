@@ -31,9 +31,9 @@ Start at [`README.md`](../README.md) for the product, and at [`docs/README.md`](
 | Name | Meaning |
 |---|---|
 | `satchelhq.testnet` | The team account (`<team>` in older docs). Parent of every account below. |
-| `satchel.satchelhq.testnet` | The **final** contract. Born keyless on Day 10 (Nov 10); until then it does not exist. |
+| `satchel.satchelhq.testnet` | The **final** (release) contract, read by the hosted app. Born keyless on Day 10 (Nov 10) in one transaction with no AddKey ([verify.md](verify.md) step 3). |
 | `rc.satchelhq.testnet` | The release-candidate rehearsal of the keyless birth (Day 9). |
-| `dev1.…`, `dev2.…` (`devN`) | Development deployments. The hosted app at https://usesatchel.xyz reads `dev2.satchelhq.testnet` until the final contract exists. |
+| `dev1.…`, `dev2.…` (`devN`) | Development deployments. They keep their access keys; the hosted app read `dev2.satchelhq.testnet` until the final contract was born. |
 | `alice`, `bob`, `carol` (`.satchelhq.testnet`) | Demo personas that own and trade the demo Satchels. |
 | Role `dev` / `rc` / `final` | `NEXT_PUBLIC_CONTRACT_ROLE`: which contract the app trusts. `rc` and `final` enforce the strict lock and code-hash checks; `dev` only warns. kb/90 §4 (T5). |
 | Fixture mode / live mode | `NEXT_PUBLIC_DATA_MODE`. Fixture (the default) uses built-in data and a simulated chain, fully offline; live reads NEAR testnet and the three chains. |

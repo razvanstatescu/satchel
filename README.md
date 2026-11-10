@@ -40,8 +40,8 @@ coins, and no NFT-wallet design we know of provides it.
 
 ## Try it in 60 seconds (no wallet, no install)
 
-> The app reads the development contract `dev2.satchelhq.testnet` until the final contract
-> `satchel.satchelhq.testnet` is born keyless on **Nov 10**. Values marked `[TBD: …]` exist from then on.
+> The app reads the release contract `satchel.satchelhq.testnet`, born keyless in transaction
+> [`2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL`](https://testnet.nearblocks.io/txns/2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL) at block 277053821. [Verify on-chain](docs/verify.md) checks it.
 
 | Do | See |
 |---|---|
@@ -49,7 +49,7 @@ coins, and no NFT-wallet design we know of provides it.
 | `curl -s https://usesatchel.xyz/api/satchels/1` | The same facts as JSON: `owner`, `addresses`, `balances`, `sig_count`, `listing`, `status` |
 | `curl -s https://usesatchel.xyz/api/clean-history/1` | The clean-history check for Satchel #1 as JSON, computed by the server from live chain data: each signature record, what it names (nonce, coin or blockhash), whether it can still move coins, and the overall verdict. Labelled a hint: only the buyer's browser can turn Buy on |
 | Open https://usesatchel.xyz/market | Each listing with its clean-history verdict. On the final contract, demo Satchel #4 is blocked on purpose ([why](docs/security-model.md#demo-token-4-is-blocked-on-purpose)) |
-| Open https://usesatchel.xyz/contract | The lock facts: no access keys, the birth transaction `[TBD]`, the code hash `[TBD: H]` and the MPC version |
+| Open https://usesatchel.xyz/contract | The lock facts: no access keys, the birth transaction `2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL`, the code hash `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa` and the MPC version |
 | With a testnet wallet (Meteor or Intear), open `/mint` | A new Satchel with three fresh addresses. Fund one from a faucet, then use Send |
 
 A Satchel's addresses depend only on the contract and the path `satchel/{id}/{btc|evm|sol}`, so they never change

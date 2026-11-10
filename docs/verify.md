@@ -12,17 +12,16 @@ It needs `bash`, `curl` and `python3`; the near CLI is optional. RPC: dRPC (`nea
 `test.rpc.fastnear.com` as fallback. NEAR history: the FastNEAR tx API (`tx.test.fastnear.com`), which keeps old
 transactions that non-archival RPC nodes soon forget.
 
-Until the final contract is born (Nov 10), the checks that read it **skip** rather than fail, and so does any check
-whose expected value is still `[TBD]`. To run the same checks against the development contract that the hosted app
-reads today:
+The checks run against the release contract, `satchel.satchelhq.testnet`. They also run against a development
+contract:
 
 ```sh
 SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh
 ```
 
-On a development contract the lock checks (2 and 4 below) skip, because a development contract keeps its key, and so
-do the birth checks (3 and 5), which belong to the final contract. The
-token's addresses come from the app when it serves that contract. Every other value can be overridden too:
+There the lock checks (2 and 4 below) skip, because a development contract keeps its key, and so do the birth checks
+(3 and 5), which belong to the release contract. That token's addresses come from `SATCHEL_BTC_ADDRESS` and
+`SATCHEL_EVM_ADDRESS`, or from the app when it serves that contract. Every other value can be overridden too:
 `SATCHEL_TOKEN`, `SATCHEL_OWNER`, `SATCHEL_EXPECTED_CODE_HASH`, `SATCHEL_BIRTH_TX`, `SATCHEL_BIRTH_BLOCK`, `SATCHEL_BTC_ADDRESS`,
 `SATCHEL_EVM_ADDRESS`, `SATCHEL_APP_URL`, `SATCHEL_RPC` (the full list is in `tools/judge-snippets.sh --help`).
 
@@ -47,17 +46,17 @@ k=keys["result"]["keys"]; print("access keys =", len(k), "(full access:", sum(1 
 ```
 Expected:
 ```
-code sha256 = [TBD: H]
+code sha256 = 42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa
 access keys = 0 (full access: 0 )
 ```
 With the near CLI (near-cli-rs): `near account view-account-summary satchel.satchelhq.testnet network-config testnet-fastnear now`
-→ `Local Contract (SHA-256 checksum hex)  [TBD: H]` and `Access keys  Account is locked (no access keys)`. Do not
+→ `Local Contract (SHA-256 checksum hex)  42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa` and `Access keys  Account is locked (no access keys)`. Do not
 use `near account list-keys`: it prints the same empty table for an account that does not exist.
 
 **3. The birth transaction had no AddKey.** One tx from `satchelhq.testnet` created the account, funded it, deployed
 the code, ran `new` and minted #1–#7:
 ```sh
-curl -s -X POST https://tx.test.fastnear.com/v0/transactions -H 'content-type: application/json' -d '{"tx_hashes":["[TBD: birth tx hash]"]}' | python3 -c '
+curl -s -X POST https://tx.test.fastnear.com/v0/transactions -H 'content-type: application/json' -d '{"tx_hashes":["2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL"]}' | python3 -c '
 import sys,json
 t=json.load(sys.stdin)["transactions"][0]; tx=t["transaction"]
 kinds=[a if isinstance(a,str) else next(iter(a)) for a in tx["actions"]]
@@ -82,7 +81,7 @@ Expected: `{"account_txs":[],"txs_count":0}`
 ```sh
 curl -s -X POST https://tx.test.fastnear.com/v0/account -H 'content-type: application/json' -d '{"account_id":"satchel.satchelhq.testnet","desc":false,"limit":1}'
 ```
-Expected: the first entry is `"transaction_hash":"[TBD: birth tx hash]"` at `"tx_block_height":[TBD: block A]`.
+Expected: the first entry is `"transaction_hash":"2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL"` at `"tx_block_height":277053821`.
 
 **6. The deployed code is this repository's code.** You need Rust (pinned by `rust-toolchain.toml`), cargo-near and
 Docker; the build itself runs in the Docker image pinned in `contracts/satchel/Cargo.toml`. That image is linux/amd64
@@ -93,7 +92,7 @@ cargo near build reproducible-wasm --manifest-path contracts/satchel/Cargo.toml
 sha256sum target/near/satchel/satchel.wasm        # Linux
 shasum -a 256 target/near/satchel/satchel.wasm    # macOS
 ```
-Expected: `[TBD: H]`, the same hash as in step 2. Without an x86_64 machine: the `reproducible` job in
+Expected: `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa`, the same hash as in step 2. Without an x86_64 machine: the `reproducible` job in
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the same build on every push to `main`, prints the
 SHA-256 in its summary and keeps the wasm as an artifact. After the repo is public:
 `near contract verify deployed-at satchel.satchelhq.testnet network-config testnet-fastnear now` → "…are the same".

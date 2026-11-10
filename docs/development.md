@@ -23,8 +23,9 @@ pnpm --filter web dev                        # http://localhost:3000, fixture da
 NEXT_PUBLIC_DATA_MODE=live pnpm --filter web dev   # live testnet reads; see .env.example for every variable
 ```
 
-Until the final contract is born on Nov 10, live mode needs the development contract too:
-`NEXT_PUBLIC_DATA_MODE=live NEXT_PUBLIC_SATCHEL_CONTRACT=dev2.satchelhq.testnet pnpm --filter web dev`.
+Live mode reads the release contract `satchel.satchelhq.testnet` by default. The hosted app also sets
+`NEXT_PUBLIC_CONTRACT_ROLE=final` and `NEXT_PUBLIC_EXPECTED_CODE_HASH` (H, from [verify.md](verify.md)) for the strict
+checks; `apps/web/.env.production` has its exact settings.
 
 Tests, all offline. Every suite must pass in full; what each one covers is in
 [`docs/testing/README.md`](testing/README.md), which also keeps the dated results of each run:

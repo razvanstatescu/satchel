@@ -9,7 +9,7 @@ What the clean-history check proves, what it trusts, what it does not cover, and
 **Clean history: what it checks and what it trusts.**
 
 **What signs.** A Satchel's keys can sign only through `sign_for` on `satchel.satchelhq.testnet`.
-- That account was **born without a key**. One transaction (`[TBD: birth tx hash]`, block `[TBD: block A]`) created
+- That account was **born without a key**. One transaction (`2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL`, block `277053821`) created
   it, deployed the published code, initialized it and minted Satchels #1–#7. That transaction contains no AddKey
   action.
 - It still has no access keys (`near account view-account-summary satchel.satchelhq.testnet network-config testnet-fastnear now`
@@ -17,7 +17,7 @@ What the clean-history check proves, what it trusts, what it does not cover, and
 - It has never signed a transaction, delegated ones included. The FastNEAR `is_any_signer` query in step 4 of [verify.md](verify.md) returns
   nothing.
 - Its history starts at the birth transaction.
-- It runs the published code: SHA-256 `[TBD: H]`, reproducible with `cargo near build reproducible-wasm` at tag
+- It runs the published code: SHA-256 `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa`, reproducible with `cargo near build reproducible-wasm` at tag
   `contract-v1.0.0`. Compare with `shasum -a 256` on macOS or `sha256sum` on Linux.
 
 **What gets recorded.** Before NEAR's MPC network signs anything, `sign_for` records on-chain exactly what is being

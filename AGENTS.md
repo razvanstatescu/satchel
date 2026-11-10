@@ -95,13 +95,12 @@ end-to-end suite about 7 minutes including its app build. For a fast pass over t
 
 ## Status
 
-- Contract: complete and reviewed internally (three rounds); the freeze is set for Nov 9. Until the final birth
-  the hosted app reads the development contract `dev2.satchelhq.testnet`.
-- The final contract `satchel.satchelhq.testnet` is born keyless on Nov 10. Until then the README values marked
-  `[TBD: …]` (code hash **H**, birth transaction) do not exist, and checks against the final account report
-  "account does not exist". That is expected, not a failure: `tools/judge-snippets.sh` skips those checks, and
-  `SATCHEL_CONTRACT=dev2.satchelhq.testnet tools/judge-snippets.sh` runs them against the development contract
-  (the lock checks apply to the final contract only).
+- Contract: complete and reviewed internally (three rounds), frozen at tag `contract-v1.0.0`. The hosted app reads
+  the release contract `satchel.satchelhq.testnet`.
+- That contract was born keyless in one transaction (`2h46feHW4uAAHtYkJvgBRzWUq1jsx1bfxYGXA7Wiq6GL`, block 277053821) with no AddKey,
+  and runs the code with SHA-256 `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa`, reproducible at that tag.
+  `tools/judge-snippets.sh` checks all of it read-only. The development contracts (`dev1`, `dev2.satchelhq.testnet`)
+  keep their keys: they are for testing, not for trust (the lock checks skip there).
 - Testnet only. No coin in this project has value.
 
 ## Rules for agents in this repo
