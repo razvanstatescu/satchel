@@ -694,6 +694,8 @@ export const STEPS: StepSpec[] = [
       const offers = await r.view<{ id: number; offerer_id: string }[]>('offers_for', { token_id: t, from_index: 0, limit: 50 })
       const o = offers.find((x) => x.offerer_id === r.carol)
       if (!o) throw new Error(`no offer by ${r.carol} on #${t}`)
+      // accept_offer moves the Satchel like a sale, so it keeps the quiet period too (ERR_QUIET_PERIOD): #9 has just signed
+      await r.waitListable(t)
       return (await r.sendCall('accept_offer', r.alice, acceptOfferCall(r.c, o.id))).hash
     },
   },

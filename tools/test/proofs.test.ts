@@ -151,13 +151,15 @@ describe('proofs on the final contract (D-32 demo states, #4, the README)', () =
   const FINAL = 'satchel.satchelhq.testnet'
   const realReadme = readFileSync(join(ROOT, 'docs', 'evidence', 'README.md'), 'utf8')
   const realDoc = JSON.parse(readFileSync(join(ROOT, 'docs', 'evidence', 'proofs.json'), 'utf8')) as ProofsDoc
-  // the committed set, as if it had been made in one run on the final contract with fresh Satchels #8 (sale), #9 (USDC)
+  // the development set (dev2), archived when the proofs were regenerated on the final contract
+  const devDoc = JSON.parse(readFileSync(join(ROOT, 'docs', 'evidence', 'history', 'dev2.satchelhq.testnet.json'), 'utf8')) as ProofsDoc
+  // the dev2 set, as if it had been made in one run on the final contract with fresh Satchels #8 (sale), #9 (USDC)
   const fresh: Record<string, string> = { '5': '8', '6': '9', '7': '10' }
   const finalDoc: ProofsDoc = {
-    ...realDoc,
+    ...devDoc,
     contract: FINAL,
     contract_role: 'final',
-    proofs: realDoc.proofs.map(({ adopted: _a, ...p }) => ({ ...p, ...(p.token_id ? { token_id: fresh[p.token_id] ?? p.token_id } : {}) })),
+    proofs: devDoc.proofs.map(({ adopted: _a, ...p }) => ({ ...p, ...(p.token_id ? { token_id: fresh[p.token_id] ?? p.token_id } : {}) })),
   }
 
   it('never signs with #4; on the final contract never touches the staged demo Satchels', () => {
@@ -206,15 +208,22 @@ describe('proofs on the final contract (D-32 demo states, #4, the README)', () =
   })
 
   it('links the app only when it reads the set\'s contract (after the switch, dev2\'s #5 is not the app\'s #5)', () => {
-    const dev = renderStatus(realDoc, FINAL)
+    const dev = renderStatus(devDoc, FINAL)
     expect(dev).not.toContain('usesatchel.xyz')
     expect(dev).toContain(`The hosted app reads \`${FINAL}\` now`)
-    expect(renderStatus(realDoc, realDoc.contract)).toContain('https://usesatchel.xyz/api/clean-history/5')
-    expect(renderContract(realDoc)).toMatch(/marked \*earlier\*/)
+    expect(renderStatus(devDoc, devDoc.contract)).toContain('https://usesatchel.xyz/api/clean-history/5')
+    expect(renderContract(devDoc)).toMatch(/marked \*earlier\*/)
     const timedOut = renderStatus({ ...finalDoc, mpc_timeouts: ['3r5zp3ucdPAmizKQmULoG53fdL1Ybj7n5Xo8LLjHnDht'] })
     expect(timedOut).toContain('## Timed-out MPC requests')
     expect(timedOut).not.toContain('none did during this run')
     expect(renderStatus(finalDoc)).toContain('none did during this run')
+  })
+
+  it('the committed set was made on the final contract and never names Satchel #4', () => {
+    expect(realDoc.contract).toBe(FINAL)
+    expect(realDoc.contract_role).toBe('final')
+    expect(realDoc.proofs.filter((p) => p.token_id === '4')).toEqual([])
+    expect(devDoc.contract).toBe('dev2.satchelhq.testnet')
   })
 
   it('the committed README is exactly what the generator renders from the committed proofs.json', () => {
@@ -226,15 +235,15 @@ describe('proofs on the final contract (D-32 demo states, #4, the README)', () =
     try {
       const out = join(d, 'proofs.json')
       expect(archivePrevious(out, FINAL)).toBeNull()
-      writeFileSync(out, JSON.stringify(realDoc))
-      expect(archivePrevious(out, realDoc.contract)).toBeNull()
+      writeFileSync(out, JSON.stringify(devDoc))
+      expect(archivePrevious(out, devDoc.contract)).toBeNull()
       const dest = archivePrevious(out, FINAL)!
-      expect(dest).toBe(join(d, 'history', `${realDoc.contract}.json`))
+      expect(dest).toBe(join(d, 'history', `${devDoc.contract}.json`))
       expect(readFileSync(dest, 'utf8')).toBe(readFileSync(out, 'utf8'))
       expect(existsSync(out)).toBe(true)
       expect(archivePrevious(out, FINAL)).toBe(dest)
-      expect(historyFiles(out)).toEqual([`${realDoc.contract}.json`])
-      writeFileSync(out, JSON.stringify({ ...realDoc, note: 'changed' }))
+      expect(historyFiles(out)).toEqual([`${devDoc.contract}.json`])
+      writeFileSync(out, JSON.stringify({ ...devDoc, note: 'changed' }))
       expect(() => archivePrevious(out, FINAL)).toThrow(/exists already with other content/)
     } finally {
       rmSync(d, { recursive: true, force: true })
