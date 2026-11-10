@@ -77,7 +77,7 @@ on each chain. The same history is on-chain: `sig_records` returns the signature
 view gives one hash over all of them.
 
 <p align="center">
-  <img src="assets/readme/activity.png" width="100%" alt="The Activity tab of Satchel #1 in the live app: a list of signatures issued on Ethereum Sepolia, Solana devnet and Bitcoin testnet4, and messages signed with its Solana and Ethereum addresses, grouped by day.">
+  <img src="assets/readme/activity.png" width="100%" alt="The Activity tab of Satchel #1 in the live app: signatures issued for Bitcoin testnet4, Solana devnet and Ethereum Sepolia, newest first, under the mint by alice.satchelhq.testnet.">
   <br><sub>Live: Satchel #1's activity on the development contract, every signature it has issued, read from the
   contract's events.</sub>
 </p>

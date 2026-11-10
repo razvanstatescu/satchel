@@ -94,7 +94,9 @@ shasum -a 256 target/near/satchel/satchel.wasm    # macOS
 ```
 Expected: `42d12b441f85b3208f97e1b8c6cc7b7ad3198f97d971f5d7651caf749706d8fa`, the same hash as in step 2. Without an x86_64 machine: the `reproducible` job in
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the same build on every push to `main`, prints the
-SHA-256 in its summary and keeps the wasm as an artifact. After the repo is public:
+SHA-256 in its summary and keeps the wasm as an artifact. The build writes the commit it came from into the wasm
+(NEP-330 `source_code_snapshot`, readable with `contract_source_metadata`), so the hash changes with every commit even
+when the contract code doesn't: H is the run for commit `843d353` (`contract-v1.0.0`). After the repo is public:
 `near contract verify deployed-at satchel.satchelhq.testnet network-config testnet-fastnear now` → "…are the same".
 
 **7. Contract constants and the MPC it depends on**

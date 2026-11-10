@@ -149,7 +149,7 @@ a claim link · sell it for NEAR or USDC · make or accept offers · let someone
 USDC and wNEAR inside it · empty it in one go · read its full history.
 
 <p align="center">
-  <img src="docs/assets/readme/activity.png" width="100%" alt="The Activity tab of Satchel #1 in the live app: signatures issued on Ethereum Sepolia, Solana devnet and Bitcoin testnet4, and messages signed with its Solana and Ethereum addresses, grouped by day.">
+  <img src="docs/assets/readme/activity.png" width="100%" alt="The Activity tab of Satchel #1 in the live app: signatures issued for Bitcoin testnet4, Solana devnet and Ethereum Sepolia, newest first, under the mint by alice.satchelhq.testnet.">
   <br><sub>Live: Satchel #1's history, every signature it has issued, read from the contract.</sub>
 </p>
 

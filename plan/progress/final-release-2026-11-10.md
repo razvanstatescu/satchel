@@ -61,9 +61,14 @@ in `docs/evidence/history/` and still verifies (8e3c188). No MPC timeouts.
   freshness.
 - No `[TBD]` and no pre-birth wording left in judge-facing files.
 
-## Left
+## After
 
 - F-07 fresh-clone rehearsal: done; three findings fixed (S13 skip count, #4 wording, development.md notes).
-- CI on the pushed commits: confirm green on GitHub (no `gh` CLI on this machine).
-- `FASTNEAR_API_KEY` in Vercel or the `.env.production` comment; the `security` track (H-02, by Nov 12); re-shoot
-  `docs/assets/readme/activity.png` (it shows dev2); repo public on Day 13 (needs a yes); submission (needs a yes).
+- CI: run #143 on `cd88e09` green (contracts, reproducible, web), confirmed by Razvan. Its reproducible hash differs
+  from H because the build writes its commit into the wasm (NEP-330 `source_code_snapshot`); docs/verify.md says so.
+- Sandbox suite on nearcore 2.14.0 (testnet's version) against the deployed wasm: all pass (F-04).
+- `docs/assets/readme/activity.png` re-shot from the live final (#1: BTC ×3, SOL, ETH ×2, mint); alt text updated.
+
+## Left
+
+- `FASTNEAR_API_KEY` in Vercel or the `.env.production` comment; the `security` track (H-02, by Nov 12); repo public on Day 13 (needs a yes); submission (needs a yes).

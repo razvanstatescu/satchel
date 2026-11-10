@@ -10,7 +10,7 @@ by hand, so every screen matches the app at the commit it was made from.
 | `send.png` | The two steps of sending ETH: fill in, review | the app, sample data, as the owner |
 | `buy-check.png` | The Buy tab of a clean listing (#3) and of a blocked one (#4) | the app, sample data, as `carol.satchelhq.testnet` |
 | `market.png` | The market, with each listing's verdict | the app, sample data |
-| `activity.png` | Satchel #1's activity | **live** app (`https://usesatchel.xyz`, the development contract until Nov 10) |
+| `activity.png` | Satchel #1's activity | **live** app (`https://usesatchel.xyz`, the final contract `satchel.satchelhq.testnet`) |
 
 "Sample data" is the app's fixture mode, the offline dataset the e2e suite runs on. Those screens keep the app's own
 "Sample data: these pages don't read the chains live" strip. The contract page is not shown here: in fixture mode
