@@ -193,6 +193,15 @@ describe('shell scripts', () => {
     expect(r.stdout).toMatch(/HIDDEN +tb1qhidden/)
     expect(r.stdout).toMatch(/MISSING +gone/)
   })
+
+  it('visible-facts.py reads grouped inline text as one string, as a browser does, and keeps blocks apart', () => {
+    const html = '<dl><dt>Code hash</dt><dd><span><span>42d12b44</span><span>1f85b320</span></span></dd></dl><p>one</p><p>two</p>'
+    const run = (...facts: string[]) => spawnSync('python3', [join(TOOLS, 'lib/visible-facts.py'), ...facts], { input: html, encoding: 'utf8' })
+    expect(run('42d12b441f85b320', 'Code hash 42d12b44').status).toBe(0)
+    const r = run('onetwo')
+    expect(r.status).toBe(1)
+    expect(r.stdout).toMatch(/MISSING +onetwo/)
+  })
 })
 
 describe('repo hygiene for release files', () => {

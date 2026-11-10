@@ -86,7 +86,7 @@ else
   for page in "/s/1|$OWNER|$BTC_ADDR|$EVM_ADDR|$SOL_ADDR" "/contract|$C|Account is locked (no access keys)|MPC version" "/market|Listed|Clean history"; do
     IFS='|' read -r path f1 f2 f3 f4 <<<"$page"
     facts=("$f1"); [[ -n "${f2:-}" ]] && facts+=("$f2"); [[ -n "${f3:-}" ]] && facts+=("$f3"); [[ -n "${f4:-}" ]] && facts+=("$f4")
-    tbd "$H" || [[ "$path" == "/market" ]] || facts+=("$H")
+    tbd "$H" || [[ "$path" != "/contract" ]] || facts+=("$H")   # the code hash is a /contract fact
     if visible_check "$APP$path" "${facts[@]}"; then res PASS "$path shows its facts without JS"; else res FAIL "$path is missing facts (or they are hidden)"; fi
   done
 fi
