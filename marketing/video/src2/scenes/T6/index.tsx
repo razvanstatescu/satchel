@@ -7,7 +7,7 @@ import { getScene } from "../../lib/timeline";
 import { FPS } from "../../lib/time";
 import { blinkAt, blinkSchedule, bonkAngle, CHARM_SWING, clamp, EASE2, eyeOpen, noWobbleX, SPRING2 } from "../../motion";
 import { TABS } from "../T5";
-import { Browser, CAM_MID, type Cam, CameraView, camAt, Caption, type CharmAnim, mixFace, type RowSpec, SalePage } from "../T5/sale";
+import { Browser, CAM_MID, type Cam, CameraView, camAt, Caption, CAPTION_2L, type CharmAnim, mixFace, type RowSpec, SalePage } from "../T5/sale";
 
 /**
  * T6 · Blocked (110–116 s; the music drops to bass + tick on the "blocked" marker). A tab switch to Satchel #4: the
@@ -31,19 +31,17 @@ const T = {
   redAt: fr(SC.wordAt("V24", "old")) + 2, // the outline turns red as the beam passes, on "old signature"
   slipOut: fr(SC.wordAt("V24", "signature")) + 6,
   contact: fr(SC.wordAt("V24", "move")), // the bonk lands on "could still MOVE coins"
-  // a hard cut back to the whole page on the beat before "Buy" (6 beats in): a moving pull-back would drag the
-  // browser's tab and URL bars through the caption band
-  cutOut: 90,
+  // a hard cut back to the whole page on the last beat at least 8 f before "Buy" (scene starts sit on the 120 BPM
+  // grid, so a beat is every 15 f): a moving pull-back would drag the tab and URL bars through the caption band
+  cutOut: Math.floor((fr(SC.wordAt("V24", "Buy")) - 8) / 15) * 15,
   buyNo: fr(SC.wordAt("V24", "Buy")), // the greyed Buy shakes "no" on "Buy"…
   offerNo: fr(SC.wordAt("V24", "offers")), // …and Make an offer on "offers"
 };
 const BLOCK = T.contact + 10; // the verdict turns Blocked
 const CAP = BLOCK + 4; // caption contact
 
-/** CU for #4: its history panel with a caption band above (the panel header sits at y ≈ 240). */
-const CAM_CU4: Cam = { x: 905, y: 300, z: 2.7 };
-/** After the cut: the whole page, 12 px lower than T5's MID so "signature"'s descender clears the tab bar. */
-const CAM_MID6: Cam = { ...CAM_MID, y: CAM_MID.y - 12 / CAM_MID.z };
+/** CU for #4: its history panel with a caption band above (the panel's top edge at y ≈ 266, ≥ 15 px under the caption). */
+const CAM_CU4: Cam = { x: 905, y: 300 - 10 / 2.7, z: 2.7 };
 
 function charmT6(f: number, fps: number): CharmAnim {
   const t = f / fps;
@@ -83,7 +81,7 @@ export default function T6Scene() {
     { f: T.camIn[0], cam: CAM_MID },
     { f: T.camIn[1], cam: CAM_CU4 },
     { f: T.cutOut - 1, cam: CAM_CU4 },
-    { f: T.cutOut, cam: CAM_MID6 },
+    { f: T.cutOut, cam: CAM_MID }, // the same MID as T5 and T7 (its top edge clears "signature"'s descender)
   ]);
 
   const spin = (f % 24) / 24;
@@ -151,7 +149,7 @@ export default function T6Scene() {
         </div>
       </div>
 
-      <Caption frame={f} text={<>Blocked:<br />1 unused signature</>} contact={CAP} y={22} size={110} seed="t6-blocked" />
+      <Caption frame={f} text={<>Blocked:<br />1 unused signature</>} contact={CAP} y={CAPTION_2L.y} size={CAPTION_2L.size} leading={CAPTION_2L.leading} seed="t6-blocked" />
 
       <Sfx name="sticker-slap" at={4 / FPS} gainDb={-9} />
       <Sfx name="whoosh-soft" at={(T.camIn[0] + 8) / FPS} align="peak" gainDb={-11} />

@@ -1,0 +1,39 @@
+{
+ "id": "F11",
+ "plate": "T2-18",
+ "voice": "bill",
+ "text": "drain more than $270 million from Drift",
+ "say": "drain more than $270 million from Drift",
+ "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F11-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F11-tv.mp3"
+ },
+ "durationSec": 3.99,
+ "heard": {
+  "dry": "Drain more than $270 million from Drift",
+  "tv": "drain more than two hundred and seventy million dollars from Drift"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22.7,
+   "momentaryMaxLufs": -21,
+   "truePeakDb": -9.6
+  },
+  "tv": {
+   "integratedLufs": -26,
+   "momentaryMaxLufs": -23.8,
+   "truePeakDb": -10.7
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Drain more than $270 million from Drift",
+   "heardTv": "drain more than two hundred and seventy million dollars from Drift"
+  }
+ ]
+}

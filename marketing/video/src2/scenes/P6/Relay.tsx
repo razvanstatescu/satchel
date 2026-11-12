@@ -48,6 +48,13 @@ export function RelayStage({ frame }: { frame: number }) {
   const nx = edge.x + 34 * reach + 300 * (1 - newIn);
   const ny = edge.y + 10 * reach + bobNew + (t >= HANDOFF.contact ? 8 * (1 - spring({ frame: t - HANDOFF.contact, fps: FPS, config: SPRING2.rebound })) : 0);
   const grabbing = t >= HANDOFF.contact - 3;
+  // new-team's tag rides with the hand (no tag before the hand arrives); its offset keeps its right edge ≥ 90 px inside
+  // the frame with the hand at rest (and the 2 % push)
+  const NEW_TAG_DX = Math.min(190, 1690 - (edge.x + 34));
+  const newTagX = nx + 34 * (1 - reach) + NEW_TAG_DX; // the entrance moves it; the reach → grab shift doesn't
+  // QA verify N2: old-team's tag pops out (6 f) just before the lift, so the leaning card never meets it and it never
+  // has to follow the runner's fall-back toward the frame edge
+  const oldTagS = 1 - interpolate(t, [-3, -1, 3], [0, -0.08, 1], { ...clamp, easing: EASE2.fall });
 
   const fx = (i: number) => {
     const chain = CHAINS3[i];
@@ -82,8 +89,8 @@ export function RelayStage({ frame }: { frame: number }) {
         <Hand pose="grab" x={ox} y={oy} k={K} angle={90} sleeve={SLEEVE.oldTeam} tag={null} grip={oldGrip} layer="front" />
         {grabbing ? <Hand pose="grab" x={nx} y={ny} k={K} angle={90} mirror sleeve={SLEEVE.newTeam} tag={null} grip={ramp(t, HANDOFF.contact - 3, HANDOFF.contact)} layer="front" /> : null}
         <SvgLayer>
-          <NameTag x={Math.max(170, ox - 200)} y={oy + 30} text="old-team.near" k={2.4} tilt={-2} />
-          <NameTag x={nx + 190} y={ny + 30} text="new-team.near" k={2.4} tilt={2} />
+          {oldTagS > 0.01 ? <NameTag x={240} y={oy + 30} text="old-team.near" k={2.4 * oldTagS} tilt={-2} /> : null}
+          <NameTag x={newTagX} y={ny + 30} text="new-team.near" k={2.4} tilt={2} />
         </SvgLayer>
       </AbsoluteFill>
     </AbsoluteFill>

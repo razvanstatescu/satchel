@@ -4,8 +4,8 @@ import { GiveSheet, SatchelScreen } from "../../components/ui";
 import { charmKick, Hand, handPoint, NameTag, PhoneFrame } from "../../illustration/characters";
 import { getScene } from "../../lib/timeline";
 import { Sfx } from "../../lib/Sfx";
-import { clamp, EASE2, HANDOFF, pressAt, SLAP_CONTACT, slapAt, SPRING2 } from "../../motion";
-import { ClaimLinkSticker } from "./cards";
+import { clamp, EASE2, HANDOFF, Peel, pressAt, SLAP_CONTACT, slapAt, SPRING2 } from "../../motion";
+import { CARD_H, ClaimLinkSticker } from "./cards";
 import { Caption, CHAINS3, FPS, ramp, sec, SvgLayer, SwingCard, swingGeom, type SwingOpts, whip, WhipLayer } from "./rig";
 
 /**
@@ -39,12 +39,16 @@ const F = {
 const LIFT = F.contact - HANDOFF.contact; // the hand-off clock's zero
 const CUT = F.press + 11; // whip out of the phone
 const TYPE0 = 2; // v4: the press comes on 44.0 s, so bob.near types in faster
-const BOUNCE = onBeat(V10.end); // the first beat after the VO has finished (51.5 s)
+const BOUNCE = onBeat(V10.end); // the first beat after the VO has finished (51.5 s); skipped if the tail is too short
 // the claim link: slaps in on "even one who isn't on NEAR yet" (once the whip has settled), "Claimed" on "yet", then
 // tucks into the top-right corner before the swing lifts and stays there beside it
-const CLAIM_IN = Math.max(F.even, CUT + 8);
-const CLAIMED = F.yet;
-const CLAIM_TUCK = Math.min(LIFT - 14, F.everything - 8);
+// v5: it lands on "one who" (after "Even by link." has landed and been read), "Claimed" pops on "NEAR", then it peels
+// off and leaves up-then-right above bob's glove, gone 6 f before the caption swap (no small badge left behind)
+const CLAIM_IN = Math.max(sec(SC.wordAt("V10", "one")), CUT + 8) + 2;
+// QA verify N3: the peel starts as late as it can (gone 6 f before the caption swap; dog-ear 3 f + away 7 f) and
+// "Claimed" lands early enough to sit still ≥ 0.6 s before the link lifts
+const CLAIM_PEEL = F.everything - SLAP_CONTACT - 6 - 10;
+const CLAIMED = Math.min(sec(SC.wordAt("V10", "NEAR")) - 7, CLAIM_PEEL - 21);
 const FOUND = TYPE0 + 20;
 
 // stage: hero card, alice (left) → bob (right)
@@ -116,19 +120,26 @@ function PhoneStage({ frame }: { frame: number }) {
 // ── 1b. give by link: the claim-link sticker beside the swing ────────────────────────────────────────────────────
 
 function ClaimLink({ frame }: { frame: number }) {
-  if (frame < CLAIM_IN - SLAP_CONTACT) return null;
+  if (frame < CLAIM_IN - SLAP_CONTACT || frame >= CLAIM_PEEL + 10) return null;
   const slap = slapAt(frame - (CLAIM_IN - SLAP_CONTACT), FPS, 0, { from: 1.2, squash: 0.06, drop: 0 });
-  const claimed = ramp(frame, CLAIMED, CLAIMED + 8); // the kit's badge pop runs on 0..1 progress
-  const tuck = interpolate(frame, [CLAIM_TUCK, CLAIM_TUCK + 14], [0, 1], { ...clamp, easing: EASE2.pan });
+  const claimed = ramp(frame, CLAIMED, CLAIMED + 5); // the kit's badge pop runs on 0..1 progress (settled in 5 f)
   const K0 = 2.05;
   const W = 236 * K0;
-  // in the gap between alice's card and bob's hand, then tucked to the top right at 55 %
-  const x = interpolate(tuck, [0, 1], [1232, 1702]);
-  const y = interpolate(tuck, [0, 1], [612, 196]);
-  const sc = interpolate(tuck, [0, 1], [1, 0.55]);
+  const H = W * CARD_H.claim;
+  // the peel (bible §2.2): the top-right corner dog-ears (3 f, rip), then the sticker comes away: up first (clear of
+  // the caption above and bob's glove to the right), then out to the right, shrinking as it recedes and turning 10°
+  const curl = interpolate(frame, [CLAIM_PEEL, CLAIM_PEEL + 3], [0, 0.22], { ...clamp, easing: EASE2.rip });
+  const up = interpolate(frame, [CLAIM_PEEL + 3, CLAIM_PEEL + 7], [0, 1], { ...clamp, easing: EASE2.out });
+  const away = interpolate(frame, [CLAIM_PEEL + 5, CLAIM_PEEL + 10], [0, 1], { ...clamp, easing: EASE2.fall });
+  const x = 1232 + 1150 * away;
+  const y = 612 - 236 * up;
+  const sc = 1 - 0.24 * up;
+  const turn = 10 * up;
   return (
-    <div style={{ position: "absolute", left: x - W / 2, top: y - 135, width: W, scale: `${sc * slap.sx} ${sc * slap.sy}`, opacity: slap.opacity, transformOrigin: "50% 50%", rotate: "-2deg" }}>
-      <ClaimLinkSticker k={K0} claimed={claimed} />
+    <div style={{ position: "absolute", left: x - W / 2, top: y - H / 2, width: W, height: H, scale: `${sc * slap.sx} ${sc * slap.sy}`, opacity: slap.opacity, transformOrigin: "50% 50%", rotate: `${turn - 2}deg` }}>
+      <Peel w={W} h={H} progress={curl} corner="tr" radius={16 * (W / 300)} outline={5} rest={7}>
+        <ClaimLinkSticker k={K0} claimed={claimed} />
+      </Peel>
     </div>
   );
 }
@@ -157,9 +168,15 @@ function SwingStage({ frame }: { frame: number }) {
   const aliceExit = interpolate(frame, [F.wrapped + 2, F.wrapped + 12], [0, 1], { ...clamp, easing: EASE2.fall });
   const aliceProps = { ...pinchProps, pinch: 1 - release };
   const aliceTag = { x: wrist.x - 200 + 120 * raise, y: wrist.y + 18 + 10 * raise };
+  // alice's tag holds a fixed SCREEN x (centre 207 px: its left edge ≥ 90 px inside the frame and its right edge clear
+  // of the card's left edge before the lift), so the camera follow and the push never carry it to the edge
+  const ALICE_TAG_X = O.toX + (207 + camX - O.toX) / push;
+  // QA verify N2: the tag pops out (6 f, like the status pills) just before the lift, so the leaning card never covers
+  // it, and it never comes back (alice's wave and exit run tagless, so it can't trail her hand)
+  const aliceTagS = 1 - interpolate(t, [-3, -1, 3], [0, -0.08, 1], { ...clamp, easing: EASE2.fall });
 
   // a little bounce of bob's hand on the 45.5 s beat (after the last caption has been read): the card and charms answer
-  const bounce = -14 * Math.sin(Math.PI * ramp(frame, BOUNCE, BOUNCE + 8)) * (frame < BOUNCE + 8 ? 1 : 0);
+  const bounce = BOUNCE + 10 <= F.end ? -14 * Math.sin(Math.PI * ramp(frame, BOUNCE, BOUNCE + 8)) * (frame < BOUNCE + 8 ? 1 : 0) : 0;
 
   // bob (right): slides in, waits with an open pinch, rises 6 px 2 f before contact, dips 8 px on it, then holds the corner
   const bobIn = spring({ frame: frame - CUT, fps: FPS, config: SPRING2.land });
@@ -168,6 +185,8 @@ function SwingStage({ frame }: { frame: number }) {
   const rise = -6 * ramp(t, HANDOFF.contact - 4, HANDOFF.contact - 2);
   const dip = t >= HANDOFF.contact ? 8 * (1 - spring({ frame: t - HANDOFF.contact, fps: FPS, config: SPRING2.rebound })) : 0;
   const bx = corner.x + 340 * (1 - bobIn);
+  // bob's tag rides with his hand; its offset is set so that, at rest, its right edge is ≥ 90 px inside the frame
+  const BOB_TAG_DX = Math.min(330, 1740 - corner.x);
   const by = corner.y + 40 * (1 - bobIn) + (t < HANDOFF.contact ? rise : dip) + bounce;
   const bobPinch = 0.15 + 0.85 * ramp(t, HANDOFF.contact - 3, HANDOFF.contact);
 
@@ -195,13 +214,13 @@ function SwingStage({ frame }: { frame: number }) {
             <Hand {...aliceProps} layer="back" />
           )}
           <SvgLayer>
-            <NameTag x={Math.max(150 + camX, aliceTag.x)} y={aliceTag.y} text="alice.near" k={2.6} tilt={-2} />
+            {aliceTagS > 0.01 ? <NameTag x={ALICE_TAG_X} y={aliceTag.y} text="alice.near" k={2.6 * aliceTagS} tilt={-2} /> : null}
           </SvgLayer>
         </div>
       ) : null}
       <Hand pose="pinch" x={bx} y={by} k={K} angle={84} mirror sleeve="bob" tag={null} pinch={bobPinch} layer="back" />
       <SvgLayer>
-        <NameTag x={Math.min(1800 + camX, bx + 330)} y={by + (bx + 330 > 1800 + camX ? 62 : 30)} text="bob.near" k={2.6} tilt={2} />
+        <NameTag x={bx + BOB_TAG_DX} y={by + (BOB_TAG_DX < 330 ? 62 : 30)} text="bob.near" k={2.6} tilt={2} />
       </SvgLayer>
       <SwingCard t={t} o={O} frame={frame} fx={fx} blinkSeed="p5" offsetY={bounce} />
       {raise <= 0 && aliceExit < 1 ? <Hand {...aliceProps} layer="front" /> : null}
@@ -223,6 +242,7 @@ function Sounds() {
       <Sfx name="whoosh-zip" at={at(CUT)} align="peak" gainDb={0} />
       <Sfx name="sticker-slap" at={at(CLAIM_IN)} gainDb={-6} />
       <Sfx name="pop" at={at(CLAIMED)} gainDb={-3} />
+      <Sfx name="sticker-peel" at={at(CLAIM_PEEL + 3)} align="peak" gainDb={-4} />
       <Sfx name="swing-swish" at={at(LIFT + 10)} align="peak" gainDb={-1} />
       <Sfx name="charm-jingle" at={at(LIFT + HANDOFF.apex)} align="peak" gainDb={2} />
       <Sfx name="sticker-slap" at={at(F.contact)} gainDb={-4} />

@@ -1,0 +1,958 @@
+{
+  "generated": "2026-11-10",
+  "purpose": "Raw material for the ~8 s cold open of the Satchel launch film: real headlines and posts about the problems Satchel answers. Raw captures are UNBLURRED; apply the blur list in each item before use.",
+  "seeAlso": "marketing/notes/intro-research/sources.md (all candidates, fact checks, licensing)",
+  "capture": {
+    "tool": "Playwright Chromium (apps/web @playwright/test), deviceScaleFactor 2, timezone UTC, locale en-US, one browser at a time",
+    "xPosts": "Public embed https://platform.twitter.com/embed/Tweet.html?id=<ID>&theme=<light|dark>&dnt=true&lang=en (no login). Element screenshot of the post card, transparent rounded corners. Times on cards are UTC.",
+    "pages": "Viewport 1280 CSS px (PNG 2560 px wide). Cookie/consent dialogs, newsletter pop-ups and ad slots hidden with CSS or removed before capture; requests to common ad/video-ad domains blocked. No words, numbers or layout of the article were edited.",
+    "blockedByBotCheck": [
+      "bleepingcomputer.com (Cloudflare check): Trust Wallet, Ledger implant, snail-mail letters, $494M drainers articles",
+      "reuters.com (401)",
+      "helpnetsecurity.com",
+      "fbi.gov video page (Cloudflare check)"
+    ],
+    "notBypassed": "Pages behind a bot check were skipped, not circumvented."
+  },
+  "items": [
+    {
+      "id": "T1-01",
+      "theme": [
+        1
+      ],
+      "type": "x-post",
+      "account": "@_SEAL_Org (Security Alliance, SEAL 911)",
+      "date": "2024-12-16T23:50:07Z",
+      "url": "https://x.com/_SEAL_Org/status/1868805837311074576",
+      "tweetId": "1868805837311074576",
+      "files": [
+        "t1-x-seal-org-2024-12-16-lastpass-seed-phrases-at-risk-light.png",
+        "t1-x-seal-org-2024-12-16-lastpass-seed-phrases-at-risk-dark.png"
+      ],
+      "text": "⚠️ Reminder that if you ever stored your private keys or seed phrases in LastPass prior to 2023, your funds might be at risk. We've seen 15+ cases of potential LastPass-related hacks TODAY\n\nMove your assets before hackers move them for you. For more information, keep reading🧵",
+      "mapsTo": "A seed phrase copied years ago can still empty a wallet today. Satchel: its BTC/ETH/SOL addresses have no seed phrase, so there is nothing to copy or leak.",
+      "factCheck": "VERIFIED as SEAL's own post (primary). The '15+ cases' count is SEAL's claim, not independently checked.",
+      "people": "Organisation account. No private individuals.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 5,
+      "topPick": 7
+    },
+    {
+      "id": "T1-02",
+      "theme": [
+        1
+      ],
+      "type": "news",
+      "outlet": "KrebsOnSecurity (Brian Krebs)",
+      "date": "2025-03-07",
+      "url": "https://krebsonsecurity.com/2025/03/feds-link-150m-cyberheist-to-2022-lastpass-hacks/",
+      "files": [
+        "t1-news-krebsonsecurity-2025-03-07-lastpass-150m-cyberheist.png"
+      ],
+      "text": "Feds Link $150M Cyberheist to 2022 LastPass Hacks",
+      "mapsTo": "Seed phrases kept in a password manager were stolen in 2022 and used to drain wallets in 2024. Satchel: no seed phrase to store.",
+      "factCheck": "REPORTED (Krebs quoting a federal seizure filing: ~$24M seized from a $150M theft on 2024-01-30; victims had stored seed phrases in LastPass Secure Notes). LastPass says it has seen no conclusive evidence of the link.",
+      "people": "Header photo of Brian Krebs (journalist, public figure). Site ad hidden at capture.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4,
+      "topPick": 8
+    },
+    {
+      "id": "T1-03",
+      "theme": [
+        1
+      ],
+      "type": "x-post",
+      "account": "@MetaMask",
+      "date": "2022-04-17T16:21:49Z",
+      "url": "https://x.com/MetaMask/status/1515727239391809536",
+      "tweetId": "1515727239391809536",
+      "files": [
+        "t1-x-metamask-2022-04-17-icloud-backup-vault-phished-light.png",
+        "t1-x-metamask-2022-04-17-icloud-backup-vault-phished-dark.png"
+      ],
+      "text": "🔒 If you have enabled iCloud backup for app data, this will include your password-encrypted MetaMask vault. If your password isn’t strong enough, and someone phishes your iCloud credentials, this can mean stolen funds. (Read on 👇) 1/3",
+      "mapsTo": "Wallet backups end up in the cloud and get phished. Satchel: nothing to back up for the chain addresses.",
+      "factCheck": "VERIFIED (primary post). The triggering ~$650K loss is REPORTED (Decrypt, The Block, AppleInsider, Apr 2022).",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4
+    },
+    {
+      "id": "T1-04",
+      "theme": [
+        1
+      ],
+      "type": "x-post",
+      "account": "@SolanaStatus",
+      "date": "2022-08-03T20:05:24Z",
+      "url": "https://x.com/SolanaStatus/status/1554921397717180416",
+      "tweetId": "1554921397717180416",
+      "files": [
+        "t1-x-solanastatus-2022-08-03-slope-private-keys-sent-to-monitoring-light.png"
+      ],
+      "text": "This exploit was isolated to one wallet on Solana, and hardware wallets used by Slope remain secure.\n\nWhile the details of exactly how this occurred are still under investigation, but private key information was inadvertently transmitted to an application monitoring service.  2/3",
+      "captureNote": "Captured with hideThread=true: shows post 2/3 only ('Replying to @SolanaStatus').",
+      "mapsTo": "A wallet app leaked private keys to a logging service and thousands of wallets were drained. Satchel: no private key or seed phrase on the user's device for the chain addresses.",
+      "factCheck": "VERIFIED (primary post). Scale is REPORTED and varies: 'almost 8,000 wallets' (The Block, 2022-08-03); $4M-$8M in other outlets.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4
+    },
+    {
+      "id": "T1-05",
+      "theme": [
+        1
+      ],
+      "type": "press-release",
+      "outlet": "Kaspersky",
+      "date": "2025-02-05",
+      "url": "https://www.kaspersky.com/about/press-releases/kaspersky-discovers-new-crypto-stealing-trojan-in-appstore-and-google-play",
+      "files": [
+        "t1-pr-kaspersky-2025-02-sparkcat-app-store-trojan.png"
+      ],
+      "text": "Kaspersky discovers new crypto-stealing Trojan in AppStore and Google Play",
+      "mapsTo": "Malware reads screenshots of recovery phrases from phone galleries (SparkCat). Satchel: no recovery phrase to photograph.",
+      "factCheck": "VERIFIED (primary): 'first known instance of optical recognition-based malware appearing in AppStore'; Google Play apps 'downloaded over 242,000 times'; it steals 'screenshots containing cryptocurrency wallet recovery phrases'.",
+      "people": "None.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 3
+    },
+    {
+      "id": "T1-06",
+      "theme": [
+        1
+      ],
+      "type": "x-post",
+      "account": "@TrustWallet",
+      "date": "2025-12-26T08:51:16Z",
+      "url": "https://x.com/TrustWallet/status/2004475085168795941",
+      "tweetId": "2004475085168795941",
+      "files": [
+        "t1-x-trustwallet-2025-12-26-extension-7m-impacted-light.png"
+      ],
+      "text": "Update on the Trust Wallet Browser Extension (v2.68) incident:\n\nWe’ve confirmed that approximately $7M has been impacted and we will ensure all affected users are refunded.\n\nSupporting affected users is our top priority, and we are actively finalizing the process to refund the Show more",
+      "quoted": "We’ve identified a security incident affecting Trust Wallet Browser Extension version 2.68 only. Users with Browser Extension 2.68 should disable and upgrade to 2.69.\n\nPlease refer to the official Chrome Webstore link here: https://chrome.google.com/webstore/detail/trust-wallet/egjidjbpglichdcondbcbdnbeeppgdph…\n\nPlease note: Mobile-only users",
+      "mapsTo": "A poisoned wallet-extension update harvested seed phrases (~$7M). Satchel: there is no seed phrase for an extension to harvest.",
+      "factCheck": "VERIFIED (primary: Trust Wallet's own '$7M'). Seed-phrase exfiltration is REPORTED (SlowMist analysis, quoted by The Hacker News).",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4,
+      "brandNote": "Wallet brand (Trust Wallet)."
+    },
+    {
+      "id": "T1-07",
+      "theme": [
+        1
+      ],
+      "type": "news",
+      "outlet": "The Hacker News",
+      "date": "2025-12-26",
+      "url": "https://thehackernews.com/2025/12/trust-wallet-chrome-extension-bug.html",
+      "files": [
+        "t1-news-thehackernews-2025-12-26-trust-wallet-7m.png"
+      ],
+      "text": "Trust Wallet Chrome Extension Breach Caused $7 Million Crypto Loss via Malicious Code",
+      "mapsTo": "Same incident as T1-06, as a news headline.",
+      "factCheck": "VERIFIED ($7M per Trust Wallet's post; SlowMist: 'Once decrypted, the mnemonic phrase is sent to the attacker's server').",
+      "people": "Journalist byline only. Site ads hidden at capture.",
+      "privacy": {
+        "blur": [],
+        "notes": "lead image is a wallet UI illustration with a sample balance; fine"
+      },
+      "score": 4,
+      "brandNote": "Wallet brand (Trust Wallet)."
+    },
+    {
+      "id": "T1-08",
+      "theme": [
+        1,
+        3
+      ],
+      "type": "news",
+      "outlet": "Cointelegraph",
+      "date": "2026-10-13",
+      "url": "https://cointelegraph.com/news/ledger-cellular-implants-wallets-sold-cryptobilis",
+      "files": [
+        "t1-news-cointelegraph-2026-10-13-ledger-lte-spy-implants-cryptobilis.png"
+      ],
+      "text": "Ledger details LTE-enabled spy implants in wallets sold by CryptoBilis",
+      "mapsTo": "Hardware wallets bought from a reseller came with an implant that copied the 24-word phrase during setup: someone else had the keys from day one. Satchel: no phrase is ever shown, so there is nothing to capture.",
+      "factCheck": "VERIFIED that Ledger Donjon described the implant (decodes the 24 words shown during setup, sends them over LTE via eSIM). Loss totals are UNVERIFIED ('could exceed $86 million' per investigator Specter; $103M per Yfarmx; Ledger hasn't confirmed a total). Do not show a dollar figure for this case.",
+      "people": "Journalist avatars only.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4,
+      "topPick": 9,
+      "brandNote": "Ledger-related; use at most one Ledger item in the cut."
+    },
+    {
+      "id": "T1-09",
+      "theme": [
+        1,
+        3
+      ],
+      "type": "x-post",
+      "account": "@Ledger",
+      "date": "2026-10-13T06:39:17Z",
+      "url": "https://x.com/Ledger/status/2109896739985453358",
+      "tweetId": "2109896739985453358",
+      "files": [
+        "t1-x-ledger-2026-10-13-cryptobilis-hardware-implant-light.png"
+      ],
+      "text": "Update from Ledger Donjon on the CryptoBilis investigation 🔽\n\n@DonjonLedger is investigating Ledger signers sold by CryptoBilis, a reseller in Southeast Asia, that contained an unauthorized hardware implant. Ledger confirmed this on October 10th for one affected user's signer. Show more",
+      "mapsTo": "Primary statement for T1-08.",
+      "factCheck": "VERIFIED (primary).",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 3,
+      "brandNote": "Ledger-related."
+    },
+    {
+      "id": "T1-10",
+      "theme": [
+        1
+      ],
+      "type": "x-post",
+      "account": "@JacobCanfield",
+      "date": "2025-04-28T22:08:29Z",
+      "url": "https://x.com/JacobCanfield/status/1916977850344694024",
+      "tweetId": "1916977850344694024",
+      "files": [
+        "t1-x-jacobcanfield-2025-04-28-fake-letter-recovery-phrase-light.png"
+      ],
+      "text": "Breaking: New scam meta launched. Now they’re sending physical letters to the @Ledger addresses database leak requesting an ‘upgrade’ due to a security risk.\n\nBe very cautious and warn any friends or family that you know is in crypto and is not that savvy.",
+      "mapsTo": "A paper letter, styled as Ledger, asks owners to scan a QR code and enter their recovery phrase. Satchel: there is no recovery phrase to phish for the chain addresses.",
+      "factCheck": "VERIFIED: Ledger replied 'You are correct, this is a scam.' (https://x.com/Ledger/status/1917209656973213746, 2025-04-29); The Block reported it on 2025-04-30.",
+      "people": "Individual (crypto trader/influencer with a verified account; semi-public). Two photos of the letter held in his hand.",
+      "privacy": {
+        "blur": [
+          "avatar, display name and @handle (individual) unless you treat him as a public figure",
+          "the QR code on the letter (it pointed to a live phishing site)",
+          "his hand/fingers are fine"
+        ],
+        "notes": "Name and reference number on the letter were already redacted by the poster."
+      },
+      "score": 4,
+      "brandNote": "Ledger-related."
+    },
+    {
+      "id": "T1-11",
+      "theme": [
+        1
+      ],
+      "type": "news",
+      "outlet": "Cointelegraph",
+      "date": "2026-02-17",
+      "url": "https://cointelegraph.com/news/scammers-send-physical-letters-trezor-ledger-users-again",
+      "files": [
+        "t1-news-cointelegraph-2026-02-17-phishers-letters-trezor-ledger.png"
+      ],
+      "text": "Crypto phishers are sending letters to Trezor, Ledger users again",
+      "mapsTo": "Physical letters with QR codes lead to fake setup pages that ask for the recovery phrase.",
+      "factCheck": "VERIFIED (Cointelegraph: QR code leads to a fake site where users are tricked into 'entering their wallet recovery phrases').",
+      "people": "Journalist avatars only; illustration.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 3,
+      "brandNote": "Names two wallet brands (as victims' vendors)."
+    },
+    {
+      "id": "T1-12",
+      "theme": [
+        1
+      ],
+      "type": "news",
+      "outlet": "CoinDesk",
+      "date": "2026-01-16",
+      "url": "https://www.coindesk.com/business/2026/01/16/hacker-steals-usd282-milion-in-hardware-wallet-social-engineering-attack",
+      "files": [
+        "t1-news-coindesk-2026-01-16-282m-social-engineering.png"
+      ],
+      "text": "Hacker steals $282 million crypto from a victim in social-engineering attack",
+      "mapsTo": "One person tricked out of a hardware wallet's secret: $282M gone.",
+      "factCheck": "REPORTED ($282M in BTC and LTC per investigator ZachXBT, theft on 2026-01-10). That the victim revealed the seed phrase is UNVERIFIED (other outlets say so; CoinDesk only says 'social-engineering attack').",
+      "people": "Stock photo (Unsplash). Black box at right is a blocked video player.",
+      "privacy": {
+        "blur": [],
+        "notes": "crop out the black player box"
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-01",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@realScamSniffer (Scam Sniffer)",
+      "date": "2025-08-02T06:20:57Z",
+      "url": "https://x.com/realScamSniffer/status/1951528627985850508",
+      "tweetId": "1951528627985850508",
+      "files": [
+        "t2-x-realscamsniffer-2025-08-02-approval-signed-458-days-ago-908k-light.png",
+        "t2-x-realscamsniffer-2025-08-02-approval-signed-458-days-ago-908k-dark.png"
+      ],
+      "text": "🚨 ALERT: A victim lost $908,551 due to a phishing approval signed 458 days ago.\n🔐 REMINDER: Regularly review and revoke old approvals - your wallet security matters! 💰",
+      "mapsTo": "The film's central problem in one line: an authorization signed 458 days earlier emptied the wallet. Satchel refuses token approvals and permits, records every signature before it is made, and the buyer's browser checks that none can still move coins.",
+      "factCheck": "VERIFIED (primary post); Cointelegraph (2025-08-03) independently reports '$908,551 ... 458 days after unknowingly signing a malicious approval transaction' from on-chain data. On-chain transactions not checked by us.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "victim wallet address fragments in the attached Etherscan screenshot (e.g. 0x6c0eB6ef...9Ffb8d8aF, ...9d7c7AF129aE9D1B5E3e9Ffb8d8aF)"
+        ],
+        "notes": "Note: it was an on-chain approval, not an off-chain signature; say 'approval', not 'signature', in captions."
+      },
+      "score": 5,
+      "topPick": 1
+    },
+    {
+      "id": "T2-02",
+      "theme": [
+        2
+      ],
+      "type": "news",
+      "outlet": "Cointelegraph",
+      "date": "2025-08-03",
+      "url": "https://cointelegraph.com/news/crypto-victim-loses-908k-in-sophisticated-phishing-attack",
+      "files": [
+        "t2-news-cointelegraph-2025-08-delayed-phishing-908k.png"
+      ],
+      "text": "Crypto victim loses $908K in sophisticated phishing attack",
+      "mapsTo": "Same as T2-01, as a headline with '$908K' artwork.",
+      "factCheck": "VERIFIED (see T2-01). Subhead: 'A victim lost $908,551 in a crypto phishing scam 15 months after signing a malicious approval transaction.'",
+      "people": "Illustration; journalist avatars.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-03",
+      "theme": [
+        2
+      ],
+      "type": "blog",
+      "outlet": "Elliptic",
+      "date": "2022-01-24",
+      "url": "https://www.elliptic.co/blog/bug-allows-nfts-worth-over-1-million-to-be-stolen",
+      "files": [
+        "t2-blog-elliptic-2022-01-24-opensea-bug-old-listings-1m.png"
+      ],
+      "text": "Hackers Exploit Bug to \"Steal\" $1 Million in NFTs from OpenSea Users",
+      "keyLine": "Those old listings are now being used to purchase NFTs at prices chosen by the seller in the past.",
+      "mapsTo": "Old signed listings were filled long after the owners moved on: a signature outlived the moment it was made. Satchel: signing pauses while listed and the buyer checks every old signature is used up or expired.",
+      "factCheck": "VERIFIED (primary analysis): 'NFTs with a market value of $1.1 million have been purchased in this way'; Bored Ape #9991 bought for 0.77 ETH (~$1,800) and resold for 84.2 ETH (~$196,000).",
+      "people": "Lead image is an OpenSea activity table with marketplace usernames.",
+      "privacy": {
+        "blur": [
+          "OpenSea usernames in the lead table (Vault327, jpegdegenl..., TBALLER, MAYC-A-Wi...)"
+        ],
+        "notes": "Promo bar at top is part of the site; crop if needed."
+      },
+      "score": 5
+    },
+    {
+      "id": "T2-04",
+      "theme": [
+        2
+      ],
+      "type": "news",
+      "outlet": "Decrypt",
+      "date": "2022-01-24",
+      "url": "https://decrypt.co/91076/opensea-exploit-sees-bored-ape-yacht-club-nft-sell-1700",
+      "files": [
+        "t2-news-decrypt-2022-01-24-opensea-exploit-bayc-sells-1700.png"
+      ],
+      "text": "OpenSea Exploit Sees Bored Ape Yacht Club NFT Sell For $1,700 in Ethereum",
+      "subhead": "A listing bug on OpenSea allowed one user to buy Bored Ape Yacht Club NFTs at old prices, far below the current floor price.",
+      "mapsTo": "Same incident as T2-03: old listings bought at old prices.",
+      "factCheck": "VERIFIED via Elliptic (T2-03). OpenSea later refunded about 750 ETH (~$1.8M) (REPORTED, Decrypt).",
+      "people": "Journalist avatar; lead image is Bored Ape #9991 (credited 'Image: Yuga Labs').",
+      "privacy": {
+        "blur": [],
+        "notes": "Third-party NFT artwork in lead image; crop to the headline if rights are a concern. Price ticker is site chrome."
+      },
+      "score": 5,
+      "topPick": 2
+    },
+    {
+      "id": "T2-05",
+      "theme": [
+        2
+      ],
+      "type": "news",
+      "outlet": "The Record (Recorded Future News)",
+      "date": "2022-01-24",
+      "url": "https://therecord.media/hacker-abuses-opensea-to-buy-nfts-at-older-cheaper-prices",
+      "files": [
+        "t2-news-therecord-2022-01-24-opensea-old-cheaper-prices.png"
+      ],
+      "text": "Hacker abuses OpenSea to buy NFTs at older, cheaper prices",
+      "mapsTo": "Same incident, security-news outlet.",
+      "factCheck": "VERIFIED via Elliptic (T2-03).",
+      "people": "Byline Catalin Cimpanu (journalist).",
+      "privacy": {
+        "blur": [],
+        "notes": "Right column shows unrelated 2026 briefs; crop to the left column."
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-06",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@PeckShieldAlert (PeckShield)",
+      "date": "2022-01-24T09:38:01Z",
+      "url": "https://x.com/PeckShieldAlert/status/1485547426467364864",
+      "tweetId": "1485547426467364864",
+      "files": [
+        "t2-x-peckshieldalert-2022-01-24-opensea-old-listings-332-eth-light.png"
+      ],
+      "text": "It appears that @opensea has a front-end issue and the exploiter gained about 332 Ether",
+      "mapsTo": "Same incident, first alert.",
+      "factCheck": "VERIFIED as PeckShield's claim (primary); 332 ETH not checked on-chain by us.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "exploiter address fragment in the link card (0xb1a22c...), optional"
+        ],
+        "notes": "Link card text is fetched live from Etherscan ('As at Nov-04-2026')."
+      },
+      "score": 3
+    },
+    {
+      "id": "T2-07",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@dfinzer (Devin Finzer, OpenSea co-founder and CEO)",
+      "date": "2022-02-20T03:53:56Z",
+      "url": "https://x.com/dfinzer/status/1495245308812402688",
+      "tweetId": "1495245308812402688",
+      "files": [
+        "t2-x-dfinzer-2022-02-20-opensea-32-users-signed-malicious-payload-light.png",
+        "t2-x-dfinzer-2022-02-20-opensea-32-users-signed-malicious-payload-dark.png"
+      ],
+      "text": "As far as we can tell, this is a phishing attack. We don’t believe it’s connected to the OpenSea website. It appears 32 users thus far have signed a malicious payload from an attacker, and some of their NFTs were stolen.",
+      "parent": "I know you’re all worried. We’re running an all hands on deck investigation, but I want to take a minute to share the facts as I see them:",
+      "captureNote": "Captured with hideThread=true (shows 'Replying to @dfinzer').",
+      "mapsTo": "Users signed an off-chain payload that let an attacker take their NFTs. Satchel: it signs only readable requests (no raw hashes, no permits/approvals).",
+      "factCheck": "VERIFIED (primary post, 2022-02-20). OpenSea later revised the count to 17 affected users (REPORTED, CoinDesk 2022-02-21); losses ~$1.7M (Engadget, T2-08).",
+      "people": "Public figure (CEO); avatar is an NFT image.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 5,
+      "topPick": 5
+    },
+    {
+      "id": "T2-08",
+      "theme": [
+        2
+      ],
+      "type": "news",
+      "outlet": "Engadget",
+      "date": "2022-02-20",
+      "url": "https://www.engadget.com/opensea-phishing-attack-190402620.html",
+      "files": [
+        "t2-news-engadget-2022-02-20-opensea-phishing-hundreds-of-nfts.png"
+      ],
+      "text": "OpenSea users lose hundreds of NFTs in likely phishing attack",
+      "subhead": "The damage is estimated at $1.7 million.",
+      "mapsTo": "Same incident as T2-07, mainstream tech outlet.",
+      "factCheck": "REPORTED (Engadget citing Molly White's estimate: 641 ETH, ~$1.7M at the time).",
+      "people": "Lead photo credited 'JUSTIN TALLIS via Getty Images' (shows NFT artworks).",
+      "privacy": {
+        "blur": [],
+        "notes": "Getty photo: crop to the headline block unless licensed."
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-09",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@benbybit (Ben Zhou, Bybit co-founder and CEO)",
+      "date": "2025-02-21T15:44:09Z",
+      "url": "https://x.com/benbybit/status/1892963530422505586",
+      "tweetId": "1892963530422505586",
+      "files": [
+        "t2-x-benbybit-2025-02-21-bybit-signers-saw-masked-ui-light.png",
+        "t2-x-benbybit-2025-02-21-bybit-signers-saw-masked-ui-dark.png"
+      ],
+      "text": "Bybit ETH multisig cold wallet just made a transfer to our warm wallet about 1 hr ago. It appears that this specific transaction was musked, all the signers saw the musked UI which showed the correct address and the URL was from @safe . However the signing message was to change Show more",
+      "captureNote": "Embed truncates with 'Show more'; 'musked' is the original spelling (= masked). Do not correct it.",
+      "mapsTo": "Every signer approved a transaction they could not read: the screen showed one thing, the signature did another. Satchel: it refuses blind signing and anything it cannot parse.",
+      "factCheck": "VERIFIED (primary post); amount and attribution VERIFIED by FBI PSA I-022625-PSA (T2-11).",
+      "people": "Public figure (CEO), avatar photo.",
+      "privacy": {
+        "blur": [
+          "tx hash fragment 0xb61413c495... in the Etherscan card (public exchange incident), optional"
+        ],
+        "notes": "Do not imply Satchel would have prevented Bybit (an exchange multisig); use it only as 'signers could not read what they signed'."
+      },
+      "score": 5,
+      "topPick": 3
+    },
+    {
+      "id": "T2-10",
+      "theme": [
+        2,
+        4
+      ],
+      "type": "news",
+      "outlet": "NBC News",
+      "date": "2025-02-21",
+      "url": "https://www.nbcnews.com/tech/crypto/hackers-steal-15-billion-exchange-bybit-biggest-ever-crypto-heist-rcna193273",
+      "files": [
+        "t2-news-nbcnews-2025-02-21-bybit-biggest-ever-crypto-heist.png"
+      ],
+      "text": "Hackers steal $1.5 billion from exchange Bybit in biggest-ever crypto heist",
+      "subhead": "Blockchain analysis firm Elliptic later linked the attack to North Korea's Lazarus Group, a state-sponsored hacking collective.",
+      "mapsTo": "Scale: the biggest crypto theft on record started with signers approving what they could not read.",
+      "factCheck": "VERIFIED ($1.5B per FBI PSA, T2-11).",
+      "people": "Lead photo of Ben Zhou (public figure); agency photo.",
+      "privacy": {
+        "blur": [],
+        "notes": "Crop to the headline block unless the photo is licensed."
+      },
+      "score": 5,
+      "topPick": 4
+    },
+    {
+      "id": "T2-11",
+      "theme": [
+        2,
+        4
+      ],
+      "type": "government",
+      "outlet": "FBI / IC3 Public Service Announcement I-022625-PSA",
+      "date": "2025-02-26",
+      "url": "https://www.ic3.gov/PSA/2025/PSA250226",
+      "files": [
+        "t2-gov-ic3-fbi-2025-02-26-north-korea-1-5b-bybit-psa.png"
+      ],
+      "text": "North Korea Responsible for $1.5 Billion Bybit Hack",
+      "mapsTo": "Official confirmation of the Bybit figure.",
+      "factCheck": "VERIFIED (primary, US government).",
+      "people": "None; FBI and IC3 seals.",
+      "privacy": {
+        "blur": [],
+        "notes": "US government work (public domain), but 18 U.S.C. 701/709 restrict FBI seal/name use that implies endorsement. Never pair with Satchel branding in a way that suggests FBI approval; consider cropping the seals."
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-12",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@realScamSniffer (Scam Sniffer)",
+      "date": "2024-09-28T07:03:54Z",
+      "url": "https://x.com/realScamSniffer/status/1839923975184625832",
+      "tweetId": "1839923975184625832",
+      "files": [
+        "t2-x-realscamsniffer-2024-09-28-permit-signature-32m-light.png",
+        "t2-x-realscamsniffer-2024-09-28-permit-signature-32m-dark.png"
+      ],
+      "text": "🚨 43 mins ago, someone lost 12,083 spWETH ($32.43M) after signing a \"permit\" phishing signature.💸",
+      "mapsTo": "One gasless 'permit' signature, $32.43M gone. Satchel refuses EIP-712 permits and Permit2.",
+      "factCheck": "VERIFIED (primary post); also reported by Cointelegraph/BeInCrypto. Not checked on-chain by us.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "victim and phishing address fragments in the attached screenshot (e.g. 0xAA158208...F86A3eE57)"
+        ],
+        "notes": "none"
+      },
+      "score": 5,
+      "topPick": 6
+    },
+    {
+      "id": "T2-13",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@realScamSniffer (Scam Sniffer)",
+      "date": "2024-10-11T04:05:58Z",
+      "url": "https://x.com/realScamSniffer/status/1844590237521203610",
+      "tweetId": "1844590237521203610",
+      "files": [
+        "t2-x-realscamsniffer-2024-10-11-permit-signature-35m-light.png",
+        "t2-x-realscamsniffer-2024-10-11-permit-signature-35m-dark.png"
+      ],
+      "text": "🚨 5 hours ago, someone lost 15,079 fwDETH($35M) after signing a \"permit\" phishing signature.💸",
+      "mapsTo": "Same pattern, $35M.",
+      "factCheck": "VERIFIED (primary post); not checked on-chain.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "address and tx-hash fragments in the attached screenshot"
+        ],
+        "notes": "none"
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-14",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@realScamSniffer (Scam Sniffer)",
+      "date": "2025-12-08T13:15:05Z",
+      "url": "https://x.com/realScamSniffer/status/1998018496635207832",
+      "tweetId": "1998018496635207832",
+      "files": [
+        "t2-x-realscamsniffer-2025-12-08-permit-signature-440k-usdc-light.png"
+      ],
+      "text": "🚨 Someone lost $440,358 in $USDC after signing a malicious \"permit\" signatures.",
+      "quoted": "🚨 ScamSniffer November 2025 Phishing Report\n\nNovember losses: $7.77M | 6,344 victims\nVS October: +137% in losses | -42% in victims\n\nKey insight: Sharp reversal—losses surged while victim count dropped. Whale hunting intensified with top hit at $1.22M (permit signature). Despite",
+      "mapsTo": "Same pattern in USDC, late 2025 (shows it is still happening).",
+      "factCheck": "VERIFIED (primary post); Decrypt covered it ('What a $440,000 Hack Shows About the Rising Threat of Ethereum Permit Scams').",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "address and tx-hash fragments in the attached screenshot"
+        ],
+        "notes": "Busy (quotes a monthly report card); crop to the top half."
+      },
+      "score": 3
+    },
+    {
+      "id": "T2-15",
+      "theme": [
+        2,
+        1
+      ],
+      "type": "x-post",
+      "account": "@wintermute_t (Wintermute)",
+      "date": "2025-05-30T17:20:25Z",
+      "url": "https://x.com/wintermute_t/status/1928501765865091400",
+      "tweetId": "1928501765865091400",
+      "files": [
+        "t2-x-wintermute-2025-05-30-eip7702-97pct-sweepers-light.png",
+        "t2-x-wintermute-2025-05-30-eip7702-97pct-sweepers-dark.png"
+      ],
+      "text": "While EIP-7702 brings new convenience, it also introduces new risks\n\nOur Research team found that over 97% of all EIP-7702 delegations were authorized to multiple contracts using the same exact code. These are sweepers, used to automatically drain incoming ETH from compromised Show more",
+      "mapsTo": "EIP-7702 delegations were overwhelmingly sweepers draining wallets whose keys had leaked. Satchel refuses EIP-7702 authorizations and has no key to leak.",
+      "factCheck": "VERIFIED as Wintermute's claim (primary). The Block (2025-06-01) reported 'over 80%'; the sweepers target already-compromised keys, so do not caption it as '97% of users were robbed'.",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "contract address fragments in the Dune legend (optional)"
+        ],
+        "notes": "none"
+      },
+      "score": 4
+    },
+    {
+      "id": "T2-16",
+      "theme": [
+        2
+      ],
+      "type": "x-post",
+      "account": "@realScamSniffer (Scam Sniffer)",
+      "date": "2025-05-24T15:18:12Z",
+      "url": "https://x.com/realScamSniffer/status/1926296681198326254",
+      "tweetId": "1926296681198326254",
+      "files": [
+        "t2-x-realscamsniffer-2025-05-24-eip7702-batched-146k-light.png"
+      ],
+      "text": "🚨 ALERT: An address upgraded to EIP-7702 lost $146,551 through malicious batched transactions in phishing attack.",
+      "mapsTo": "First EIP-7702 batch phishing loss.",
+      "factCheck": "VERIFIED (primary post).",
+      "people": "Organisation account.",
+      "privacy": {
+        "blur": [
+          "victim address 0xc6d2...06dc and other fragments in the screenshot"
+        ],
+        "notes": "none"
+      },
+      "score": 3
+    },
+    {
+      "id": "T2-17",
+      "theme": [
+        2
+      ],
+      "type": "news",
+      "outlet": "Decrypt",
+      "date": "2024-07-19",
+      "url": "https://decrypt.co/240604/wazirx-loses-230-million-in-suspected-dprk-hack",
+      "files": [
+        "t2-news-decrypt-2024-07-19-wazirx-230m.png"
+      ],
+      "text": "WazirX Loses $230 Million in Suspected DPRK Hack",
+      "subhead": "WazirX lost funds exceeding $230 million in yesterday's attack, which Elliptic has said is linked to North Korea-based hackers.",
+      "mapsTo": "Another multisig whose signers approved what the screen did not show (WazirX: 'a discrepancy between the data displayed on Liminal's interface and the transaction's actual contents').",
+      "factCheck": "REPORTED; the cause is disputed (Liminal blames compromised WazirX devices). Elliptic estimate ~$235M.",
+      "people": "Stock image (Shutterstock).",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 3
+    },
+    {
+      "id": "T3-01",
+      "theme": [
+        3
+      ],
+      "type": "news",
+      "outlet": "Cointelegraph",
+      "date": "2021-07-05",
+      "url": "https://cointelegraph.com/news/your-keys-his-coins-cryptopia-employee-admits-to-stealing-172k-in-crypto",
+      "files": [
+        "t3-news-cointelegraph-2021-07-05-cryptopia-your-keys-his-coins.png"
+      ],
+      "text": "Your keys, his coins — Cryptopia employee admits to stealing $172K in crypto",
+      "mapsTo": "Keys copied while someone had access were used after they left. A copied secret survives every handover. Satchel: there is no secret to copy; whoever holds the NFT holds the wallet.",
+      "factCheck": "VERIFIED in Cointelegraph's report of his guilty plea: he 'made his own copy of the information on a USB flash drive'; theft of 'roughly $172,000'. Other outlets give $170K-$177K.",
+      "people": "Illustration; journalist avatars. The employee is not named in the capture.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 5,
+      "topPick": 10
+    },
+    {
+      "id": "T3-02",
+      "theme": [
+        3
+      ],
+      "type": "news",
+      "outlet": "NBC 6 South Florida (NBC Miami)",
+      "date": "2026-05-27",
+      "url": "https://www.nbcmiami.com/news/local/miami-man-arrested-in-theft-of-1-9-million-in-bitcoin-from-former-employer-cops-say/3813867/",
+      "files": [
+        "t3-news-nbcmiami-2026-05-27-ex-employer-1-9m-bitcoin.png"
+      ],
+      "text": "Miami man arrested in theft of $1.9M in Bitcoin from former employer, cops say",
+      "keyLine": "The wallet contained a \"seed phrase\" and the only people who had it were the victim and Castro",
+      "mapsTo": "Two people knew one seed phrase; the theft went unnoticed for years. Satchel: handing over the NFT hands over control, with nothing left behind.",
+      "factCheck": "REPORTED allegation (arrest report, May 2026); no conviction known. Say 'police say'.",
+      "people": "PRIVATE INDIVIDUAL: the accused is named in the subhead.",
+      "privacy": {
+        "blur": [
+          "accused's full name in the subhead (and anywhere else)"
+        ],
+        "notes": "Allegation only; never present as proven."
+      },
+      "score": 4
+    },
+    {
+      "id": "T3-03",
+      "theme": [
+        3
+      ],
+      "type": "blog",
+      "outlet": "Kaspersky Daily (Kaspersky official blog)",
+      "date": "2023-05-10",
+      "url": "https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/",
+      "files": [
+        "t3-blog-kaspersky-2023-05-10-fake-trezor-preset-seed.png"
+      ],
+      "text": "Case study: fake hardware cryptowallet",
+      "subhead": "Full review of a fake cryptowallet incident. It looks and feels like a Trezor wallet, but puts all your crypto-investments into the hands of criminals.",
+      "mapsTo": "A second-hand 'hardware wallet' came with a seed phrase the sellers already knew. Buying a wallet means trusting whoever touched it before you. Satchel: the buyer's browser checks the history before Buy turns on.",
+      "factCheck": "VERIFIED (Kaspersky blog: 'the randomly generated seed phrase was replaced with one of 20 pre-generated seed phrases saved in the hacked firmware'; press release: 1.33 BTC, ~$29,585 stolen).",
+      "people": "Author avatar (Kaspersky employee).",
+      "privacy": {
+        "blur": [],
+        "notes": "Counterfeit device, not a Trezor flaw; brand appears in the subhead."
+      },
+      "score": 4,
+      "topPick": 11
+    },
+    {
+      "id": "T4-01",
+      "theme": [
+        4,
+        2
+      ],
+      "type": "report",
+      "outlet": "Scam Sniffer (annual report 2024)",
+      "date": "2025-01-03",
+      "url": "https://drops.scamsniffer.io/scam-sniffer-2024-web3-phishing-attacks-wallet-drainers-drain-494-million/",
+      "files": [
+        "t4-report-scamsniffer-2025-01-03-drainers-494m-2024-figure.png",
+        "t4-report-scamsniffer-2025-01-03-drainers-494m-2024.png"
+      ],
+      "text": "Scam Sniffer 2024: Web3 Phishing Attacks – Wallet Drainers Drain $494 Million",
+      "figureText": "Crypto Phishing Report / Annual Report 2024 by ScamSniffer / $494M+ TOTAL LOSS (up 67%) / 332K+ VICTIMS (up 3.7%) / $55.4M LARGEST SINGLE LOSS (up 130%) / 30 LARGE LOSS CASES (up 56%)",
+      "mapsTo": "Wallet drainers (malicious signatures) took about half a billion dollars in one year.",
+      "factCheck": "VERIFIED (primary): 'approximately $494 million in losses', '332,000 addresses'; text gives the largest theft as $55.48M (infographic rounds to $55.4M). Permit was 56.7% of large-case losses.",
+      "people": "None.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 4,
+      "topPick": 12
+    },
+    {
+      "id": "T4-02",
+      "theme": [
+        4,
+        2
+      ],
+      "type": "report",
+      "outlet": "Scam Sniffer (annual report 2025)",
+      "date": "2026-01-03",
+      "url": "https://drops.scamsniffer.io/scam-sniffer-2025-crypto-phishing-losses-fall-83-to-84-million/",
+      "files": [
+        "t4-report-scamsniffer-2026-01-03-phishing-2025-84m-figure.png",
+        "t4-report-scamsniffer-2026-01-03-phishing-2025-84m.png"
+      ],
+      "text": "Scam Sniffer 2025: Crypto Phishing Losses Fall 83% to $84 Million",
+      "figureText": "Year-over-Year Comparison / Signature Phishing Losses | 2023 - 2025 (total loss $295M / $494M / $84M; victims 324K / 332K / 106K; largest single theft $24.1M / $55.5M / $6.5M; large cases 13 / 30 / 11)",
+      "mapsTo": "Signature phishing over three years; 2025's largest single theft was one Permit signature.",
+      "factCheck": "VERIFIED (primary): '$83.85M across 106,106 victims'; 'Largest single theft: $6.5M via Permit signature (September)'; 'Permit/Permit2 signatures accounted for 38% of large-case losses'. Losses FELL in 2025, so don't use this headline to imply growth.",
+      "people": "None.",
+      "privacy": {
+        "blur": [],
+        "notes": "none"
+      },
+      "score": 3
+    },
+    {
+      "id": "T4-03",
+      "theme": [
+        4,
+        1
+      ],
+      "type": "report",
+      "outlet": "Chainalysis (blog)",
+      "date": "2025-12-18",
+      "url": "https://www.chainalysis.com/blog/crypto-hacking-stolen-funds-2026/",
+      "files": [
+        "t4-report-chainalysis-2025-12-18-personal-wallet-158k-incidents.png",
+        "t4-report-chainalysis-2025-12-18-theft-3-4b-2025.png"
+      ],
+      "text": "North Korea Drives Record $2 Billion Crypto Theft Year, Pushing All-Time Total to $6.75 Billion",
+      "keyLine": "Individual wallet compromises surged to 158,000 incidents affecting 80,000 unique victims in 2025, though total value stolen ($713M) decreased from 2024.",
+      "mapsTo": "Personal wallets are where thefts multiply: 158,000 incidents in 2025.",
+      "factCheck": "VERIFIED (primary): 'over $3.4 billion in theft from January through early December 2025'; 158,000 incidents; at least 80,000 victims; $713M from individuals (down from $1.5B in 2024).",
+      "people": "None (stock illustration in header).",
+      "privacy": {
+        "blur": [],
+        "notes": "The TL;DR crop also shows North Korea bullets; crop to the 158,000 bullet."
+      },
+      "score": 4
+    }
+  ],
+  "video": [
+    {
+      "id": "V1",
+      "file": "video/fbi-2021-seed-phrase-all-that-stands.mp4",
+      "alt": "video/fbi-2021-never-share-seed-phrase.mp4",
+      "source": "FBI, 'Cybersecurity Awareness Month: What is Cryptocurrency?' (FBI Portland forensic accountant)",
+      "urls": [
+        "https://www.youtube.com/watch?v=NkZe5vRAHF8",
+        "https://www.fbi.gov/video-repository/portland-cyber-cryptocurrency-102121.mp4/view"
+      ],
+      "uploaded": "2021-10-22 (YouTube, official FBI channel); fbi.gov file name dated 10/21/21",
+      "licence": "US federal government work: no copyright in the US (17 U.S.C. 105). Uploaded by the FBI's own channel. CAUTION: the FBI and DOJ seals are behind the speaker; 18 U.S.C. 701/709 bar uses of the FBI seal or name that imply endorsement. Use audio only, or crop/blur the seal, and label it as an FBI public-service video.",
+      "clips": [
+        {
+          "file": "video/fbi-2021-never-share-seed-phrase.mp4",
+          "in": "00:03:31.45",
+          "out": "00:03:34.95",
+          "duration_s": 3.5,
+          "transcript": "Never share your private key or seed phrase with anyone."
+        },
+        {
+          "file": "video/fbi-2021-seed-phrase-all-that-stands.mp4",
+          "in": "00:03:35.10",
+          "out": "00:03:40.75",
+          "duration_s": 5.71,
+          "transcript": "That private key or seed phrase is all that is standing between you and someone trying to take your money."
+        }
+      ],
+      "transcriptSource": "FBI's own uploaded captions (punctuated), cut points checked against silence detection",
+      "quality": "640x360 (only format reachable without a browser session). For 1080p, download from the fbi.gov page in a normal browser.",
+      "people": "FBI employee (forensic accountant, first name only) speaking in an official capacity; face visible. Audio-only use avoids likeness questions.",
+      "theme": [
+        1
+      ],
+      "score": 4
+    },
+    {
+      "id": "V2",
+      "file": "video/devcon7-2024-blind-signing-blank-check.mp4",
+      "alt": "video/devcon7-2024-blind-signing-blank-check-long.mp4",
+      "source": "Charles Guillemet (Ledger CTO), 'DeFi Can't Move Forward Without Clear Signing: Let Me Change Your Mind', Devcon SEA (Devcon 7), Bangkok, Nov 2024",
+      "urls": [
+        "https://www.youtube.com/watch?v=qGSGzHMqsSQ",
+        "https://archive.devcon.org/devcon-7/defi-cant-move-forward-without-clear-signing-let-me-change-your-mind"
+      ],
+      "uploaded": "2024-11-15 (YouTube, Ethereum Foundation channel)",
+      "licence": "YouTube licence field: 'Creative Commons Attribution license (reuse allowed)' (CC BY). Ethereum Foundation terms of use also license non-code website material, including videos, under CC BY 4.0 unless marked otherwise; the archive page footer says '(c) 2026 Ethereum Foundation. All Rights Reserved.' (minor ambiguity; the YouTube licence is explicit). Required credit: 'Charles Guillemet, Devcon SEA 2024 (Ethereum Foundation), CC BY'.",
+      "clips": [
+        {
+          "file": "video/devcon7-2024-blind-signing-blank-check.mp4",
+          "in": "00:01:00.86",
+          "out": "00:01:04.62",
+          "duration_s": 3.8,
+          "transcript": "Blind signing is simply equivalent to signing a blank check."
+        },
+        {
+          "file": "video/devcon7-2024-blind-signing-blank-check-long.mp4",
+          "in": "00:00:58.55",
+          "out": "00:01:04.62",
+          "duration_s": 6.08,
+          "transcript": "This is what we called, uh, blind signing, and blind signing is simply equivalent to signing a blank check."
+        }
+      ],
+      "transcriptSource": "YouTube auto-captions with word timings, cut points checked against audio levels",
+      "quality": "640x360. Frame: slide 'Blind Signing' (phone -> blank check) with the speaker inset and DC7 SEA branding.",
+      "people": "Public figure (Ledger CTO) on stage. Ledger brand: avoid also using several Ledger items, and don't imply endorsement.",
+      "theme": [
+        2
+      ],
+      "score": 5
+    }
+  ],
+  "posterFrames": [
+    "video/fbi-2021-never-share-seed-phrase.poster.jpg",
+    "video/fbi-2021-seed-phrase-all-that-stands.poster.jpg",
+    "video/devcon7-2024-blind-signing-blank-check.poster.jpg"
+  ]
+}

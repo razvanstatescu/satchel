@@ -1,6 +1,6 @@
 import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C } from "../../brand/tokens";
-import { CardBack, type CharmFace, charmBlink, charmKick, CardWithCharms, Hand, handPoint, type HandProps } from "../../illustration/characters";
+import { CardBack, type CharmFace, charmBlink, charmKick, CardWithCharms, Hand, handPoint, type HandProps, NameTag } from "../../illustration/characters";
 import { ContractPlaque, plaqueSlot } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
 import { FPS } from "../../lib/time";
@@ -41,7 +41,7 @@ export default function T2() {
   const vo = voF("T2", "V19");
 
   // ── timing (scene frames), from the voice, landed on the groove ──────────────────────────────────────────────
-  const capNo = vo.word(2) - 1; // "No admin key." lands on "no"
+  const capNo = vo.word(1); // "No admin key." lands on "there's", so it reads ≥ 1.55 s before "Not even ours." replaces it
   const capNot = vo.sentence(1); // "Not even ours." lands on "Not", after the narrator's beat
   const zeroAt = onBeat(vo.word(2), beats); // the "0" pops on the beat under "no"
   const pinchAt = beatAfter(vo.word(4, "end") - 3, beats); // the pinch closes on nothing as "key." ends: the "tok"
@@ -103,6 +103,20 @@ export default function T2() {
   const phase = (f - openAt) * 1.2;
   const squash = interpolate(f, [pinchAt, pinchAt + 1, pinchAt + 4], [1, 1, 0], clamp);
   const handVisible = f >= handIn - 1 && leave < 1;
+  // the pinch → open pose change: the arm turns 34° → −6° (and the sleeve bends 0° → 26°) evenly over 6 f around the
+  // switch (≈ 7° a frame) instead of snapping in one frame; the palm anchor holds the hand in place while it turns
+  const turn = interpolate(f, [openAt - 4, openAt + 2], [0, 1], clamp);
+  const handAngle = 34 + (-6 - 34) * turn;
+  const handArm = 26 * turn;
+  const shownHand: HandProps = opened
+    ? { pose: "open", anchor: "palm", x: palmX, y: palmY, k: HK, size: HSIZE * handScale, angle: handAngle, arm: handArm, sleeve: "team", spread: 0.9 * openPop, wiggle, phase }
+    : { ...pinchProps, x: palmX, y: palmY, size: HSIZE * handScale, angle: handAngle, arm: handArm, pinch, squash };
+  // the "satchelhq" sleeve tag, drawn 40 px further up the arm than the kit puts it (clear of the bottom margin)
+  const tagAt = handPoint(shownHand, "tag");
+  const wristAt = handPoint(shownHand, "wrist");
+  const toWrist = Math.hypot(wristAt.x - tagAt.x, wristAt.y - tagAt.y) || 1;
+  const tagX = tagAt.x + ((wristAt.x - tagAt.x) / toWrist) * 40;
+  const tagY = tagAt.y + ((wristAt.y - tagAt.y) / toWrist) * 40;
 
   // ── charms: look at the plaque, widen at the "tok", giggle as "ours." lands ───────────────────────────────────
   const lag = { btc: 4, evm: 2, sol: 0 } as const;
@@ -134,17 +148,18 @@ export default function T2() {
           <CardWithCharms width={CARD_W} front={<CardBack width={CARD_W} records={T2_RECORDS} />} charmSize={CHARM_SIZE} charms={charms} />
         </At>
         {handVisible ? (
-          opened ? (
-            <Hand pose="open" anchor="palm" x={palmX} y={palmY} k={HK} size={HSIZE * handScale} angle={-6} arm={26} sleeve="team" spread={0.9 * openPop} wiggle={wiggle} phase={phase} tagTilt={-2} />
-          ) : (
-            <Hand {...pinchProps} x={palmX} y={palmY} size={HSIZE * handScale} pinch={pinch} squash={squash} tagTilt={-2} />
-          )
+          <>
+            <Hand {...shownHand} tag={null} />
+            <svg width={1} height={1} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+              <NameTag x={tagX} y={tagY} text="satchelhq" k={HK} tilt={-2} />
+            </svg>
+          </>
         ) : null}
       </div>
 
       <div style={{ position: "absolute", inset: 0, translate: `${-whipX}px 0`, scale: `${smear} ${1 / smear}` }}>
-        <Caption text="No admin key." contact={capNo} leaveAt={capNot - 9} y={CAP_Y} seed="t2-no-admin" />
-        <Caption text="Not even ours." contact={capNot} y={CAP_Y} seed="t2-not-even" />
+        <Caption text="No admin key." contact={capNo} leaveAt={Math.round(capNot) - 4} y={CAP_Y} seed="t2-no-admin" />
+        <Caption text="Not even ours." contact={capNot} y={CAP_Y} seed="t2-not-even" swapIn />
       </div>
 
       {/* sound: the pull-back, the slaps, the empty slot's "tok", the charms, the typing (the whip's whoosh is in T3) */}

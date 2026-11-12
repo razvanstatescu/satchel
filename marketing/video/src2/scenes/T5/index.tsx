@@ -12,7 +12,9 @@ import {
   CameraView,
   camAt,
   Caption,
+  CAPTION_2L,
   type CharmAnim,
+  holdTop,
   mixFace,
   ROW,
   rowMid,
@@ -54,18 +56,31 @@ export const T5 = {
   end: fr(SC.duration),
 };
 
+/**
+ * The ending, laid out backwards from the scene's end so it adapts to the timeline (QA v5 #5). After SOL's contact
+ * the close-up holds still on the three stamps ("Blockhash expired" settles in 10 f, then stays put). The camera then
+ * cuts back to the whole page on a beat (T6's move: push in, hard cut out; a pull-back would drag the tab and URL bars
+ * through the caption band and cost 12 f), the verdict pops on the cut, "Clean history." slaps in with it and is read
+ * alone for ≥ 1.05 s, and only then does Buy wake up coral, with ≥ 24 f left before the tab switch to #4 so the wake's
+ * sparkles end before it (QA v5 N4). With a 10.5 s T5 (SOL at f229, end f315): still close-up 26 f, cut f255,
+ * caption f259, Buy wake f291, last sparkle gone by f313.
+ */
+const C3 = T5.contact[2];
+const CAP_ALONE = 32; // "Clean history." landed and alone ≥ 1.05 s before the Buy wake (it stays readable during it)
+const WAKE_MIN = 24; // the Buy wake (grey → coral) and its sparkles finish before the tab switch to T6 (QA v5 N4)
+const CUT_OUT = Math.max(C3 + 12, Math.floor((T5.end - 4 - CAP_ALONE - WAKE_MIN) / 15) * 15); // the latest beat that fits
+
 const T = {
   capIn: T5.browser, // "Checked in your browser." lands on "browser"
   capOut: Math.min(T5.v22End - 15, T5.contact[1] - 36),
   scanA: T5.checks + 3,
   scanB: T5.v22End - 6,
   camIn: [T5.contact[1] - 31, T5.contact[1] - 12] as const, // land before ETH's wind-up
-  // v4: the scene is 9.5 s, so the pull-back starts as SOL's stamp settles and the verdict lands with the camera
-  camOut: [T5.contact[2] + 5, T5.contact[2] + 19] as const,
-  verdict: T5.contact[2] + 15,
-  capClean: T5.contact[2] + 17,
-  wake: T5.contact[2] + 29,
-  cheer: T5.contact[2] + 32,
+  cutOut: CUT_OUT,
+  verdict: CUT_OUT, // the page arrives with its verdict popping
+  capClean: CUT_OUT + 4, // the caption's slap starts on the cut frame
+  wake: CUT_OUT + 4 + CAP_ALONE,
+  cheer: CUT_OUT + 4 + CAP_ALONE + 3,
 };
 
 /** CU: the history panel (header, verdict, three records and their charms) fills the frame. */
@@ -76,14 +91,12 @@ export const PRICE_7 = "2,000 NEAR";
 export const PAGE7 = { id: "7" as const, price: PRICE_7, seller: "bob.near", balances: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC" };
 export const TABS = [{ title: "Satchel #7" }, { title: "Satchel #4" }];
 
-/** The Buy wake's lemon glints, on the button's flanks (page px) so they never cover a word. */
+/** The Buy wake's lemon glints, on the button's flanks (page px) so they never cover a word: 4 (a 3–5 burst, §2.13). */
 const BUY_SPARKS = [
   { x: 24, y: 206, r: 17 },
   { x: 488, y: 196, r: 19 },
   { x: 30, y: 150, r: 11 },
   { x: 506, y: 246, r: 12 },
-  { x: 20, y: 252, r: 9 },
-  { x: 476, y: 140, r: 10 },
 ];
 
 const STAMP_LEN = 10; // frames for the stamp impression to settle (props Stamp `impact` 0.22 → 1)
@@ -100,7 +113,7 @@ function charmT5(f: number, r: number, fps: number): CharmAnim {
   T5.contact.forEach((c, j) => {
     if (j !== r) angle += charmKick(chain, t - (c + CHARM_LAG[kit] + 1) / fps, j < r ? -3 : 3);
   });
-  angle += charmKick(chain, t - (T.cheer + CHARM_LAG[kit] + 8) / fps, 7);
+  angle += charmKick(chain, t - (T.cheer + CHARM_LAG[kit] + 2) / fps, 5);
 
   // eyes: blinks on a per-charm clock, forced one after the landing
   const blinks = blinkSchedule(`t5-${chain}`, 30, T5.end + 30, [C0 + 26]);
@@ -137,15 +150,14 @@ function charmT5(f: number, r: number, fps: number): CharmAnim {
     const k = interpolate(f, [T.verdict - 6, T.verdict - 3], [0, 1], clamp);
     face = mixFace(face, { ...face, look: { x: -6, y: -5 }, smile: 1.35 }, k);
   }
+  // the cheer: joy faces and a small happy swing in reaction order (no hop: the caption is being read, QA v5 #5)
   const ch = f - (T.cheer + CHARM_LAG[kit]);
-  let hop = 0;
   if (ch >= 0) {
     face = ch < 8 ? { ...face, joy: 1, smile: 1.6 } : mixFace({ ...face, joy: 1, smile: 1.6 }, { ...face, joy: 0, smile: 1.5, look: { x: -2, y: 1 } }, interpolate(ch, [8, 14], [0, 1], clamp));
-    hop = 9 * (spring({ frame: ch, fps, config: SPRING2.pop }) - spring({ frame: ch - 7, fps, config: SPRING2.land }));
   }
   // contact squash: the coin flattens against the outline for 2 f
   const squash = interpolate(s, [-1, 0, 2, 5], [0, -0.42, -0.42, 0], clamp);
-  return { angle, face, squash, hop };
+  return { angle, face, squash };
 }
 
 /** Row r's animation at frame f. */
@@ -164,13 +176,14 @@ export default function T5Scene() {
   const { fps } = useVideoConfig();
   const f = Math.min(frame, T5.end + 20);
 
-  // camera: the whole browser → the history panel for the stamps → back for the verdict and Buy
+  // camera: the whole browser → the history panel for the stamps → back for the verdict and Buy. The slow drift
+  // before the push-in holds the browser's top edge, so it never creeps up under "your browser." (QA v5 #4)
   const cam = camAt(f, [
     { f: 0, cam: CAM_MID },
-    { f: T.camIn[0], cam: { ...CAM_MID, z: 1.36 } },
+    { f: T.camIn[0], cam: holdTop(CAM_MID, 1.36) },
     { f: T.camIn[1], cam: CAM_CU },
-    { f: T.camOut[0], cam: CAM_CU },
-    { f: T.camOut[1], cam: CAM_MID },
+    { f: T.cutOut - 1, cam: CAM_CU },
+    { f: T.cutOut, cam: CAM_MID }, // the hard cut back to the page, on a beat
   ]);
 
   // the browser drops onto the desk on the cut (contact f4)
@@ -193,7 +206,7 @@ export default function T5Scene() {
 
   return (
     <AbsoluteFill style={{ background: C.ground, overflow: "hidden" }}>
-      <CameraView cam={cam} dy={interpolate(f - T.wake - 2, [0, 1, 5], [0, 6, 0], { ...clamp, easing: EASE2.out })}>
+      <CameraView cam={cam}>
         <div style={{ position: "absolute", inset: 0, transformOrigin: "50% 50%", transform: `scale(${drop.sx}, ${drop.sy})` }}>
           <Browser tabs={TABS} active={0} url="satchel/s/7" account="carol.near" lift={drop.lift}>
             <SalePage
@@ -205,8 +218,8 @@ export default function T5Scene() {
               scanBrackets={brackets}
               verdict={verdictOn ? "clean" : "checking"}
               verdictPop={verdictOn ? interpolate(f, [T.verdict, T.verdict + 12], [0, 1], clamp) : undefined}
-              checked={f >= T.verdict - 4}
-              checkedPop={interpolate(f, [T.verdict - 4, T.verdict + 6], [0, 1], clamp)}
+              checked={f >= T.verdict}
+              checkedPop={interpolate(f, [T.verdict, T.verdict + 10], [0, 1], clamp)}
               buy={{
                 mode: f >= T.wake ? "enabled" : "checking",
                 wake: f >= T.wake ? wakeSpring : 0,
@@ -216,14 +229,15 @@ export default function T5Scene() {
               }}
               spin={spin}
               enter={f < 30 ? f : undefined}
-              overlay={<SparkPoints f={f - T.wake - 1} points={BUY_SPARKS} k={1} />}
+              overlay={<SparkPoints f={f - T.wake} points={BUY_SPARKS} k={1} />}
             />
           </Browser>
         </div>
       </CameraView>
 
       {/* captions (screen space, in the band above the browser) */}
-      <Caption frame={f} text={<>Checked in<br />your browser.</>} contact={T.capIn} out={T.capOut} y={22} size={112} seed="t5-checked" />
+      {/* the shared two-line setting: cap tops ≥ 60 px from the top, the "y" of "your" ≥ 20 px over the tab bar (QA v5 #4, N5) */}
+      <Caption frame={f} text={<>Checked in<br />your browser.</>} contact={T.capIn} out={T.capOut} y={CAPTION_2L.y} size={CAPTION_2L.size} leading={CAPTION_2L.leading} seed="t5-checked" />
       <Caption frame={f} text="Clean history." contact={T.capClean} y={62} size={132} seed="t5-clean" />
 
       {/* sound */}
@@ -238,9 +252,9 @@ export default function T5Scene() {
       {T5.contact.map((c, i) => (
         <Sfx key={`mar${i}`} name="success-marimba" at={(c + 2) / FPS} gainDb={-3} />
       ))}
-      <Sfx name="whoosh-soft" at={(T.camOut[0] + 8) / FPS} align="peak" gainDb={-11} />
+      <Sfx name="whoosh-soft" at={T.cutOut / FPS} align="peak" gainDb={-11} />
       <Sfx name="magic-wand" at={T.verdict / FPS} gainDb={-2} />
-      <Sfx name="sparkle" at={(T.wake + 2) / FPS} gainDb={0} />
+      <Sfx name="sparkle" at={T.wake / FPS} gainDb={0} />
     </AbsoluteFill>
   );
 }

@@ -1,0 +1,39 @@
+{
+ "id": "F01",
+ "plate": "T1-01",
+ "voice": "daniel",
+ "text": "seed phrases in LastPass",
+ "say": "seed phrases in LastPass",
+ "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F01-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F01-tv.mp3"
+ },
+ "durationSec": 2.21,
+ "heard": {
+  "dry": "Seed phrases in LastPass",
+  "tv": "Seed phrases in LastPass"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -20.5,
+   "momentaryMaxLufs": -17.7,
+   "truePeakDb": -4
+  },
+  "tv": {
+   "integratedLufs": -21.6,
+   "momentaryMaxLufs": -17.8,
+   "truePeakDb": -6
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Seed phrases in LastPass",
+   "heardTv": "Seed phrases in LastPass"
+  }
+ ]
+}

@@ -1,0 +1,4095 @@
+{
+ "generated": "2026-11-11",
+ "dir": "marketing/video/public/v2/intro/plates",
+ "units": "pixels in the plate PNG (x, y, w, h from top-left)",
+ "answers": {
+  "A1": "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+  "A2": "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+  "A3": "Every signature is recorded on NEAR before it is made.",
+  "A4": "Signing pauses while it is for sale.",
+  "A5": "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+ },
+ "plates": [
+  {
+   "file": "t1-01-x-seal-lastpass-seed-phrases-light.png",
+   "sourceId": "T1-01",
+   "plateId": "T1-01",
+   "variant": "light",
+   "url": "https://x.com/_SEAL_Org/status/1868805837311074576",
+   "outlet": null,
+   "account": "@_SEAL_Org (Security Alliance, SEAL 911)",
+   "date": "2024-12-16T23:50:07.000Z",
+   "exactText": {
+    "post": "⚠️ Reminder that if you ever stored your private keys or seed phrases in LastPass prior to 2023, your funds might be at risk. We've seen 15+ cases of potential LastPass-related hacks TODAY\n\nMove your assets before hackers move them for you. For more information, keep reading🧵"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED as SEAL's own post (primary). The '15+ cases' count is SEAL's claim, not independently checked.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1104
+   ],
+   "keyPhrases": [
+    {
+     "text": "private keys or seed phrases in LastPass",
+     "boxes": [
+      [
+       1124,
+       217,
+       396,
+       69
+      ],
+      [
+       48,
+       289,
+       662,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1472,
+      141
+     ]
+    },
+    {
+     "text": "15+ cases",
+     "boxes": [
+      [
+       634,
+       361,
+       265,
+       69
+      ]
+     ],
+     "union": [
+      634,
+      361,
+      265,
+      69
+     ]
+    },
+    {
+     "text": "TODAY",
+     "boxes": [
+      [
+       413,
+       433,
+       189,
+       69
+      ]
+     ],
+     "union": [
+      413,
+      433,
+      189,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-01-x-seal-lastpass-seed-phrases-dark.png",
+   "sourceId": "T1-01",
+   "plateId": "T1-01",
+   "variant": "dark",
+   "url": "https://x.com/_SEAL_Org/status/1868805837311074576",
+   "outlet": null,
+   "account": "@_SEAL_Org (Security Alliance, SEAL 911)",
+   "date": "2024-12-16T23:50:07.000Z",
+   "exactText": {
+    "post": "⚠️ Reminder that if you ever stored your private keys or seed phrases in LastPass prior to 2023, your funds might be at risk. We've seen 15+ cases of potential LastPass-related hacks TODAY\n\nMove your assets before hackers move them for you. For more information, keep reading🧵"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED as SEAL's own post (primary). The '15+ cases' count is SEAL's claim, not independently checked.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1104
+   ],
+   "keyPhrases": [
+    {
+     "text": "private keys or seed phrases in LastPass",
+     "boxes": [
+      [
+       1124,
+       217,
+       396,
+       69
+      ],
+      [
+       48,
+       289,
+       662,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1472,
+      141
+     ]
+    },
+    {
+     "text": "15+ cases",
+     "boxes": [
+      [
+       634,
+       361,
+       265,
+       69
+      ]
+     ],
+     "union": [
+      634,
+      361,
+      265,
+      69
+     ]
+    },
+    {
+     "text": "TODAY",
+     "boxes": [
+      [
+       413,
+       433,
+       189,
+       69
+      ]
+     ],
+     "union": [
+      413,
+      433,
+      189,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-03-x-metamask-icloud-vault-light.png",
+   "sourceId": "T1-03",
+   "plateId": "T1-03",
+   "variant": "light",
+   "url": "https://x.com/MetaMask/status/1515727239391809536",
+   "outlet": null,
+   "account": "@MetaMask",
+   "date": "2022-04-17T16:21:49.000Z",
+   "exactText": {
+    "post": "🔒 If you have enabled iCloud backup for app data, this will include your password-encrypted MetaMask vault. If your password isn’t strong enough, and someone phishes your iCloud credentials, this can mean stolen funds. (Read on 👇) 1/3"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary post). The triggering ~$650K loss is REPORTED (Decrypt, The Block, AppleInsider, Apr 2022).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    960
+   ],
+   "keyPhrases": [
+    {
+     "text": "password-encrypted MetaMask vault",
+     "boxes": [
+      [
+       383,
+       289,
+       977,
+       69
+      ]
+     ],
+     "union": [
+      383,
+      289,
+      977,
+      69
+     ]
+    },
+    {
+     "text": "someone phishes your iCloud credentials",
+     "boxes": [
+      [
+       964,
+       361,
+       606,
+       69
+      ],
+      [
+       48,
+       433,
+       471,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      361,
+      1522,
+      141
+     ]
+    },
+    {
+     "text": "stolen funds",
+     "boxes": [
+      [
+       927,
+       433,
+       323,
+       69
+      ]
+     ],
+     "union": [
+      927,
+      433,
+      323,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-03-x-metamask-icloud-vault-dark.png",
+   "sourceId": "T1-03",
+   "plateId": "T1-03",
+   "variant": "dark",
+   "url": "https://x.com/MetaMask/status/1515727239391809536",
+   "outlet": null,
+   "account": "@MetaMask",
+   "date": "2022-04-17T16:21:49.000Z",
+   "exactText": {
+    "post": "🔒 If you have enabled iCloud backup for app data, this will include your password-encrypted MetaMask vault. If your password isn’t strong enough, and someone phishes your iCloud credentials, this can mean stolen funds. (Read on 👇) 1/3"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary post). The triggering ~$650K loss is REPORTED (Decrypt, The Block, AppleInsider, Apr 2022).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    960
+   ],
+   "keyPhrases": [
+    {
+     "text": "password-encrypted MetaMask vault",
+     "boxes": [
+      [
+       383,
+       289,
+       977,
+       69
+      ]
+     ],
+     "union": [
+      383,
+      289,
+      977,
+      69
+     ]
+    },
+    {
+     "text": "someone phishes your iCloud credentials",
+     "boxes": [
+      [
+       964,
+       361,
+       606,
+       69
+      ],
+      [
+       48,
+       433,
+       471,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      361,
+      1522,
+      141
+     ]
+    },
+    {
+     "text": "stolen funds",
+     "boxes": [
+      [
+       927,
+       433,
+       323,
+       69
+      ]
+     ],
+     "union": [
+      927,
+      433,
+      323,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-04-x-solanastatus-slope-private-keys-light.png",
+   "sourceId": "T1-04",
+   "plateId": "T1-04",
+   "variant": "light",
+   "url": "https://x.com/SolanaStatus/status/1554921397717180416",
+   "outlet": null,
+   "account": "@SolanaStatus",
+   "date": "2022-08-03T20:05:24.000Z",
+   "exactText": {
+    "post": "This exploit was isolated to one wallet on Solana, and hardware wallets used by Slope remain secure.\n\nWhile the details of exactly how this occurred are still under investigation, but private key information was inadvertently transmitted to an application monitoring service.  2/3"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary post). Scale is REPORTED and varies: 'almost 8,000 wallets' (The Block, 2022-08-03); $4M-$8M in other outlets.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1173
+   ],
+   "keyPhrases": [
+    {
+     "text": "private key information was inadvertently transmitted",
+     "boxes": [
+      [
+       678,
+       576,
+       729,
+       69
+      ],
+      [
+       48,
+       648,
+       657,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      576,
+      1359,
+      141
+     ]
+    },
+    {
+     "text": "application monitoring service",
+     "boxes": [
+      [
+       864,
+       648,
+       598,
+       69
+      ],
+      [
+       48,
+       720,
+       189,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      1414,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Thread context hidden (hideThread); shows 'Replying to'.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-04-x-solanastatus-slope-private-keys-dark.png",
+   "sourceId": "T1-04",
+   "plateId": "T1-04",
+   "variant": "dark",
+   "url": "https://x.com/SolanaStatus/status/1554921397717180416",
+   "outlet": null,
+   "account": "@SolanaStatus",
+   "date": "2022-08-03T20:05:24.000Z",
+   "exactText": {
+    "post": "This exploit was isolated to one wallet on Solana, and hardware wallets used by Slope remain secure.\n\nWhile the details of exactly how this occurred are still under investigation, but private key information was inadvertently transmitted to an application monitoring service.  2/3"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary post). Scale is REPORTED and varies: 'almost 8,000 wallets' (The Block, 2022-08-03); $4M-$8M in other outlets.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1173
+   ],
+   "keyPhrases": [
+    {
+     "text": "private key information was inadvertently transmitted",
+     "boxes": [
+      [
+       678,
+       576,
+       729,
+       69
+      ],
+      [
+       48,
+       648,
+       657,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      576,
+      1359,
+      141
+     ]
+    },
+    {
+     "text": "application monitoring service",
+     "boxes": [
+      [
+       864,
+       648,
+       598,
+       69
+      ],
+      [
+       48,
+       720,
+       189,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      1414,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Thread context hidden (hideThread); shows 'Replying to'.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-06-x-trustwallet-7m-light.png",
+   "sourceId": "T1-06",
+   "plateId": "T1-06",
+   "variant": "light",
+   "url": "https://x.com/TrustWallet/status/2004475085168795941",
+   "outlet": null,
+   "account": "@TrustWallet",
+   "date": "2025-12-26T08:51:16.000Z",
+   "exactText": {
+    "post": "Update on the Trust Wallet Browser Extension (v2.68) incident:\n\nWe’ve confirmed that approximately $7M has been impacted and we will ensure all affected users are refunded.\n\nSupporting affected users is our top priority, and we are actively finalizing the process to refund the Show more",
+    "quoted": "We’ve identified a security incident affecting Trust Wallet Browser Extension version 2.68 only. Users with Browser Extension 2.68 should disable and upgrade to 2.69.\n\nPlease refer to the official Chrome Webstore link here: https://chrome.google.com/webstore/detail/trust-wallet/egjidjbpglichdcondbcbdnbeeppgdph…\n\nPlease note: Mobile-only users"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary: Trust Wallet's own '$7M'). Seed-phrase exfiltration is REPORTED (SlowMist analysis, quoted by The Hacker News).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1917
+   ],
+   "keyPhrases": [
+    {
+     "text": "approximately $7M has been impacted",
+     "boxes": [
+      [
+       622,
+       432,
+       771,
+       69
+      ],
+      [
+       48,
+       504,
+       246,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1345,
+      141
+     ]
+    },
+    {
+     "text": "Browser Extension (v2.68)",
+     "boxes": [
+      [
+       760,
+       216,
+       691,
+       69
+      ]
+     ],
+     "union": [
+      760,
+      216,
+      691,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-06-x-trustwallet-7m-dark.png",
+   "sourceId": "T1-06",
+   "plateId": "T1-06",
+   "variant": "dark",
+   "url": "https://x.com/TrustWallet/status/2004475085168795941",
+   "outlet": null,
+   "account": "@TrustWallet",
+   "date": "2025-12-26T08:51:16.000Z",
+   "exactText": {
+    "post": "Update on the Trust Wallet Browser Extension (v2.68) incident:\n\nWe’ve confirmed that approximately $7M has been impacted and we will ensure all affected users are refunded.\n\nSupporting affected users is our top priority, and we are actively finalizing the process to refund the Show more",
+    "quoted": "We’ve identified a security incident affecting Trust Wallet Browser Extension version 2.68 only. Users with Browser Extension 2.68 should disable and upgrade to 2.69.\n\nPlease refer to the official Chrome Webstore link here: https://chrome.google.com/webstore/detail/trust-wallet/egjidjbpglichdcondbcbdnbeeppgdph…\n\nPlease note: Mobile-only users"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary: Trust Wallet's own '$7M'). Seed-phrase exfiltration is REPORTED (SlowMist analysis, quoted by The Hacker News).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1917
+   ],
+   "keyPhrases": [
+    {
+     "text": "approximately $7M has been impacted",
+     "boxes": [
+      [
+       622,
+       432,
+       771,
+       69
+      ],
+      [
+       48,
+       504,
+       246,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1345,
+      141
+     ]
+    },
+    {
+     "text": "Browser Extension (v2.68)",
+     "boxes": [
+      [
+       760,
+       216,
+       691,
+       69
+      ]
+     ],
+     "union": [
+      760,
+      216,
+      691,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-01-x-scamsniffer-approval-458-days-light.png",
+   "sourceId": "T2-01",
+   "plateId": "T2-01",
+   "variant": "light",
+   "url": "https://x.com/realScamSniffer/status/1951528627985850508",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2025-08-02T06:20:57.000Z",
+   "exactText": {
+    "post": "🚨 ALERT: A victim lost $908,551 due to a phishing approval signed 458 days ago.\n🔐 REMINDER: Regularly review and revoke old approvals - your wallet security matters! 💰"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (primary post); Cointelegraph (2025-08-03) independently reports '$908,551 ... 458 days after unknowingly signing a malicious approval transaction' from on-chain data. On-chain transactions not checked by us.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    888
+   ],
+   "keyPhrases": [
+    {
+     "text": "$908,551",
+     "boxes": [
+      [
+       682,
+       217,
+       254,
+       69
+      ]
+     ],
+     "union": [
+      682,
+      217,
+      254,
+      69
+     ]
+    },
+    {
+     "text": "phishing approval signed 458 days ago",
+     "boxes": [
+      [
+       1177,
+       217,
+       238,
+       69
+      ],
+      [
+       48,
+       289,
+       789,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1367,
+      141
+     ]
+    },
+    {
+     "text": "458 days ago",
+     "boxes": [
+      [
+       478,
+       289,
+       359,
+       69
+      ]
+     ],
+     "union": [
+      478,
+      289,
+      359,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-01-x-scamsniffer-approval-458-days-light-full.png",
+   "sourceId": "T2-01",
+   "plateId": "T2-01",
+   "variant": "light-full",
+   "url": "https://x.com/realScamSniffer/status/1951528627985850508",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2025-08-02T06:20:57.000Z",
+   "exactText": {
+    "post": "🚨 ALERT: A victim lost $908,551 due to a phishing approval signed 458 days ago.\n🔐 REMINDER: Regularly review and revoke old approvals - your wallet security matters! 💰"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (primary post); Cointelegraph (2025-08-03) independently reports '$908,551 ... 458 days after unknowingly signing a malicious approval transaction' from on-chain data. On-chain transactions not checked by us.",
+   "blurRegions": [
+    {
+     "box": [
+      32,
+      591,
+      371,
+      56
+     ],
+     "reason": "victim wallet address (token holder row)"
+    },
+    {
+     "box": [
+      1328,
+      674,
+      265,
+      51
+     ],
+     "reason": "victim wallet address (search box)"
+    },
+    {
+     "box": [
+      32,
+      865,
+      131,
+      451
+     ],
+     "reason": "transaction hashes (Txn Hash column)"
+    },
+    {
+     "box": [
+      678,
+      865,
+      271,
+      451
+     ],
+     "reason": "victim wallet address (From column)"
+    },
+    {
+     "box": [
+      1093,
+      929,
+      271,
+      120
+     ],
+     "reason": "victim wallet address (To column, rows 2-3)"
+    },
+    {
+     "box": [
+      1093,
+      1179,
+      271,
+      137
+     ],
+     "reason": "wallet addresses (To column, rows 6-7)"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1701
+   ],
+   "keyPhrases": [
+    {
+     "text": "$908,551",
+     "boxes": [
+      [
+       682,
+       217,
+       254,
+       69
+      ]
+     ],
+     "union": [
+      682,
+      217,
+      254,
+      69
+     ]
+    },
+    {
+     "text": "phishing approval signed 458 days ago",
+     "boxes": [
+      [
+       1177,
+       217,
+       238,
+       69
+      ],
+      [
+       48,
+       289,
+       789,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1367,
+      141
+     ]
+    },
+    {
+     "text": "458 days ago",
+     "boxes": [
+      [
+       478,
+       289,
+       359,
+       69
+      ]
+     ],
+     "union": [
+      478,
+      289,
+      359,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-01-x-scamsniffer-approval-458-days-dark.png",
+   "sourceId": "T2-01",
+   "plateId": "T2-01",
+   "variant": "dark",
+   "url": "https://x.com/realScamSniffer/status/1951528627985850508",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2025-08-02T06:20:57.000Z",
+   "exactText": {
+    "post": "🚨 ALERT: A victim lost $908,551 due to a phishing approval signed 458 days ago.\n🔐 REMINDER: Regularly review and revoke old approvals - your wallet security matters! 💰"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (primary post); Cointelegraph (2025-08-03) independently reports '$908,551 ... 458 days after unknowingly signing a malicious approval transaction' from on-chain data. On-chain transactions not checked by us.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    888
+   ],
+   "keyPhrases": [
+    {
+     "text": "$908,551",
+     "boxes": [
+      [
+       682,
+       217,
+       254,
+       69
+      ]
+     ],
+     "union": [
+      682,
+      217,
+      254,
+      69
+     ]
+    },
+    {
+     "text": "phishing approval signed 458 days ago",
+     "boxes": [
+      [
+       1177,
+       217,
+       238,
+       69
+      ],
+      [
+       48,
+       289,
+       789,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1367,
+      141
+     ]
+    },
+    {
+     "text": "458 days ago",
+     "boxes": [
+      [
+       478,
+       289,
+       359,
+       69
+      ]
+     ],
+     "union": [
+      478,
+      289,
+      359,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-01-x-scamsniffer-approval-458-days-dark-full.png",
+   "sourceId": "T2-01",
+   "plateId": "T2-01",
+   "variant": "dark-full",
+   "url": "https://x.com/realScamSniffer/status/1951528627985850508",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2025-08-02T06:20:57.000Z",
+   "exactText": {
+    "post": "🚨 ALERT: A victim lost $908,551 due to a phishing approval signed 458 days ago.\n🔐 REMINDER: Regularly review and revoke old approvals - your wallet security matters! 💰"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (primary post); Cointelegraph (2025-08-03) independently reports '$908,551 ... 458 days after unknowingly signing a malicious approval transaction' from on-chain data. On-chain transactions not checked by us.",
+   "blurRegions": [
+    {
+     "box": [
+      32,
+      591,
+      371,
+      56
+     ],
+     "reason": "victim wallet address (token holder row)"
+    },
+    {
+     "box": [
+      1328,
+      674,
+      265,
+      51
+     ],
+     "reason": "victim wallet address (search box)"
+    },
+    {
+     "box": [
+      32,
+      865,
+      131,
+      451
+     ],
+     "reason": "transaction hashes (Txn Hash column)"
+    },
+    {
+     "box": [
+      678,
+      865,
+      271,
+      451
+     ],
+     "reason": "victim wallet address (From column)"
+    },
+    {
+     "box": [
+      1093,
+      929,
+      271,
+      120
+     ],
+     "reason": "victim wallet address (To column, rows 2-3)"
+    },
+    {
+     "box": [
+      1093,
+      1179,
+      271,
+      137
+     ],
+     "reason": "wallet addresses (To column, rows 6-7)"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1701
+   ],
+   "keyPhrases": [
+    {
+     "text": "$908,551",
+     "boxes": [
+      [
+       682,
+       217,
+       254,
+       69
+      ]
+     ],
+     "union": [
+      682,
+      217,
+      254,
+      69
+     ]
+    },
+    {
+     "text": "phishing approval signed 458 days ago",
+     "boxes": [
+      [
+       1177,
+       217,
+       238,
+       69
+      ],
+      [
+       48,
+       289,
+       789,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1367,
+      141
+     ]
+    },
+    {
+     "text": "458 days ago",
+     "boxes": [
+      [
+       478,
+       289,
+       359,
+       69
+      ]
+     ],
+     "union": [
+      478,
+      289,
+      359,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-07-x-dfinzer-32-users-signed-light.png",
+   "sourceId": "T2-07",
+   "plateId": "T2-07",
+   "variant": "light",
+   "url": "https://x.com/dfinzer/status/1495245308812402688",
+   "outlet": null,
+   "account": "@dfinzer (Devin Finzer, OpenSea co-founder and CEO)",
+   "date": "2022-02-20T03:53:56.000Z",
+   "exactText": {
+    "post": "As far as we can tell, this is a phishing attack. We don’t believe it’s connected to the OpenSea website. It appears 32 users thus far have signed a malicious payload from an attacker, and some of their NFTs were stolen."
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post, 2022-02-20). OpenSea later revised the count to 17 affected users (REPORTED, CoinDesk 2022-02-21); losses ~$1.7M (Engadget, T2-08).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    957
+   ],
+   "keyPhrases": [
+    {
+     "text": "32 users thus far have signed a malicious payload",
+     "boxes": [
+      [
+       48,
+       432,
+       1300,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1300,
+      69
+     ]
+    },
+    {
+     "text": "some of their NFTs were stolen",
+     "boxes": [
+      [
+       400,
+       504,
+       809,
+       69
+      ]
+     ],
+     "union": [
+      400,
+      504,
+      809,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Thread context hidden (hideThread); shows 'Replying to'.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-07-x-dfinzer-32-users-signed-dark.png",
+   "sourceId": "T2-07",
+   "plateId": "T2-07",
+   "variant": "dark",
+   "url": "https://x.com/dfinzer/status/1495245308812402688",
+   "outlet": null,
+   "account": "@dfinzer (Devin Finzer, OpenSea co-founder and CEO)",
+   "date": "2022-02-20T03:53:56.000Z",
+   "exactText": {
+    "post": "As far as we can tell, this is a phishing attack. We don’t believe it’s connected to the OpenSea website. It appears 32 users thus far have signed a malicious payload from an attacker, and some of their NFTs were stolen."
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post, 2022-02-20). OpenSea later revised the count to 17 affected users (REPORTED, CoinDesk 2022-02-21); losses ~$1.7M (Engadget, T2-08).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    957
+   ],
+   "keyPhrases": [
+    {
+     "text": "32 users thus far have signed a malicious payload",
+     "boxes": [
+      [
+       48,
+       432,
+       1300,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1300,
+      69
+     ]
+    },
+    {
+     "text": "some of their NFTs were stolen",
+     "boxes": [
+      [
+       400,
+       504,
+       809,
+       69
+      ]
+     ],
+     "union": [
+      400,
+      504,
+      809,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Card as published (no media).",
+    "Thread context hidden (hideThread); shows 'Replying to'.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-09-x-benbybit-signers-saw-ui-light.png",
+   "sourceId": "T2-09",
+   "plateId": "T2-09",
+   "variant": "light-nocard",
+   "url": "https://x.com/benbybit/status/1892963530422505586",
+   "outlet": null,
+   "account": "@benbybit (Ben Zhou, Bybit co-founder and CEO)",
+   "date": "2025-02-21T15:44:09.000Z",
+   "exactText": {
+    "post": "Bybit ETH multisig cold wallet just made a transfer to our warm wallet about 1 hr ago. It appears that this specific transaction was musked, all the signers saw the musked UI which showed the correct address and the URL was from @safe . However the signing message was to change Show more"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); amount and attribution VERIFIED by FBI PSA I-022625-PSA (T2-11).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1029
+   ],
+   "keyPhrases": [
+    {
+     "text": "all the signers saw the musked UI",
+     "boxes": [
+      [
+       712,
+       360,
+       872,
+       69
+      ]
+     ],
+     "union": [
+      712,
+      360,
+      872,
+      69
+     ]
+    },
+    {
+     "text": "the correct address",
+     "boxes": [
+      [
+       437,
+       432,
+       512,
+       69
+      ]
+     ],
+     "union": [
+      437,
+      432,
+      512,
+      69
+     ]
+    },
+    {
+     "text": "the signing message was to change",
+     "boxes": [
+      [
+       501,
+       504,
+       740,
+       69
+      ],
+      [
+       48,
+       576,
+       195,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      504,
+      1193,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Link preview hidden with the embed's own hideCard option; words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-09-x-benbybit-signers-saw-ui-light-full.png",
+   "sourceId": "T2-09",
+   "plateId": "T2-09",
+   "variant": "light-full",
+   "url": "https://x.com/benbybit/status/1892963530422505586",
+   "outlet": null,
+   "account": "@benbybit (Ben Zhou, Bybit co-founder and CEO)",
+   "date": "2025-02-21T15:44:09.000Z",
+   "exactText": {
+    "post": "Bybit ETH multisig cold wallet just made a transfer to our warm wallet about 1 hr ago. It appears that this specific transaction was musked, all the signers saw the musked UI which showed the correct address and the URL was from @safe . However the signing message was to change Show more"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); amount and attribution VERIFIED by FBI PSA I-022625-PSA (T2-11).",
+   "blurRegions": [
+    {
+     "box": [
+      1369,
+      744,
+      162,
+      157
+     ],
+     "reason": "QR code in the Etherscan preview (encodes the transaction link)"
+    },
+    {
+     "box": [
+      666,
+      1596,
+      373,
+      71
+     ],
+     "reason": "transaction hash in the link-card title (exchange incident; pixelated for consistency)"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    2208
+   ],
+   "keyPhrases": [
+    {
+     "text": "all the signers saw the musked UI",
+     "boxes": [
+      [
+       712,
+       360,
+       872,
+       69
+      ]
+     ],
+     "union": [
+      712,
+      360,
+      872,
+      69
+     ]
+    },
+    {
+     "text": "the correct address",
+     "boxes": [
+      [
+       437,
+       432,
+       512,
+       69
+      ]
+     ],
+     "union": [
+      437,
+      432,
+      512,
+      69
+     ]
+    },
+    {
+     "text": "the signing message was to change",
+     "boxes": [
+      [
+       501,
+       504,
+       740,
+       69
+      ],
+      [
+       48,
+       576,
+       195,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      504,
+      1193,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-09-x-benbybit-signers-saw-ui-dark.png",
+   "sourceId": "T2-09",
+   "plateId": "T2-09",
+   "variant": "dark-nocard",
+   "url": "https://x.com/benbybit/status/1892963530422505586",
+   "outlet": null,
+   "account": "@benbybit (Ben Zhou, Bybit co-founder and CEO)",
+   "date": "2025-02-21T15:44:09.000Z",
+   "exactText": {
+    "post": "Bybit ETH multisig cold wallet just made a transfer to our warm wallet about 1 hr ago. It appears that this specific transaction was musked, all the signers saw the musked UI which showed the correct address and the URL was from @safe . However the signing message was to change Show more"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); amount and attribution VERIFIED by FBI PSA I-022625-PSA (T2-11).",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1029
+   ],
+   "keyPhrases": [
+    {
+     "text": "all the signers saw the musked UI",
+     "boxes": [
+      [
+       712,
+       360,
+       872,
+       69
+      ]
+     ],
+     "union": [
+      712,
+      360,
+      872,
+      69
+     ]
+    },
+    {
+     "text": "the correct address",
+     "boxes": [
+      [
+       437,
+       432,
+       512,
+       69
+      ]
+     ],
+     "union": [
+      437,
+      432,
+      512,
+      69
+     ]
+    },
+    {
+     "text": "the signing message was to change",
+     "boxes": [
+      [
+       501,
+       504,
+       740,
+       69
+      ],
+      [
+       48,
+       576,
+       195,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      504,
+      1193,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Link preview hidden with the embed's own hideCard option; words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-09-x-benbybit-signers-saw-ui-dark-full.png",
+   "sourceId": "T2-09",
+   "plateId": "T2-09",
+   "variant": "dark-full",
+   "url": "https://x.com/benbybit/status/1892963530422505586",
+   "outlet": null,
+   "account": "@benbybit (Ben Zhou, Bybit co-founder and CEO)",
+   "date": "2025-02-21T15:44:09.000Z",
+   "exactText": {
+    "post": "Bybit ETH multisig cold wallet just made a transfer to our warm wallet about 1 hr ago. It appears that this specific transaction was musked, all the signers saw the musked UI which showed the correct address and the URL was from @safe . However the signing message was to change Show more"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); amount and attribution VERIFIED by FBI PSA I-022625-PSA (T2-11).",
+   "blurRegions": [
+    {
+     "box": [
+      1369,
+      744,
+      162,
+      157
+     ],
+     "reason": "QR code in the Etherscan preview (encodes the transaction link)"
+    },
+    {
+     "box": [
+      666,
+      1596,
+      373,
+      71
+     ],
+     "reason": "transaction hash in the link-card title (exchange incident; pixelated for consistency)"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    2208
+   ],
+   "keyPhrases": [
+    {
+     "text": "all the signers saw the musked UI",
+     "boxes": [
+      [
+       712,
+       360,
+       872,
+       69
+      ]
+     ],
+     "union": [
+      712,
+      360,
+      872,
+      69
+     ]
+    },
+    {
+     "text": "the correct address",
+     "boxes": [
+      [
+       437,
+       432,
+       512,
+       69
+      ]
+     ],
+     "union": [
+      437,
+      432,
+      512,
+      69
+     ]
+    },
+    {
+     "text": "the signing message was to change",
+     "boxes": [
+      [
+       501,
+       504,
+       740,
+       69
+      ],
+      [
+       48,
+       576,
+       195,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      504,
+      1193,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-12-x-scamsniffer-permit-32m-light.png",
+   "sourceId": "T2-12",
+   "plateId": "T2-12",
+   "variant": "light",
+   "url": "https://x.com/realScamSniffer/status/1839923975184625832",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-09-28T07:03:54.000Z",
+   "exactText": {
+    "post": "🚨 43 mins ago, someone lost 12,083 spWETH ($32.43M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); also reported by Cointelegraph/BeInCrypto. Not checked on-chain by us.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    744
+   ],
+   "keyPhrases": [
+    {
+     "text": "12,083 spWETH ($32.43M)",
+     "boxes": [
+      [
+       863,
+       217,
+       723,
+       69
+      ]
+     ],
+     "union": [
+      863,
+      217,
+      723,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       48,
+       289,
+       1105,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      289,
+      1105,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-12-x-scamsniffer-permit-32m-light-full.png",
+   "sourceId": "T2-12",
+   "plateId": "T2-12",
+   "variant": "light-full",
+   "url": "https://x.com/realScamSniffer/status/1839923975184625832",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-09-28T07:03:54.000Z",
+   "exactText": {
+    "post": "🚨 43 mins ago, someone lost 12,083 spWETH ($32.43M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); also reported by Cointelegraph/BeInCrypto. Not checked on-chain by us.",
+   "blurRegions": [
+    {
+     "box": [
+      51,
+      400,
+      768,
+      868
+     ],
+     "reason": "Etherscan transaction screenshot: victim and phishing addresses, hashes"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1653
+   ],
+   "keyPhrases": [
+    {
+     "text": "12,083 spWETH ($32.43M)",
+     "boxes": [
+      [
+       863,
+       217,
+       723,
+       69
+      ]
+     ],
+     "union": [
+      863,
+      217,
+      723,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       48,
+       289,
+       1105,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      289,
+      1105,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-12-x-scamsniffer-permit-32m-dark.png",
+   "sourceId": "T2-12",
+   "plateId": "T2-12",
+   "variant": "dark",
+   "url": "https://x.com/realScamSniffer/status/1839923975184625832",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-09-28T07:03:54.000Z",
+   "exactText": {
+    "post": "🚨 43 mins ago, someone lost 12,083 spWETH ($32.43M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); also reported by Cointelegraph/BeInCrypto. Not checked on-chain by us.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    744
+   ],
+   "keyPhrases": [
+    {
+     "text": "12,083 spWETH ($32.43M)",
+     "boxes": [
+      [
+       863,
+       217,
+       723,
+       69
+      ]
+     ],
+     "union": [
+      863,
+      217,
+      723,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       48,
+       289,
+       1105,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      289,
+      1105,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-12-x-scamsniffer-permit-32m-dark-full.png",
+   "sourceId": "T2-12",
+   "plateId": "T2-12",
+   "variant": "dark-full",
+   "url": "https://x.com/realScamSniffer/status/1839923975184625832",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-09-28T07:03:54.000Z",
+   "exactText": {
+    "post": "🚨 43 mins ago, someone lost 12,083 spWETH ($32.43M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); also reported by Cointelegraph/BeInCrypto. Not checked on-chain by us.",
+   "blurRegions": [
+    {
+     "box": [
+      51,
+      400,
+      768,
+      868
+     ],
+     "reason": "Etherscan transaction screenshot: victim and phishing addresses, hashes"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1653
+   ],
+   "keyPhrases": [
+    {
+     "text": "12,083 spWETH ($32.43M)",
+     "boxes": [
+      [
+       863,
+       217,
+       723,
+       69
+      ]
+     ],
+     "union": [
+      863,
+      217,
+      723,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       48,
+       289,
+       1105,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      289,
+      1105,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-13-x-scamsniffer-permit-35m-light.png",
+   "sourceId": "T2-13",
+   "plateId": "T2-13",
+   "variant": "light",
+   "url": "https://x.com/realScamSniffer/status/1844590237521203610",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-10-11T04:05:58.000Z",
+   "exactText": {
+    "post": "🚨 5 hours ago, someone lost 15,079 fwDETH($35M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); not checked on-chain.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    744
+   ],
+   "keyPhrases": [
+    {
+     "text": "15,079 fwDETH($35M)",
+     "boxes": [
+      [
+       850,
+       217,
+       608,
+       69
+      ]
+     ],
+     "union": [
+      850,
+      217,
+      608,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       1472,
+       217,
+       137,
+       69
+      ],
+      [
+       48,
+       289,
+       968,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1561,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-13-x-scamsniffer-permit-35m-light-full.png",
+   "sourceId": "T2-13",
+   "plateId": "T2-13",
+   "variant": "light-full",
+   "url": "https://x.com/realScamSniffer/status/1844590237521203610",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-10-11T04:05:58.000Z",
+   "exactText": {
+    "post": "🚨 5 hours ago, someone lost 15,079 fwDETH($35M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); not checked on-chain.",
+   "blurRegions": [
+    {
+     "box": [
+      51,
+      400,
+      768,
+      868
+     ],
+     "reason": "Etherscan transaction screenshot: victim and phishing addresses, hashes"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1653
+   ],
+   "keyPhrases": [
+    {
+     "text": "15,079 fwDETH($35M)",
+     "boxes": [
+      [
+       850,
+       217,
+       608,
+       69
+      ]
+     ],
+     "union": [
+      850,
+      217,
+      608,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       1472,
+       217,
+       137,
+       69
+      ],
+      [
+       48,
+       289,
+       968,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1561,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-13-x-scamsniffer-permit-35m-dark.png",
+   "sourceId": "T2-13",
+   "plateId": "T2-13",
+   "variant": "dark",
+   "url": "https://x.com/realScamSniffer/status/1844590237521203610",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-10-11T04:05:58.000Z",
+   "exactText": {
+    "post": "🚨 5 hours ago, someone lost 15,079 fwDETH($35M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); not checked on-chain.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    744
+   ],
+   "keyPhrases": [
+    {
+     "text": "15,079 fwDETH($35M)",
+     "boxes": [
+      [
+       850,
+       217,
+       608,
+       69
+      ]
+     ],
+     "union": [
+      850,
+      217,
+      608,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       1472,
+       217,
+       137,
+       69
+      ],
+      [
+       48,
+       289,
+       968,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1561,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-13-x-scamsniffer-permit-35m-dark-full.png",
+   "sourceId": "T2-13",
+   "plateId": "T2-13",
+   "variant": "dark-full",
+   "url": "https://x.com/realScamSniffer/status/1844590237521203610",
+   "outlet": null,
+   "account": "@realScamSniffer (Scam Sniffer)",
+   "date": "2024-10-11T04:05:58.000Z",
+   "exactText": {
+    "post": "🚨 5 hours ago, someone lost 15,079 fwDETH($35M) after signing a \"permit\" phishing signature.💸"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary post); not checked on-chain.",
+   "blurRegions": [
+    {
+     "box": [
+      51,
+      400,
+      768,
+      868
+     ],
+     "reason": "Etherscan transaction screenshot: victim and phishing addresses, hashes"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    1653
+   ],
+   "keyPhrases": [
+    {
+     "text": "15,079 fwDETH($35M)",
+     "boxes": [
+      [
+       850,
+       217,
+       608,
+       69
+      ]
+     ],
+     "union": [
+      850,
+      217,
+      608,
+      69
+     ]
+    },
+    {
+     "text": "after signing a \"permit\" phishing signature",
+     "boxes": [
+      [
+       1472,
+       217,
+       137,
+       69
+      ],
+      [
+       48,
+       289,
+       968,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      217,
+      1561,
+      141
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners.",
+    "Compact variant hides the attached screenshots; the -full variant keeps them with the Etherscan side pixelated."
+   ]
+  },
+  {
+   "file": "t2-15-x-wintermute-eip7702-97pct-light.png",
+   "sourceId": "T2-15",
+   "plateId": "T2-15",
+   "variant": "light",
+   "url": "https://x.com/wintermute_t/status/1928501765865091400",
+   "outlet": null,
+   "account": "@wintermute_t (Wintermute)",
+   "date": "2025-05-30T17:20:25.000Z",
+   "exactText": {
+    "post": "While EIP-7702 brings new convenience, it also introduces new risks\n\nOur Research team found that over 97% of all EIP-7702 delegations were authorized to multiple contracts using the same exact code. These are sweepers, used to automatically drain incoming ETH from compromised Show more"
+   },
+   "theme": [
+    2,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED as Wintermute's claim (primary). The Block (2025-06-01) reported 'over 80%'; the sweepers target already-compromised keys, so do not caption it as '97% of users were robbed'.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1173
+   ],
+   "keyPhrases": [
+    {
+     "text": "over 97% of all EIP-7702 delegations",
+     "boxes": [
+      [
+       850,
+       432,
+       662,
+       69
+      ],
+      [
+       48,
+       504,
+       305,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1464,
+      141
+     ]
+    },
+    {
+     "text": "sweepers",
+     "boxes": [
+      [
+       896,
+       576,
+       252,
+       69
+      ]
+     ],
+     "union": [
+      896,
+      576,
+      252,
+      69
+     ]
+    },
+    {
+     "text": "automatically drain incoming ETH",
+     "boxes": [
+      [
+       48,
+       648,
+       877,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      877,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-15-x-wintermute-eip7702-97pct-light-full.png",
+   "sourceId": "T2-15",
+   "plateId": "T2-15",
+   "variant": "light-full",
+   "url": "https://x.com/wintermute_t/status/1928501765865091400",
+   "outlet": null,
+   "account": "@wintermute_t (Wintermute)",
+   "date": "2025-05-30T17:20:25.000Z",
+   "exactText": {
+    "post": "While EIP-7702 brings new convenience, it also introduces new risks\n\nOur Research team found that over 97% of all EIP-7702 delegations were authorized to multiple contracts using the same exact code. These are sweepers, used to automatically drain incoming ETH from compromised Show more"
+   },
+   "theme": [
+    2,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED as Wintermute's claim (primary). The Block (2025-06-01) reported 'over 80%'; the sweepers target already-compromised keys, so do not caption it as '97% of users were robbed'.",
+   "blurRegions": [
+    {
+     "box": [
+      635,
+      904,
+      180,
+      332
+     ],
+     "reason": "contract addresses in the Dune chart legend"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    2085
+   ],
+   "keyPhrases": [
+    {
+     "text": "over 97% of all EIP-7702 delegations",
+     "boxes": [
+      [
+       850,
+       432,
+       662,
+       69
+      ],
+      [
+       48,
+       504,
+       305,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1464,
+      141
+     ]
+    },
+    {
+     "text": "sweepers",
+     "boxes": [
+      [
+       896,
+       576,
+       252,
+       69
+      ]
+     ],
+     "union": [
+      896,
+      576,
+      252,
+      69
+     ]
+    },
+    {
+     "text": "automatically drain incoming ETH",
+     "boxes": [
+      [
+       48,
+       648,
+       877,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      877,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-15-x-wintermute-eip7702-97pct-dark.png",
+   "sourceId": "T2-15",
+   "plateId": "T2-15",
+   "variant": "dark",
+   "url": "https://x.com/wintermute_t/status/1928501765865091400",
+   "outlet": null,
+   "account": "@wintermute_t (Wintermute)",
+   "date": "2025-05-30T17:20:25.000Z",
+   "exactText": {
+    "post": "While EIP-7702 brings new convenience, it also introduces new risks\n\nOur Research team found that over 97% of all EIP-7702 delegations were authorized to multiple contracts using the same exact code. These are sweepers, used to automatically drain incoming ETH from compromised Show more"
+   },
+   "theme": [
+    2,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED as Wintermute's claim (primary). The Block (2025-06-01) reported 'over 80%'; the sweepers target already-compromised keys, so do not caption it as '97% of users were robbed'.",
+   "blurRegions": [],
+   "naturalSize": [
+    1644,
+    1173
+   ],
+   "keyPhrases": [
+    {
+     "text": "over 97% of all EIP-7702 delegations",
+     "boxes": [
+      [
+       850,
+       432,
+       662,
+       69
+      ],
+      [
+       48,
+       504,
+       305,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1464,
+      141
+     ]
+    },
+    {
+     "text": "sweepers",
+     "boxes": [
+      [
+       896,
+       576,
+       252,
+       69
+      ]
+     ],
+     "union": [
+      896,
+      576,
+      252,
+      69
+     ]
+    },
+    {
+     "text": "automatically drain incoming ETH",
+     "boxes": [
+      [
+       48,
+       648,
+       877,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      877,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Post media hidden at capture (third-party image); words unchanged.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t2-15-x-wintermute-eip7702-97pct-dark-full.png",
+   "sourceId": "T2-15",
+   "plateId": "T2-15",
+   "variant": "dark-full",
+   "url": "https://x.com/wintermute_t/status/1928501765865091400",
+   "outlet": null,
+   "account": "@wintermute_t (Wintermute)",
+   "date": "2025-05-30T17:20:25.000Z",
+   "exactText": {
+    "post": "While EIP-7702 brings new convenience, it also introduces new risks\n\nOur Research team found that over 97% of all EIP-7702 delegations were authorized to multiple contracts using the same exact code. These are sweepers, used to automatically drain incoming ETH from compromised Show more"
+   },
+   "theme": [
+    2,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED as Wintermute's claim (primary). The Block (2025-06-01) reported 'over 80%'; the sweepers target already-compromised keys, so do not caption it as '97% of users were robbed'.",
+   "blurRegions": [
+    {
+     "box": [
+      635,
+      904,
+      180,
+      332
+     ],
+     "reason": "contract addresses in the Dune chart legend"
+    }
+   ],
+   "naturalSize": [
+    1644,
+    2085
+   ],
+   "keyPhrases": [
+    {
+     "text": "over 97% of all EIP-7702 delegations",
+     "boxes": [
+      [
+       850,
+       432,
+       662,
+       69
+      ],
+      [
+       48,
+       504,
+       305,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      432,
+      1464,
+      141
+     ]
+    },
+    {
+     "text": "sweepers",
+     "boxes": [
+      [
+       896,
+       576,
+       252,
+       69
+      ]
+     ],
+     "union": [
+      896,
+      576,
+      252,
+      69
+     ]
+    },
+    {
+     "text": "automatically drain incoming ETH",
+     "boxes": [
+      [
+       48,
+       648,
+       877,
+       69
+      ]
+     ],
+     "union": [
+      48,
+      648,
+      877,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Full post card including its media; addresses pixelated.",
+    "Captured from the public X embed at 3x, UTC timestamps; transparent rounded corners."
+   ]
+  },
+  {
+   "file": "t1-02-krebsonsecurity-lastpass-150m.png",
+   "sourceId": "T1-02",
+   "plateId": "T1-02",
+   "variant": null,
+   "url": "https://krebsonsecurity.com/2025/03/feds-link-150m-cyberheist-to-2022-lastpass-hacks/",
+   "outlet": "KrebsOnSecurity (Brian Krebs)",
+   "account": null,
+   "date": "2025-03-07",
+   "exactText": {
+    "h1": "Feds Link $150M Cyberheist to 2022 LastPass Hacks",
+    "sub": null,
+    "date": "March 7, 2025"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "REPORTED (Krebs quoting a federal seizure filing: ~$24M seized from a $150M theft on 2024-01-30; victims had stored seed phrases in LastPass Secure Notes). LastPass says it has seen no conclusive evidence of the link.",
+   "blurRegions": [],
+   "naturalSize": [
+    3840,
+    1147
+   ],
+   "keyPhrases": [
+    {
+     "text": "$150M Cyberheist",
+     "boxes": [
+      [
+       557,
+       777,
+       786,
+       114
+      ]
+     ],
+     "union": [
+      557,
+      777,
+      786,
+      114
+     ]
+    },
+    {
+     "text": "2022 LastPass Hacks",
+     "boxes": [
+      [
+       1476,
+       777,
+       932,
+       114
+      ]
+     ],
+     "union": [
+      1476,
+      777,
+      932,
+      114
+     ]
+    },
+    {
+     "text": "March 7, 2025",
+     "boxes": [
+      [
+       167,
+       1003,
+       319,
+       60
+      ]
+     ],
+     "union": [
+      167,
+      1003,
+      319,
+      60
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t1-05-kaspersky-sparkcat-trojan.png",
+   "sourceId": "T1-05",
+   "plateId": "T1-05",
+   "variant": null,
+   "url": "https://www.kaspersky.com/about/press-releases/kaspersky-discovers-new-crypto-stealing-trojan-in-appstore-and-google-play",
+   "outlet": "Kaspersky",
+   "account": null,
+   "date": "2025-02-05",
+   "exactText": {
+    "h1": "Kaspersky discovers new crypto-stealing Trojan in AppStore and Google Play",
+    "sub": null,
+    "date": "February 5, 2025"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (primary): 'first known instance of optical recognition-based malware appearing in AppStore'; Google Play apps 'downloaded over 242,000 times'; it steals 'screenshots containing cryptocurrency wallet recovery phrases'.",
+   "blurRegions": [],
+   "naturalSize": [
+    3492,
+    1119
+   ],
+   "keyPhrases": [
+    {
+     "text": "crypto-stealing Trojan",
+     "boxes": [
+      [
+       1781,
+       624,
+       1243,
+       141
+      ]
+     ],
+     "union": [
+      1781,
+      624,
+      1243,
+      141
+     ]
+    },
+    {
+     "text": "AppStore and Google Play",
+     "boxes": [
+      [
+       1010,
+       768,
+       1472,
+       141
+      ]
+     ],
+     "union": [
+      1010,
+      768,
+      1472,
+      141
+     ]
+    },
+    {
+     "text": "February 5, 2025",
+     "boxes": [
+      [
+       1516,
+       960,
+       460,
+       72
+      ]
+     ],
+     "union": [
+      1516,
+      960,
+      460,
+      72
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t1-07-thehackernews-trust-wallet-7m.png",
+   "sourceId": "T1-07",
+   "plateId": "T1-07",
+   "variant": null,
+   "url": "https://thehackernews.com/2025/12/trust-wallet-chrome-extension-bug.html",
+   "outlet": "The Hacker News",
+   "account": null,
+   "date": "2025-12-26",
+   "exactText": {
+    "h1": "Trust Wallet Chrome Extension Breach Caused $7 Million Crypto Loss via Malicious Code",
+    "sub": null,
+    "date": "Dec 26, 2025"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED ($7M per Trust Wallet's post; SlowMist: 'Once decrypted, the mnemonic phrase is sent to the attacker's server').",
+   "blurRegions": [],
+   "naturalSize": [
+    3624,
+    915
+   ],
+   "keyPhrases": [
+    {
+     "text": "$7 Million Crypto Loss",
+     "boxes": [
+      [
+       2195,
+       516,
+       960,
+       114
+      ]
+     ],
+     "union": [
+      2195,
+      516,
+      960,
+      114
+     ]
+    },
+    {
+     "text": "Malicious Code",
+     "boxes": [
+      [
+       180,
+       660,
+       662,
+       114
+      ]
+     ],
+     "union": [
+      180,
+      660,
+      662,
+      114
+     ]
+    },
+    {
+     "text": "Dec 26, 2025",
+     "boxes": [
+      [
+       666,
+       825,
+       225,
+       45
+      ]
+     ],
+     "union": [
+      666,
+      825,
+      225,
+      45
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t1-11-cointelegraph-letters-trezor-ledger.png",
+   "sourceId": "T1-11",
+   "plateId": "T1-11",
+   "variant": null,
+   "url": "https://cointelegraph.com/news/scammers-send-physical-letters-trezor-ledger-users-again",
+   "outlet": "Cointelegraph",
+   "account": null,
+   "date": "2026-02-17",
+   "exactText": {
+    "h1": "Crypto phishers are sending letters to Trezor, Ledger users again",
+    "sub": "It's not the first time scammers have used snail mail to target victims of hardware wallet company data breaches from years ago.",
+    "date": "Feb 17, 2026"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED (Cointelegraph: QR code leads to a fake site where users are tricked into 'entering their wallet recovery phrases').",
+   "blurRegions": [],
+   "naturalSize": [
+    2472,
+    1362
+   ],
+   "keyPhrases": [
+    {
+     "text": "sending letters",
+     "boxes": [
+      [
+       1194,
+       684,
+       818,
+       165
+      ]
+     ],
+     "union": [
+      1194,
+      684,
+      818,
+      165
+     ]
+    },
+    {
+     "text": "Feb 17, 2026",
+     "boxes": [
+      [
+       574,
+       1032,
+       248,
+       57
+      ]
+     ],
+     "union": [
+      574,
+      1032,
+      248,
+      57
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t1-12-coindesk-282m-social-engineering.png",
+   "sourceId": "T1-12",
+   "plateId": "T1-12",
+   "variant": null,
+   "url": "https://www.coindesk.com/business/2026/01/16/hacker-steals-usd282-milion-in-hardware-wallet-social-engineering-attack",
+   "outlet": "CoinDesk",
+   "account": null,
+   "date": "2026-01-16",
+   "exactText": {
+    "h1": "Hacker steals $282 million crypto from a victim in social-engineering attack",
+    "sub": "A sophisticated social-engineering attack led to the theft of more than $282 million in BTC and LTC, with the funds rapidly laundered through monero.",
+    "date": "Published Jan 16, 2026, 1:56 p.m. EST"
+   },
+   "theme": [
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "REPORTED ($282M in BTC and LTC per investigator ZachXBT, theft on 2026-01-10). That the victim revealed the seed phrase is UNVERIFIED (other outlets say so; CoinDesk only says 'social-engineering attack').",
+   "blurRegions": [],
+   "naturalSize": [
+    2496,
+    1401
+   ],
+   "keyPhrases": [
+    {
+     "text": "$282 million",
+     "boxes": [
+      [
+       976,
+       738,
+       545,
+       129
+      ]
+     ],
+     "union": [
+      976,
+      738,
+      545,
+      129
+     ]
+    },
+    {
+     "text": "social-engineering attack",
+     "boxes": [
+      [
+       774,
+       870,
+       1108,
+       129
+      ]
+     ],
+     "union": [
+      774,
+      870,
+      1108,
+      129
+     ]
+    },
+    {
+     "text": "Published Jan 16, 2026",
+     "boxes": [
+      [
+       1144,
+       1266,
+       449,
+       51
+      ]
+     ],
+     "union": [
+      1144,
+      1266,
+      449,
+      51
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t2-02-cointelegraph-908k-15-months.png",
+   "sourceId": "T2-02",
+   "plateId": "T2-02",
+   "variant": null,
+   "url": "https://cointelegraph.com/news/crypto-victim-loses-908k-in-sophisticated-phishing-attack",
+   "outlet": "Cointelegraph",
+   "account": null,
+   "date": "2025-08-03",
+   "exactText": {
+    "h1": "Crypto victim loses $908K in sophisticated phishing attack",
+    "sub": "A victim lost $908,551 in a crypto phishing scam 15 months after signing a malicious approval transaction. The scammer waited until two large deposits were made before striking.",
+    "date": "Aug 3, 2025"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (see T2-01). Subhead: 'A victim lost $908,551 in a crypto phishing scam 15 months after signing a malicious approval transaction.'",
+   "blurRegions": [],
+   "naturalSize": [
+    2472,
+    1362
+   ],
+   "keyPhrases": [
+    {
+     "text": "$908K",
+     "boxes": [
+      [
+       1150,
+       684,
+       336,
+       165
+      ]
+     ],
+     "union": [
+      1150,
+      684,
+      336,
+      165
+     ]
+    },
+    {
+     "text": "15 months after signing a malicious approval transaction",
+     "boxes": [
+      [
+       1232,
+       1155,
+       1067,
+       72
+      ],
+      [
+       84,
+       1236,
+       270,
+       72
+      ]
+     ],
+     "union": [
+      84,
+      1155,
+      2215,
+      153
+     ]
+    },
+    {
+     "text": "Aug 3, 2025",
+     "boxes": [
+      [
+       574,
+       1032,
+       228,
+       57
+      ]
+     ],
+     "union": [
+      574,
+      1032,
+      228,
+      57
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t2-04-decrypt-opensea-old-prices-1700.png",
+   "sourceId": "T2-04",
+   "plateId": "T2-04",
+   "variant": null,
+   "url": "https://decrypt.co/91076/opensea-exploit-sees-bored-ape-yacht-club-nft-sell-1700",
+   "outlet": "Decrypt",
+   "account": null,
+   "date": "2022-01-24",
+   "exactText": {
+    "h1": "OpenSea Exploit Sees Bored Ape Yacht Club NFT Sell For $1,700 in Ethereum",
+    "sub": "A listing bug on OpenSea allowed one user to buy Bored Ape Yacht Club NFTs at old prices, far below the current floor price.",
+    "date": "Jan 24, 2022"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Every signature is recorded on NEAR before it is made.",
+    "Signing pauses while it is for sale.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A3",
+    "A4",
+    "A5"
+   ],
+   "factCheck": "VERIFIED via Elliptic (T2-03). OpenSea later refunded about 750 ETH (~$1.8M) (REPORTED, Decrypt).",
+   "blurRegions": [],
+   "naturalSize": [
+    2124,
+    1767
+   ],
+   "keyPhrases": [
+    {
+     "text": "$1,700",
+     "boxes": [
+      [
+       84,
+       1233,
+       468,
+       174
+      ]
+     ],
+     "union": [
+      84,
+      1233,
+      468,
+      174
+     ]
+    },
+    {
+     "text": "at old prices",
+     "boxes": [
+      [
+       383,
+       1476,
+       345,
+       78
+      ]
+     ],
+     "union": [
+      383,
+      1476,
+      345,
+      78
+     ]
+    },
+    {
+     "text": "Jan 24, 2022",
+     "boxes": [
+      [
+       1708,
+       1614,
+       332,
+       69
+      ]
+     ],
+     "union": [
+      1708,
+      1614,
+      332,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged.",
+    "Lead image (Bored Ape #9991, Yuga Labs) not included."
+   ]
+  },
+  {
+   "file": "t2-10-nbcnews-bybit-1-5-billion.png",
+   "sourceId": "T2-10",
+   "plateId": "T2-10",
+   "variant": null,
+   "url": "https://www.nbcnews.com/tech/crypto/hackers-steal-15-billion-exchange-bybit-biggest-ever-crypto-heist-rcna193273",
+   "outlet": "NBC News",
+   "account": null,
+   "date": "2025-02-21",
+   "exactText": {
+    "h1": "Hackers steal $1.5 billion from exchange Bybit in biggest-ever crypto heist",
+    "sub": "Blockchain analysis firm Elliptic later linked the attack to North Korea’s Lazarus Group, a state-sponsored hacking collective.",
+    "date": "Feb. 21, 2025, 10:30 PM UTC"
+   },
+   "theme": [
+    2,
+    4
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED ($1.5B per FBI PSA, T2-11).",
+   "blurRegions": [],
+   "naturalSize": [
+    3744,
+    1830
+   ],
+   "keyPhrases": [
+    {
+     "text": "$1.5 billion",
+     "boxes": [
+      [
+       1673,
+       465,
+       672,
+       210
+      ]
+     ],
+     "union": [
+      1673,
+      465,
+      672,
+      210
+     ]
+    },
+    {
+     "text": "biggest-ever crypto heist",
+     "boxes": [
+      [
+       1294,
+       645,
+       1583,
+       210
+      ]
+     ],
+     "union": [
+      1294,
+      645,
+      1583,
+      210
+     ]
+    },
+    {
+     "text": "Feb. 21, 2025",
+     "boxes": [
+      [
+       780,
+       1698,
+       269,
+       42
+      ]
+     ],
+     "union": [
+      780,
+      1698,
+      269,
+      42
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged.",
+    "Byline on the page: 'By MacKenzie Sigalos, CNBC' (Source: CNBC); the date line reads 'Feb. 21, 2025, 10:30 PM UTC'."
+   ]
+  },
+  {
+   "file": "t3-01-cointelegraph-your-keys-his-coins.png",
+   "sourceId": "T3-01",
+   "plateId": "T3-01",
+   "variant": null,
+   "url": "https://cointelegraph.com/news/your-keys-his-coins-cryptopia-employee-admits-to-stealing-172k-in-crypto",
+   "outlet": "Cointelegraph",
+   "account": null,
+   "date": "2021-07-05",
+   "exactText": {
+    "h1": "Your keys, his coins — Cryptopia employee admits to stealing $172K in crypto",
+    "sub": "The theft was first discovered in September and was not yet connected to the crypto exchange going into liquidation the previous year.",
+    "date": "Jul 5, 2021"
+   },
+   "theme": [
+    3
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak."
+   ],
+   "answerCodes": [
+    "A1"
+   ],
+   "factCheck": "VERIFIED in Cointelegraph's report of his guilty plea: he 'made his own copy of the information on a USB flash drive'; theft of 'roughly $172,000'. Other outlets give $170K-$177K.",
+   "blurRegions": [],
+   "naturalSize": [
+    2472,
+    1506
+   ],
+   "keyPhrases": [
+    {
+     "text": "Your keys, his coins",
+     "boxes": [
+      [
+       84,
+       684,
+       1068,
+       165
+      ]
+     ],
+     "union": [
+      84,
+      684,
+      1068,
+      165
+     ]
+    },
+    {
+     "text": "$172K",
+     "boxes": [
+      [
+       1665,
+       828,
+       336,
+       165
+      ]
+     ],
+     "union": [
+      1665,
+      828,
+      336,
+      165
+     ]
+    },
+    {
+     "text": "Jul 5, 2021",
+     "boxes": [
+      [
+       574,
+       1176,
+       200,
+       57
+      ]
+     ],
+     "union": [
+      574,
+      1176,
+      200,
+      57
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t3-03-kaspersky-fake-hardware-wallet.png",
+   "sourceId": "T3-03",
+   "plateId": "T3-03",
+   "variant": null,
+   "url": "https://www.kaspersky.com/blog/fake-trezor-hardware-crypto-wallet/48155/",
+   "outlet": "Kaspersky Daily (Kaspersky official blog)",
+   "account": null,
+   "date": "2023-05-10",
+   "exactText": {
+    "h1": "Case study: fake hardware cryptowallet",
+    "sub": "Full review of a fake cryptowallet incident. It looks and feels like a Trezor wallet, but puts all your crypto-investments into the hands of criminals.",
+    "date": "May 10, 2023"
+   },
+   "theme": [
+    3
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A1",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (Kaspersky blog: 'the randomly generated seed phrase was replaced with one of 20 pre-generated seed phrases saved in the hacked firmware'; press release: 1.33 BTC, ~$29,585 stolen).",
+   "blurRegions": [],
+   "naturalSize": [
+    3258,
+    1506
+   ],
+   "keyPhrases": [
+    {
+     "text": "fake hardware cryptowallet",
+     "boxes": [
+      [
+       1054,
+       605,
+       1161,
+       204
+      ],
+      [
+       84,
+       790,
+       1045,
+       204
+      ]
+     ],
+     "union": [
+      84,
+      605,
+      2131,
+      389
+     ]
+    },
+    {
+     "text": "into the hands of criminals",
+     "boxes": [
+      [
+       904,
+       1164,
+       860,
+       87
+      ]
+     ],
+     "union": [
+      904,
+      1164,
+      860,
+      87
+     ]
+    },
+    {
+     "text": "May 10, 2023",
+     "boxes": [
+      [
+       2936,
+       1400,
+       238,
+       45
+      ]
+     ],
+     "union": [
+      2936,
+      1400,
+      238,
+      45
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t2-18-coindesk-drift-durable-nonce-270m.png",
+   "sourceId": "T2-18",
+   "plateId": "T2-18",
+   "variant": null,
+   "url": "https://www.coindesk.com/tech/2026/04/02/how-a-solana-feature-designed-for-convenience-let-an-attacker-drain-usd270-million-from-drift",
+   "outlet": "CoinDesk",
+   "account": null,
+   "date": "2026-04-02",
+   "exactText": {
+    "h1": "How a Solana feature designed for convenience let attackers drain more than $270 million from Drift",
+    "sub": "The exploit did not involve a bug in Drift's code. It used \"durable nonces,\" a legitimate Solana transaction feature, to pre-sign administrative transfers weeks before executing them, bypassing the protocol's multisig security in minutes.",
+    "date": "Published Apr 2, 2026, 11:08 a.m. EDT"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED (CoinDesk): $270M = researcher's sum of drained assets; durable-nonce accounts created Mar 23, executed Apr 1 (more than a week).",
+   "blurRegions": [],
+   "naturalSize": [
+    2496,
+    1605
+   ],
+   "keyPhrases": [
+    {
+     "text": "more than $270 million",
+     "boxes": [
+      [
+       1746,
+       870,
+       454,
+       129
+      ],
+      [
+       372,
+       1002,
+       550,
+       129
+      ]
+     ],
+     "union": [
+      372,
+      870,
+      1828,
+      261
+     ]
+    },
+    {
+     "text": "pre-sign administrative transfers",
+     "boxes": [
+      [
+       1041,
+       1236,
+       717,
+       60
+      ]
+     ],
+     "union": [
+      1041,
+      1236,
+      717,
+      60
+     ]
+    },
+    {
+     "text": "Published Apr 2, 2026",
+     "boxes": [
+      [
+       1136,
+       1470,
+       432,
+       51
+      ]
+     ],
+     "union": [
+      1136,
+      1470,
+      432,
+      51
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged.",
+    "Pair with T2-19 only if you avoid showing both dollar figures together ($270M here is a researcher's token sum; $285M is Drift's figure)."
+   ]
+  },
+  {
+   "file": "t2-19-thehackernews-drift-285m-durable-nonce.png",
+   "sourceId": "T2-19",
+   "plateId": "T2-19",
+   "variant": null,
+   "url": "https://thehackernews.com/2026/04/drift-loses-285-million-in-durable.html",
+   "outlet": "The Hacker News",
+   "account": null,
+   "date": "2026-04-03",
+   "exactText": {
+    "h1": "Drift Loses $285 Million in Durable Nonce Social Engineering Attack Linked to DPRK",
+    "sub": null,
+    "date": "Apr 03, 2026"
+   },
+   "theme": [
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces.",
+    "Every signature is recorded on NEAR before it is made.",
+    "The buyer's browser checks that no old signature can still move the coins before Buy turns on."
+   ],
+   "answerCodes": [
+    "A2",
+    "A3",
+    "A5"
+   ],
+   "factCheck": "VERIFIED: $285M is Drift's confirmed figure; DPRK link reported as indications only.",
+   "blurRegions": [],
+   "naturalSize": [
+    3624,
+    915
+   ],
+   "keyPhrases": [
+    {
+     "text": "$285 Million",
+     "boxes": [
+      [
+       671,
+       516,
+       534,
+       114
+      ]
+     ],
+     "union": [
+      671,
+      516,
+      534,
+      114
+     ]
+    },
+    {
+     "text": "Durable Nonce",
+     "boxes": [
+      [
+       1331,
+       516,
+       630,
+       114
+      ]
+     ],
+     "union": [
+      1331,
+      516,
+      630,
+      114
+     ]
+    },
+    {
+     "text": "Apr 03, 2026",
+     "boxes": [
+      [
+       666,
+       825,
+       219,
+       45
+      ]
+     ],
+     "union": [
+      666,
+      825,
+      219,
+      45
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged.",
+    "$285M is Drift's own confirmed figure."
+   ]
+  },
+  {
+   "file": "t4-01-scamsniffer-2024-drainers-494m-headline.png",
+   "sourceId": "T4-01",
+   "plateId": "T4-01h",
+   "variant": null,
+   "url": "https://drops.scamsniffer.io/scam-sniffer-2024-web3-phishing-attacks-wallet-drainers-drain-494-million/",
+   "outlet": "Scam Sniffer (annual report 2024)",
+   "account": null,
+   "date": "2025-01-03",
+   "exactText": {
+    "h1": "Scam Sniffer 2024: Web3 Phishing Attacks – Wallet Drainers Drain $494 Million",
+    "sub": null,
+    "date": "January 3, 2025"
+   },
+   "theme": [
+    4,
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary): 'approximately $494 million in losses', '332,000 addresses'; text gives the largest theft as $55.48M (infographic rounds to $55.4M). Permit was 56.7% of large-case losses.",
+   "blurRegions": [],
+   "naturalSize": [
+    3744,
+    1010
+   ],
+   "keyPhrases": [
+    {
+     "text": "Wallet Drainers Drain $494 Million",
+     "boxes": [
+      [
+       2447,
+       569,
+       1142,
+       135
+      ],
+      [
+       84,
+       677,
+       631,
+       135
+      ]
+     ],
+     "union": [
+      84,
+      569,
+      3505,
+      243
+     ]
+    },
+    {
+     "text": "January 3, 2025",
+     "boxes": [
+      [
+       554,
+       884,
+       283,
+       42
+      ]
+     ],
+     "union": [
+      554,
+      884,
+      283,
+      42
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t4-01-scamsniffer-2024-report-card.png",
+   "sourceId": "T4-01",
+   "plateId": "T4-01c",
+   "variant": null,
+   "url": "https://drops.scamsniffer.io/scam-sniffer-2024-web3-phishing-attacks-wallet-drainers-drain-494-million/",
+   "outlet": "Scam Sniffer (annual report 2024)",
+   "account": null,
+   "date": "2025-01-03",
+   "exactText": {
+    "cardText": "Crypto Phishing Report / Annual Report 2024 by ScamSniffer / $494M+ ↑67% TOTAL LOSS / 332K+ ↑3.7% VICTIMS / $55.4M ↑130% LARGEST SINGLE LOSS / 30 ↑56% LARGE LOSS CASES / 2024 / ScamSniffer",
+    "note": "text inside the report's own image (read from the image); see keyPhrases"
+   },
+   "theme": [
+    4,
+    2
+   ],
+   "satchelAnswer": [
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary): 'approximately $494 million in losses', '332,000 addresses'; text gives the largest theft as $55.48M (infographic rounds to $55.4M). Permit was 56.7% of large-case losses.",
+   "blurRegions": [],
+   "naturalSize": [
+    1024,
+    532
+   ],
+   "keyPhrases": [
+    {
+     "text": "$494M+ / TOTAL LOSS",
+     "boxes": [
+      [
+       64,
+       206,
+       170,
+       74
+      ]
+     ],
+     "union": [
+      64,
+      206,
+      170,
+      74
+     ],
+     "note": "measured by inspection (text is inside an image)"
+    },
+    {
+     "text": "332K+ / VICTIMS",
+     "boxes": [
+      [
+       419,
+       206,
+       132,
+       74
+      ]
+     ],
+     "union": [
+      419,
+      206,
+      132,
+      74
+     ],
+     "note": "measured by inspection (text is inside an image)"
+    },
+    {
+     "text": "Crypto Phishing Report",
+     "boxes": [
+      [
+       48,
+       52,
+       542,
+       50
+      ]
+     ],
+     "union": [
+      48,
+      52,
+      542,
+      50
+     ],
+     "note": "measured by inspection (text is inside an image)"
+    }
+   ],
+   "notes": [
+    "Element capture of the report's own figure at its native resolution; words unchanged.",
+    "Native resolution of the source image is 1024x532 (no larger version); upscale in the edit if needed."
+   ]
+  },
+  {
+   "file": "t4-03-chainalysis-2025-theft-headline.png",
+   "sourceId": "T4-03",
+   "plateId": "T4-03h",
+   "variant": null,
+   "url": "https://www.chainalysis.com/blog/crypto-hacking-stolen-funds-2026/",
+   "outlet": "Chainalysis (blog)",
+   "account": null,
+   "date": "2025-12-18",
+   "exactText": {
+    "h1": "North Korea Drives Record $2 Billion Crypto Theft Year, Pushing All-Time Total to $6.75 Billion",
+    "sub": null,
+    "date": "December 18, 2025"
+   },
+   "theme": [
+    4,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary): 'over $3.4 billion in theft from January through early December 2025'; 158,000 incidents; at least 80,000 victims; $713M from individuals (down from $1.5B in 2024).",
+   "blurRegions": [],
+   "naturalSize": [
+    1950,
+    1723
+   ],
+   "keyPhrases": [
+    {
+     "text": "$2 Billion Crypto Theft Year",
+     "boxes": [
+      [
+       60,
+       990,
+       1764,
+       165
+      ]
+     ],
+     "union": [
+      60,
+      990,
+      1764,
+      165
+     ]
+    },
+    {
+     "text": "December 18, 2025",
+     "boxes": [
+      [
+       60,
+       1576,
+       462,
+       63
+      ]
+     ],
+     "union": [
+      60,
+      1576,
+      462,
+      63
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x from a 1280-px-wide page; cookie/consent/newsletter overlays and ads hidden; lead image not included; words unchanged."
+   ]
+  },
+  {
+   "file": "t4-03-chainalysis-158k-incidents.png",
+   "sourceId": "T4-03",
+   "plateId": "T4-03b",
+   "variant": null,
+   "url": "https://www.chainalysis.com/blog/crypto-hacking-stolen-funds-2026/",
+   "outlet": "Chainalysis (blog)",
+   "account": null,
+   "date": "2025-12-18",
+   "exactText": {
+    "text": "Individual wallet compromises surged to 158,000 incidents affecting 80,000 unique victims in 2025, though total value stolen ($713M) decreased from 2024."
+   },
+   "theme": [
+    4,
+    1
+   ],
+   "satchelAnswer": [
+    "No seed phrase: a Satchel's Bitcoin, Ethereum and Solana addresses have nothing to copy, photograph, back up or leak.",
+    "Readable requests only: refuses raw hashes, permits/Permit2, approvals and other contract calls, EIP-7702 authorizations, durable nonces."
+   ],
+   "answerCodes": [
+    "A1",
+    "A2"
+   ],
+   "factCheck": "VERIFIED (primary): 'over $3.4 billion in theft from January through early December 2025'; 158,000 incidents; at least 80,000 victims; $713M from individuals (down from $1.5B in 2024).",
+   "blurRegions": [],
+   "naturalSize": [
+    2511,
+    162
+   ],
+   "keyPhrases": [
+    {
+     "text": "158,000 incidents",
+     "boxes": [
+      [
+       1058,
+       6,
+       444,
+       69
+      ]
+     ],
+     "union": [
+      1058,
+      6,
+      444,
+      69
+     ]
+    },
+    {
+     "text": "80,000 unique victims",
+     "boxes": [
+      [
+       1750,
+       6,
+       546,
+       69
+      ]
+     ],
+     "union": [
+      1750,
+      6,
+      546,
+      69
+     ]
+    }
+   ],
+   "notes": [
+    "Captured at 3x: the single bullet, cropped tight; words unchanged.",
+    "No outlet mark inside this crop: pair it with T4-03h or label it 'Chainalysis, Dec 2025'."
+   ]
+  }
+ ]
+}

@@ -1,0 +1,540 @@
+{
+ "voices": {
+  "daniel": {
+   "id": "onwK4e9ZLuTAKqWW03F9",
+   "label": "Daniel - Steady Broadcaster (British, male)"
+  },
+  "matilda": {
+   "id": "XrExE9yKIg1WjnnlVkGX",
+   "label": "Matilda - Knowledgable, Professional (American, female)"
+  },
+  "bill": {
+   "id": "pqHfZKP75CvOlQylNhV4",
+   "label": "Bill - Wise, Mature, Balanced (American, male)"
+  },
+  "alice": {
+   "id": "Xb7hH8MSUJpSbSDYk0k2",
+   "label": "Alice - Clear, Engaging Educator (British, female)"
+  }
+ },
+ "settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.8
+ },
+ "context": "Breaking news tonight.",
+ "fragments": [
+  {
+   "id": "F01",
+   "plate": "T1-01",
+   "voice": "daniel",
+   "text": "seed phrases in LastPass",
+   "say": "seed phrases in LastPass",
+   "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F01-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F01-tv.mp3"
+   },
+   "durationSec": 2.21,
+   "heard": {
+    "dry": "Seed phrases in LastPass",
+    "tv": "Seed phrases in LastPass"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -20.5,
+     "momentaryMaxLufs": -17.7,
+     "truePeakDb": -4
+    },
+    "tv": {
+     "integratedLufs": -21.6,
+     "momentaryMaxLufs": -17.8,
+     "truePeakDb": -6
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Seed phrases in LastPass",
+     "heardTv": "Seed phrases in LastPass"
+    }
+   ]
+  },
+  {
+   "id": "F02",
+   "plate": "T1-01",
+   "voice": "matilda",
+   "text": "your funds might be at risk",
+   "say": "your funds might be at risk",
+   "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F02-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F02-tv.mp3"
+   },
+   "durationSec": 2.05,
+   "heard": {
+    "dry": "Your funds might be at risk",
+    "tv": "Your funds might be at risk"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -21.4,
+     "momentaryMaxLufs": -18.7,
+     "truePeakDb": -4.8
+    },
+    "tv": {
+     "integratedLufs": -21.2,
+     "momentaryMaxLufs": -17.4,
+     "truePeakDb": -6.7
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Your funds might be at risk",
+     "heardTv": "Your funds might be at risk"
+    }
+   ]
+  },
+  {
+   "id": "F03",
+   "plate": "T1-04",
+   "voice": "bill",
+   "text": "private key information was inadvertently transmitted",
+   "say": "private key information was inadvertently transmitted",
+   "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F03-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F03-tv.mp3"
+   },
+   "durationSec": 3.44,
+   "heard": {
+    "dry": "Private key information was inadvertently transmitted",
+    "tv": "Private key information was inadvertently transmitted"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -23.1,
+     "momentaryMaxLufs": -21.8,
+     "truePeakDb": -9.2
+    },
+    "tv": {
+     "integratedLufs": -26.3,
+     "momentaryMaxLufs": -23.3,
+     "truePeakDb": -9.3
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Private key information was inadvertently transmitted",
+     "heardTv": "Private key information was inadvertently transmitted"
+    }
+   ]
+  },
+  {
+   "id": "F04",
+   "plate": "T2-12",
+   "voice": "alice",
+   "text": "after signing a \"permit\" phishing signature",
+   "say": "after signing a \"permit\" phishing signature",
+   "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F04-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F04-tv.mp3"
+   },
+   "durationSec": 2.99,
+   "heard": {
+    "dry": "After signing a permit fishing signature",
+    "tv": "After signing a permit fishing signature"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -23.5,
+     "momentaryMaxLufs": -21,
+     "truePeakDb": -6.6
+    },
+    "tv": {
+     "integratedLufs": -23.2,
+     "momentaryMaxLufs": -19.4,
+     "truePeakDb": -6.7
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "After signing a permit fishing signature",
+     "heardTv": "After signing a permit fishing signature"
+    }
+   ]
+  },
+  {
+   "id": "F05",
+   "plate": "T2-01",
+   "voice": "daniel",
+   "text": "A victim lost $908,551",
+   "say": "A victim lost $908,551",
+   "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F05-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F05-tv.mp3"
+   },
+   "durationSec": 4.56,
+   "heard": {
+    "dry": "A victim lost $908,551",
+    "tv": "A victim lost $908,551."
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -20.9,
+     "momentaryMaxLufs": -18.2,
+     "truePeakDb": -3.3
+    },
+    "tv": {
+     "integratedLufs": -21.2,
+     "momentaryMaxLufs": -17.8,
+     "truePeakDb": -6.2
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "A victim lost $908,551",
+     "heardTv": "A victim lost $908,551."
+    }
+   ]
+  },
+  {
+   "id": "F06",
+   "plate": "T2-01",
+   "voice": "matilda",
+   "text": "a phishing approval signed 458 days ago",
+   "say": "a phishing approval signed 458 days ago",
+   "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F06-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F06-tv.mp3"
+   },
+   "durationSec": 3.51,
+   "heard": {
+    "dry": "A phishing approval signed 458 days ago",
+    "tv": "A phishing approval signed 458 days ago"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22.6,
+     "momentaryMaxLufs": -19.3,
+     "truePeakDb": -2.9
+    },
+    "tv": {
+     "integratedLufs": -22.6,
+     "momentaryMaxLufs": -20.2,
+     "truePeakDb": -5.8
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "A phishing approval signed 458 days ago",
+     "heardTv": "A phishing approval signed 458 days ago"
+    }
+   ]
+  },
+  {
+   "id": "F07",
+   "plate": "T2-07",
+   "voice": "bill",
+   "text": "32 users thus far have signed a malicious payload",
+   "say": "32 users thus far have signed a malicious payload",
+   "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F07-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F07-tv.mp3"
+   },
+   "durationSec": 4.02,
+   "heard": {
+    "dry": "32 users thus far have signed a malicious payload",
+    "tv": "Thirty-two users thus far have signed a malicious payload"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22.8,
+     "momentaryMaxLufs": -21.1,
+     "truePeakDb": -8.2
+    },
+    "tv": {
+     "integratedLufs": -25,
+     "momentaryMaxLufs": -22.4,
+     "truePeakDb": -9.3
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "32 users thus far have signed a malicious payload",
+     "heardTv": "Thirty-two users thus far have signed a malicious payload"
+    },
+    {
+     "attempt": 1,
+     "ok": true,
+     "heardDry": "32 users thus far have signed a malicious payload",
+     "heardTv": "32 users thus far have signed a malicious payload"
+    }
+   ]
+  },
+  {
+   "id": "F08",
+   "plate": "T2-09",
+   "voice": "alice",
+   "text": "all the signers saw the musked UI",
+   "say": "all the signers saw the masked UI",
+   "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F08-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F08-tv.mp3"
+   },
+   "durationSec": 2.58,
+   "heard": {
+    "dry": "All the signers saw the masked UI",
+    "tv": "All the signers saw the masked UI"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22.3,
+     "momentaryMaxLufs": -20,
+     "truePeakDb": -7.1
+    },
+    "tv": {
+     "integratedLufs": -21.9,
+     "momentaryMaxLufs": -19,
+     "truePeakDb": -7.6
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "All the signers saw the masked UI",
+     "heardTv": "All the signers saw the masked UI"
+    }
+   ]
+  },
+  {
+   "id": "F09",
+   "plate": "T2-10",
+   "voice": "daniel",
+   "text": "Hackers steal $1.5 billion",
+   "say": "Hackers steal $1.5 billion",
+   "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F09-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F09-tv.mp3"
+   },
+   "durationSec": 3.23,
+   "heard": {
+    "dry": "Hackers steal $1.5 billion",
+    "tv": "Hackers steal $1.5 billion."
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -20.8,
+     "momentaryMaxLufs": -18.7,
+     "truePeakDb": -1.4
+    },
+    "tv": {
+     "integratedLufs": -21.6,
+     "momentaryMaxLufs": -18.5,
+     "truePeakDb": -5.7
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Hackers steal $1.5 billion",
+     "heardTv": "Hackers steal $1.5 billion."
+    }
+   ]
+  },
+  {
+   "id": "F10",
+   "plate": "T4-01h",
+   "voice": "matilda",
+   "text": "Wallet Drainers Drain $494 Million",
+   "say": "Wallet Drainers Drain $494 Million",
+   "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F10-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F10-tv.mp3"
+   },
+   "durationSec": 4.08,
+   "heard": {
+    "dry": "Wallet drainers drain $494 million",
+    "tv": "Wallet drainers drain $494 million"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -21.1,
+     "momentaryMaxLufs": -14.5,
+     "truePeakDb": -2
+    },
+    "tv": {
+     "integratedLufs": -20.9,
+     "momentaryMaxLufs": -14.1,
+     "truePeakDb": -5.4
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Wallet drainers drain $494 million",
+     "heardTv": "Wallet drainers drain $494 million"
+    }
+   ]
+  },
+  {
+   "id": "F11",
+   "plate": "T2-18",
+   "voice": "bill",
+   "text": "drain more than $270 million from Drift",
+   "say": "drain more than $270 million from Drift",
+   "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F11-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F11-tv.mp3"
+   },
+   "durationSec": 3.99,
+   "heard": {
+    "dry": "Drain more than $270 million from Drift",
+    "tv": "drain more than two hundred and seventy million dollars from Drift"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22.7,
+     "momentaryMaxLufs": -21,
+     "truePeakDb": -9.6
+    },
+    "tv": {
+     "integratedLufs": -26,
+     "momentaryMaxLufs": -23.8,
+     "truePeakDb": -10.7
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "Drain more than $270 million from Drift",
+     "heardTv": "drain more than two hundred and seventy million dollars from Drift"
+    }
+   ]
+  },
+  {
+   "id": "F12",
+   "plate": "T1-07",
+   "voice": "alice",
+   "text": "$7 Million Crypto Loss via Malicious Code",
+   "say": "$7 Million Crypto Loss via Malicious Code",
+   "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F12-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F12-tv.mp3"
+   },
+   "durationSec": 3.7,
+   "heard": {
+    "dry": "$7 million crypto loss via malicious code",
+    "tv": "$7 million crypto loss via malicious code"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22.2,
+     "momentaryMaxLufs": -20.2,
+     "truePeakDb": -5.3
+    },
+    "tv": {
+     "integratedLufs": -22,
+     "momentaryMaxLufs": -19.2,
+     "truePeakDb": -7.3
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "$7 million crypto loss via malicious code",
+     "heardTv": "$7 million crypto loss via malicious code"
+    }
+   ]
+  },
+  {
+   "id": "F13",
+   "plate": "T1-05",
+   "voice": "bill",
+   "text": "new crypto-stealing Trojan",
+   "say": "new crypto-stealing Trojan",
+   "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+   "ok": true,
+   "chosen": 0,
+   "files": {
+    "dry": "v2/intro/audio/chorus/F13-dry.mp3",
+    "tv": "v2/intro/audio/chorus/F13-tv.mp3"
+   },
+   "durationSec": 1.99,
+   "heard": {
+    "dry": "New crypto-stealing Trojan",
+    "tv": "New crypto-stealing Trojan"
+   },
+   "loudness": {
+    "dry": {
+     "integratedLufs": -22,
+     "momentaryMaxLufs": -20.3,
+     "truePeakDb": -6.6
+    },
+    "tv": {
+     "integratedLufs": -24.3,
+     "momentaryMaxLufs": -22.7,
+     "truePeakDb": -9.6
+    }
+   },
+   "takes": [
+    {
+     "attempt": 0,
+     "ok": true,
+     "heardDry": "New crypto-stealing Trojan",
+     "heardTv": "New crypto-stealing Trojan"
+    }
+   ]
+  }
+ ]
+}

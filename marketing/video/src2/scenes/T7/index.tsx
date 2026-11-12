@@ -1,13 +1,14 @@
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { type CharmFace, charmKick } from "../../brand/Charm";
 import { C, type Chain, F, sans } from "../../brand/tokens";
+import { NameSticker } from "../../components/Sticker";
 import { CardBack, CardWithCharms, Hand, type HandProps } from "../../illustration/characters";
 import { Snowflake } from "lucide-react";
 import { FrostLaminate, PriceTag, priceTagSize, textWidth } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
 import { getScene, marker } from "../../lib/timeline";
 import { FPS } from "../../lib/time";
-import { blinkSchedule, CHARM_LAG, clamp, EASE2, eyeOpen, HANDOFF, handoffAt, pressAt, rideAngle, smear, SPRING2 } from "../../motion";
+import { blinkSchedule, CHARM_LAG, clamp, EASE2, eyeOpen, HANDOFF, handoffAt, pressAt, rideAngle, slapAt, smear, SPRING2 } from "../../motion";
 import { PAGE7, ROWS7, TABS } from "../T5";
 import { Browser, CAM_MID, type Cam, CameraView, camAt, Caption, type CharmAnim, mixFace, SalePage, SparkPoints } from "../T5/sale";
 
@@ -18,7 +19,7 @@ import { Browser, CAM_MID, type Cam, CameraView, camAt, Caption, type CharmAnim,
  * it reads "bound to 3 signatures". ONE MOVE: the frost melts, the card flips to its front and swings like a charm from
  * bob's hand to carol's (white sleeve, ink stripes) while the tag pops off and flies the other way, over the card, to
  * bob ("pays the seller"). Both land on the music's landing (122.0) with the charm jingle; the charms cheer.
- * "Satchel #7 is yours." · "You now control 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC."
+ * "Satchel #7 is yours." (the lemon "Yours" sticker slaps onto the band with it) · "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC."
  */
 
 const SC = getScene("T7");
@@ -28,8 +29,8 @@ const LAND = fr(marker("landing") - SC.start); // 180: the card and the tag land
 const H0 = LAND - HANDOFF.contact; // the hand-off clock's frame 0
 const T = {
   end: fr(SC.duration),
-  camBuy: [5, 21] as const,
-  handIn: 10,
+  camBuy: [5, 18] as const, // after the tab's slap (contact f4): one move at a time (QA v5 #8)
+  handIn: 13, // carol's hand rises as the push settles, and is in place ≈ 5 f before the press
   press: 26, // just after "clean," (bar 59 + 1 beat + 11 f)
   recheck: 28,
   wallet: 46,
@@ -39,8 +40,9 @@ const T = {
   carolIn: H0 - 24,
   melt: H0 - 5,
   yours: fr(SC.wordAt("V26", "gets")) - 2,
-  control: fr(SC.wordAt("V26", "everything")) - 4,
 };
+// the amounts rise once "Satchel #7 is yours." has been read for 0.6 s (QA v5 #11), and hold ≥ 2.8 s before the peel
+const AMOUNTS_AT = T.yours + 18;
 // "One transaction." lands as the world arrives (end of "transaction"): the browser close-up has no clear band
 const CAP_ONE = T.whip + 6;
 const CAP_ONE_OUT = H0 - 30;
@@ -61,6 +63,18 @@ const CAROL_PINCH = { x: TO_X + CW / 2 - 26, y: CARD_TOP + 26 };
 const TAG_SCALE = 1.8;
 const TAG_TEXT = "2,000 NEAR";
 const NOTE = "bound to 3 signatures";
+/**
+ * The "Paused for sale" pill on the card back (laminate units, 400 × 252, origin inside the card's 3 px outline): a
+ * size smaller than the laminate's own (pill scale 0.9 vs 1.15), its right edge 8 px inside the rows' right border,
+ * centred on the gap between the BTC and ETH rows (rows at 61–107 and 115–161), clear of every label.
+ */
+const PILL_SCALE = 0.9;
+const PILL_W = 14 + 20 + 8 + 16; // + the label, measured at render time (once the brand fonts are in)
+const pillGeom = () => {
+  const tw = textWidth("Paused for sale", { family: F.sans, weight: 700, size: 15, tabular: true });
+  const w = (PILL_W + tw) * PILL_SCALE;
+  return { k: PILL_SCALE / 1.15, x: (369 - w / 2) / 400, y: 111 / 252 };
+};
 
 const W1: Cam = { x: 600, y: 520, z: 1.0 };
 const W1T: Cam = { x: 772, y: 336, z: 2.0 };
@@ -131,7 +145,6 @@ export default function T7Scene() {
     { f: T.camBuy[0], cam: CAM_MID },
     { f: T.camBuy[1], cam: BUY_CU },
   ]);
-  const arrive = spring({ frame: f, fps, config: SPRING2.land });
   const pr = pressAt(f, T.press, 4, fps);
   const mode = f < T.recheck ? "enabled" : f < T.wallet ? "recheck" : "wallet";
   // carol's tap: in from below on a shallow arc (land), presses with the button, leaves accelerating down
@@ -236,13 +249,19 @@ export default function T7Scene() {
   ];
 
   const cardFront = { lift: m.lift / (8 * KC) };
-  // the back as T4 left it: the frost laminate (pill low) and the header's "3 signatures" sealed in ice; both melt
+  // the back as T4 left it: the frost laminate and the header's "3 signatures" sealed in ice; all melt. The "Paused
+  // for sale" pill is the kit's, drawn by a second laminate (no sheet) a size smaller, right-aligned over the empty
+  // right half of the rows between BTC and ETH, so it never sits on record text (QA v5 #9)
+  const PILL = pillGeom();
   const cardBack = (
     <CardBack width={CW} lift={cardFront.lift} records={ROWS7.map((r) => ({ chain: r.chain, label: r.label }))}>
-      <FrostLaminate width={400} height={252} progress={1} pill={1} pillY={0.6} melt={melt} k={1} />
+      <FrostLaminate width={400} height={252} progress={1} pill={0} melt={melt} k={1} style={{ position: "absolute", left: 0, top: 0 }} />
       <IceSeal show={1 - melt} />
+      <FrostLaminate width={400} height={252} progress={0} pill={1} pillX={PILL.x} pillY={PILL.y} melt={melt} k={PILL.k} style={{ position: "absolute", left: 0, top: 0 }} />
     </CardBack>
   );
+  // the lemon "Yours" sticker slaps onto the band with "Satchel #7 is yours." (QA v5 #10: it used to pop in one frame)
+  const yoursSlap = slapAt(f - (T.yours - 4), fps, 0, { from: 1.3, squash: 0.06, drop: 0 });
 
   return (
     <AbsoluteFill style={{ background: C.ground, overflow: "hidden" }}>
@@ -260,7 +279,6 @@ export default function T7Scene() {
                 checked
                 buy={{ mode, wake: 1, lift: pr.lift, press: mode === "enabled" ? pr.pressed : 0, spin, gatePop: f >= T.recheck ? interpolate(f, [mode === "wallet" ? T.wallet : T.recheck, (mode === "wallet" ? T.wallet : T.recheck) + 8], [0, 1], clamp) : undefined }}
                 spin={spin}
-                contentY={40 * (1 - arrive)}
                 overlay={handInP > 0.001 && handOut < 1 ? <Hand {...tap} /> : null}
               />
             </Browser>
@@ -289,12 +307,12 @@ export default function T7Scene() {
               <CardWithCharms
                 width={CW}
                 charmSize={0.19}
-                yours={f >= LAND + 8}
                 lift={cardFront.lift}
                 flip={flip}
                 back={cardBack}
                 charms={charms.map((c) => ({ angle: c.angle, face: c.face, dy: -c.hop }))}
               />
+              {f >= T.yours - 4 ? <YoursOnBand slap={yoursSlap} rise={-8 * cardFront.lift * KC} /> : null}
             </div>
             <div style={{ position: "absolute", left: holeX - holeOff.x, top: holeY - holeOff.y, transformOrigin: `${holeOff.x}px ${holeOff.y}px`, scale: `${tagScale}` }}>
               <PriceTag text={TAG_TEXT} note={hasNote ? NOTE : undefined} scale={TAG_SCALE} clip={tagClip} tilt={tagTilt} drop={tagDrop} swing={f >= TAG_POP && f < LAND + 10 ? 18 * Math.sin((f - TAG_POP) / 3) * Math.max(0, 1 - (f - TAG_POP) / 36) : 0} />
@@ -309,9 +327,9 @@ export default function T7Scene() {
       {/* captions */}
       <Caption frame={f} text="One transaction." contact={CAP_ONE} out={CAP_ONE_OUT} y={58} size={124} seed="t7-one" />
       <Caption frame={f} text="Satchel #7 is yours." contact={T.yours} y={40} size={118} seed="t7-yours" />
-      {f >= T.control ? (
+      {f >= AMOUNTS_AT ? (
         <div style={{ position: "absolute", left: 0, right: 0, top: 178, display: "flex", justifyContent: "center", textAlign: "center" }}>
-          <Rise frame={f - T.control} />
+          <Rise frame={f - AMOUNTS_AT} />
         </div>
       ) : null}
 
@@ -367,31 +385,34 @@ function IceSeal({ show }: { show: number }) {
   );
 }
 
-/** "You now control 0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC." rising line by line (must-read: Onest 600, 56 px). */
+/**
+ * What carol now holds: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC." rising out of its mask (16 f, no bounce) in Funnel
+ * Display 800 with tabular figures (motion bible §2.9). One line under the caption: "You now control" was dropped so
+ * the two must-read lines no longer arrive together and the amounts get their full read before the peel (QA v5 #11).
+ */
 function Rise({ frame }: { frame: number }) {
+  const y = interpolate(frame, [0, 16], [110, 0], { ...clamp, easing: EASE2.out });
   return (
-    <div style={{ display: "inline-block" }}>
-      <RiseInner frame={frame} />
+    <div style={{ display: "inline-block", lineHeight: 1.1, color: C.ink, fontVariantNumeric: "tabular-nums" }}>
+      <div style={{ overflow: "hidden", paddingBottom: "0.08em", fontFamily: '"Funnel Display", Onest, sans-serif', fontSize: 58, fontWeight: 800, letterSpacing: "-0.02em" }}>
+        <div style={{ translate: `0 ${y}%` }}>0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC.</div>
+      </div>
     </div>
   );
 }
 
-function RiseInner({ frame }: { frame: number }) {
-  // line 1 in Onest (must-read, 56 px); the amounts in Funnel Display 800 with tabular figures (motion bible §2.9)
-  const lines = [
-    { text: "You now control", style: { fontFamily: '"Onest", system-ui, sans-serif', fontSize: 56, fontWeight: 600 } },
-    { text: "0.05 BTC · 0.80 ETH · 12 SOL · 800 USDC.", style: { fontFamily: '"Funnel Display", Onest, sans-serif', fontSize: 58, fontWeight: 800, letterSpacing: "-0.02em" } },
-  ];
+/**
+ * The lemon "Yours" sticker (the kit's NameSticker) on the card band's name line, exactly where SatchelCard puts it
+ * (band content at x 23, name + 10 px gap, centred in the 63 px band), with the kit slap (scale 1.3 → 1, contact f4).
+ * Drawn in the card wrapper (card px), at the card's UI scale; `rise` follows the card's lift.
+ */
+function YoursOnBand({ slap, rise }: { slap: { sx: number; sy: number; opacity: number }; rise: number }) {
+  const nameW = textWidth("Satchel #7", { family: F.display, weight: 800, size: 22, ls: -0.02, tabular: false });
   return (
-    <div style={{ lineHeight: 1.1, color: C.ink, fontVariantNumeric: "tabular-nums" }}>
-      {lines.map((line, i) => {
-        const y = interpolate(frame, [i * 3, i * 3 + 16], [110, 0], { ...clamp, easing: EASE2.out });
-        return (
-          <div key={i} style={{ overflow: "hidden", paddingBottom: "0.08em", ...line.style }}>
-            <div style={{ translate: `0 ${y}%` }}>{line.text}</div>
-          </div>
-        );
-      })}
+    <div style={{ position: "absolute", left: 0, top: 0, width: 400, height: 252, transform: `translateY(${rise}px) scale(${KC})`, transformOrigin: "0 0", pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: 23 + nameW + 10, top: 3 + 63 / 2, translate: "0 -50%", scale: `${slap.sx} ${slap.sy}`, opacity: slap.opacity, transformOrigin: "50% 50%" }}>
+        <NameSticker />
+      </div>
     </div>
   );
 }

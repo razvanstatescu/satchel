@@ -79,8 +79,15 @@ export function CameraView({ cam, children, w = BROWSER.w, h = BROWSER.h, dy = 0
   );
 }
 
-/** MID: the whole browser, its top at y 262 so the caption band (0–262) holds two caption lines. */
-export const CAM_MID: Cam = { x: BROWSER.w / 2, y: 209, z: 1.33 };
+/**
+ * MID: the whole browser, its top at y 274 so the caption band (0–274) holds two caption lines with their descenders
+ * clear of the tab bar. One framing for T5, T6 and T7, so both tab switches keep the chrome perfectly still.
+ */
+export const CAM_MID: Cam = { x: BROWSER.w / 2, y: 209 - 12 / 1.33, z: 1.33 };
+/** The browser's top edge on screen (px) for a camera (to keep slow drifts from creeping into the caption band). */
+export const browserTop = (cam: Cam) => 540 - cam.y * cam.z;
+/** The same framing at another zoom, with the browser's top edge held where `base` puts it. */
+export const holdTop = (base: Cam, z: number): Cam => ({ x: base.x, y: (540 - browserTop(base)) / z, z });
 
 // ── the browser (the kit's BrowserFrame look, with tabs) ─────────────────────────────────────────────────────────
 export interface TabSpec {
@@ -605,11 +612,17 @@ function HowBuying({ id, price, seller }: { id: string; price: string; seller?: 
 
 // ── captions (screen space) ──────────────────────────────────────────────────────────────────────────────────────
 /**
+ * The two-line captions over the browser (T5 "Checked in / your browser.", T6 "Blocked: / 1 unused signature"): one
+ * shared setting so their cap tops sit ≥ 60 px from the frame top and their descenders ≥ 20 px over the browser's top
+ * edge (y 274) at rest (QA v5 N5). Leading 0.95 is the motion bible's caption leading.
+ */
+export const CAPTION_2L = { y: 49, size: 100, leading: 0.95 } as const;
+/**
  * Caption slap (motion bible §2.16): Funnel Display 800, sentence case, ink, scale 1.2 → 1 with contact on f4 and a
  * seeded tilt within ±2°. `contact` = the contact frame (the slap starts 4 f earlier). `out` = the frame it lifts off
  * (8 f, accelerating up and away). Centred on x, its top at `y`.
  */
-export function Caption({ frame, text, contact, out, y, size = 120, seed, x = 960, color = C.ink, maxWidth }: { frame: number; text: ReactNode; contact: number; out?: number; y: number; size?: number; seed: string; x?: number; color?: string; maxWidth?: number }) {
+export function Caption({ frame, text, contact, out, y, size = 120, seed, x = 960, color = C.ink, maxWidth, leading = 1.02 }: { frame: number; text: ReactNode; contact: number; out?: number; y: number; size?: number; seed: string; x?: number; color?: string; maxWidth?: number; leading?: number }) {
   const start = contact - 4;
   if (frame < start) return null;
   const f = frame - start;
@@ -628,7 +641,7 @@ export function Caption({ frame, text, contact, out, y, size = 120, seed, x = 96
           fontFamily: F.display,
           fontWeight: 800,
           fontSize: size,
-          lineHeight: 1.02,
+          lineHeight: leading,
           letterSpacing: "-0.035em",
           color,
           opacity,

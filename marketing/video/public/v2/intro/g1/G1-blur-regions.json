@@ -1,0 +1,309 @@
+{
+ "readable": [
+  "garden",
+  "honey",
+  "rocket"
+ ],
+ "blurredWords": [
+  "anchor",
+  "copper",
+  "ladder",
+  "orbit",
+  "salmon",
+  "tiger",
+  "umbrella",
+  "velvet",
+  "window"
+ ],
+ "regions": [
+  {
+   "where": "paper",
+   "word": "velvet",
+   "box": [
+    680,
+    740,
+    872,
+    830
+   ],
+   "blurBox": [
+    656,
+    716,
+    896,
+    854
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "anchor",
+   "box": [
+    695,
+    815,
+    905,
+    912
+   ],
+   "blurBox": [
+    671,
+    791,
+    929,
+    936
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "ladder",
+   "box": [
+    708,
+    893,
+    922,
+    990
+   ],
+   "blurBox": [
+    684,
+    869,
+    946,
+    1014
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "orbit",
+   "box": [
+    995,
+    478,
+    1148,
+    566
+   ],
+   "blurBox": [
+    971,
+    454,
+    1172,
+    590
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "salmon",
+   "box": [
+    1015,
+    545,
+    1212,
+    636
+   ],
+   "blurBox": [
+    991,
+    521,
+    1236,
+    660
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "tiger",
+   "box": [
+    1030,
+    618,
+    1188,
+    714
+   ],
+   "blurBox": [
+    1006,
+    594,
+    1212,
+    738
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "umbrella",
+   "box": [
+    1050,
+    680,
+    1298,
+    782
+   ],
+   "blurBox": [
+    1026,
+    656,
+    1322,
+    806
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "window",
+   "box": [
+    1070,
+    752,
+    1292,
+    848
+   ],
+   "blurBox": [
+    1046,
+    728,
+    1316,
+    872
+   ]
+  },
+  {
+   "where": "paper",
+   "word": "copper",
+   "box": [
+    1088,
+    832,
+    1298,
+    940
+   ],
+   "blurBox": [
+    1064,
+    808,
+    1322,
+    964
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "velvet",
+   "box": [
+    1553,
+    635,
+    1693,
+    712
+   ],
+   "blurBox": [
+    1529,
+    611,
+    1717,
+    736
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "anchor",
+   "box": [
+    1573,
+    698,
+    1728,
+    783
+   ],
+   "blurBox": [
+    1549,
+    674,
+    1752,
+    807
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "ladder",
+   "box": [
+    1597,
+    762,
+    1750,
+    848
+   ],
+   "blurBox": [
+    1573,
+    738,
+    1774,
+    872
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "orbit",
+   "box": [
+    1728,
+    422,
+    1840,
+    492
+   ],
+   "blurBox": [
+    1704,
+    398,
+    1864,
+    516
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "salmon",
+   "box": [
+    1738,
+    478,
+    1890,
+    553
+   ],
+   "blurBox": [
+    1714,
+    454,
+    1914,
+    577
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "tiger",
+   "box": [
+    1767,
+    538,
+    1885,
+    613
+   ],
+   "blurBox": [
+    1743,
+    514,
+    1909,
+    637
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "umbrella",
+   "box": [
+    1797,
+    583,
+    1970,
+    668
+   ],
+   "blurBox": [
+    1773,
+    559,
+    1994,
+    692
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "window",
+   "box": [
+    1817,
+    646,
+    1975,
+    728
+   ],
+   "blurBox": [
+    1793,
+    622,
+    1999,
+    752
+   ]
+  },
+  {
+   "where": "phone",
+   "word": "copper",
+   "box": [
+    1842,
+    707,
+    1995,
+    794
+   ],
+   "blurBox": [
+    1818,
+    683,
+    2019,
+    818
+   ]
+  }
+ ],
+ "method": "per word: downscale x0.1 + bilinear upscale + Gaussian r=14, soft 18px rounded mask"
+}

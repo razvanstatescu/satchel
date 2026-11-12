@@ -3,8 +3,8 @@
  "bpm": 120,
  "beatSec": 0.5,
  "barSec": 2,
- "durationSec": 133,
- "durationInFrames": 3990,
+ "durationSec": 129.5,
+ "durationInFrames": 3885,
  "voice": {
   "id": "EXAVITQu4vr4xnSDxMaL",
   "name": "Sarah",
@@ -19,100 +19,100 @@
   {
    "id": "H2",
    "start": 3,
-   "end": 12
+   "end": 11.5
   },
   {
    "id": "P1",
-   "start": 12,
-   "end": 18
+   "start": 11.5,
+   "end": 17
   },
   {
    "id": "P2",
-   "start": 18,
-   "end": 26
+   "start": 17,
+   "end": 24.5
   },
   {
    "id": "P3",
-   "start": 26,
-   "end": 35
+   "start": 24.5,
+   "end": 33.5
   },
   {
    "id": "P4",
-   "start": 35,
-   "end": 43
+   "start": 33.5,
+   "end": 41
   },
   {
    "id": "P5",
-   "start": 43,
-   "end": 52
+   "start": 41,
+   "end": 49.5
   },
   {
    "id": "P6",
-   "start": 52,
-   "end": 59
+   "start": 49.5,
+   "end": 56
   },
   {
    "id": "C1",
-   "start": 59,
-   "end": 72
+   "start": 56,
+   "end": 68.5
   },
   {
    "id": "T0",
-   "start": 72,
-   "end": 76
+   "start": 68.5,
+   "end": 72.5
   },
   {
    "id": "T1",
-   "start": 76,
-   "end": 82
+   "start": 72.5,
+   "end": 78.5
   },
   {
    "id": "T2",
-   "start": 82,
-   "end": 88.5
+   "start": 78.5,
+   "end": 85
   },
   {
    "id": "T3",
-   "start": 88.5,
-   "end": 96
+   "start": 85,
+   "end": 92
   },
   {
    "id": "T4",
-   "start": 96,
-   "end": 101
+   "start": 92,
+   "end": 96.5
   },
   {
    "id": "T5",
-   "start": 101,
-   "end": 110.5
+   "start": 96.5,
+   "end": 107
   },
   {
    "id": "T6",
-   "start": 110.5,
-   "end": 116
+   "start": 107,
+   "end": 112.5
   },
   {
    "id": "T7",
-   "start": 116,
-   "end": 126.5
+   "start": 112.5,
+   "end": 123
   },
   {
    "id": "E1",
-   "start": 126.5,
-   "end": 133
+   "start": 123,
+   "end": 129.5
   }
  ],
  "markers": {
   "hookLand": 2.5,
-  "musicStop": 59,
-  "thud": 66,
-  "subHit": 67.5,
-  "flip": 73,
-  "landing": 122,
-  "endPress": 131.5,
-  "drop": 76,
-  "blocked": 110.5,
-  "end": 133
+  "musicStop": 56,
+  "thud": 63,
+  "subHit": 64.5,
+  "flip": 69.5,
+  "landing": 118.5,
+  "endPress": 128,
+  "drop": 72.5,
+  "blocked": 107,
+  "end": 129.5
  },
  "vo": [
   {
@@ -268,9 +268,9 @@
    "id": "V05",
    "scene": "P1",
    "file": "v2/vo/V05.mp3",
-   "start": 12,
+   "start": 11.5,
    "duration": 5.25,
-   "end": 17.25,
+   "end": 16.75,
    "text": "Mint one on NEAR, and it gets its own Bitcoin, Ethereum and Solana addresses.",
    "words": [
     {
@@ -349,9 +349,9 @@
    "id": "V06",
    "scene": "P2",
    "file": "v2/vo/V06.mp3",
-   "start": 18,
+   "start": 17,
    "duration": 7.3,
-   "end": 25.3,
+   "end": 24.3,
    "text": "Fill it from any wallet or exchange. USDC too, on Ethereum, Base, Arbitrum or Optimism.",
    "words": [
     {
@@ -439,9 +439,9 @@
    "id": "V07",
    "scene": "P3",
    "file": "v2/vo/V07.mp3",
-   "start": 26,
+   "start": 24.5,
    "duration": 2.86,
-   "end": 28.86,
+   "end": 27.36,
    "text": "Then send from it, on all three chains.",
    "words": [
     {
@@ -490,9 +490,9 @@
    "id": "V08",
    "scene": "P3",
    "file": "v2/vo/V08.mp3",
-   "start": 29.5,
+   "start": 28,
    "duration": 5.22,
-   "end": 34.72,
+   "end": 33.22,
    "text": "Approve in your NEAR wallet, and NEAR Chain Signatures signs a native transaction.",
    "words": [
     {
@@ -566,9 +566,9 @@
    "id": "V09",
    "scene": "P4",
    "file": "v2/vo/V09.mp3",
-   "start": 35.5,
+   "start": 34,
    "duration": 6.89,
-   "end": 42.39,
+   "end": 40.89,
    "text": "There's no seed phrase to copy. Only the holder can send, or someone they allow, within daily limits.",
    "words": [
     {
@@ -671,9 +671,9 @@
    "id": "V10",
    "scene": "P5",
    "file": "v2/vo/V10.mp3",
-   "start": 43,
+   "start": 41,
    "duration": 8.39,
-   "end": 51.39,
+   "end": 49.39,
    "text": "Give it to a friend, even one who isn't on NEAR yet. Everything inside goes with it. No bridge. No wrapped tokens.",
    "words": [
     {
@@ -798,9 +798,9 @@
    "id": "V12",
    "scene": "P6",
    "file": "v2/vo/V12.mp3",
-   "start": 52,
+   "start": 49.5,
    "duration": 3.93,
-   "end": 55.93,
+   "end": 53.43,
    "text": "Sell a whole position in one trade, or take an offer.",
    "words": [
     {
@@ -864,9 +864,9 @@
    "id": "V13",
    "scene": "P6",
    "file": "v2/vo/V13.mp3",
-   "start": 56.5,
+   "start": 54,
    "duration": 2.03,
-   "end": 58.53,
+   "end": 56.03,
    "text": "Hand a treasury to the next team.",
    "words": [
     {
@@ -910,9 +910,9 @@
    "id": "V14",
    "scene": "C1",
    "file": "v2/vo/V14.mp3",
-   "start": 59.5,
+   "start": 56.5,
    "duration": 1.21,
-   "end": 60.71,
+   "end": 57.71,
    "text": "But there's a catch.",
    "words": [
     {
@@ -941,9 +941,9 @@
    "id": "V15",
    "scene": "C1",
    "file": "v2/vo/V15.mp3",
-   "start": 61.5,
+   "start": 58.5,
    "duration": 4.06,
-   "end": 65.56,
+   "end": 62.56,
    "text": "A signature made before the sale can still be used after it.",
    "words": [
     {
@@ -1012,9 +1012,9 @@
    "id": "V16",
    "scene": "C1",
    "file": "v2/vo/V16.mp3",
-   "start": 68,
+   "start": 65,
    "duration": 2.24,
-   "end": 70.24,
+   "end": 67.24,
    "text": "So how does a buyer know it's clean?",
    "words": [
     {
@@ -1063,9 +1063,9 @@
    "id": "V17",
    "scene": "T0",
    "file": "v2/vo/V17.mp3",
-   "start": 73.5,
+   "start": 70,
    "duration": 1.7,
-   "end": 75.2,
+   "end": 71.7,
    "text": "Satchel keeps the receipts.",
    "words": [
     {
@@ -1094,9 +1094,9 @@
    "id": "V18",
    "scene": "T1",
    "file": "v2/vo/V18.mp3",
-   "start": 76,
+   "start": 72.5,
    "duration": 5.75,
-   "end": 81.75,
+   "end": 78.25,
    "text": "Every signature goes on the record, on NEAR, before NEAR's signer network makes it.",
    "words": [
     {
@@ -1175,9 +1175,9 @@
    "id": "V19",
    "scene": "T2",
    "file": "v2/vo/V19.mp3",
-   "start": 82.5,
+   "start": 79,
    "duration": 5.63,
-   "end": 88.13,
+   "end": 84.63,
    "text": "And there's no admin key. Not even ours. So it can't sign anything off the record.",
    "words": [
     {
@@ -1271,9 +1271,9 @@
    "id": "V20",
    "scene": "T3",
    "file": "v2/vo/V20.mp3",
-   "start": 89,
+   "start": 85.5,
    "duration": 6.04,
-   "end": 95.04,
+   "end": 91.54,
    "text": "It only signs what it can read, transfers and messages, so each one can be checked later.",
    "words": [
     {
@@ -1367,9 +1367,9 @@
    "id": "V21",
    "scene": "T4",
    "file": "v2/vo/V21.mp3",
-   "start": 96,
+   "start": 92,
    "duration": 4.42,
-   "end": 100.42,
+   "end": 96.42,
    "text": "List it, and signing pauses. The history stops growing.",
    "words": [
     {
@@ -1427,9 +1427,9 @@
    "id": "V22",
    "scene": "T5",
    "file": "v2/vo/V22.mp3",
-   "start": 101,
+   "start": 96.5,
    "duration": 3.97,
-   "end": 104.97,
+   "end": 100.47,
    "text": "Then the buyer's browser checks every record against each chain.",
    "words": [
     {
@@ -1488,9 +1488,9 @@
    "id": "V23",
    "scene": "T5",
    "file": "v2/vo/V23.mp3",
-   "start": 105.5,
+   "start": 101,
    "duration": 4.49,
-   "end": 109.99,
+   "end": 105.49,
    "text": "Nonce used. Coin spent. Blockhash expired.",
    "words": [
     {
@@ -1534,22 +1534,22 @@
      "text": "Nonce used.",
      "gridStart": 0,
      "start": 0.12,
-     "absStart": 105.62,
-     "beatIndex": 211
+     "absStart": 101.12,
+     "beatIndex": 202
     },
     {
      "text": "Coin spent.",
      "gridStart": 1.5,
      "start": 1.58,
-     "absStart": 107.08,
-     "beatIndex": 214
+     "absStart": 102.58,
+     "beatIndex": 205
     },
     {
      "text": "Blockhash expired.",
      "gridStart": 3,
      "start": 3.12,
-     "absStart": 108.62,
-     "beatIndex": 217
+     "absStart": 104.12,
+     "beatIndex": 208
     }
    ],
    "phrasePeriod": 1.5
@@ -1558,9 +1558,9 @@
    "id": "V24",
    "scene": "T6",
    "file": "v2/vo/V24.mp3",
-   "start": 110.5,
+   "start": 107,
    "duration": 4.96,
-   "end": 115.46,
+   "end": 111.96,
    "text": "If one old signature could still move coins, Buy and offers stay off.",
    "words": [
     {
@@ -1634,9 +1634,9 @@
    "id": "V25",
    "scene": "T7",
    "file": "v2/vo/V25.mp3",
-   "start": 116,
+   "start": 112.5,
    "duration": 5.63,
-   "end": 121.63,
+   "end": 118.13,
    "text": "When it's clean, one transaction, bound to that exact history, pays the seller,",
    "words": [
     {
@@ -1710,9 +1710,9 @@
    "id": "V26",
    "scene": "T7",
    "file": "v2/vo/V26.mp3",
-   "start": 122,
+   "start": 118.5,
    "duration": 2.42,
-   "end": 124.42,
+   "end": 120.92,
    "text": "and the buyer gets everything inside.",
    "words": [
     {
@@ -1751,9 +1751,9 @@
    "id": "V27",
    "scene": "E1",
    "file": "v2/vo/V27.mp3",
-   "start": 127,
+   "start": 123.5,
    "duration": 3.12,
-   "end": 130.12,
+   "end": 126.62,
    "text": "Satchel. Stick it on. Hand it over.",
    "words": [
     {
@@ -1802,158 +1802,122 @@
  "duck": [
   {
    "start": 0.85,
-   "end": 11.62,
+   "end": 27.66,
    "lines": [
     "V01",
     "V02",
     "V03",
-    "V04"
-   ]
-  },
-  {
-   "start": 11.85,
-   "end": 17.55,
-   "lines": [
-    "V05"
-   ]
-  },
-  {
-   "start": 17.85,
-   "end": 25.6,
-   "lines": [
-    "V06"
-   ]
-  },
-  {
-   "start": 25.85,
-   "end": 29.16,
-   "lines": [
+    "V04",
+    "V05",
+    "V06",
     "V07"
    ]
   },
   {
-   "start": 29.35,
-   "end": 35.02,
+   "start": 27.85,
+   "end": 33.52,
    "lines": [
     "V08"
    ]
   },
   {
-   "start": 35.35,
-   "end": 42.69,
+   "start": 33.85,
+   "end": 53.73,
    "lines": [
-    "V09"
-   ]
-  },
-  {
-   "start": 42.85,
-   "end": 51.69,
-   "lines": [
-    "V10"
-   ]
-  },
-  {
-   "start": 51.85,
-   "end": 56.23,
-   "lines": [
+    "V09",
+    "V10",
     "V12"
    ]
   },
   {
-   "start": 56.35,
-   "end": 58.83,
+   "start": 53.85,
+   "end": 56.33,
    "lines": [
     "V13"
    ]
   },
   {
-   "start": 59.35,
-   "end": 61.01,
+   "start": 56.35,
+   "end": 58.01,
    "lines": [
     "V14"
    ]
   },
   {
-   "start": 61.35,
-   "end": 65.86,
+   "start": 58.35,
+   "end": 62.86,
    "lines": [
     "V15"
    ]
   },
   {
-   "start": 67.85,
-   "end": 70.54,
+   "start": 64.85,
+   "end": 67.54,
    "lines": [
     "V16"
    ]
   },
   {
-   "start": 73.35,
-   "end": 75.5,
+   "start": 69.85,
+   "end": 72,
    "lines": [
     "V17"
    ]
   },
   {
-   "start": 75.85,
-   "end": 82.05,
+   "start": 72.35,
+   "end": 78.55,
    "lines": [
     "V18"
    ]
   },
   {
-   "start": 82.35,
-   "end": 88.43,
+   "start": 78.85,
+   "end": 84.93,
    "lines": [
     "V19"
    ]
   },
   {
-   "start": 88.85,
-   "end": 95.34,
+   "start": 85.35,
+   "end": 91.84,
    "lines": [
     "V20"
    ]
   },
   {
-   "start": 95.85,
-   "end": 100.72,
+   "start": 91.85,
+   "end": 100.77,
    "lines": [
-    "V21"
-   ]
-  },
-  {
-   "start": 100.85,
-   "end": 105.27,
-   "lines": [
+    "V21",
     "V22"
    ]
   },
   {
-   "start": 105.35,
-   "end": 110.29,
+   "start": 100.85,
+   "end": 105.79,
    "lines": [
     "V23"
    ]
   },
   {
-   "start": 110.35,
-   "end": 115.76,
+   "start": 106.85,
+   "end": 112.26,
    "lines": [
     "V24"
    ]
   },
   {
-   "start": 115.85,
-   "end": 124.72,
+   "start": 112.35,
+   "end": 121.22,
    "lines": [
     "V25",
     "V26"
    ]
   },
   {
-   "start": 126.85,
-   "end": 130.42,
+   "start": 123.35,
+   "end": 126.92,
    "lines": [
     "V27"
    ]
@@ -1961,13 +1925,13 @@
  ],
  "music": {
   "file": "v2/music/score.mp3",
-  "durationSec": 133,
-  "bpmGrid": 119.995,
-  "beatOffset": 0.024,
-  "trackerOffset": 0.024,
-  "gridRmsMs": 6.2,
+  "durationSec": 129.5,
+  "bpmGrid": 119.998,
+  "beatOffset": 0.0252,
+  "trackerOffset": 0.0252,
+  "gridRmsMs": 6.6,
   "gridSource": "beats.mjs",
-  "firstDownbeat": 0.024,
+  "firstDownbeat": 0.025,
   "shipped": "arranged edit (tools/audio-v3/arrangement.json), mp3 320 kbps, 44.1 kHz stereo, sample peak -3 dBFS",
   "arrangedFrom": {
    "source": "tools/audio-v3/work/music/v3/score.music_v1.seed3313.raw.mp3",
@@ -1979,31 +1943,26 @@
     },
     {
      "t0": 2.5,
-     "t1": 58,
+     "t1": 56,
      "s0": 8.5
     },
     {
-     "t0": 58,
-     "t1": 59,
-     "s0": 62
+     "t0": 56,
+     "t1": 57
     },
     {
-     "t0": 59,
-     "t1": 60
+     "t0": 57,
+     "t1": 60.5,
+     "s0": 66.5
     },
     {
-     "t0": 60,
-     "t1": 64,
+     "t0": 60.5,
+     "t1": 118.5,
      "s0": 66
     },
     {
-     "t0": 64,
-     "t1": 122,
-     "s0": 66
-    },
-    {
-     "t0": 122,
-     "t1": 133,
+     "t0": 118.5,
+     "t1": 129.5,
      "s0": 122
     }
    ]
@@ -2012,85 +1971,85 @@
    {
     "id": "M1",
     "start": 0,
-    "end": 12,
+    "end": 11.5,
     "what": "glockenspiel pickup; the groove kicks in on hookLand 2.5"
    },
    {
     "id": "M2",
-    "start": 12,
-    "end": 52,
+    "start": 11.5,
+    "end": 49.5,
     "what": "bright groove"
    },
    {
     "id": "M3",
-    "start": 52,
-    "end": 59,
+    "start": 49.5,
+    "end": 56,
     "what": "the same groove (no separate chorus in the take)"
    },
    {
     "id": "M4",
-    "start": 59,
-    "end": 72,
-    "what": "hard stop on 59, silence to 60, dark drone + heartbeat + ticks, thud 66, sub hit 67.5, near silence"
+    "start": 56,
+    "end": 68.5,
+    "what": "hard stop on 56, silence to 57, dark drone + heartbeat + ticks, thud 63, sub hit 64.5, near silence"
    },
    {
     "id": "M5",
-    "start": 72,
-    "end": 76,
-    "what": "fade to silence, 1-bar riser 74-76, DROP on 76"
+    "start": 68.5,
+    "end": 72.5,
+    "what": "fade to silence, 1-bar riser 70.5-72.5, DROP on 72.5"
    },
    {
     "id": "M6",
-    "start": 76,
-    "end": 110.5,
+    "start": 72.5,
+    "end": 107,
     "what": "driving tech groove"
    },
    {
     "id": "M7",
-    "start": 110.5,
-    "end": 116,
-    "what": "bass + tick for 2 bars (110.5-114.5), band back to 116"
+    "start": 107,
+    "end": 112.5,
+    "what": "bass + tick for 2 bars (107-111), band back to 112.5"
    },
    {
     "id": "M8",
-    "start": 116,
-    "end": 126,
-    "what": "high-pass build 116-122, LANDING on 122 (sub hit, full band)"
+    "start": 112.5,
+    "end": 122.5,
+    "what": "high-pass build 112.5-118.5, LANDING on 118.5 (sub hit, full band)"
    },
    {
     "id": "M9",
-    "start": 126,
-    "end": 133,
-    "what": "held chord on 126, ring-out faded by 132.5, silent 132.5-133"
+    "start": 122.5,
+    "end": 129.5,
+    "what": "held chord on 122.5, ring-out faded by 129, silent 129-129.5"
    }
   ],
   "hits": [
    {
-    "t": 67.5,
+    "t": 64.5,
     "why": "M4: the deep sub hit (subHit) before 'So how does a buyer know it's clean?'"
    },
    {
-    "t": 122,
+    "t": 118.5,
     "why": "M8: the landing"
    }
   ],
   "sweeps": [
    {
     "type": "lowpass",
-    "t0": 60,
-    "t1": 72,
+    "t0": 57,
+    "t1": 68.5,
     "fromHz": 380,
     "toHz": 380
    },
    {
     "type": "strip",
-    "t0": 110.5,
-    "t1": 114.5
+    "t0": 107,
+    "t1": 111
    },
    {
     "type": "highpass",
-    "t0": 116,
-    "t1": 122,
+    "t0": 112.5,
+    "t1": 118.5,
     "fromHz": 30,
     "toHz": 1200
    }

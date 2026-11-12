@@ -6,7 +6,7 @@ import { Caption, FPS, whip, WhipLayer } from "../P5/rig";
 import { DeskStage } from "./Desk";
 import { FinaleStage } from "./Finale";
 import { RelayStage } from "./Relay";
-import { ACCEPT, CAP, CONTACT, CUT, FINALE, LIFT } from "./timing";
+import { ACCEPT, CAP, CONTACT, CUT, END, FINALE, LIFT } from "./timing";
 
 /**
  * P6 · Use cases (v4: 52–59 s), the warmest section. Two sticker vignettes built around the hand-off swing (the v2
@@ -31,7 +31,8 @@ function stageMotion(frame: number, inCut?: number, outCut?: number) {
 }
 
 export default function P6() {
-  const frame = useCurrentFrame();
+  // v5: P6 holds its final pose (frozen) for the extra frames it renders under C1's falling Night blind
+  const frame = Math.min(useCurrentFrame(), END - 1);
   const b = stageMotion(frame, undefined, CUT.c);
   const c = stageMotion(frame, CUT.c, FINALE);
   const d = stageMotion(frame, FINALE);
@@ -40,6 +41,8 @@ export default function P6() {
       {frame < CUT.c ? (
         <WhipLayer x={b.x} stretch={b.s}>
           <DeskStage frame={frame} />
+          {/* rides out with the desk's whip, so it never sits over the relay (QA r2 #3) */}
+          <Caption text="Or take an offer." at={CAP.or} size={112} width={1200} seed="p6-o" />
         </WhipLayer>
       ) : frame < FINALE ? (
         <WhipLayer x={c.x} stretch={c.s}>
@@ -51,8 +54,7 @@ export default function P6() {
         </WhipLayer>
       )}
       <Caption text={"One trade. Whole position."} at={CAP.b} until={CAP.or - 4} size={112} width={1000} seed="p6-b" />
-      <Caption text="Or take an offer." at={CAP.or} until={CAP.c - 4} size={112} width={1200} seed="p6-o" />
-      <Caption text="Hand over a treasury." at={CAP.c} until={FINALE} size={110} width={1200} seed="p6-c" />
+      <Caption text="Hand over a treasury." at={CAP.c} size={110} width={1200} seed="p6-c" />
       <Sounds />
     </AbsoluteFill>
   );
@@ -76,7 +78,8 @@ function Sounds() {
       <Sfx name="whoosh-zip" at={at(CUT.c)} align="peak" gainDb={-1} />
       {swing(LIFT.c, CONTACT.c)}
       <Sfx name="whoosh-zip" at={at(FINALE)} align="peak" gainDb={-1} />
-      <Sfx name="charm-jingle" at={at(FINALE + 15)} align="peak" gainDb={1} />
+      {/* as the two cards settle in sync; it rings out before the music stop (END) */}
+      <Sfx name="charm-jingle" at={at(Math.min(FINALE + 4, END - 9))} align="peak" gainDb={1} />
     </>
   );
 }

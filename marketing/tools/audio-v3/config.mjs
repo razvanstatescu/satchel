@@ -48,7 +48,7 @@ export const PATHS = {
   musicDir: resolve(here, '../../video/public/v2/music'),
   musicPrefix: 'v2/music',
   dataDir: resolve(here, '../../video/src2/data'),
-  timelineMd: resolve(here, '../../script/timeline-v4.md'),
+  timelineMd: resolve(here, '../../script/timeline-v5.md'), // v4: script/timeline-v4.md (kept as is)
   probeDir: resolve(here, '../../notes/probe'),
 };
 

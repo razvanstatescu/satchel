@@ -1,0 +1,38 @@
+{
+  "words": [
+    "garden",
+    "honey",
+    "rocket",
+    "velvet",
+    "anchor",
+    "ladder",
+    "orbit",
+    "salmon",
+    "tiger",
+    "umbrella",
+    "window",
+    "copper"
+  ],
+  "wordlistIndices": [
+    765,
+    873,
+    1499,
+    1936,
+    67,
+    995,
+    1247,
+    1523,
+    1807,
+    1889,
+    2011,
+    383
+  ],
+  "wordlistSize": 2048,
+  "entropyHex": "5fada6edf90086f8e6fdf3e1fd87ed97",
+  "checksumBitsInWords": "1111",
+  "checksumBitsRequired": "0101",
+  "checksumValid": false,
+  "scureValidateMnemonic": false,
+  "library": "@scure/bip39@1.6.0 (English wordlist)",
+  "checkedAt": "2026-11-10T22:02:51.546Z"
+}

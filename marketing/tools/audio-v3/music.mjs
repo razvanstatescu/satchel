@@ -221,6 +221,25 @@ function analyze(out, tl, extra = {}, { raw: isRaw = false } = {}) {
   if (bt.gridRmsMs > 15) bt = refitGrid(out, bt, tl.bpm);
   const beats = phaseFix(out, bt);
   beats.file = out.startsWith(PATHS.publicDir) ? out.slice(PATHS.publicDir.length + 1) : out;
+  // Arranged score: every edit shifts by whole beats, so the beat grid stays global, but the bar phase changes where an
+  // edit shifts by a non-whole number of bars (v5: the bars after the Night section sit on 58.5 + 2k). Map the raw
+  // take's bar lines (beatOffset + 2k) through the segments instead of guessing one downbeat phase for the whole film.
+  const arrMap = !isRaw && readJson(resolve(PATHS.marketing, 'tools/audio-v3/arrangement.json'));
+  if (arrMap) {
+    const off = arrMap.beatOffset, bar = 4 * (60 / tl.bpm), dbs = [];
+    for (const seg of arrMap.segments) {
+      if (seg.silence) continue;
+      const shift = seg.s0 - seg.t0, sEnd = seg.s0 + (seg.t1 - seg.t0);
+      for (let sb = off + bar * Math.ceil((seg.s0 - off) / bar - 1e-6); sb < sEnd - 1e-6; sb += bar) {
+        const t = +(sb - shift).toFixed(4);
+        if (t >= 0 && t < dur && !dbs.some((d) => Math.abs(d - t) < 0.05)) dbs.push(t);
+      }
+    }
+    beats.downbeats = dbs.sort((p, q) => p - q);
+    if (beats.fps) beats.downbeatFrames = beats.downbeats.map((t) => Math.round(t * beats.fps));
+    beats.downbeatPhase = null;
+    beats.downbeatSource = 'mapped from the raw take\'s bar lines through tools/audio-v3/arrangement.json (bar phase changes at edits)';
+  }
   writeJson(beatsOut, beats);
   const prof = loudnessProfile(out); // 0.25 s windows
   const mean = (a, b) => { const s = prof.slice(Math.round(a * 4), Math.round(b * 4)); return Math.round(10 * Math.log10(s.reduce((p, q) => p + 10 ** (q / 10), 0) / Math.max(1, s.length))); };

@@ -39,13 +39,17 @@ const DETACH = PEEL + 10;
 const GONE = DETACH + 13;
 
 // ── layout (a macro on the card's back: its right edge shows, the header is above the frame) ─────────────────────────
-const S = 3.2; // record scale (UI → px): a step closer than T0's last frame (the drop punches in)
+const S = 3.0; // record scale (UI → px): a step closer than T0's last frame (the drop punches in)
 const REC = { w: 340, h: 46 };
 const RW = REC.w * S;
 const RH = REC.h * S;
 const REC_C = { x: 900, y: 600 };
-const CARD_EDGE = 1504; // the card's right edge (px)
-const STRIP = { x: 1528, y: REC_C.y - 65, w: 620, h: 130 };
+const CARD_EDGE = 1474; // the card's right edge (px); the captions, centred on the record, end left of it even mid-slap
+// The Ethereum strip runs out from under the card's right edge (its left end is tucked 34 px under the card, the dot
+// clear of the edge), so "Ethereum" ends ≥ 90 px inside the frame, at rest, mid-slap and on the slow push (QA #16).
+const STRIP = { x: CARD_EDGE - 34, y: REC_C.y - 62, w: 620, h: 124 };
+const STRIP_LABEL_ORIGIN = "36% 50%"; // the slap grows from the label's centre (strip x + ≈ 225 px), not from its left end
+const CAPTION_BOX = { left: REC_C.x - 960, right: 960 - REC_C.x }; // the captions are centred over the record
 
 const prog = (f: number, a: number, b: number, ease: (t: number) => number = EASE2.swing) => interpolate(f, [a, b], [0, 1], { ...clamp, easing: ease });
 const sp = (f: number, cfg: { mass: number; stiffness: number; damping: number }) => (f <= 0 ? 0 : spring({ frame: f, fps: FPS, config: cfg }));
@@ -161,22 +165,27 @@ export default function T1() {
         <SigningPill f={f} />
         <FlyingSignature f={f} />
         {f >= STRIP_IN - 4 ? (
-          <div style={{ position: "absolute", left: STRIP.x, top: STRIP.y, opacity: stripIn.opacity, scale: `${stripIn.sx} ${stripIn.sy}`, transformOrigin: "0% 50%" }}>
-            <ChainStrip w={STRIP.w} h={STRIP.h} theme="day" press={stripJolt} />
+          <div style={{ position: "absolute", left: CARD_EDGE, top: 0, right: -400, bottom: 0, overflow: "hidden" }}>
+            <div style={{ position: "absolute", left: STRIP.x - CARD_EDGE, top: STRIP.y, opacity: stripIn.opacity, scale: `${stripIn.sx} ${stripIn.sy}`, transformOrigin: STRIP_LABEL_ORIGIN }}>
+              <ChainStrip w={STRIP.w} h={STRIP.h} theme="day" press={stripJolt} />
+            </div>
           </div>
         ) : null}
       </AbsoluteFill>
 
-      <Sequence from={T.record - 4} durationInFrames={SIGN - T.record} layout="none">
-        <div style={{ position: "absolute", left: 0, right: 0, top: 104, display: "flex", justifyContent: "center" }}>
+      {/* the replacing caption appears on its slap's frame 2 (already opaque); the outgoing one stays up until then (QA #2) */}
+      <Sequence from={T.record - 4} durationInFrames={SIGN - 2 - (T.record - 4)} layout="none">
+        <div style={{ position: "absolute", ...CAPTION_BOX, top: 104, display: "flex", justifyContent: "center" }}>
           <CaptionSlap text="Recorded first." size={140} seed="t1-recorded" />
         </div>
       </Sequence>
-      <Sequence from={SIGN - 4} layout="none">
-        <div style={{ position: "absolute", left: 0, right: 0, top: 104, display: "flex", justifyContent: "center" }}>
-          <CaptionSlap text="Then signed." size={150} seed="t1-signed" />
-        </div>
-      </Sequence>
+      {f >= SIGN - 2 ? (
+        <Sequence from={SIGN - 4} layout="none">
+          <div style={{ position: "absolute", ...CAPTION_BOX, top: 104, display: "flex", justifyContent: "center" }}>
+            <CaptionSlap text="Then signed." size={150} seed="t1-signed" />
+          </div>
+        </Sequence>
+      ) : null}
 
       <Sfx name="pen-scribble" at={DRAW / FPS} gainDb={2} />
       <Sfx name="type-run" at={TYPE / FPS} gainDb={-2} />

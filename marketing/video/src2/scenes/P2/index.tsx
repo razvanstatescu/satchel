@@ -10,6 +10,7 @@ import { MintPhoneAfter, P1_CAPTION_END, P1T } from "../P1";
 import {
   CaptionAt,
   CHAINS3,
+  chipOut,
   charmBlink,
   charmPoint,
   type CharmSlot,
@@ -25,6 +26,7 @@ import {
   PagePush,
   Phone,
   sp,
+  SWAP,
   type TagState,
   TagsLayer,
   TapHand,
@@ -66,7 +68,7 @@ export const P2T = (() => {
   const usdcWord = W("USDC");
   const onWord = fr(sc.word("V06", 9)); // "on" (… USDC too, on Ethereum …)
   const nets = [W("Ethereum"), W("Base"), W("Arbitrum"), W("Optimism")];
-  const push = 2;
+  const push = 6; // after the caption swap at the cut (QA v5 r3 #2)
   const copy = from + 4;
   // coins: [charm index, source, launch, arrive (the coin enters the mouth)]
   const coins = [
@@ -89,7 +91,7 @@ export default function P2() {
   return (
     <AbsoluteFill style={{ background: C.ground }}>
       <P2World f={f} />
-      <P2Captions />
+      <P2Captions f={f} />
       <P2Sound />
     </AbsoluteFill>
   );
@@ -133,7 +135,7 @@ function P2World({ f }: { f: number }) {
           }
         />
       </Phone>
-      <TapHand f={f} x={TAP.x} y={TAP.y} arrive={T.copy - 14} at={T.copy} leave={T.copy + 8} />
+      <TapHand f={f} x={TAP.x} y={TAP.y} arrive={T.copy - 10} at={T.copy} leave={T.copy + 8} />
       <WorldCard charms={charms} coins={holdings}>
         <YoursSticker />
       </WorldCard>
@@ -307,15 +309,16 @@ function Coins({ f }: { f: number }) {
 // ── captions ────────────────────────────────────────────────────────────────────────────────────────────────────
 export const P2_CAPTION_END = { text: "USDC too.\nFour networks.", seed: "p2-usdc" };
 
-function P2Captions() {
+function P2Captions({ f }: { f: number }) {
   return (
     <>
-      {/* P1's last caption and chip hold under the incoming slap's 2-frame anti-pop, so the cut frame matches */}
-      <Sequence from={-60} durationInFrames={62} layout="none">
+      {/* P1's last caption and chip, held across the cut until "Fill it up." reaches full opacity (the swap rule); the
+          chip pops off across the cut (chipOut) and is gone on the same frame */}
+      <Sequence from={-60} durationInFrames={60 + T.cap1 + SWAP} layout="none">
         <CaptionAt text={P1_CAPTION_END.text} seed={P1_CAPTION_END.seed} />
-        <NftChip />
+        <NftChip out={chipOut(f)} />
       </Sequence>
-      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1} layout="none">
+      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1 + SWAP} layout="none">
         <CaptionAt text="Fill it up." seed="p2-fill" />
       </Sequence>
       <Sequence from={T.cap2} layout="none">

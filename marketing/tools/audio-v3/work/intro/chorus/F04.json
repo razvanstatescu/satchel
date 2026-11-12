@@ -1,0 +1,39 @@
+{
+ "id": "F04",
+ "plate": "T2-12",
+ "voice": "alice",
+ "text": "after signing a \"permit\" phishing signature",
+ "say": "after signing a \"permit\" phishing signature",
+ "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F04-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F04-tv.mp3"
+ },
+ "durationSec": 2.99,
+ "heard": {
+  "dry": "After signing a permit fishing signature",
+  "tv": "After signing a permit fishing signature"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -23.5,
+   "momentaryMaxLufs": -21,
+   "truePeakDb": -6.6
+  },
+  "tv": {
+   "integratedLufs": -23.2,
+   "momentaryMaxLufs": -19.4,
+   "truePeakDb": -6.7
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "After signing a permit fishing signature",
+   "heardTv": "After signing a permit fishing signature"
+  }
+ ]
+}

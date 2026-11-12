@@ -29,8 +29,11 @@ const SS_X = 960 - (SLOT_W * SS) / 2;
 const SS_Y = CB_Y + 40 - SLOT.h * SS; // the plate straddles the card's top edge
 const MOUTH = SS_Y + SLOT.mouthY * SS; // entry line: below it, a sticker is behind the plate
 const RS = 2.6; // request sticker scale (text ≈ 42 px)
+const BAR_TOP = MOUTH - 10 * SS; // the dark slot bar's top edge (SignSlot's opening: mouthY ± 10 UI)
+const BAR_L = SS_X + 20 * SS + 13; // the bar's straight top run (its x 20…W − 20 UI, minus half its rounded ends)
+const BAR_R = SS_X + (SLOT_W - 20) * SS - 13;
 
-type Req = { kind: RequestKind; contact: number; reason?: string; seed: number; hang: number };
+type Req = { kind: RequestKind; contact: number; reason?: string; seed: number; hang: number; apex: number };
 
 export default function T3() {
   const f = useCurrentFrame();
@@ -47,16 +50,18 @@ export default function T3() {
   const capAt = vo.wordAt("what") - 0.5; // "Readable requests only." on "what it can read"
   const b1 = onBeat(vo.wordAt("read"), beats); // raw hash bounces under "read," ("Can't read it")
   const reqs: Req[] = [
-    { kind: "rawHash", contact: b1, reason: "Can't read it", seed: 1, hang: 6 },
-    { kind: "approve", contact: b1 + 15, reason: "Not a transfer", seed: 2, hang: 4 },
-    { kind: "durableNonce", contact: b1 + 30, reason: "Doesn't expire", seed: 3, hang: 4 },
+    // each one rises to a slightly lower apex and leaves before the next one rises, so they never stack
+    { kind: "rawHash", contact: b1, reason: "Can't read it", seed: 1, hang: 5, apex: 200 },
+    { kind: "approve", contact: b1 + 15, reason: "Not a transfer", seed: 2, hang: 3, apex: 175 },
+    { kind: "durableNonce", contact: b1 + 30, reason: "Doesn't expire", seed: 3, hang: 6, apex: 150 },
   ];
-  // the message lands on "messages": recorded (marked "message"), checked, swallowed like the send
+  // the message lands on "messages": recorded (marked "message"), checked, held a beat longer than the send (it is
+  // the new request type, so its tag gets read), then swallowed like the send
   const msgAt = onBeat(vo.wordAt("messages"), beats);
   const msgRead = msgAt + 2;
   const msgOk = msgAt + 11;
-  const msgSinkFrom = msgAt + 20;
-  const msgSinkAt = beatAfter(msgAt + 28, beats);
+  const msgSinkFrom = msgAt + 32;
+  const msgSinkAt = beatAfter(msgAt + 40, beats);
   const panFrom = Math.max(msgSinkAt + 2, vo.wordAt("so") - 6); // tilt down to the records on "so each one can be checked later"
   const panTo = panFrom + 24;
 
@@ -64,12 +69,13 @@ export default function T3() {
   const whip = (u: number) => 640 * Math.pow(1 - interpolate(u, [0, 4], [0, 1], clamp), 2.2);
   const whipX = whip(f);
   const whipSmear = 1 + Math.min(0.25, (whip(f - 1) - whip(f)) / 1000);
-  // tight on the slot for the send, out to the full board once the caption has landed, then the tilt to the records
-  const wide = interpolate(f, [capAt + 1, capAt + 15], [0, 1], { ...clamp, easing: EASE2.pan });
+  // tight on the slot for the send, out to the full board as the caption lands (finished before the raw hash is
+  // tossed in, so its flight stays below the caption band), then the tilt to the records
+  const wide = interpolate(f, [capAt - 9, capAt + 5], [0, 1], { ...clamp, easing: EASE2.pan });
   const pan = interpolate(f, [panFrom, panTo], [0, 1], { ...clamp, easing: EASE2.pan });
   // a punch-in for the message (the new request type), released into the tilt
   const punch = interpolate(f, [msgAt + 1, msgAt + 13], [0, 1], { ...clamp, easing: EASE2.pan });
-  const baseY = 700 - 160 * wide + (640 - 540) * punch;
+  const baseY = 700 - 160 * wide + (612 - 540) * punch; // framed a little low so the message's tag clears the caption
   const baseZ = 1.3 - 0.3 * wide + 0.22 * punch;
   const camY = baseY + (800 - baseY) * pan;
   const camZ = baseZ + (1.06 - baseZ) * pan;
@@ -105,6 +111,15 @@ export default function T3() {
   const msgOutline = interpolate(f, [msgRead, msgRead + 14], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
   const msgAccepted = f < msgOk ? 0 : spring({ frame: f - msgOk, fps, config: SPRING2.pop });
   const tagDraw = interpolate(f, [msgRead + 3, msgRead + 15], [0, 1], { ...clamp, easing: Easing.inOut(Easing.quad) });
+
+  // ── the slot's clip line: at the plate's top edge while a request rests (its text sits just above it), rising to
+  //    the dark slot bar's top edge within the bar's width over the first 30 px of a sink, so whatever sinks goes INTO
+  //    the bar instead of being drawn over it (QA v5 N3) ───────────────────────────────────────────────────────────
+  const sendDown = sink * (sh * 0.85 + 40);
+  const lift = Math.max(f < sinkAt ? Math.min(1, sendDown / 30) : 0, f < msgSinkAt ? Math.min(1, msgDown / 30) : 0);
+  const plateEdge = MOUTH + 4;
+  const notchY = plateEdge + (BAR_TOP - plateEdge) * lift;
+  const slotClip = `polygon(-4000px -4000px, 6000px -4000px, 6000px ${plateEdge}px, ${BAR_R}px ${plateEdge}px, ${BAR_R}px ${notchY}px, ${BAR_L}px ${notchY}px, ${BAR_L}px ${plateEdge}px, -4000px ${plateEdge}px)`;
   const tagType = interpolate(f, [msgRead + 8, msgRead + 16], [0, 1], clamp);
 
   return (
@@ -117,7 +132,9 @@ export default function T3() {
           <div style={{ position: "absolute", left: SS_X, top: SS_Y, scale: `${1 + 0.025 * gulp} ${1 - 0.025 * gulp}`, transformOrigin: "50% 100%" }}>
             <SignSlot part="back" width={SLOT_W} scale={SS} />
           </div>
-          {/* the stickers sit between the slot's mouth and its plate */}
+          {/* the stickers sit between the slot's mouth and its plate; the two that pass are clipped at the mouth, so
+              nothing that sinks into the slot can show below the plate */}
+          <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, clipPath: slotClip }}>
           {f >= sendAt - FLIGHT_F && sink < 1 ? (
             <Chip x={sendFly.x} y={sendY} w={sw} h={sh} smearK={sendFly.smear}>
               <RequestSticker kind="send" scale={RS} outline={outline} accepted={accepted} drop={sendFly.drop} tilt={sendFly.tilt} />
@@ -135,12 +152,13 @@ export default function T3() {
               </Chip>
             </>
           ) : null}
+          </div>
           {reqs.map((r) => {
             const size = requestSize(REQ_TEXT[r.kind]);
             const w = size.w * RS;
             const h = size.h * RS;
             const restY = MOUTH - h / 2 - 2;
-            const m = bounce(f, r.contact, { x: 960, y: restY }, r.seed, r.hang);
+            const m = bounce(f, r.contact, { x: 960, y: restY }, r.seed, r.hang, r.apex);
             if (!m.visible) return null;
             return (
               <Chip key={r.kind} x={m.x} y={m.y} w={w} h={h} smearK={m.smear}>
@@ -202,18 +220,18 @@ function flight(f: number, contact: number, to: { x: number; y: number }) {
 }
 
 /** Tossed in like the send, but it hits the lip and bounces up and off to the right: the reason pops at the top. */
-function bounce(f: number, contact: number, rest: { x: number; y: number }, seed: number, hangF: number) {
+function bounce(f: number, contact: number, rest: { x: number; y: number }, seed: number, hangF: number, apex: number) {
   if (f < contact - FLIGHT_F) return { visible: false, x: 0, y: 0, tilt: 0, smear: 1, drop: 1, bounced: 0 };
   if (f < contact) {
     const m = flight(f, contact, rest);
     return { visible: true, ...m, bounced: 0 };
   }
-  const outFrom = 7 + hangF;
+  const outFrom = 6 + hangF;
   const at = (g: number) => {
-    const up = interpolate(g, [0, 7], [0, 1], { ...clamp, easing: EASE2.out }); // off the lip to the apex
-    const hang = interpolate(g, [7, outFrom], [0, 1], clamp); // a short readable hang, drifting
+    const up = interpolate(g, [0, 6], [0, 1], { ...clamp, easing: EASE2.out }); // off the lip to the apex
+    const hang = interpolate(g, [6, outFrom], [0, 1], clamp); // a short readable hang, drifting
     const out = interpolate(g, [outFrom, outFrom + 8], [0, 1], { ...clamp, easing: EASE2.fall }); // then away, down-right
-    return { x: rest.x + 520 * up + 30 * hang + 950 * out, y: rest.y - 200 * up - 8 * hang + 860 * out, up, out };
+    return { x: rest.x + 520 * up + 30 * hang + 950 * out, y: rest.y - apex * up - 8 * hang + 860 * out, up, out };
   };
   const g = f - contact;
   const p = at(g);
@@ -226,7 +244,7 @@ function bounce(f: number, contact: number, rest: { x: number; y: number }, seed
     tilt: (seed % 2 ? 6 : 3) * p.up + 34 * p.out,
     smear: smear(Math.hypot(p.x - q.x, p.y - q.y)).along,
     drop: interpolate(g, [0, 1, 4], [0, 0, 2], clamp),
-    bounced: interpolate(g, [0, 4], [0, 1], clamp),
+    bounced: interpolate(g, [0, 2], [0, 1], clamp),
   };
 }
 

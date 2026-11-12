@@ -1,0 +1,107 @@
+{
+ "positive_global_styles": [
+  "120 BPM",
+  "4/4",
+  "instrumental",
+  "dark modern trailer and glitch hybrid",
+  "G minor",
+  "deep sub bass pulse",
+  "ticking closed hi-hats",
+  "glitchy bit-crushed percussion",
+  "tense staccato synth stabs",
+  "cinematic tension",
+  "tight, punchy modern mix",
+  "continuous, no gaps"
+ ],
+ "negative_global_styles": [
+  "melody",
+  "bright",
+  "major key",
+  "vocals",
+  "choir",
+  "piano",
+  "glockenspiel",
+  "EDM drop",
+  "dubstep wobble",
+  "tempo changes",
+  "swing",
+  "lo-fi",
+  "long silent gaps",
+  "fade in"
+ ],
+ "sections": [
+  {
+   "section_name": "Pulse",
+   "positive_local_styles": [
+    "only a deep sub pulse on every beat and ticking closed hi-hats on sixteenths",
+    "sparse, tense and dark",
+    "starts on the very first beat"
+   ],
+   "negative_local_styles": [
+    "drums",
+    "synth stabs",
+    "fade in"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Glitch build",
+   "positive_local_styles": [
+    "glitchy bit-crushed percussion enters",
+    "tense staccato synth stabs on the offbeats",
+    "building"
+   ],
+   "negative_local_styles": [
+    "melody",
+    "release"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Glitch build 2",
+   "positive_local_styles": [
+    "denser glitch percussion and digital stutters",
+    "synth stabs on every beat",
+    "low toms",
+    "building harder"
+   ],
+   "negative_local_styles": [
+    "melody",
+    "breakdown"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Peak",
+   "positive_local_styles": [
+    "full intensity: driving trailer percussion, distorted sub, stabs",
+    "a riser climbing on top"
+   ],
+   "negative_local_styles": [
+    "release",
+    "drop",
+    "breakdown"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  },
+  {
+   "section_name": "Riser top",
+   "positive_local_styles": [
+    "everything at its peak, the riser climbing to its very top",
+    "relentless"
+   ],
+   "negative_local_styles": [
+    "fade",
+    "release",
+    "drop",
+    "silence"
+   ],
+   "duration_ms": 4000,
+   "lines": []
+  }
+ ]
+}

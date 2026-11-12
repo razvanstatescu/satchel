@@ -1,27 +1,40 @@
 // Satchel 2.0 SFX: raw -> video/public/v2/sfx/<name>.mp3 (44.1 kHz stereo, 192 kbps) + catalog video/src2/data/sfx.json.
-//   node tools/sfx2/process.mjs [--qa-only]
+//   node tools/sfx2/process.mjs [--set intro] [--qa-only]
+// Sets: 'library' (default; specs.mjs, _raw/, choice.json, peaks -3 dBFS) and 'intro' (the v5 cold open;
+// specs-intro.mjs, _raw/intro/, choice-intro.json, peaks -6.5 dBFS so the decoded mp3 stays <= -6 dBFS, gainDb capped
+// at a -6 dBFS mix peak). Each run writes only its own set's mp3s and merges only its own keys into the catalog.
 // Same pipeline as tools/sfx (the first film's library), except loudness: matching and the suggested gainDb use the
 // K-weighted momentary maximum (ITU-R BS.1770 filter, 400 ms window, zero-padded for clips shorter than 400 ms).
 // Steps: decode -> onset trim (transient at 5 ms) -> cut to target with tail fade -> trailing-silence trim
 // -> normalize (peak -3 dBFS; 'hit' group loudness-matched to its median, never above -3 dBFS peak)
 // -> encode -> decode the mp3 again and verify (duration, onset, peak, RMS, silence, clipping).
-// Source per effect: tools/sfx2/choice.json `sources[name]` (a file in _raw/: a v2 regeneration or a composite from
-// composite.mjs), else _raw/<name>.mp3. Prompts for v2 files come from regen-v2.json.
+// Source per effect: the set's choice file `sources[name]` (a v2 regeneration or a composite from composite*.mjs),
+// else <raw dir>/<name>.mp3. Prompts for v2 files come from regen-v2.json (library) or regen-intro.json (intro).
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SPECS, SOURCES } from './specs.mjs';
+import { SPECS as LIBRARY_SPECS, SOURCES } from './specs.mjs';
+import { INTRO_SPECS } from './specs-intro.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
+const si = process.argv.indexOf('--set');
+const SET = si > 0 ? process.argv[si + 1] : 'library';
+if (!['library', 'intro'].includes(SET)) throw new Error(`unknown --set ${SET}`);
+const INTRO = SET === 'intro';
+const SPECS = INTRO ? INTRO_SPECS : LIBRARY_SPECS;
 const PUB = resolve(here, '../../video/public/v2/sfx');
-const RAW = resolve(dirname(fileURLToPath(import.meta.url)), '_raw');
+const RAW = resolve(here, INTRO ? '_raw/intro' : '_raw');
 const CATALOG = resolve(here, '../../video/src2/data/sfx.json');
-const CHOICE = resolve(here, 'choice.json');
+const CHOICE = resolve(here, INTRO ? 'choice-intro.json' : 'choice.json');
 const choice = existsSync(CHOICE) ? JSON.parse(readFileSync(CHOICE, 'utf8')) : {};
-const REGEN = resolve(here, 'regen-v2.json');
+const REGEN = resolve(here, INTRO ? 'regen-intro.json' : 'regen-v2.json');
 const regenPrompts = existsSync(REGEN) ? JSON.parse(readFileSync(REGEN, 'utf8')) : {};
-const SR = 44100, LEAD = 0.005, PEAK_TARGET_DB = -3;
+const QA_REPORT = resolve(here, INTRO ? 'qa-report-intro.json' : 'qa-report.json');
+const SR = 44100, LEAD = 0.005;
+const PEAK_TARGET_DB = INTRO ? -6.5 : -3; // sample peak of the processed file
+const MIX_PEAK_CAP_DB = INTRO ? -6 : -1; // gainDb never lifts the file's peak above this
+const HOT_DB = INTRO ? -6 : -0.5; // QA: decoded mp3 peak above this is flagged
 const db = (x) => 20 * Math.log10(Math.max(x, 1e-9));
 const fromDb = (d) => 10 ** (d / 20);
 
@@ -111,6 +124,16 @@ function fade(ch, inSamples, outSamples) {
   }
 }
 function scale(ch, g) { for (const c of ch) for (let i = 0; i < c.length; i++) c[i] *= g; }
+// Clicks at the cut points: energy above 4 kHz in the first and last 3 ms against the 20 ms next to them (a click is
+// a spike there), plus the level of the very first and last samples. Returns dB values.
+const HF_HP = biquadCoefs('hp', 0, Math.SQRT1_2, 4000);
+function edgeCheck(ch) {
+  const h = ch.map((c) => biquad(c, HF_HP)), n = h[0].length, w3 = Math.round(0.003 * SR), w20 = Math.round(0.02 * SR), pk = peakOf(ch);
+  const rms = (a, b) => { a = Math.max(0, a); b = Math.min(n, b); let s = 0; for (let i = a; i < b; i++) s += (h[0][i] ** 2 + h[1][i] ** 2) / 2; return Math.sqrt(s / Math.max(1, b - a)); };
+  return { startHfJumpDb: +(db(rms(0, w3)) - db(rms(w3, w3 + w20))).toFixed(1), startHfDb: +db(rms(0, w3) / pk).toFixed(1),
+    endHfJumpDb: +(db(rms(n - w3, n)) - db(rms(n - w3 - w20, n - w3))).toFixed(1), endHfDb: +db(rms(n - w3, n) / pk).toFixed(1),
+    firstSampleDb: +db(absAt(ch, 0) / pk).toFixed(1), lastSampleDb: +db(absAt(ch, n - 1) / pk).toFixed(1) };
+}
 
 const qaOnly = process.argv.includes('--qa-only');
 const stage = [];
@@ -121,6 +144,11 @@ for (const s of SPECS) {
   const decoded = decode(resolve(RAW, srcFile));
   const rawOver = v === 'comp' ? 0 : overFullScale(decoded);
   let raw = decoded.map((c) => Float32Array.from(biquad(c, DC_HP)));
+  // optional shaping (intro specs): extra high-pass, high-shelf EQ, light tanh saturation for small-speaker harmonics
+  if (s.hpHz) { const hp = biquadCoefs('hp', 0, Math.SQRT1_2, s.hpHz); raw = raw.map((c) => Float32Array.from(biquad(c, hp))); }
+  if (s.shelf) { const sh = biquadCoefs('shelf', s.shelf.db, Math.SQRT1_2, s.shelf.hz); raw = raw.map((c) => Float32Array.from(biquad(c, sh))); }
+  if (s.sat) { const p0 = peakOf(raw) || 1, { mix, drive } = s.sat, t = Math.tanh(drive);
+    raw = raw.map((c) => c.map((v) => { const u = v / p0; return p0 * ((1 - mix) * u + (mix * Math.tanh(drive * u)) / t); })); }
   let endCut = 0; // strip end-of-file clicks; repeat while a bump remains (some span more than 15 ms), max 60 ms
   for (let cut; (cut = endBump(raw)) > 0 && endCut < 0.06 * SR; endCut += cut) raw = slice(raw, 0, raw[0].length - cut);
   if (s.srcStart != null || s.srcEnd != null) raw = slice(raw, Math.round((s.srcStart ?? 0) * SR), s.srcEnd != null ? Math.round(s.srcEnd * SR) : raw[0].length);
@@ -163,35 +191,46 @@ for (const x of stage) {
   let tr20 = 0; while (tr20 < dec[0].length && absAt(dec, tr20) < pk * fromDb(-20)) tr20++;
   const { env, hop } = envelope(dec, 0.01);
   let kmax = 0; env.forEach((e, k) => { if (e > env[kmax]) kmax = k; });
-  const peakSec = +((kmax + 0.5) * hop).toFixed(3);
+  // peakSec: the loudest 10 ms; a riser trimmed to end on its top (peakAtEnd) reports its end instead
+  const peakSec = x.s.peakAtEnd ? +(dec[0].length / SR).toFixed(3) : +((kmax + 0.5) * hop).toFixed(3);
   const silences = (execFileSync('sh', ['-c', `ffmpeg -i "${out}" -af silencedetect=n=-50dB:d=0.25 -f null - 2>&1 | grep -c silence_start || true`]).toString().trim());
   const tr = transients(dec, x.s.hitRefractorySec, x.s.hitRiseDb, x.s.hitFloorDb);
+  const edge = edgeCheck(dec);
   const r = { name: x.s.name, v: x.v, dur: +dur.toFixed(3), target: x.s.dur, sr: st.sample_rate, chn: st.channels, kbps: Math.round(st.bit_rate / 1000),
     onsetMs: +(on * 1000).toFixed(1), transientMs: +(tr20 / SR * 1000).toFixed(1), peakDb: +db(pk).toFixed(1), rmsDb: +db(rmsOf(dec)).toFixed(1), loudM: +loudM(dec).toFixed(1),
     peakSec, gainApplied: +gDb.toFixed(1), rawPeakDb: +db(x.rawPeak).toFixed(1), rawOverFS: x.rawOver, lead: +x.leadSec.toFixed(3),
-    trimmed: x.truncated, endCutMs: x.endCutMs, outEndBump: endBump(dec, pk * fromDb(-50)) > 0, silences: Number(silences), transients: tr.length, tAt: tr.slice(0, 12).join(' ') };
+    trimmed: x.truncated, endCutMs: x.endCutMs, outEndBump: endBump(dec, pk * fromDb(-50)) > 0, silences: Number(silences), transients: tr.length, tAt: tr.slice(0, 12).join(' '), ...edge };
   const flags = [];
   if (r.rawPeakDb < -40) flags.push('EMPTY');
   if (r.rawOverFS > 200) flags.push('CLIPPED-SRC?');
-  if (r.peakDb > -0.5) flags.push('HOT');
+  if (r.peakDb > HOT_DB) flags.push('HOT');
+  if ((edge.startHfJumpDb > 6 && edge.startHfDb > -45) || (edge.endHfJumpDb > 6 && edge.endHfDb > -45) || edge.firstSampleDb > -30 || (!x.s.abruptEnd && edge.lastSampleDb > -30)) flags.push('EDGE-CLICK');
   if (r.outEndBump) flags.push('END-BUMP');
   if (x.s.anchor !== 'end' && (r.onsetMs > 12 || r.transientMs < 3)) flags.push('ONSET');
   if (x.s.minTransients && r.transients < x.s.minTransients) flags.push('FEW-TRANSIENTS');
   if (Math.abs(r.dur - x.s.dur) > 0.15 * x.s.dur + 0.05) flags.push('SHORT');
   r.flags = flags.join(',');
   report.push(r);
-  r.gainDb = Math.floor(Math.min(x.s.mixDb - r.loudM, -1 - r.peakDb) * 2) / 2; // capped so peaks stay <= -1 dBFS
+  r.gainDb = Math.floor(Math.min(x.s.mixDb - r.loudM, MIX_PEAK_CAP_DB - r.peakDb) * 2) / 2; // capped: mix peaks stay <= MIX_PEAK_CAP_DB
   // prompt: v2 -> the regeneration prompt; composite -> the prompts of the takes it was built from (choice.promptFrom)
   const promptOf = (ref) => { const [kind, n] = ref.split(':');
-    return kind === 'regen' ? regenPrompts[n]?.prompt : kind === 'src' ? SOURCES.find((q) => q.name === n)?.prompt : SPECS.find((q) => q.name === n)?.prompt; };
+    return kind === 'regen' ? regenPrompts[n]?.prompt : kind === 'src' ? SOURCES.find((q) => q.name === n)?.prompt : [...SPECS, ...LIBRARY_SPECS].find((q) => q.name === n)?.prompt; };
   const prompt = x.v === 2 ? regenPrompts[x.s.name]?.prompt ?? x.s.prompt
     : x.v === 'comp' && choice.promptFrom?.[x.s.name] ? choice.promptFrom[x.s.name].map(promptOf).join(' + ') : x.s.prompt;
   catalog[x.s.name] = { file: `v2/sfx/${x.s.name}.mp3`, duration: r.dur, peakSec, prompt, gainDb: r.gainDb,
     source: x.v === 'comp' ? 'composite' : `eleven_text_to_sound_v2 (v${x.v})`, ...(x.s.hitRefractorySec ? { hitsSec: tr } : {}),
     ...(choice.notes?.[x.s.name] ? { note: choice.notes[x.s.name] } : {}) };
 }
-if (!qaOnly) writeFileSync(CATALOG, JSON.stringify(catalog, null, 2) + '\n');
-writeFileSync(resolve(here, 'qa-report.json'), JSON.stringify(report, null, 2));
+// Merge: entries of other sets stay exactly as they are (same order, same values); this set's entries are replaced
+// in place, dropped ones are removed, and new ones are appended.
+if (!qaOnly) {
+  const existing = existsSync(CATALOG) ? JSON.parse(readFileSync(CATALOG, 'utf8')) : {};
+  const mine = new Set(SPECS.map((q) => q.name)), merged = {};
+  for (const [k, e] of Object.entries(existing)) if (!mine.has(k)) merged[k] = e; else if (catalog[k]) merged[k] = catalog[k];
+  for (const [k, e] of Object.entries(catalog)) if (!(k in merged)) merged[k] = e;
+  writeFileSync(CATALOG, JSON.stringify(merged, null, 2) + '\n');
+}
+writeFileSync(QA_REPORT, JSON.stringify(report, null, 2));
 console.table(report.map(({ name, v, dur, target, onsetMs, transientMs, peakDb, rmsDb, loudM, peakSec, gainDb, rawPeakDb, rawOverFS, endCutMs, silences, transients, flags }) =>
   ({ name, v, dur, target, onsetMs, transientMs, peakDb, rmsDb, loudM, peakSec, gainDb, rawPeakDb, rawOverFS, endCutMs, silences, transients, flags })));
-console.log('hit-group loudness target (LUFS momentary max at peak -3 dBFS):', hitTarget.toFixed(1));
+if (hitTarget != null) console.log(`set ${SET}: hit-group loudness target (LUFS momentary max at peak ${PEAK_TARGET_DB} dBFS):`, hitTarget.toFixed(1));

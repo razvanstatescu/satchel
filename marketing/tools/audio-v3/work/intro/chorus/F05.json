@@ -1,0 +1,39 @@
+{
+ "id": "F05",
+ "plate": "T2-01",
+ "voice": "daniel",
+ "text": "A victim lost $908,551",
+ "say": "A victim lost $908,551",
+ "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F05-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F05-tv.mp3"
+ },
+ "durationSec": 4.56,
+ "heard": {
+  "dry": "A victim lost $908,551",
+  "tv": "A victim lost $908,551."
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -20.9,
+   "momentaryMaxLufs": -18.2,
+   "truePeakDb": -3.3
+  },
+  "tv": {
+   "integratedLufs": -21.2,
+   "momentaryMaxLufs": -17.8,
+   "truePeakDb": -6.2
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "A victim lost $908,551",
+   "heardTv": "A victim lost $908,551."
+  }
+ ]
+}

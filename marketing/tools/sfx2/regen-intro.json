@@ -1,0 +1,62 @@
+{
+  "glitch-stutter": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "A fast accelerating digital stutter: one tiny electronic blip repeated about ten times, the gaps getting shorter and shorter so it speeds up into a buzz, like a skipping CD, harsh and clean, clean, dry, no music, no reverb tail."
+  },
+  "zoom-punch": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "A short punchy cinematic zoom hit: a sharp bright click and a tight mid-range thud hitting together at the very start, snappy and present, like a camera zoom impact, clean, dry, no music, no reverb tail."
+  },
+  "notif-ping-1": {
+    "gen": 0.5,
+    "influence": 0.8,
+    "prompt": "A short bright glassy smartphone notification, two quick separate notes, ding-ding, the second note higher, crystal clear, clean, dry, no music, no reverb tail."
+  },
+  "notif-ping-2": {
+    "gen": 0.5,
+    "influence": 0.8,
+    "prompt": "A short bright marimba notification tick, two quick high wooden mallet notes, tick-tock, crisp and clear, clean, dry, no music, no reverb tail."
+  },
+  "phone-buzz": {
+    "gen": 0.6,
+    "influence": 0.8,
+    "prompt": "A smartphone on a hard wooden desk vibrating twice: two separate short buzzy rattles with a clear pause between them, bzzt bzzt, close-mic, clean, dry, no music, no reverb tail."
+  },
+  "static-burst": {
+    "gen": 0.5,
+    "influence": 0.75,
+    "prompt": "A short burst of bright harsh analog TV static, loud white-noise hiss with crackles across the whole spectrum, abruptly cut off, clean, dry, no music, no reverb tail."
+  },
+  "keyboard-burst": {
+    "gen": 1.0,
+    "influence": 0.75,
+    "prompt": "A frantic rapid-fire burst of very fast mechanical keyboard typing, about twenty sharp clicky keystrokes packed into one second, no pauses, close-mic, no voices, clean, dry, no music, no reverb tail."
+  },
+  "notif-swarm": {
+    "gen": 3.0,
+    "influence": 0.75,
+    "prompt": "A swarm of smartphone notifications building up: it starts with a single ping, then more and more different pings, message chimes and vibration buzzes pile on top of each other, getting denser, faster and louder until the very end, a chaotic wall of alerts, no music, no voices."
+  },
+  "riser-digital": {
+    "gen": 2.5,
+    "influence": 0.75,
+    "prompt": "A tense digital riser lasting the full duration: filtered white noise and a thin glassy synth tone sweeping steadily upward, getting louder, brighter and faster all the way to the very end, loudest and highest at the end, then cutting off abruptly, no drums, clean, dry, no music, no reverb tail."
+  },
+  "sub-drone": {
+    "gen": 9.0,
+    "influence": 0.7,
+    "prompt": "A dark tense drone: a low buzzing synth bass note with gritty mid-range harmonics, like a distorted cello drone, steady and loud, slowly rising in pitch by two semitones over the whole duration, sustained to the very end and then stopping dead, no drums, no melody, no music."
+  },
+  "reveal-boom-1": {
+    "gen": 1.8,
+    "influence": 0.75,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music."
+  },
+  "reveal-boom-2": {
+    "gen": 1.8,
+    "influence": 0.75,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music."
+  }
+}

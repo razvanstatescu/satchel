@@ -2,16 +2,22 @@
 //   node tools/sfx2/generate.mjs                 # generate any missing raw files
 //   node tools/sfx2/generate.mjs --regen a,b     # one regeneration each (saved as <name>.v2.mp3)
 //   node tools/sfx2/generate.mjs --sources       # helper sources for composites (_raw/src-<name>.mp3)
+//   add --set intro to any of these for the v5 cold-open set (specs-intro.mjs, raw files in _raw/intro/)
 // Keys come from env.mjs via eleven.mjs; never printed. Costs are appended to tools/sfx2/gen-log.json.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sfx } from '../lib/eleven.mjs';
 import { loadEnv } from '../lib/env.mjs';
-import { SPECS, SOURCES } from './specs.mjs';
+import { SPECS as LIBRARY_SPECS, SOURCES } from './specs.mjs';
+import { INTRO_SPECS } from './specs-intro.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const RAW = resolve(here, '_raw');
+const si = process.argv.indexOf('--set');
+const SET = si > 0 ? process.argv[si + 1] : 'library';
+if (!['library', 'intro'].includes(SET)) throw new Error(`unknown --set ${SET}`);
+const SPECS = SET === 'intro' ? INTRO_SPECS : LIBRARY_SPECS;
+const RAW = SET === 'intro' ? resolve(here, '_raw/intro') : resolve(here, '_raw');
 const LOG = resolve(here, 'gen-log.json');
 loadEnv(['ELEVENLABS_API_KEY']);
 
@@ -32,7 +38,7 @@ for (const s of SPECS) {
   const durationSeconds = Math.max(0.5, o.gen ?? s.gen ?? s.dur);
   const buf = await sfx(prompt, { durationSeconds, promptInfluence: o.influence ?? s.influence ?? 0.6 });
   writeFileSync(out, buf);
-  const entry = { name: s.name, version: isRegen ? 2 : 1, prompt, durationSeconds, bytes: buf.length,
+  const entry = { set: SET, name: s.name, version: isRegen ? 2 : 1, prompt, durationSeconds, bytes: buf.length,
     characterCost: buf.meta.characterCost, requestId: buf.meta.requestId, at: new Date().toISOString() };
   log.push(entry);
   writeFileSync(LOG, JSON.stringify(log, null, 2));
@@ -51,4 +57,5 @@ if (process.argv.includes('--sources')) {
     console.log(`src-${s.name}: ${s.gen}s cost=${buf.meta.characterCost}`);
   }
 }
-console.log('total cost so far:', log.reduce((a, e) => a + (e.characterCost || 0), 0));
+console.log('total cost so far:', log.reduce((a, e) => a + (e.characterCost || 0), 0),
+  `(set ${SET}: ${log.filter((e) => (e.set ?? 'library') === SET).reduce((a, e) => a + (e.characterCost || 0), 0)})`);

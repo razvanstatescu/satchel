@@ -34,7 +34,7 @@ const T = {
 const HALF = 7.5;
 const CHIP0 = Math.ceil((T.overEnd - 2) / HALF) * HALF; // 105 = 130.0 s, a downbeat
 const CHIP_AT = [0, 1, 2, 3, 4].map((i) => Math.round(CHIP0 + HALF * i)); // contacts 105 · 113 · 120 · 128 · 135
-const FOOT = CHIP_AT[4] + 3;
+const FOOT = CHIP_AT[2]; // the footer rises with the third chip, so the press on endPress has the frame to itself (QA v5 r3 #13)
 const SOL_BOUNCE = Math.min(T.press + 22, T.silence - 8); // SOL's last bounce, before the silent tail
 
 // ── layout (1920 × 1080; key text inside the safe area, nothing must-read in the bottom 150 px) ────────────────────
@@ -137,8 +137,8 @@ function EndCharms({ frame }: { frame: number }) {
     const atHead = interpolate(frame, [T.stick - 8 + lag[i], T.stick - 4 + lag[i], T.hand + 20, T.hand + 26], [0, 1, 1, 0], clamp);
     const atChips = interpolate(frame, [CHIP_AT[0] - 8 + lag[i], CHIP_AT[0] - 4 + lag[i], CHIP_AT[4] + 6, CHIP_AT[4] + 12], [0, 1, 1, 0], clamp);
     const look = { x: -7 * atLogo - 6 * atHead - 5 * atChips, y: 3 * atLogo + 5 * atHead + 6 * atChips };
-    // blinks in turn (left to right) as the chips finish landing; idle blinks otherwise (never in sync)
-    const cascade = [CHIP_AT[4] + 4 + 5 * i];
+    // blinks in turn (left to right) as the last chips land, done before the press (which has the frame to itself)
+    const cascade = [CHIP_AT[3] + 4 + 5 * i];
     const idle = [62 + 23 * i];
     const blink = 1 - Math.min(1, ...[...cascade, ...idle].map((b) => blinkAt(frame, b)));
     const joy = interpolate(frame, [T.press + lag[i], T.press + 2 + lag[i], T.press + 10 + lag[i], T.press + 14 + lag[i]], [0, 1, 1, 0], clamp);

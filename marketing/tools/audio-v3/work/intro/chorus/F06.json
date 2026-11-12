@@ -1,0 +1,39 @@
+{
+ "id": "F06",
+ "plate": "T2-01",
+ "voice": "matilda",
+ "text": "a phishing approval signed 458 days ago",
+ "say": "a phishing approval signed 458 days ago",
+ "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F06-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F06-tv.mp3"
+ },
+ "durationSec": 3.51,
+ "heard": {
+  "dry": "A phishing approval signed 458 days ago",
+  "tv": "A phishing approval signed 458 days ago"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22.6,
+   "momentaryMaxLufs": -19.3,
+   "truePeakDb": -2.9
+  },
+  "tv": {
+   "integratedLufs": -22.6,
+   "momentaryMaxLufs": -20.2,
+   "truePeakDb": -5.8
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "A phishing approval signed 458 days ago",
+   "heardTv": "A phishing approval signed 458 days ago"
+  }
+ ]
+}

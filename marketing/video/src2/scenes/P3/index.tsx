@@ -24,6 +24,7 @@ import {
   PHONE,
   releaseSwing,
   sp,
+  SWAP,
   type TagState,
   TagsLayer,
   ui,
@@ -56,8 +57,8 @@ const FILL: Record<Chain, string> = { btc: "0.06", evm: "0.85", sol: "13" };
 const AFTER_N: Record<Chain, number> = { btc: 0.05, evm: 0.8, sol: 12 };
 const FILL_N: Record<Chain, number> = { btc: 0.06, evm: 0.85, sol: 13 };
 const SENT: Record<Chain, string> = { btc: "Sent 0.0100 BTC", evm: "Sent 0.05 ETH", sol: "Sent 1 SOL" };
-/** A coin's amount on the card: the fill until its coin launches, then rolls to the after-send amount in 10 f. */
-const cardAmount = (c: Chain, f: number) => interpolate(f, [launchOf(c), launchOf(c) + 10], [FILL_N[c], AFTER_N[c]], { ...clamp, easing: EASE2.out });
+/** A coin's amount on the card: the fill until its coin launches, then rolls to the after-send amount in 8 f. */
+const cardAmount = (c: Chain, f: number) => interpolate(f, [launchOf(c), launchOf(c) + 8], [FILL_N[c], AFTER_N[c]], { ...clamp, easing: EASE2.out });
 
 export const P3T = (() => {
   const send = W7("send");
@@ -81,8 +82,9 @@ export const P3T = (() => {
   const jump = signatures; // the timer jump-cut 0:03 → 0:09
   const signed = signs - 4;
   const sent = native - 6;
-  // flicks: start of the wind-up; the coin launches 6 f later (SOL: 4 f)
-  const flicks = { btc: native - 6, evm: transaction - 3, sol: transaction + 11 };
+  // flicks: start of the wind-up; the coin launches 6 f later (SOL: 4 f). BTC launches on "native", ETH on
+  // "transaction", SOL 8 f after it (it flicks fastest): the ≈ $8,000.00 total settles ≥ 0.5 s before the cut (QA v5 #16)
+  const flicks = { btc: native - 6, evm: transaction - 6, sol: transaction + 2 };
   return { send, all, chains, approve, nearSig, signatures, signs, native, transaction, push1, wave, pressSend, walletCta, sheetUp, pressApprove, approved, sheetDown, push2, jump, signed, sent, flicks, cap1: send - 4, cap2: nearSig - 4, end: fr(sc.duration) };
 })();
 const T = P3T;
@@ -92,7 +94,7 @@ const SEND_TAP = ui(318, 741);
 const APPROVE_TAP = ui(345, 776);
 
 // toast stack (right column)
-const TOAST = { x: 1566, y: [470, 560, 650], scale: 1.36, h: 54 * 1.36 } as const;
+const TOAST = { x: 1536, y: [470, 560, 650], scale: 1.3, h: 54 * 1.3 } as const;
 
 export default function P3() {
   const f = useCurrentFrame();
@@ -182,7 +184,9 @@ function SendHand({ f }: { f: number }) {
   const hover = f < T.pressSend ? hover1 : f < T.pressApprove ? Math.max(hover2, ease(f, T.pressSend + 2, T.pressSend + 8, 0, 1, EASE2.out) * (f < T.pressApprove - 4 ? 1 : 0)) : 0;
   const x = base.x + away.x * (1 - inP) + away.x * outP;
   const y = base.y + away.y * (1 - inP) + away.y * outP - 16 * hover + 4 * PHONE.k * pressed;
-  return <Hand pose="tap" sleeve="alice" k={1.55} x={x} y={y} angle={-52} press={pressed} arm={8} tagTilt={-2} />;
+  // no name tag on this sleeve (QA v5 #5): Send and Approve sit at the phone's bottom edge, where even the wrist is
+  // within ~80 px of the frame's edge, so the tag could only be clipped. alice's lemon sleeve still says who it is.
+  return <Hand pose="tap" sleeve="alice" k={1.55} x={x} y={y} angle={-52} press={pressed} arm={8} tag={null} />;
 }
 
 // ── the charms ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -261,10 +265,10 @@ function Toasts({ f }: { f: number }) {
       {CHAINS3.map((c, i) => {
         const at = launchOf(c) + 2; // slap starts; contact 4 f later
         if (f < at) return null;
-        const s = slapAt(f - at, FPS, 0, { from: 1.16, squash: 0.07, drop: 0 }); // a smaller overshoot: it lands near the frame edge
-        const check = interpolate(f - at, [4, 12], [0, 1], clamp);
+        const s = slapAt(f - at, FPS, 0, { from: 1.14, squash: 0.07, drop: 0 }); // a small overshoot, grown mostly rightward
+        const check = interpolate(f - at, [3, 9], [0, 1], clamp);
         return (
-          <div key={c} style={{ position: "absolute", left: TOAST.x, top: TOAST.y[i], opacity: s.opacity, scale: `${s.sx} ${s.sy}`, transformOrigin: "35% 50%" }}>
+          <div key={c} style={{ position: "absolute", left: TOAST.x, top: TOAST.y[i], opacity: s.opacity, scale: `${s.sx} ${s.sy}`, transformOrigin: "8% 50%" }}>
             <ToastSticker text={SENT[c]} check={check} scale={TOAST.scale} tilt={i === 1 ? 1.5 : -1.5} />
           </div>
         );
@@ -277,15 +281,16 @@ function Toasts({ f }: { f: number }) {
 function P3Captions() {
   return (
     <>
-      {/* P2's last caption, held until "Send on all three." slaps over it (the same shot across the cut) */}
-      <Sequence from={-60} durationInFrames={60 + T.cap1} layout="none">
+      {/* P2's last caption, held across the cut until "Send on all three." reaches full opacity (the swap rule) */}
+      <Sequence from={-60} durationInFrames={60 + T.cap1 + SWAP} layout="none">
         <CaptionAt text={P2_CAPTION_END.text} seed={P2_CAPTION_END.seed} />
       </Sequence>
-      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1} layout="none">
+      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1 + SWAP} layout="none">
         <CaptionAt text="Send on all three." seed="p3-send" />
       </Sequence>
       <Sequence from={T.cap2} layout="none">
-        <CaptionAt text={"NEAR Chain\nSignatures signs."} seed="p3-signs" />
+        {/* 104 px (QA v5 #15): the "g" of "signs." would otherwise rest on the card's top outline */}
+        <CaptionAt text={"NEAR Chain\nSignatures signs."} seed="p3-signs" size={104} />
       </Sequence>
     </>
   );

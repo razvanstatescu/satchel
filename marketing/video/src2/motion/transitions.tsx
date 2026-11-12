@@ -82,6 +82,19 @@ const PeelOff: React.FC<TransitionPresentationComponentProps<PeelOffProps>> = ({
   const g = peelGeometry(width, height, p, passedProps.corner ?? "br");
   const outline = passedProps.outline ?? 8;
   const [a, b] = g.fold;
+  // The crease (QA v5 #12): a round-capped line drawn over everything used to poke past the flap's border where the
+  // fold meets the frame edge. It is now its own layer with the flap's transform, clipped to the flap's polygon grown
+  // 1.5 px past the fold: a 2× stroke centred on the fold shows `outline` px on the flap side (meeting the border in a
+  // clean mitre at the frame edge) and 1.5 px on scene B's side, which covers the flap's anti-aliased fold edge (its
+  // white fill bleeds there). Extended past both ends, butt caps.
+  const gCrease = peelGeometry(width, height, p + 1.5 / ((width + height) / Math.SQRT2), passedProps.corner ?? "br");
+  const ext = (() => {
+    if (!a || !b) return null;
+    const L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+    const dx = ((b.x - a.x) / L) * 4 * outline;
+    const dy = ((b.y - a.y) / L) * 4 * outline;
+    return { x1: a.x - dx, y1: a.y - dy, x2: b.x + dx, y2: b.y + dy };
+  })();
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{ clipPath: polygon(g.peeled) }}>{children}</AbsoluteFill>
@@ -96,10 +109,12 @@ const PeelOff: React.FC<TransitionPresentationComponentProps<PeelOffProps>> = ({
             boxSizing: "border-box",
           }}
         />
-        {a && b ? (
-          <svg width={width} height={height} style={{ position: "absolute", inset: 0 }}>
-            <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={C.ink} strokeWidth={outline} strokeLinecap="round" />
-          </svg>
+        {ext ? (
+          <AbsoluteFill style={{ transformOrigin: "0 0", transform: g.matrix, clipPath: polygon(gCrease.peeled) }}>
+            <svg width={width} height={height} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+              <line {...ext} stroke={C.ink} strokeWidth={2 * outline} strokeLinecap="butt" />
+            </svg>
+          </AbsoluteFill>
         ) : null}
       </AbsoluteFill>
     </AbsoluteFill>

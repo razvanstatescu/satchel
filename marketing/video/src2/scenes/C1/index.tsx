@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AbsoluteFill, interpolate, Sequence, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, Sequence, spring, useCurrentFrame } from "remotion";
 import { type CharmFace, charmKick, charmSwing } from "../../brand/Charm";
 import { C, type Chain, NIGHT } from "../../brand/tokens";
 import { CardWithCharms, Hand, type HandPose } from "../../illustration/characters";
@@ -7,12 +7,13 @@ import { CoinSticker, PocketJeans, POCKET, SignedSlip, SLIP } from "../../illust
 import { Sfx } from "../../lib/Sfx";
 import { FPS } from "../../lib/time";
 import { getScene, marker } from "../../lib/timeline";
-import { blinkSchedule, CaptionSlap, clamp, EASE2, eyeOpen, handoffAt, HANDOFF, NightBlind, pressAt, slapAt, SPRING2 } from "../../motion";
+import { blinkSchedule, CaptionSlap, clamp, EASE2, eyeOpen, handoffAt, HANDOFF, pressAt, slapAt, SPRING2 } from "../../motion";
 import { SatchelCard } from "../../components/Sticker";
 import { AmountTag, ChainStrip, nightOutline, NightRig, pal, StickerButton, type Theme, WHIP_OUT, whipSmear } from "./parts";
 
 /**
- * C1 · The catch (58–72 s). Night falls as a roller blind on the music stop. A seller (ink sleeve) holds a Satchel with
+ * C1 · The catch. Night falls as a roller blind on the music stop (the P6 → C1 cut, scenes/C1/nightBlindCut.tsx: the blind
+ * falls over P6's last frames and this scene, already Night, shows above its edge). A seller (ink sleeve) holds a Satchel with
  * no number visible; the other hand taps "Send 0.80 ETH" and the signed slip tiptoes into the back pocket (one hop per
  * pizzicato pluck) while the ETH charm watches it go. The sale swings the card to a buyer (white sleeve), flat faces.
  * After the sale the slip comes back out and is slapped onto the Ethereum strip on the thud: the ETH coins fly into
@@ -50,7 +51,6 @@ const STRIP_IN = T.used + 14; // the Ethereum strip slaps in (contact)
 const DRAIN = T.thud + 4; // the coins start to leave the ETH charm
 const ZERO = T.thud + 10; // the ETH tag rolls to 0
 const ETH_ROLL = [DRAIN + 2, DRAIN + 20]; // the card's ETH (and its total) roll to 0 as the coins leave
-const REORDER = DRAIN + 24; // ETH (now 0%) drops out of the card's legend
 export const C1_WHIP = T.end - 4; // whip out (the cut is on the fastest frame; T0 whips in)
 
 // ── world layout (camera at rest: world px = screen px) ──────────────────────────────────────────────────────────────
@@ -339,10 +339,10 @@ function charmFace(chain: Chain, f: number, theme: Theme): { face: CharmFace; gr
 
 // ── camera (world → screen) ─────────────────────────────────────────────────────────────────────────────────────────
 const CAM = [
-  { f: 0, x: 940, y: 590, s: 1 },
-  { f: BTN_IN - 4, x: 940, y: 590, s: 1 },
-  { f: PRESS, x: 800, y: 600, s: 1.05 },
-  { f: PIZZ + 6, x: 800, y: 600, s: 1.05 },
+  { f: 0, x: 940, y: 570, s: 1 },
+  { f: BTN_IN - 4, x: 940, y: 570, s: 1 },
+  { f: PRESS, x: 800, y: 556, s: 1.05 }, // low enough that the glove clears the caption band (QA #7)
+  { f: PIZZ + 6, x: 800, y: 556, s: 1.05 },
   { f: SALE + 2, x: 860, y: 500, s: 0.88 },
   { f: CONTACT + 4, x: 1210, y: 500, s: 0.88 },
   { f: CONTACT + 10, x: 1210, y: 500, s: 0.88 },
@@ -368,7 +368,7 @@ export function whipOut(f: number) {
   return { dx, smear: whipSmear(dx) };
 }
 
-// ── the world in one theme (the blind shows the Day world below its edge for 18 frames) ─────────────────────────────
+// ── the world (drawn in Night; the Day palette is kept for previews of the parts) ─────────────────────────────────────
 function World({ f, theme }: { f: number; theme: Theme }) {
   const p = pal(theme);
   const night = theme === "night";
@@ -451,17 +451,22 @@ function World({ f, theme }: { f: number; theme: Theme }) {
   // R holds the slip between its back and front layers while it carries it
   const slipHeld = f >= PULL && f < T.thud + 16 && slip.layer === "top";
 
-  // three ETH coins leave the charm and arc into the seller's pocket
+  // three ETH coins leave from behind the ETH charm, dip under the charms and slide into the seller's pocket. They are
+  // drawn under the card and its charms and stay below the card, the strip and the slip, so the rolling total, the value
+  // bar and the legend stay readable (QA #10).
   const coins = [0, 1, 2].map((i) => {
     const t0 = DRAIN + i * 3;
     const dur = 18;
     const t = (f - t0) / dur;
     if (t < 0 || t > 1) return null;
-    const start = onCard(t0, CW / 2, COIN_Y);
-    const end = { x: POCKET_OPEN.x + (i - 1) * 46, y: POCKET_OPEN.y + 14 };
+    const p0 = onCard(t0, CW / 2, COIN_Y);
+    const p1 = { x: p0.x - 360, y: p0.y + 150 };
+    const p2 = { x: POCKET_OPEN.x + 270, y: POCKET_OPEN.y - 170 };
+    const p3 = { x: POCKET_OPEN.x + (i - 1) * 40, y: POCKET_OPEN.y + 16 };
     const e = EASE2.swing(t);
-    const x = lerp(start.x, end.x, e);
-    const y = lerp(start.y, end.y, e) - (250 + 40 * i) * Math.sin(Math.PI * t);
+    const u = 1 - e;
+    const x = u * u * u * p0.x + 3 * u * u * e * p1.x + 3 * u * e * e * p2.x + e * e * e * p3.x;
+    const y = u * u * u * p0.y + 3 * u * u * e * p1.y + 3 * u * e * e * p2.y + e * e * e * p3.y;
     const s = interpolate(t, [0, 0.16, 0.86, 1], [0.2, 1, 1, 0], clamp);
     const size = 104;
     return <CoinSticker key={i} chain="evm" size={size} k={2} flip={(f - t0) * 31} night={night} drop={night ? 0 : 1} style={{ position: "absolute", left: x - size / 2, top: y - size / 2, scale: `${s}`, filter: night ? nightOutline() : undefined }} />;
@@ -472,6 +477,13 @@ function World({ f, theme }: { f: number; theme: Theme }) {
 
   return (
     <AbsoluteFill>
+      {/* the Send button: under the slip in both its layers, so the slip never ducks behind it mid-hop (QA #9) */}
+      {showBtn ? (
+        <div style={{ position: "absolute", left: BTN.x, top: BTN.y, translate: "-50% -50%", opacity: btnIn.opacity, scale: `${btnIn.sx * btnOut} ${btnIn.sy * btnOut}` }}>
+          <StickerButton label="Send 0.80 ETH" k={2.05} theme={theme} press={press} />
+        </div>
+      ) : null}
+
       {/* the seller's back pocket (bottom-left corner): back, the slip when it is in it, front */}
       <PocketJeans scale={POCKET_S} part="back" fabric night={night} drop={night ? 0 : 1} style={pocketStyle} />
       {slip.show && slip.layer === "pocket" && !slipHeld ? slipNode : null}
@@ -484,12 +496,8 @@ function World({ f, theme }: { f: number; theme: Theme }) {
         </div>
       ) : null}
 
-      {/* the Send button */}
-      {showBtn ? (
-        <div style={{ position: "absolute", left: BTN.x, top: BTN.y, translate: "-50% -50%", opacity: btnIn.opacity, scale: `${btnIn.sx * btnOut} ${btnIn.sy * btnOut}` }}>
-          <StickerButton label="Send 0.80 ETH" k={2.05} theme={theme} press={press} />
-        </div>
-      ) : null}
+      {/* the drained coins, under the card and its charms */}
+      {coins}
 
       {/* hands behind the card, the card with its charms, hands in front */}
       {hand(hl, "back", "L")}
@@ -524,7 +532,7 @@ function World({ f, theme }: { f: number; theme: Theme }) {
                 { coin: "SOL", amount: 12 },
                 { coin: "USDC", amount: 800, network: "base" },
               ]}
-              order={f < REORDER ? "given" : "value"}
+              order="given"
             />
           }
           charms={charms}
@@ -540,7 +548,6 @@ function World({ f, theme }: { f: number; theme: Theme }) {
       {slipHeld ? hand(hr, "back", "R") : null}
       {slip.show && (slip.layer === "top" || slipHeld) ? slipNode : null}
       {hand(hr, slipHeld ? "front" : "both", "R")}
-      {coins}
     </AbsoluteFill>
   );
 }
@@ -554,27 +561,31 @@ function Caption({ text, size, seed }: { text: string; size: number; seed: strin
   );
 }
 
-// contact frames on the VO words; each holds ≥ 0.8 s + 0.25 s per word after it lands (slapped over by the next one)
+// contact frames on the VO words; each holds ≥ 0.8 s + 0.25 s per word after it lands, then is slapped over by the next.
+// A replacing caption appears on its slap's frame 2 (already opaque, scale 1.15) and the outgoing one stays up until
+// then, so the band is never empty or half-transparent at a swap (QA #2).
 const CAP2 = T.before - 2;
 const CAP3 = T.used + 2;
 const CAP4 = T.how + 1;
 const CAPTIONS = [
-  { at: T.catchW, until: CAP2, text: "But there's a catch.", size: 124 },
-  { at: CAP2, until: CAP3, text: "Signed before\nthe sale.", size: 116 },
-  { at: CAP3, until: CAP4, text: "Used after it.", size: 140 },
-  { at: CAP4, until: T.end + 30, text: "Is it clean?", size: 150 },
+  { at: T.catchW, text: "But there's a catch.", size: 124 },
+  { at: CAP2, text: "Signed before the sale.", size: 102 }, // one line inside the 1080 square: two lines sat on the glove and the band (QA #8)
+  { at: CAP3, text: "Used after it.", size: 140 },
+  { at: CAP4, text: "Is it clean?", size: 150 },
 ];
 
 function Captions({ f }: { f: number }) {
   return (
     <AbsoluteFill>
-      {CAPTIONS.map((c) =>
-        f >= c.at - 4 && f < c.until - 4 ? (
+      {CAPTIONS.map((c, i) => {
+        const from = i === 0 ? c.at - 4 : c.at - 2;
+        const until = i < CAPTIONS.length - 1 ? CAPTIONS[i + 1].at - 2 : T.end + 30;
+        return f >= from && f < until ? (
           <Sequence key={c.text} from={c.at - 4} layout="none">
             <Caption text={c.text} size={c.size} seed={`c1-${c.at}`} />
           </Sequence>
-        ) : null,
-      )}
+        ) : null;
+      })}
     </AbsoluteFill>
   );
 }
@@ -610,23 +621,17 @@ function Sounds() {
 
 export default function C1() {
   const f = useCurrentFrame();
-  const { height } = useVideoConfig();
   const cam = camera(f);
   const whip = whipOut(f);
-  // the blind's edge, as in the kit's NightBlind: Night is drawn above it, Day below it, for its 18-frame fall
-  const fall = interpolate(f, [T.blind, T.blind + 18], [0, 1], { ...clamp, easing: EASE2.fall });
-  const edge = fall * height;
-  const blindDone = f >= T.blind + 18;
   const view = (node: ReactNode) => (
     <AbsoluteFill style={{ translate: `${whip.dx}px 0`, scale: `${whip.smear} 1` }}>
       <AbsoluteFill style={{ transform: `translate(960px, 540px) scale(${cam.s}) translate(${-cam.x}px, ${-cam.y}px)`, transformOrigin: "0 0" }}>{node}</AbsoluteFill>
     </AbsoluteFill>
   );
+  // Night from frame 0: the roller blind is the P6 → C1 cut (nightBlindCut), falling over P6's last frame (QA #6)
   return (
-    <AbsoluteFill style={{ background: blindDone ? NIGHT.ground : C.ground, overflow: "hidden" }}>
-      {!blindDone ? view(<World f={f} theme="day" />) : null}
-      {!blindDone ? <NightBlind at={T.blind} night={NIGHT.ground} /> : null}
-      <AbsoluteFill style={{ clipPath: blindDone ? undefined : `inset(0 0 ${Math.max(0, height - edge)}px 0)` }}>{view(<World f={f} theme="night" />)}</AbsoluteFill>
+    <AbsoluteFill style={{ background: NIGHT.ground, overflow: "hidden" }}>
+      {view(<World f={f} theme="night" />)}
       <AbsoluteFill style={{ translate: `${whip.dx}px 0`, scale: `${whip.smear} 1` }}>
         <Captions f={f} />
       </AbsoluteFill>

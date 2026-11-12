@@ -70,7 +70,6 @@ export function DeskStage({ frame }: { frame: number }) {
       <div style={{ position: "absolute", left: DESK.left, top: DESK.top + deskShake }}>
         <TradeDesk width={DESK.width} scale={2} legs={50} />
       </div>
-      <Offer frame={frame} x={stackX} lift={stackLift} arrive={arrive} shake={deskShake} />
       <Hand pose="pinch" x={sellerAt.x - 22 * recoil} y={sellerAt.y + heave + 30 * recoil} k={K} angle={84} sleeve={SLEEVE.seller} tag={null} pinch={1 - release} layer="back" />
       <Hand pose="pinch" x={bx} y={by} k={K} angle={84} mirror sleeve={SLEEVE.buyer} tag={null} pinch={buyerPinch} layer="back" />
       <SwingCard
@@ -85,6 +84,9 @@ export function DeskStage({ frame }: { frame: number }) {
         kickPeak={-9}
         front={(lift) => <HeavyFront width={O.width} lift={lift} />}
       />
+      {/* the offer stands on the desk's front edge, in front of the hanging card: at the crossing the charms pass behind
+          it, so "42,000 NEAR" stays readable (QA r2 #1) */}
+      <Offer frame={frame} x={stackX} lift={stackLift} arrive={arrive} shake={deskShake} />
       <Hand pose="pinch" x={sellerAt.x - 22 * recoil} y={sellerAt.y + heave + 30 * recoil} k={K} angle={84} sleeve={SLEEVE.seller} tag={null} pinch={1 - release} layer="front" />
       <Hand pose="pinch" x={bx} y={by} k={K} angle={84} mirror sleeve={SLEEVE.buyer} tag={null} pinch={buyerPinch} layer="front" />
     </AbsoluteFill>

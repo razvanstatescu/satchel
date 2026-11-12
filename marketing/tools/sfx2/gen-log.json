@@ -394,5 +394,395 @@
     "bytes": 20732,
     "characterCost": 4,
     "at": "2026-10-26T09:51:16.659Z"
+  },
+  {
+    "set": "intro",
+    "name": "barrage-cold-hit",
+    "version": 1,
+    "prompt": "A sudden harsh digital impact: a deep sub thump layered with a burst of bit-crushed static and a short electrical zap, hits instantly and stops dead, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.8,
+    "bytes": 20732,
+    "characterCost": 4,
+    "at": "2026-11-10T22:01:21.841Z"
+  },
+  {
+    "set": "intro",
+    "name": "glitch-hit-1",
+    "version": 1,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:23.781Z"
+  },
+  {
+    "set": "intro",
+    "name": "glitch-hit-2",
+    "version": 1,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:25.302Z"
+  },
+  {
+    "set": "intro",
+    "name": "glitch-hit-3",
+    "version": 1,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:27.075Z"
+  },
+  {
+    "set": "intro",
+    "name": "glitch-stutter",
+    "version": 1,
+    "prompt": "A fast digital stutter: one tiny electronic blip repeated about ten times and speeding up like a skipping CD, harsh and clean, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:28.662Z"
+  },
+  {
+    "set": "intro",
+    "name": "whip-fast",
+    "version": 1,
+    "prompt": "A very fast aggressive whip-pan whoosh, a sharp swipe of air passing left to right in a quarter of a second, cinematic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:30.308Z"
+  },
+  {
+    "set": "intro",
+    "name": "zoom-punch",
+    "version": 1,
+    "prompt": "A short punchy cinematic hit: a tight low thud with a quick bright click on top, like a camera zoom impact, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:32.272Z"
+  },
+  {
+    "set": "intro",
+    "name": "sub-drop",
+    "version": 1,
+    "prompt": "A deep cinematic sub bass drop, a low boom that falls in pitch and fades out over one second, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1.2,
+    "bytes": 30136,
+    "characterCost": 7,
+    "at": "2026-11-10T22:01:34.022Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-ping-1",
+    "version": 1,
+    "prompt": "One single modern smartphone notification sound, a short bright two-note glassy ping, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:35.841Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-ping-2",
+    "version": 1,
+    "prompt": "One single modern smartphone notification sound, a short soft marimba tick, two quick wooden notes, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:37.444Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-ping-3",
+    "version": 1,
+    "prompt": "One single modern chat app message notification, a short round bubbly pop, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:39.425Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-swarm",
+    "version": 1,
+    "prompt": "Dozens of different smartphone notification pings, message chimes and vibration buzzes piling up and overlapping faster and faster, a chaotic swarm, no music, no voices.",
+    "durationSeconds": 3,
+    "bytes": 73394,
+    "characterCost": 16,
+    "at": "2026-11-10T22:01:41.876Z"
+  },
+  {
+    "set": "intro",
+    "name": "phone-buzz",
+    "version": 1,
+    "prompt": "A smartphone vibrating twice on a hard wooden desk, two short buzzy rattles, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-11-10T22:01:43.404Z"
+  },
+  {
+    "set": "intro",
+    "name": "keyboard-burst",
+    "version": 1,
+    "prompt": "A frantic burst of fast mechanical keyboard typing, about twenty sharp clicky keystrokes in one second, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-11-10T22:02:24.593Z"
+  },
+  {
+    "set": "intro",
+    "name": "shutter-snap",
+    "version": 1,
+    "prompt": "A single crisp mechanical camera shutter click with a tiny mirror clack, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:26.206Z"
+  },
+  {
+    "set": "intro",
+    "name": "static-burst",
+    "version": 1,
+    "prompt": "A short burst of harsh analog TV static, white-noise hiss with crackles, abruptly cut, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:28.045Z"
+  },
+  {
+    "set": "intro",
+    "name": "news-murmur",
+    "version": 1,
+    "prompt": "Several television news anchors talking over each other, indistinct overlapping broadcast voices with no clear words, small TV speaker sound, no music.",
+    "durationSeconds": 4,
+    "bytes": 97845,
+    "characterCost": 22,
+    "at": "2026-11-10T22:02:30.167Z"
+  },
+  {
+    "set": "intro",
+    "name": "riser-digital",
+    "version": 1,
+    "prompt": "A tense rising digital riser, filtered white noise and a thin glassy synth tone sweeping upward for two seconds, getting brighter and faster, stopping abruptly at the top, no drums, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 2.5,
+    "bytes": 60856,
+    "characterCost": 14,
+    "at": "2026-11-10T22:02:32.369Z"
+  },
+  {
+    "set": "intro",
+    "name": "tape-stop",
+    "version": 1,
+    "prompt": "A tape-stop effect: chaotic electronic noise slowing down and falling in pitch to a dead stop in half a second, like a cassette player losing power, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:34.335Z"
+  },
+  {
+    "set": "intro",
+    "name": "sub-drone",
+    "version": 1,
+    "prompt": "A low dark ominous drone, a deep sustained synth bass with a gritty mid-range harmonic layer, slowly rising in pitch by about two semitones over eight seconds and stopping dead at the end, no drums, no melody, no music.",
+    "durationSeconds": 8,
+    "bytes": 193767,
+    "characterCost": 44,
+    "at": "2026-11-10T22:02:36.510Z"
+  },
+  {
+    "set": "intro",
+    "name": "paper-unstick-1",
+    "version": 1,
+    "prompt": "A strip of sticky tape torn loose from a painted wall, one short quick rip, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:38.281Z"
+  },
+  {
+    "set": "intro",
+    "name": "paper-unstick-2",
+    "version": 1,
+    "prompt": "A sticker torn loose from a wall in one fast tug, a short sticky crackle, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:42.976Z"
+  },
+  {
+    "set": "intro",
+    "name": "paper-unstick-3",
+    "version": 1,
+    "prompt": "A sheet of paper taped to a wall pulled loose at the corner, a short tearing rustle, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:02:44.959Z"
+  },
+  {
+    "set": "intro",
+    "name": "glitch-stutter",
+    "version": 2,
+    "prompt": "A fast accelerating digital stutter: one tiny electronic blip repeated about ten times, the gaps getting shorter and shorter so it speeds up into a buzz, like a skipping CD, harsh and clean, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:11.643Z"
+  },
+  {
+    "set": "intro",
+    "name": "zoom-punch",
+    "version": 2,
+    "prompt": "A short punchy cinematic zoom hit: a sharp bright click and a tight mid-range thud hitting together at the very start, snappy and present, like a camera zoom impact, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:13.552Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-ping-1",
+    "version": 2,
+    "prompt": "A short bright glassy smartphone notification, two quick separate notes, ding-ding, the second note higher, crystal clear, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:15.161Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-ping-2",
+    "version": 2,
+    "prompt": "A short bright marimba notification tick, two quick high wooden mallet notes, tick-tock, crisp and clear, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:16.757Z"
+  },
+  {
+    "set": "intro",
+    "name": "notif-swarm",
+    "version": 2,
+    "prompt": "A swarm of smartphone notifications building up: it starts with a single ping, then more and more different pings, message chimes and vibration buzzes pile on top of each other, getting denser, faster and louder until the very end, a chaotic wall of alerts, no music, no voices.",
+    "durationSeconds": 3,
+    "bytes": 73394,
+    "characterCost": 16,
+    "at": "2026-11-10T22:08:18.731Z"
+  },
+  {
+    "set": "intro",
+    "name": "phone-buzz",
+    "version": 2,
+    "prompt": "A smartphone on a hard wooden desk vibrating twice: two separate short buzzy rattles with a clear pause between them, bzzt bzzt, close-mic, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.6,
+    "bytes": 15716,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:20.447Z"
+  },
+  {
+    "set": "intro",
+    "name": "keyboard-burst",
+    "version": 2,
+    "prompt": "A frantic rapid-fire burst of very fast mechanical keyboard typing, about twenty sharp clicky keystrokes packed into one second, no pauses, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 1,
+    "bytes": 25747,
+    "characterCost": 5,
+    "at": "2026-11-10T22:08:22.345Z"
+  },
+  {
+    "set": "intro",
+    "name": "static-burst",
+    "version": 2,
+    "prompt": "A short burst of bright harsh analog TV static, loud white-noise hiss with crackles across the whole spectrum, abruptly cut off, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.5,
+    "bytes": 13208,
+    "characterCost": 3,
+    "at": "2026-11-10T22:08:23.848Z"
+  },
+  {
+    "set": "intro",
+    "name": "riser-digital",
+    "version": 2,
+    "prompt": "A tense digital riser lasting the full duration: filtered white noise and a thin glassy synth tone sweeping steadily upward, getting louder, brighter and faster all the way to the very end, loudest and highest at the end, then cutting off abruptly, no drums, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 2.5,
+    "bytes": 60856,
+    "characterCost": 14,
+    "at": "2026-11-10T22:08:26.079Z"
+  },
+  {
+    "set": "intro",
+    "name": "sub-drone",
+    "version": 2,
+    "prompt": "A dark tense drone: a low buzzing synth bass note with gritty mid-range harmonics, like a distorted cello drone, steady and loud, slowly rising in pitch by two semitones over the whole duration, sustained to the very end and then stopping dead, no drums, no melody, no music.",
+    "durationSeconds": 9,
+    "bytes": 217590,
+    "characterCost": 49,
+    "at": "2026-11-10T22:08:28.508Z"
+  },
+  {
+    "set": "intro",
+    "name": "reveal-boom-1",
+    "version": 1,
+    "prompt": "A massive cinematic impact for a big reveal: a deep sub boom with a punchy transient, followed by a bright airy shimmer and sparkle tail that rings out, starts instantly with no pre-roll, no riser and no whoosh before the hit, clean, no music.",
+    "durationSeconds": 1.8,
+    "bytes": 43928,
+    "characterCost": 10,
+    "at": "2026-11-10T22:49:40.207Z"
+  },
+  {
+    "set": "intro",
+    "name": "reveal-boom-2",
+    "version": 1,
+    "prompt": "A massive cinematic impact for a big reveal: a deep sub boom with a punchy transient, followed by a bright airy shimmer and sparkle tail that rings out, starts instantly with no pre-roll, no riser and no whoosh before the hit, clean, no music.",
+    "durationSeconds": 1.8,
+    "bytes": 43928,
+    "characterCost": 10,
+    "at": "2026-11-10T22:49:42.432Z"
+  },
+  {
+    "set": "intro",
+    "name": "crt-off",
+    "version": 1,
+    "prompt": "An old CRT television switching off: a short high-pitched whine and a soft electric pop as the picture collapses, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-11-10T22:49:44.037Z"
+  },
+  {
+    "set": "intro",
+    "name": "suck-in",
+    "version": 1,
+    "prompt": "A fast reverse whoosh like a sharp inhale of air, rising quickly in intensity and pitch and stopping dead at its loudest point, sucked in, no impact, clean, dry, no music, no reverb tail.",
+    "durationSeconds": 0.7,
+    "bytes": 18224,
+    "characterCost": 4,
+    "at": "2026-11-10T22:49:45.710Z"
+  },
+  {
+    "set": "intro",
+    "name": "reveal-boom-1",
+    "version": 2,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music.",
+    "durationSeconds": 1.8,
+    "bytes": 43928,
+    "characterCost": 10,
+    "at": "2026-11-10T22:50:49.273Z"
+  },
+  {
+    "set": "intro",
+    "name": "reveal-boom-2",
+    "version": 2,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music.",
+    "durationSeconds": 1.8,
+    "bytes": 43928,
+    "characterCost": 10,
+    "at": "2026-11-10T22:50:51.439Z"
   }
 ]

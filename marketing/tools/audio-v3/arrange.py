@@ -77,8 +77,8 @@ def sweeps(y, sws, off, N=2048, H=512):
     freqs = np.fft.rfftfreq(N, 1 / SR)
     out = y.copy()
     for sw in sws:
-        a = int((sw['t0'] + off - 0.2) * SR)
-        b = int((sw['t1'] + off + 0.2) * SR)
+        a = max(0, int((sw['t0'] + off - 0.2) * SR))  # a sweep at the very start must not wrap to the end
+        b = min(len(y), int((sw['t1'] + off + 0.2) * SR))
         seg = y[a:b]
         L = len(seg)
         pad = np.zeros((L + 2 * N, 2))
@@ -147,6 +147,28 @@ def tick(level_db, seed=0):
     return s / np.max(np.abs(s)) * 10 ** (level_db / 20)
 
 
+def riser(dur, level_db, f0=180.0, f1=2400.0, seed=3):
+    """A synth riser that ends on its top: an exponential saturated-sine glide plus noise whose low-pass opens
+    (800 Hz -> 12 kHz), with an accelerating crescendo (-24 dB -> 0 dB). It is meant to be cut dead by a hard stop."""
+    t = np.arange(int(dur * SR)) / SR
+    p = t / dur
+    f = f0 * (f1 / f0) ** p
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    tone = 0.5 * np.tanh(2.5 * np.sin(ph)) + 0.25 * np.sin(2 * ph)
+    rng = np.random.default_rng(seed)
+    n = rng.standard_normal(len(t))
+    a = np.exp(-2 * np.pi * (800 * (12000 / 800) ** p) / SR)
+    y = np.empty_like(n)
+    acc = 0.0
+    for i in range(len(n)):
+        acc = a[i] * acc + (1 - a[i]) * n[i]
+        y[i] = acc
+    y /= np.std(y) + 1e-9
+    env = 10 ** ((-24 + 24 * p ** 2) / 20) * np.minimum(1, t / 0.02)
+    s = (0.6 * tone + 0.25 * y) * env
+    return s / np.max(np.abs(s)) * 10 ** (level_db / 20)
+
+
 def sub_hit(level_db, dur=2.6):
     t = np.arange(int(dur * SR)) / SR
     f = 36 + (78 - 36) * np.exp(-t / 0.09)
@@ -185,6 +207,8 @@ def main():
             t = e['t0']
             while t < e['t1'] - 1e-9:
                 add(heartbeat(e['db']), t); t += e['every']
+        elif e['type'] == 'riser':
+            add(riser(e['t1'] - e['t0'], e['db'], e.get('fromHz', 180.0), e.get('toHz', 2400.0)), e['t0'])
         elif e['type'] == 'ticks':
             t, k = e['t0'], 0
             while t < e['t1'] - 1e-9:
@@ -194,8 +218,8 @@ def main():
         a = int(round((h['t'] + off - 0.004) * SR))
         b = min(len(y), a + len(s))
         y[a:b] += s[:b - a, None]
-    # end: make sure the last 50 ms ramp to zero (clean ending)
-    k = int(0.05 * SR)
+    # end: make sure the last endFadeMs (default 50 ms) ramp to zero (a hard stop uses a few ms: no click, still a stop)
+    k = max(1, int(cfg.get('endFadeMs', 50) / 1000 * SR))
     y[-k:] *= np.linspace(1, 0, k)[:, None]
     peak = np.max(np.abs(y))
     # soft-knee clip above 0.9 only (touches just the few samples where a sub hit stacks on a kick)

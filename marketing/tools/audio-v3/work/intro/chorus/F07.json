@@ -1,0 +1,45 @@
+{
+ "id": "F07",
+ "plate": "T2-07",
+ "voice": "bill",
+ "text": "32 users thus far have signed a malicious payload",
+ "say": "32 users thus far have signed a malicious payload",
+ "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F07-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F07-tv.mp3"
+ },
+ "durationSec": 4.02,
+ "heard": {
+  "dry": "32 users thus far have signed a malicious payload",
+  "tv": "Thirty-two users thus far have signed a malicious payload"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22.8,
+   "momentaryMaxLufs": -21.1,
+   "truePeakDb": -8.2
+  },
+  "tv": {
+   "integratedLufs": -25,
+   "momentaryMaxLufs": -22.4,
+   "truePeakDb": -9.3
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "32 users thus far have signed a malicious payload",
+   "heardTv": "Thirty-two users thus far have signed a malicious payload"
+  },
+  {
+   "attempt": 1,
+   "ok": true,
+   "heardDry": "32 users thus far have signed a malicious payload",
+   "heardTv": "32 users thus far have signed a malicious payload"
+  }
+ ]
+}

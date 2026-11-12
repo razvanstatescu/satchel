@@ -37,16 +37,21 @@ const F = {
 const NOTE_LAND = onBeat(V09.start - 0.2); // the note slaps onto the card on the beat before the VO (35.5 s)
 const NOTE_SLIDE = NOTE_LAND + 15; // it lets go
 const NOTE_DROP = NOTE_SLIDE + 15; // off the card's edge, out of frame in 12 f
-const PRESS = onBeat(SC.wordAt("V09", "holder")); // the stranger taps Send on "holder" (38.5 s)
+// v5: the stranger taps on "Only" (the beat after the second sentence starts, 38.0 s), so "Not allowed" holds
+// ≥ 1.3 s and is gone before "Who can spend" slaps in; the teammate only enters once the stranger has left the frame.
+const PRESS = onBeat(V09.start + starts[1]); // the stranger taps Send (38.0 s)
 const NO = PRESS + 1; // the card says no
 const PILL = PRESS + 3;
 const ALLOW_IN = onBeat(SC.wordAt("V09", "someone")); // "Who can spend" slaps in (40.0 s, contact)
 const PRESS2 = onBeat(SC.wordAt("V09", "allow")); // the teammate taps Send (40.5 s) and it passes
 const SENT = PRESS2 + 3;
-const PILL_OUT = ALLOW_IN - 8; // "Not allowed" pops away before the allowance arrives
+const PILL_OUT = ALLOW_IN - SLAP_CONTACT - 9; // "Not allowed" pops away (6 f) and is gone 3 f before the allowance slap starts
+const STRANGER_OUT = PRESS + 26; // the stranger gives up and leaves (18 f, fully out of frame)
+const MATE_IN = Math.max(PRESS2 - 14, STRANGER_OUT + 18 + 6); // the teammate enters after the allowance has landed, ≥ 6 f after the stranger is gone
 
 // layout: the hero card, centred under the caption
-const O: SwingOpts = { fromX: 960, toX: 960, y: 446, width: 600 }; // v4: lower, so the pill clears the two-line caption
+// v5: lower and a little smaller, so the status pills get their own lane between the two-line caption and the band
+const O: SwingOpts = { fromX: 960, toX: 960, y: 490, width: 560 };
 const K = O.width / 400;
 const CARD_LEFT = O.fromX - O.width / 2;
 // Send button on the card face (UI units inside the 400 × 252 card)
@@ -76,11 +81,11 @@ export default function P4() {
     const followDown = ramp(frame, NOTE_SLIDE + lag, NOTE_DROP + 6 + lag, Easing.inOut(Easing.quad));
     const back = ramp(frame, NOTE_DROP + 12 + lag, NOTE_DROP + 16 + lag);
     const toStranger = ramp(frame, PRESS - 30 + lag, PRESS - 27 + lag);
-    const side = ramp(frame, PRESS + 4 + lag, PRESS + 7 + lag) * (1 - ramp(frame, PRESS + 40 + lag, PRESS + 44 + lag));
+    const side = ramp(frame, PRESS + 4 + lag, PRESS + 7 + lag) * (1 - ramp(frame, STRANGER_OUT + 14 + lag, STRANGER_OUT + 18 + lag));
     // the teammate: they look at him as he arrives, then beam (joy) when the send goes through
-    const toMate = ramp(frame, PRESS2 - 14 + lag, PRESS2 - 11 + lag);
+    const toMate = ramp(frame, MATE_IN + 4 + lag, MATE_IN + 7 + lag);
     const beam = ramp(frame, SENT + lag, SENT + 3 + lag) * (1 - ramp(frame, SENT + 16 + lag, SENT + 20 + lag));
-    const right = Math.max(toStranger * (1 - ramp(frame, PRESS + 40, PRESS + 46)), side, toMate);
+    const right = Math.max(toStranger * (1 - ramp(frame, STRANGER_OUT + 14, STRANGER_OUT + 20)), side, toMate);
     const lookNote = { x: lerp(-5, -4, followDown), y: lerp(-5, 5, followDown) };
     const lookX = lerp(lerp(lookNote.x * noteSeen, 0, back), 7, right);
     const lookY = lerp(lerp(lookNote.y * noteSeen, 0, back), -1, right);
@@ -93,7 +98,7 @@ export default function P4() {
     const smile = lerp(lerp(lerp(1, 1.25, back * (1 - toStranger)), 0.15, side), 1.6, beam) + 0.2 * toMate * (1 - side);
     return {
       worldAngle: angle,
-      face: { look: { x: lookX, y: lookY }, wide, tilt, smile, joy: beam, blink: Math.max(0.5 * side, slow * (frame < PRESS + 44 ? 1 : 0)) },
+      face: { look: { x: lookX, y: lookY }, wide, tilt, smile, joy: beam, blink: Math.max(0.5 * side, slow * (frame < STRANGER_OUT + 18 ? 1 : 0)) },
     };
   };
 
@@ -170,9 +175,9 @@ function PillSticker({ frame, at, out, tone, icon, word }: { frame: number; at: 
   if (frame < at || (out !== undefined && frame >= out + 6)) return null;
   const s = spring({ frame: frame - at, fps: FPS, config: SPRING2.pop });
   const gone = out === undefined ? 0 : interpolate(frame, [out, out + 2, out + 6], [0, -0.08, 1], { ...clamp, easing: EASE2.fall });
-  const rise = interpolate(s, [0, 1], [40, 0]);
+  // its own lane: it pops in place (no rise), growing from its bottom edge, and rests 8 px above the band
   return (
-    <div style={{ position: "absolute", left: BTN_C.x - 400, width: 800, top: O.y - 104 + rise, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
+    <div style={{ position: "absolute", left: BTN_C.x - 400, width: 800, top: PILL_TOP, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
       <div
         style={{
           display: "inline-flex",
@@ -200,6 +205,9 @@ function PillSticker({ frame, at, out, tone, icon, word }: { frame: number; at: 
     </div>
   );
 }
+
+/** the pill lane: its bottom edge (with its 8 px drop) 16 px above the card's band, ~50 px below the caption's descenders */
+const PILL_TOP = O.y - 16 - 8 - 92;
 
 function StatusPills({ frame }: { frame: number }) {
   return (
@@ -229,20 +237,26 @@ function Allowance({ frame }: { frame: number }) {
 // ── the teammate (tag sam.near): arrives from the right like the stranger, taps Send, and it goes through ──────────
 
 function Teammate({ frame, press }: { frame: number; press: number }) {
-  const inP = spring({ frame: frame - (PRESS2 - 18), fps: FPS, config: SPRING2.land });
+  const inP = spring({ frame: frame - MATE_IN, fps: FPS, config: SPRING2.land });
   const out = interpolate(frame, [PRESS2 + 28, PRESS2 + 46], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   if (inP < 0.001 || out >= 1) return null;
-  const x = BTN_C.x + 18 + lerp(560, 0, inP) + 420 * out;
-  const y = BTN_C.y + 4 + lerp(380, 0, inP) + 300 * out + 3 * K * (frame >= PRESS2 - 4 ? press : 0);
+  // in from the right edge at mid-height (a different path from the stranger's), out the same way, fully off frame
+  const x = BTN_C.x + 18 + lerp(820, 0, inP) + 820 * out;
+  const y = BTN_C.y + 4 + lerp(110, 0, inP) + 240 * out + 3 * K * (frame >= PRESS2 - 4 ? press : 0);
   const squash = frame >= PRESS2 && frame < PRESS2 + 3 ? 0.04 : 0;
   const hand = { pose: "tap" as const, x, y, k: K, angle: 34, mirror: true, sleeve: SLEEVE.sam, tag: null, press: frame >= PRESS2 - 4 ? press : 0 };
-  const wrist = handPoint(hand, "wrist");
+  // the tag sits on the sleeve; only its REST spot is clamped inside the margin, then it moves with the hand (in, the
+  // press and out), so it never stays behind (QA verify N1)
+  const rest = { x: BTN_C.x + 18, y: BTN_C.y + 4 };
+  const restWrist = handPoint({ ...hand, x: rest.x, y: rest.y, press: 0 }, "wrist");
   const dir = sleeveDir(34, 0, true);
+  const tagRest = { x: Math.min(1740, restWrist.x + 190 * dir.x), y: Math.min(962, restWrist.y + 190 * dir.y) };
+  const tag = { x: tagRest.x + (x - rest.x), y: tagRest.y + (y - rest.y) };
   return (
     <div style={{ position: "absolute", inset: 0, scale: `${1 - squash} ${1 + squash}`, transformOrigin: `${x}px ${y}px` }}>
       <Hand {...hand} />
       <SvgLayer>
-        <NameTag x={Math.min(1770, wrist.x + 190 * dir.x)} y={wrist.y + 190 * dir.y} text="sam.near" k={2.6} tilt={-2} />
+        <NameTag x={tag.x} y={tag.y} text="sam.near" k={2.6} tilt={-2} />
       </SvgLayer>
     </div>
   );
@@ -299,10 +313,10 @@ function Note({ frame }: { frame: number }) {
 
 function Stranger({ frame, press }: { frame: number; press: number }) {
   const inP = spring({ frame: frame - (PRESS - 22), fps: FPS, config: SPRING2.land });
-  const out = interpolate(frame, [PRESS + 26, PRESS + 44], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
+  const out = interpolate(frame, [STRANGER_OUT, STRANGER_OUT + 18], [0, 1], { ...clamp, easing: Easing.inOut(Easing.cubic) });
   if (inP < 0.001 || out >= 1) return null;
-  const x = BTN_C.x + 18 + lerp(560, 0, inP) + 420 * out; // the finger stays put: the card shakes under it
-  const y = BTN_C.y + 4 + lerp(380, 0, inP) + 300 * out + 3 * K * press;
+  const x = BTN_C.x + 18 + lerp(560, 0, inP) + 760 * out; // the finger stays put: the card shakes under it
+  const y = BTN_C.y + 4 + lerp(380, 0, inP) + 560 * out + 3 * K * press;
   const squash = frame >= PRESS && frame < PRESS + 3 ? 0.04 : 0;
   return (
     <div style={{ position: "absolute", inset: 0, scale: `${1 - squash} ${1 + squash}`, transformOrigin: `${x}px ${y}px` }}>

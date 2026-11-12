@@ -6,13 +6,13 @@ import { CardBack, CardWithCharms, Hand } from "../../illustration/characters";
 import { Sfx } from "../../lib/Sfx";
 import { FPS } from "../../lib/time";
 import { getScene, marker } from "../../lib/timeline";
-import { blinkSchedule, CaptionSlap, clamp, EASE2, eyeOpen, flipAt, slapAt, SPRING2 } from "../../motion";
+import { blinkSchedule, CaptionSlap, clamp, EASE2, eyeOpen, slapAt, SPRING2 } from "../../motion";
 import { SatchelCard } from "../../components/Sticker";
 import { nightOutline, NightRig, type Theme, WHIP_IN, whipSmear } from "../C1/parts";
 
 /**
  * T0 · The flip (72–76 s). The whip from the catch lands on Satchel #7, listed ("Paused for sale"), in bob's hand, still
- * in Night. bob gives it a flick: it lifts, winds back, and FLIPS (the film's one 3D move, kit flipAt on SPRING2.quick)
+ * in Night. bob gives it a flick: it lifts, winds back, and FLIPS (the film's one 3D move; its own spring, 180° in ≈ 10 f)
  * while Day sweeps back in with the rotation (the wipe's edge x = θ/180 · width, left → right). The back holds the three
  * P3 records under "History · 3 signatures" (the H1 plant paid off); it slaps down, the charms swing and smile again.
  * "Satchel keeps the receipts." Then the camera falls toward the ETH record on the riser; T1 cuts in on the drop.
@@ -27,7 +27,7 @@ const T = {
   end: F(sc.duration), // 120
 };
 const WIND = T.flip - 6; // the flick: lift and wind back
-const LAND = T.flip + 12; // it slaps down (contact)
+const LAND = T.flip + 14; // it slaps down (contact), as the overshoot peaks
 const PUSH = T.end - 17; // the camera falls toward the ETH record on the riser (after the caption's 1.8 s read)
 
 // ── layout ──────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -38,7 +38,7 @@ const U = (CW * 0.18) / 140;
 const GAP = 160 * 1.3 * U;
 const PIVOT_Y = CH + 4 * KC + 38 * U;
 const COIN_Y = PIVOT_Y + 98 * U;
-const CARD = { x: 960 - CW / 2, y: 372 };
+const CARD = { x: 960 - CW / 2, y: 428 }; // low enough that bob's glove clears the two-line caption (QA #14)
 const GRIP = { x: CARD.x + 30, y: CARD.y + 24 };
 const ETH_ROW = { x: CARD.x + KC * 198.5, y: CARD.y + KC * 138 }; // CardBack: the 2nd record's centre
 const RECORDS = HISTORY_7.map((r) => ({ chain: r.chain, label: r.label, state: "recorded" as const }));
@@ -47,13 +47,33 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const prog = (f: number, a: number, b: number, ease: (t: number) => number = EASE2.swing) => interpolate(f, [a, b], [0, 1], { ...clamp, easing: ease });
 const sp = (f: number, cfg: { mass: number; stiffness: number; damping: number }) => (f <= 0 ? 0 : spring({ frame: f, fps: FPS, config: cfg }));
 
-/** Card angle (deg): a wind-back of −12° on the flick, then the kit's flip (0 → 180 on quick, overshooting to ~196). */
+/**
+ * Card angle (deg): a wind-back of −12° on the flick, then T0's own flip spring (QA #12). The kit's flipAt
+ * (SPRING2.quick) turns in 3 frames, so the turn and the Day sweep read as a flash cut. This one is the same shape
+ * (ζ ≈ 0.63, the overshoot to ≈ 195° kept) at a third of the speed: 90° on f + 5, 180° on f + 10, settled by f + 22,
+ * so 4–5 frames show the card edge-on and the wipe edge travelling.
+ */
+const FLIP_SPRING = { mass: 1, stiffness: 90, damping: 12 } as const;
 export function t0Deg(f: number) {
   if (f < WIND) return 0;
   if (f < T.flip) return -12 * prog(f, WIND, T.flip, EASE2.out);
-  const p = flipAt(f, T.flip, FPS).deg / 180;
+  const p = spring({ frame: f - T.flip, fps: FPS, config: FLIP_SPRING });
   return -12 * (1 - p) + 180 * p;
 }
+/** First frame the turn reaches 180°: Day stays latched from here on, through the spring's undershoot (QA #13). */
+const DAY_LATCH = (() => {
+  for (let f = T.flip; f < T.flip + 40; f++) if (t0Deg(f) >= 180) return f;
+  return T.flip + 10;
+})();
+/** The 90° moment (fractional frame), for the whoosh's peak. */
+const EDGE_ON = (() => {
+  for (let f = T.flip; f < T.flip + 40; f++) {
+    const a = t0Deg(f);
+    const b = t0Deg(f + 1);
+    if (a < 90 && b >= 90) return f + (90 - a) / (b - a);
+  }
+  return T.flip + 5;
+})();
 /** Lift (sticker units): up on the flick, airborne through the flip, slapped down on LAND. */
 function cardLift(f: number) {
   if (f < LAND - 4) return 1.1 * prog(f, WIND, T.flip, EASE2.out);
@@ -137,8 +157,8 @@ function camera(f: number) {
 export default function T0() {
   const f = useCurrentFrame();
   const deg = t0Deg(f);
-  const wipe = Math.max(0, Math.min(1, deg / 180)); // Day sweeps back with the rotation (left → right)
-  const dayAll = f > T.flip && wipe >= 1;
+  const dayAll = f >= DAY_LATCH; // latched: the spring's undershoot never brings Night back (QA #13)
+  const wipe = dayAll ? 1 : Math.max(0, Math.min(1, deg / 180)); // Day sweeps back with the rotation (left → right)
   const dx = f < WHIP_IN.length ? WHIP_IN[f] : 0;
   const cam = camera(f);
   const push = pushAt(f);
@@ -161,12 +181,12 @@ export default function T0() {
       <AbsoluteFill style={{ transform: `translate(960px, 540px) scale(${push.s}) translate(${-push.x}px, ${-push.y}px)`, transformOrigin: "0 0" }}>
         <Sequence from={T.satchel - 4} layout="none">
           <div style={{ position: "absolute", left: 0, right: 0, top: 104, display: "flex", justifyContent: "center", whiteSpace: "pre-line", textAlign: "center" }}>
-            <CaptionSlap text={"Satchel keeps\nthe receipts."} size={120} seed="t0-receipts" />
+            <CaptionSlap text={"Satchel keeps\nthe receipts."} size={112} seed="t0-receipts" />
           </div>
         </Sequence>
       </AbsoluteFill>
       <Sfx name="whoosh-zip" at={0} align="peak" gainDb={0} />
-      <Sfx name="whoosh-soft" at={(T.flip + 1.5) / FPS} align="peak" gainDb={2} />
+      <Sfx name="whoosh-soft" at={EDGE_ON / FPS} align="peak" gainDb={2} />
       <Sfx name="charm-jingle" at={(T.flip + 6) / FPS} align="peak" gainDb={-8} />
       <Sfx name="sticker-slap" at={LAND / FPS} gainDb={-3} />
       <Sfx name="sticker-slap" at={T.satchel / FPS} gainDb={-13} />

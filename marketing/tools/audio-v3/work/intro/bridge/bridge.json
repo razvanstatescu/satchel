@@ -1,0 +1,102 @@
+{
+ "V00": {
+  "text": "That's why we built Satchel.",
+  "prev": "Seed phrases get copied. Signatures drain wallets. Signed once. Used later.",
+  "next": "Stick it on. Hand it over.",
+  "voice": {
+   "id": "EXAVITQu4vr4xnSDxMaL",
+   "name": "Sarah",
+   "model": "eleven_v4",
+   "format": "mp3_44100_128",
+   "settings": {
+    "stability": 0.45,
+    "similarity_boost": 0.8
+   }
+  },
+  "takes": [
+   {
+    "attempt": 0,
+    "seed": 7000,
+    "requestId": "WA5xjEFu9qedwFqs1aP7",
+    "raw": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t0.raw.mp3",
+    "mastered": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t0.mp3",
+    "duration": 1.7,
+    "heard": "That's why we built Satchel",
+    "ok": true,
+    "lufs": -17.9,
+    "truePeak": -3
+   },
+   {
+    "attempt": 1,
+    "seed": 7001,
+    "requestId": "HfvQ6iOdt3jWvXfk7Iac",
+    "raw": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t1.raw.mp3",
+    "mastered": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t1.mp3",
+    "duration": 1.72,
+    "heard": "That's why we built Satchel",
+    "ok": true,
+    "lufs": -17.7,
+    "truePeak": -4.5
+   },
+   {
+    "attempt": 2,
+    "seed": 7002,
+    "requestId": "1XAlblxeIybayB0PTuyO",
+    "raw": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t2.raw.mp3",
+    "mastered": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t2.mp3",
+    "duration": 1.8,
+    "heard": "That's why we built Satchel",
+    "ok": true,
+    "lufs": -17.7,
+    "truePeak": -2
+   },
+   {
+    "attempt": 3,
+    "seed": 7003,
+    "requestId": "Th0Kabay3p9xalvxf7Kc",
+    "raw": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t3.raw.mp3",
+    "mastered": "/Users/razvanstatescu/Documents/Work/near/Satchel/marketing/tools/audio-v3/work/intro/bridge/V00.t3.mp3",
+    "duration": 1.78,
+    "heard": "That's why we built Satchel",
+    "ok": true,
+    "lufs": -17.5,
+    "truePeak": -1.3
+   }
+  ],
+  "final": {
+   "attempt": 0,
+   "file": "v2/vo/V00.mp3",
+   "wav": "v2/intro/audio/wav/V00.wav",
+   "duration": 1.7,
+   "words": [
+    {
+     "text": "That's",
+     "start": 0.12,
+     "end": 0.36
+    },
+    {
+     "text": "why",
+     "start": 0.4,
+     "end": 0.52
+    },
+    {
+     "text": "we",
+     "start": 0.62,
+     "end": 0.74
+    },
+    {
+     "text": "built",
+     "start": 0.78,
+     "end": 0.98
+    },
+    {
+     "text": "Satchel.",
+     "start": 1.1,
+     "end": 1.56
+    }
+   ],
+   "lufs": -17.9,
+   "truePeak": -3
+  }
+ }
+}

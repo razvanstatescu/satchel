@@ -1,0 +1,39 @@
+{
+ "id": "F03",
+ "plate": "T1-04",
+ "voice": "bill",
+ "text": "private key information was inadvertently transmitted",
+ "say": "private key information was inadvertently transmitted",
+ "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F03-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F03-tv.mp3"
+ },
+ "durationSec": 3.44,
+ "heard": {
+  "dry": "Private key information was inadvertently transmitted",
+  "tv": "Private key information was inadvertently transmitted"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -23.1,
+   "momentaryMaxLufs": -21.8,
+   "truePeakDb": -9.2
+  },
+  "tv": {
+   "integratedLufs": -26.3,
+   "momentaryMaxLufs": -23.3,
+   "truePeakDb": -9.3
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Private key information was inadvertently transmitted",
+   "heardTv": "Private key information was inadvertently transmitted"
+  }
+ ]
+}

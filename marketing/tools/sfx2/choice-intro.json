@@ -1,0 +1,71 @@
+{
+  "sources": {
+    "glitch-stutter": "glitch-stutter.comp.wav",
+    "zoom-punch": "zoom-punch.comp.wav",
+    "notif-ping-1": "notif-ping-1.comp.wav",
+    "notif-ping-2": "notif-ping-2.comp.wav",
+    "phone-buzz": "phone-buzz.comp.wav",
+    "keyboard-burst": "keyboard-burst.comp.wav",
+    "notif-swarm": "notif-swarm.comp.wav",
+    "sub-drone": "sub-drone.comp.wav",
+    "static-burst": "static-burst.v2.mp3",
+    "riser-digital": "riser-digital.v2.mp3",
+    "reveal-boom-1": "reveal-boom-1.v2.mp3",
+    "reveal-boom-2": "reveal-boom-2.v2.mp3"
+  },
+  "promptFrom": {
+    "glitch-stutter": [
+      "spec:glitch-stutter"
+    ],
+    "zoom-punch": [
+      "spec:zoom-punch",
+      "regen:zoom-punch"
+    ],
+    "notif-ping-1": [
+      "spec:notif-ping-1"
+    ],
+    "notif-ping-2": [
+      "src:marimba-note"
+    ],
+    "phone-buzz": [
+      "spec:phone-buzz"
+    ],
+    "keyboard-burst": [
+      "spec:keyboard-burst",
+      "regen:keyboard-burst"
+    ],
+    "notif-swarm": [
+      "spec:notif-ping-1",
+      "regen:notif-ping-1",
+      "spec:notif-ping-3",
+      "spec:notif-swarm",
+      "regen:notif-swarm",
+      "spec:phone-buzz",
+      "src:marimba-note"
+    ],
+    "sub-drone": [
+      "regen:sub-drone"
+    ]
+  },
+  "notes": {
+    "glitch-stutter": "Composite: one blip from take 1 repeated 11 times, gaps shrinking 70 -> 18 ms into a buzz. Both takes repeated at a steady rate (55 and 75 ms).",
+    "zoom-punch": "Composite: take 1's thud (43-65 Hz, no click) raised an octave and saturated + take 2's first 45 ms (bright click). Take 1 had nothing above 200 Hz; take 2 was a bright hiss with no thud.",
+    "notif-ping-1": "Composite: take 1's glassy ping (~754 Hz) then the same ping a fourth up (~1007 Hz) 75 ms later. Both takes were a single note.",
+    "notif-ping-2": "Composite: the library's single marimba note as a falling E6-C6 tick-tock, 70 ms apart. Both takes were a muddy cluster (258-592 Hz).",
+    "notif-ping-3": "Take 1 as generated: a short round chat pop.",
+    "phone-buzz": "Composite: take 1's buzz (215 Hz + rattle) cut into two 0.2 s buzzes with a 0.12 s gap. Both takes buzzed once, continuously.",
+    "keyboard-burst": "Composite: both takes layered 30 ms apart; each had about 10-12 keystrokes a second against the brief's ~20.",
+    "notif-swarm": "Composite: 33 pings, chimes and buzzes from this set's takes, ever denser (3 -> 24 a second) and louder (-14 -> 0 dB) over 3 s, detuned and panned. Both takes started loud and decayed.",
+    "sub-drone": "Composite: take 2 (C2 drone with harmonics to ~500 Hz) extended by a phase-aligned loop, varispeed so the pitch rises 2 semitones over 8 s (65 -> 73.5 Hz), hard stop at 8.0 s. Take 1 sat at ~28 Hz and drifted down; take 2 was static and faded out.",
+    "static-burst": "Take 2 with a +8 dB high shelf at 3 kHz: both takes were mid-band crackle (centroid ~2.5 kHz), not white-noise hiss.",
+    "riser-digital": "Take 2, the last 2.0 s, so the file ends on its top (loudest and brightest), cut with a 4 ms fade. Take 1 dipped mid-way and faded out.",
+    "barrage-cold-hit": "Take 1 with a 30 Hz high-pass (its sub sat at 22-43 Hz) and cut at 0.5 s with a 60 ms fade, so it stops short.",
+    "sub-drop": "Take 1 (pitch falls 65 -> 22 Hz) with an 0.8 s fade-out and light saturation, so it fades as asked and reads on small speakers.",
+    "shutter-snap": "Take 1, started on its first strong click (clicks at ~5, 65, 120 and 165 ms).",
+    "news-murmur": "Take 1. Scribe speech-to-text found no words in it (empty transcript); the spectrum is voice-band, 200 Hz-2 kHz.",
+    "reveal-boom-1": "Retake (take 1 was a pure 43-65 Hz boom with no shimmer): punchy attack, 43 Hz boom ~0.45 s, then a bright ~9.6 kHz shimmer ringing from 0.5 s. 30 Hz high-pass, light saturation, 0.3 s tail fade.",
+    "reveal-boom-2": "Retake (take 1 was a pure sub boom): attack and a 43 Hz boom ~0.4 s, then a longer, slower bright shimmer (7-11.7 kHz) from 0.6 s. 30 Hz high-pass, light saturation, 0.3 s tail fade.",
+    "crt-off": "Take 1: a brief 12-13.4 kHz whine into a bright pop at 60-100 ms, then a 54-108 Hz collapse hum decaying. 40 Hz high-pass removes a 22 Hz rumble.",
+    "suck-in": "Take 1 (rises -65 -> 0 dB, centroid 2.7 -> 11.4 kHz), cut at 0.43 s where it is still within 1 dB of its peak, 4 ms fade: it stops dead on its loudest point. peakSec = its end."
+  }
+}

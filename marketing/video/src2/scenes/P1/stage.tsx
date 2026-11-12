@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
-import { interpolate, spring } from "remotion";
+import { interpolate, random, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { Check } from "lucide-react";
 import { type CharmFace, charmFill } from "../../brand/Charm";
 import { C, type Chain, CHAIN, display, mono, sans } from "../../brand/tokens";
-import { type CardCoin, CoinIcon, SatchelCard } from "../../components/Sticker";
+import { type CardCoin, CoinIcon, Pill, SatchelCard } from "../../components/Sticker";
 import { CardWithCharms, type CharmSlot, Hand, PhoneFrame } from "../../illustration/characters";
-import { blinkSchedule, CaptionSlap, CHARM_LAG, CHARM_SWING, clamp, EASE2, eyeOpen, pressAt, slapAt, SPRING2 } from "../../motion";
+import { blinkSchedule, CHARM_LAG, CHARM_SWING, clamp, EASE2, eyeOpen, FONT, K, pressAt, slapAt, SPRING2 } from "../../motion";
 
 /**
  * The product stage shared by P1 Mint, P2 Fill and P3 Send: one set, one light, one camera height.
@@ -153,7 +153,8 @@ export function WorldCard({
         ...style,
       }}
     >
-      <CardWithCharms width={CARD.w} id="7" lift={lift} bar={bar} charms={charms} front={<SatchelCard id="7" width={CARD.w} coins={toCoins(coins)} lift={lift} />} />
+      {/* order "given": BTC · ETH · SOL · +1 stays put while P2 counts the coins up (no re-sort when BTC overtakes ETH) */}
+      <CardWithCharms width={CARD.w} id="7" lift={lift} bar={bar} charms={charms} front={<SatchelCard id="7" width={CARD.w} coins={toCoins(coins)} order="given" lift={lift} />} />
       {children}
     </div>
   );
@@ -188,6 +189,37 @@ export function YoursSticker({ pop = 1, lift = 0 }: { pop?: number; lift?: numbe
         >
           Yours
         </span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The bible's pop exit (§5 T8 "pop swap"): 1 → 1.08 → 0 over t 0..1 (use 6 f). Scale only, never a fade.
+ */
+export const popOut = (t: number) =>
+  t <= 0 ? 1 : t >= 1 ? 0 : t < 0.35 ? lerp(1, 1.08, EASE2.out(t / 0.35)) : lerp(1.08, 0, EASE2.fall((t - 0.35) / 0.65));
+
+/**
+ * The minted card's "Active" pill (SatchelCard `pill="active"` in the phone's MintScreen), redrawn as an overlay at
+ * exactly the card's own layout (border 3, band 66, body padding 18/20, the total row) so the leaping card can leave
+ * the phone looking identical and shed the app's status pill mid-air (`out` 0..1, a pop exit). Render it as a
+ * WorldCard child, like YoursSticker; `lift` follows the card's lift (px).
+ */
+export function ActivePill({ out = 0, lift = 0 }: { out?: number; lift?: number }) {
+  const s = popOut(out);
+  if (s <= 0.001) return null;
+  const k = CARD.w / 400;
+  return (
+    <div style={{ position: "absolute", left: 0, top: -lift, width: 400, height: 252, transform: `scale(${k})`, transformOrigin: "0 0", pointerEvents: "none" }}>
+      <div style={{ width: 400, height: 252, border: "3px solid transparent", boxSizing: "border-box", display: "flex", flexDirection: "column" }}>
+        <div style={{ height: 66, flexShrink: 0 }} />
+        <div style={{ flex: 1, padding: "18px 20px 18px", boxSizing: "border-box" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, minWidth: 0 }}>
+            <span style={{ ...display(800), fontSize: 26, lineHeight: "36px", letterSpacing: "-0.02em", whiteSpace: "nowrap", visibility: "hidden" }}>Nothing inside yet</span>
+            <Pill kind="active" k={1} style={{ scale: `${s}` }} />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -430,22 +462,54 @@ export function TapHand({
 // ── captions (screen space) ─────────────────────────────────────────────────────────────────────────────────────
 export const CAPTION = { x: 770, y: 46, size: 112 } as const;
 
-/** A caption slap at the stage's caption spot (mount it inside a <Sequence> that starts at the slap). */
-export function CaptionAt({ text, seed, x = CAPTION.x, y = CAPTION.y, size = CAPTION.size }: { text: string; seed: string; x?: number; y?: number; size?: number }) {
+/**
+ * Caption swaps (QA v5, the film-wide rule; bible §2.16 "slapped over by the next one"): the outgoing caption stays
+ * until the incoming one has reached full opacity (its 2-frame anti-pop), so there is never an empty frame. Give the
+ * outgoing caption's Sequence `durationInFrames = next − from + SWAP`.
+ */
+export const SWAP = 2;
+
+/**
+ * The kit's CaptionSlap (motion/script.tsx) with the start scale as a prop: two-line captions slap from 1.1 so the
+ * overshoot never reaches the card band; one-liners keep the kit's 1.2. Otherwise identical (font, tilt, contact f4).
+ */
+function CaptionSlapFrom({ text, size, seed, from }: { text: string; size: number; seed: string; from: number }) {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const { sx, sy, opacity } = slapAt(frame, fps, 0, { from, squash: 0.05, drop: 0 });
+  const tilt = (random(`caption-${seed}`) - 0.5) * 4; // −2° … +2°
   return (
-    <div style={{ position: "absolute", left: x, top: y, whiteSpace: "pre-line", lineHeight: 0.98 }}>
-      <CaptionSlap text={text} seed={seed} size={size} />
+    <div style={{ display: "inline-block", fontFamily: FONT.display, fontWeight: 800, fontSize: size, lineHeight: 1, letterSpacing: "-0.035em", color: K.ink, opacity, scale: `${sx} ${sy}`, rotate: `${tilt}deg` }}>
+      {text}
     </div>
   );
 }
 
+/** A caption slap at the stage's caption spot (mount it inside a <Sequence> that starts at the slap). */
+export function CaptionAt({ text, seed, x = CAPTION.x, y = CAPTION.y, size = CAPTION.size }: { text: string; seed: string; x?: number; y?: number; size?: number }) {
+  return (
+    <div style={{ position: "absolute", left: x, top: y, whiteSpace: "pre-line", lineHeight: 0.98 }}>
+      <CaptionSlapFrom text={text} seed={seed} size={size} from={text.includes("\n") ? 1.1 : 1.2} />
+    </div>
+  );
+}
+
+/**
+ * The "Standard NEAR NFT" chip's exit (QA v5 #12): a 6 f pop that straddles the P1→P2 cut, `rel` = frames from the
+ * cut (P1: f − P1.end; P2: f). It starts 4 f before the cut and is gone on P2 f2, when "Fill it up." has reached full
+ * opacity and P1's caption leaves.
+ */
+export const chipOut = (rel: number) => interpolate(rel, [-4, 2], [0, 1], clamp);
+
 /** "Standard NEAR NFT": a white sticker chip beside "One NFT." (`f` = frames since its slap started). */
-export function NftChip({ f = 99 }: { f?: number }) {
+export function NftChip({ f = 99, out = 0 }: { f?: number; out?: number }) {
   const k = 2.05;
   const rest = Math.round(3 * k);
-  const s = slapAt(f, FPS, rest, { from: 1.28, squash: 0.07, drop: 24 });
+  const s = slapAt(f, FPS, rest, { from: 1.15, squash: 0.07, drop: 24 }); // 1.15: the overshoot stays clear of "One NFT."
+  const o = popOut(out);
+  if (o <= 0.001) return null;
   return (
-    <div style={{ position: "absolute", left: CAPTION.x + 498, top: CAPTION.y + 134, opacity: s.opacity, scale: `${s.sx} ${s.sy}`, rotate: "-2deg" }}>
+    <div style={{ position: "absolute", left: CAPTION.x + 514, top: CAPTION.y + 134, opacity: s.opacity, scale: `${s.sx * o} ${s.sy * o}`, rotate: "-2deg" }}>
       <div
         style={{
           display: "inline-flex",

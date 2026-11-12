@@ -56,9 +56,11 @@ const CAM_HOME: Cam = { x: 960, y: 540, z: 1 };
 const PUNCH_Z = 2.9; // close enough that each charm gets its own name sticker underneath (≥ 30 px between them)
 const CAM_PUNCH: Cam = { x: X0 + D, y: COIN_Y + (540 - 440) / PUNCH_Z, z: PUNCH_Z }; // coins at y 440: the chips leave the top, the bar stays
 const CAM_CARD: Cam = { x: X0 + D, y: 540, z: 1 };
-// V04: the promise top left, bob's card bottom right (his sleeve and tag still in frame)
-const V04_Z = 0.72;
-const V04_CARD = { x: 1350, top: 366 }; // screen
+/** The punch-in: a quick in-out (gathers over 2–3 f, settles by "Bitcoin.") instead of an ease-out's 1-frame snap. */
+const PUNCH_EASE = Easing.bezier(0.5, 0, 0.2, 1);
+// V04: the promise top left, bob's card bottom right (his sleeve and tag ≥ 90 px inside the frame: QA v5 r1 #5)
+const V04_Z = 0.68;
+const V04_CARD = { x: 1335, top: 366 }; // screen
 const CAM_V04: Cam = { x: X0 + D - (V04_CARD.x - 960) / V04_Z, y: TOP - (V04_CARD.top - 540) / V04_Z, z: V04_Z };
 
 const mixCam = (a: Cam, b: Cam, t: number): Cam => {
@@ -68,14 +70,28 @@ const mixCam = (a: Cam, b: Cam, t: number): Cam => {
   return { x: a.x + (b.x - a.x) * w, y: a.y + (b.y - a.y) * w, z };
 };
 
+/**
+ * The opening pull-back (frame 0 already moves): 1.12 → 1 over f0–15 on EASE2.out. Before frame 0 (an intro rendering
+ * H1's world at negative frames) the same move eases IN over PREROLL_F frames from rest at a closer framing and reaches
+ * EASE2.out's own starting speed exactly on frame 0, so the pull-back is one smooth in-out move across the join.
+ * EASE2.out = bezier(0.16, 1, 0.3, 1), whose slope at 0 is 1 / 0.16 (per T.ethSnap frames). Frames ≥ 0 are unchanged.
+ */
+const OPEN_V0 = 1 / (0.16 * T.ethSnap);
+const PREROLL_F = 12;
+function openMixAt(g: number) {
+  if (g >= 0) return kf(g, [0, T.ethSnap], [0, 1], EASE2.out);
+  const s = Math.min(-g, PREROLL_F);
+  return -OPEN_V0 * (s - (s * s) / (2 * PREROLL_F)); // velocity ramps 0 → OPEN_V0 over the preroll
+}
+const CAM_OPEN: Cam = { x: X0, y: TOP + 250, z: 1.12 };
+
 function camAt(g: number): Cam {
   // frame 0 already moves: the camera settles back from 1.12 as the card slides home and the first charms snap on
-  const open = kf(g, [0, T.ethSnap], [0, 1], EASE2.out);
-  let c = mixCam({ x: X0, y: TOP + 250, z: 1.12 }, CAM_HOME, open);
+  let c = mixCam(CAM_OPEN, CAM_HOME, openMixAt(g));
   // after the catch the camera drifts after the card (carry), so the held card isn't left hanging off-centre
   const follow = spring({ frame: g - T.hookLand - 2, fps: FPS, config: SPRING2.carry });
   c = { ...c, x: c.x + 0.45 * (X0 + D - 960) * follow };
-  c = mixCam(c, CAM_PUNCH, kf(g, [T.punchIn, T.punchIn + T.punchDur], [0, 1], EASE2.out));
+  c = mixCam(c, CAM_PUNCH, kf(g, [T.punchIn, T.punchIn + T.punchDur], [0, 1], PUNCH_EASE));
   c = mixCam(c, CAM_CARD, kf(g, [CAM.pullBack, CAM.pullBack + CAM.pullDur], [0, 1], EASE2.pan));
   c = mixCam(c, CAM_V04, kf(g, [CAM.reframe, CAM.reframe + CAM.reframeDur], [0, 1], EASE2.pan));
   return c;
@@ -95,14 +111,28 @@ function bounceAt(t: number) {
   return { lift: -REST * (1 - r), squash: sq };
 }
 
+/**
+ * The card's slide home. Since the cold open H0 slaps the card on in its rest pose (coordinator, 2026-11-11), the card
+ * is AT REST from H1 frame 0 (and at every negative frame an intro renders): `slideAt` is 1 everywhere. It used to slide
+ * up from 85% of the way on frame 0 and settle by `T.cardSettle` (f5); frames from f5 on are unchanged, and so are the
+ * camera's 1.12 → 1 settle and BTC's fall (both independent of the slide).
+ */
+const SLIDE_FROM = 0.85;
+const SLIDE_TRAVEL = 640; // world px below rest at slide 0
+const SLIDE_LIFT = 40; // px of lift at slide 0
+const SLIDE_V0 = ((1 - SLIDE_FROM) * 3) / T.cardSettle; // the old ease-out's slope at frame 0 (kept for H1_WORLD)
+function slideAt(_g: number) {
+  return 1;
+}
+
 function cardAt(g: number) {
-  const slide = kf(g, [0, T.cardSettle], [0.85, 1], Easing.out(Easing.cubic));
+  const slide = slideAt(g);
   const ho = handoffAt(g - T.handoff, FPS, { fromX: X0, toX: X0 + D, rest: REST });
   const b = bounceAt(g - BOUNCE);
   return {
     cx: ho.x,
-    top: TOP + (1 - slide) * 640 + ho.arcY,
-    lift: ho.lift + (1 - slide) * 40 + b.lift, // px above rest; the hard shadow stays on the ground
+    top: TOP + (1 - slide) * SLIDE_TRAVEL + ho.arcY,
+    lift: ho.lift + Math.min(1 - slide, 1 - SLIDE_FROM) * SLIDE_LIFT + b.lift, // px above rest; the hard shadow stays on the ground
     rotate: ho.rotate,
     scale: ho.scale,
     squash: ho.squash + b.squash,
@@ -140,6 +170,12 @@ function fallAt(i: number, g: number) {
     { from: { x: 2000, y: 170 }, ctrl: { x: (2000 + hook.x) / 2, y: (170 + hook.y) / 2 } },
   ];
   const { from: a, ctrl: c } = paths[i];
+  if (i === 0 && g < t0) {
+    // before frame 0 (an intro rendering H1's world): BTC was already falling, in a straight line at its frame-0
+    // velocity (≈ 101 world px/f, almost straight down), so it drops into the top-left of the frame and is mid-fall on 0
+    const v0 = { x: 2 * (c.x - a.x) * (0.55 / dur), y: 2 * (c.y - a.y) * (0.55 / dur) };
+    return { x: a.x + v0.x * (g - t0), y: a.y + v0.y * (g - t0), vx: v0.x, vy: v0.y, visible: true };
+  }
   const bx = (1 - u) * (1 - u) * a.x + 2 * u * (1 - u) * c.x + u * u * hook.x;
   const by = (1 - u) * (1 - u) * a.y + 2 * u * (1 - u) * c.y + u * u * hook.y;
   const dx = 2 * (1 - u) * (c.x - a.x) + 2 * u * (hook.x - c.x);
@@ -269,7 +305,7 @@ function FallingCharm({ i, g }: { i: number; g: number }) {
 // ── hands ─────────────────────────────────────────────────────────────────────────────────────────────────────
 const CORNER = { x: 16, y: 16 }; // alice's thumb on the top-left corner (card px)
 const ALICE_ANGLE = 104; // fingers right, the arm from the left
-const BOB_ANGLE = 128; // mirrored: fingers down-left, the arm reaching down from the upper right
+const BOB_ANGLE = 142; // mirrored: fingers down-left, the arm reaching down from the upper right (tag ≥ 90 px inside)
 
 /** alice (card px, inside the card's swinging frame): reach, pinch, peel, carry, let go, leave. */
 function aliceAt(g: number, peel: number) {
@@ -313,6 +349,12 @@ const WORDS = [
   { text: "Solana.", at: T.wSol },
 ];
 const wordX = WORDS.map((_, i) => 960 + (i - 1) * GAP * PUNCH_Z);
+/**
+ * The name stickers are stuck on the WORLD (under their charms), laid out at the punch-in's screen size: when the
+ * camera pulls back they shrink and travel with their charms, then come unstuck and drop (QA v5 r1 #4: as screen-space
+ * stickers they used to float over the shrinking charms and card for ~6 f).
+ */
+const wordWorld = WORDS.map((_, i) => ({ x: CAM_PUNCH.x + (wordX[i] - 960) / PUNCH_Z, y: CAM_PUNCH.y + (WORD_Y - 540) / PUNCH_Z }));
 
 const LOCKUP = { x: 150, y: 184, h: 124 };
 const LINE_SIZE = 112;
@@ -377,14 +419,17 @@ export function HookShot({ g }: { g: number }) {
         {bobProps ? <Hand {...bobProps} layer="front" /> : null}
         <FallingCharm i={0} g={g} />
         <FallingCharm i={2} g={g} />
+        {/* the name stickers, stuck under their charms (world); drawn at punch-in screen size, scaled by 1 / PUNCH_Z */}
+        {WORDS.map((w, i) => (
+          <div key={w.text} style={{ position: "absolute", left: wordWorld[i].x, top: wordWorld[i].y, scale: `${1 / PUNCH_Z}`, transformOrigin: "0 0" }}>
+            <StickerCaption text={w.text} size={WORD_SIZE} x={0} y={0} f={g - (w.at - 4)} out={g - (CAM.wordsOut + 2 * i)} seed={`word-${i}`} corner="tr" away={i - 1 || 0.3} exit="fall" from={1.1} />
+          </div>
+        ))}
       </div>
 
       {/* screen-space captions */}
       <StickerCaption text="Stick it on." size={CAPTION} x={960} y={ZONE_Y} f={g - T.stickIn} out={g - T.stickOut} seed="stick" corner="tl" away={-1} />
       <StickerCaption text="Hand it over." size={CAPTION} x={960} y={ZONE_Y} f={g - T.handIn} out={g - T.handOut} seed="hand" corner="br" away={1} />
-      {WORDS.map((w, i) => (
-        <StickerCaption key={w.text} text={w.text} size={WORD_SIZE} x={wordX[i]} y={WORD_Y} f={g - (w.at - 4)} out={g - (CAM.wordsOut + 2 * i)} seed={`word-${i}`} corner="tr" away={i - 1 || 0.3} exit="fall" />
-      ))}
       <StickerCaption text="One NFT." size={114} x={960} y={ZONE_Y} f={g - (T.wNft - 5)} out={g - CAM.oneOut} seed="one-nft" corner="br" away={1} />
       <InkLine size={LINE_SIZE} x={LOCKUP.x - 6} y={LINE_Y} f={g - (T.wWhoever - 6)} seed="promise">
         Whoever holds it
@@ -395,4 +440,36 @@ export function HookShot({ g }: { g: number }) {
       <SlapLockup x={LOCKUP.x} y={LOCKUP.y} h={LOCKUP.h} f={g - (T.wSatchel - 6)} />
     </AbsoluteFill>
   );
+}
+
+// ── the hook's pose as data (for the H0 cold open's hand-off; see marketing/notes/intro-research/h1-handoff.md) ─────
+/** H1's world constants (world px = screen px at zoom 1). The card box is CW × CH at (cx − CW / 2, top). */
+export const H1_WORLD = { CW, CH, K, REST, X0, D, TOP, U, GAP, PIVOT_Y, COIN_DY, SLIDE_FROM, SLIDE_TRAVEL, SLIDE_V0, CAM_OPEN, CAM_HOME, OPEN_V0, PREROLL_F } as const;
+
+/** World → screen for a camera pose (the transform HookShot applies to its world layer). */
+export const worldToScreen = (p: { x: number; y: number }, cam: Cam, thump = 0) => ({
+  x: 960 + (p.x - cam.x) * cam.z,
+  y: 540 + thump + (p.y - cam.y) * cam.z,
+});
+
+/**
+ * Everything HookShot draws at clock g, as plain numbers: the camera, the card box (centre x, top, lift, rotation,
+ * scale, squash, peel), the three falling charms (pivot = stem top, velocity in world px/f, visibility) and the charm
+ * slots on the bar. Pure; defined for any g, including negative frames (the card keeps sliding up from below at its
+ * frame-0 speed, BTC keeps falling at its frame-0 velocity, the camera eases into its pull-back from a closer framing
+ * over PREROLL_F frames; nothing else is on).
+ * `<HookShot g={g} />` renders exactly this, so an intro can render H1's own world for its last frames.
+ */
+export function h1PoseAt(g: number) {
+  const camera = camAt(g);
+  const thump = interpolate(g - T.hookLand, [0, 1, 5], [0, 6, 0], { ...clamp, easing: EASE2.out });
+  const card = cardAt(g);
+  return {
+    g,
+    camera,
+    thump,
+    card: { ...card, left: card.cx - CW / 2, width: CW, height: CH, peel: peelAt(g), shadow: Math.max(0, REST + card.lift) },
+    falling: CHAINS.map((chain, i) => ({ chain, ...fallAt(i, g), coinDy: COIN_DY })),
+    charms: CHAINS.map((_, i) => charmSlot(i, g, card)),
+  };
 }

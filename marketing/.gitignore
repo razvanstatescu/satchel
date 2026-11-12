@@ -7,3 +7,7 @@ video/.remotion/
 notes/probe/*.mp3
 *.log
 .DS_Store
+
+# FBI captures from the intro research: dropped from the film (notes/intro-research/sources.md, T2-11 and V1), kept local only
+video/public/v2/intro/raw/t2-gov-ic3-fbi-*.png
+video/public/v2/intro/raw/video/fbi-*

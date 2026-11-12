@@ -312,5 +312,240 @@
     "gainDb": -18.5,
     "source": "eleven_text_to_sound_v2 (v2)",
     "note": "v2 (2.4 s generation), cut at 1.925 s where the glide tops out at full level, 12 ms fade. v1 got quieter as it rose."
+  },
+  "barrage-cold-hit": {
+    "file": "v2/sfx/barrage-cold-hit.mp3",
+    "duration": 0.5,
+    "peakSec": 0.165,
+    "prompt": "A sudden harsh digital impact: a deep sub thump layered with a burst of bit-crushed static and a short electrical zap, hits instantly and stops dead, clean, dry, no music, no reverb tail.",
+    "gainDb": 3.5,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1 with a 30 Hz high-pass (its sub sat at 22-43 Hz) and cut at 0.5 s with a 60 ms fade, so it stops short."
+  },
+  "glitch-hit-1": {
+    "file": "v2/sfx/glitch-hit-1.mp3",
+    "duration": 0.2,
+    "peakSec": 0.035,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "gainDb": 0,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "glitch-hit-2": {
+    "file": "v2/sfx/glitch-hit-2.mp3",
+    "duration": 0.2,
+    "peakSec": 0.075,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "gainDb": 0.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "glitch-hit-3": {
+    "file": "v2/sfx/glitch-hit-3.mp3",
+    "duration": 0.2,
+    "peakSec": 0.065,
+    "prompt": "One short harsh digital glitch, a corrupted-data crackle with a bit-crushed buzz and a tiny electrical pop, starts instantly, clean, dry, no music, no reverb tail.",
+    "gainDb": -2.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "glitch-stutter": {
+    "file": "v2/sfx/glitch-stutter.mp3",
+    "duration": 0.427,
+    "peakSec": 0.365,
+    "prompt": "A fast digital stutter: one tiny electronic blip repeated about ten times and speeding up like a skipping CD, harsh and clean, clean, dry, no music, no reverb tail.",
+    "gainDb": -7.5,
+    "source": "composite",
+    "note": "Composite: one blip from take 1 repeated 11 times, gaps shrinking 70 -> 18 ms into a buzz. Both takes repeated at a steady rate (55 and 75 ms)."
+  },
+  "whip-fast": {
+    "file": "v2/sfx/whip-fast.mp3",
+    "duration": 0.3,
+    "peakSec": 0.085,
+    "prompt": "A very fast aggressive whip-pan whoosh, a sharp swipe of air passing left to right in a quarter of a second, cinematic, clean, dry, no music, no reverb tail.",
+    "gainDb": -2.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "zoom-punch": {
+    "file": "v2/sfx/zoom-punch.mp3",
+    "duration": 0.266,
+    "peakSec": 0.015,
+    "prompt": "A short punchy cinematic hit: a tight low thud with a quick bright click on top, like a camera zoom impact, clean, dry, no music, no reverb tail. + A short punchy cinematic zoom hit: a sharp bright click and a tight mid-range thud hitting together at the very start, snappy and present, like a camera zoom impact, clean, dry, no music, no reverb tail.",
+    "gainDb": 0.5,
+    "source": "composite",
+    "note": "Composite: take 1's thud (43-65 Hz, no click) raised an octave and saturated + take 2's first 45 ms (bright click). Take 1 had nothing above 200 Hz; take 2 was a bright hiss with no thud."
+  },
+  "sub-drop": {
+    "file": "v2/sfx/sub-drop.mp3",
+    "duration": 1.2,
+    "peakSec": 0.795,
+    "prompt": "A deep cinematic sub bass drop, a low boom that falls in pitch and fades out over one second, clean, dry, no music, no reverb tail.",
+    "gainDb": -9,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1 (pitch falls 65 -> 22 Hz) with an 0.8 s fade-out and light saturation, so it fades as asked and reads on small speakers."
+  },
+  "notif-ping-1": {
+    "file": "v2/sfx/notif-ping-1.mp3",
+    "duration": 0.342,
+    "peakSec": 0.085,
+    "prompt": "One single modern smartphone notification sound, a short bright two-note glassy ping, clean, dry, no music, no reverb tail.",
+    "gainDb": -4,
+    "source": "composite",
+    "note": "Composite: take 1's glassy ping (~754 Hz) then the same ping a fourth up (~1007 Hz) 75 ms later. Both takes were a single note."
+  },
+  "notif-ping-2": {
+    "file": "v2/sfx/notif-ping-2.mp3",
+    "duration": 0.283,
+    "peakSec": 0.015,
+    "prompt": "One single marimba note, middle register, struck once with a soft rubber mallet, warm wooden tone with a natural short decay, one note only, no other instruments, no reverb tail.",
+    "gainDb": -9.5,
+    "source": "composite",
+    "note": "Composite: the library's single marimba note as a falling E6-C6 tick-tock, 70 ms apart. Both takes were a muddy cluster (258-592 Hz)."
+  },
+  "notif-ping-3": {
+    "file": "v2/sfx/notif-ping-3.mp3",
+    "duration": 0.181,
+    "peakSec": 0.005,
+    "prompt": "One single modern chat app message notification, a short round bubbly pop, clean, dry, no music, no reverb tail.",
+    "gainDb": -0.5,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1 as generated: a short round chat pop."
+  },
+  "notif-swarm": {
+    "file": "v2/sfx/notif-swarm.mp3",
+    "duration": 3,
+    "peakSec": 2.575,
+    "prompt": "One single modern smartphone notification sound, a short bright two-note glassy ping, clean, dry, no music, no reverb tail. + A short bright glassy smartphone notification, two quick separate notes, ding-ding, the second note higher, crystal clear, clean, dry, no music, no reverb tail. + One single modern chat app message notification, a short round bubbly pop, clean, dry, no music, no reverb tail. + Dozens of different smartphone notification pings, message chimes and vibration buzzes piling up and overlapping faster and faster, a chaotic swarm, no music, no voices. + A swarm of smartphone notifications building up: it starts with a single ping, then more and more different pings, message chimes and vibration buzzes pile on top of each other, getting denser, faster and louder until the very end, a chaotic wall of alerts, no music, no voices. + A smartphone vibrating twice on a hard wooden desk, two short buzzy rattles, close-mic, clean, dry, no music, no reverb tail. + One single marimba note, middle register, struck once with a soft rubber mallet, warm wooden tone with a natural short decay, one note only, no other instruments, no reverb tail.",
+    "gainDb": -8.5,
+    "source": "composite",
+    "note": "Composite: 33 pings, chimes and buzzes from this set's takes, ever denser (3 -> 24 a second) and louder (-14 -> 0 dB) over 3 s, detuned and panned. Both takes started loud and decayed."
+  },
+  "phone-buzz": {
+    "file": "v2/sfx/phone-buzz.mp3",
+    "duration": 0.54,
+    "peakSec": 0.425,
+    "prompt": "A smartphone vibrating twice on a hard wooden desk, two short buzzy rattles, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -14.5,
+    "source": "composite",
+    "note": "Composite: take 1's buzz (215 Hz + rattle) cut into two 0.2 s buzzes with a 0.12 s gap. Both takes buzzed once, continuously."
+  },
+  "keyboard-burst": {
+    "file": "v2/sfx/keyboard-burst.mp3",
+    "duration": 0.98,
+    "peakSec": 0.465,
+    "prompt": "A frantic burst of fast mechanical keyboard typing, about twenty sharp clicky keystrokes in one second, close-mic, no voices, clean, dry, no music, no reverb tail. + A frantic rapid-fire burst of very fast mechanical keyboard typing, about twenty sharp clicky keystrokes packed into one second, no pauses, close-mic, no voices, clean, dry, no music, no reverb tail.",
+    "gainDb": -3.5,
+    "source": "composite",
+    "note": "Composite: both takes layered 30 ms apart; each had about 10-12 keystrokes a second against the brief's ~20."
+  },
+  "shutter-snap": {
+    "file": "v2/sfx/shutter-snap.mp3",
+    "duration": 0.2,
+    "peakSec": 0.105,
+    "prompt": "A single crisp mechanical camera shutter click with a tiny mirror clack, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": 0,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1, started on its first strong click (clicks at ~5, 65, 120 and 165 ms)."
+  },
+  "static-burst": {
+    "file": "v2/sfx/static-burst.mp3",
+    "duration": 0.3,
+    "peakSec": 0.045,
+    "prompt": "A short burst of bright harsh analog TV static, loud white-noise hiss with crackles across the whole spectrum, abruptly cut off, clean, dry, no music, no reverb tail.",
+    "gainDb": -12,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "Take 2 with a +8 dB high shelf at 3 kHz: both takes were mid-band crackle (centroid ~2.5 kHz), not white-noise hiss."
+  },
+  "news-murmur": {
+    "file": "v2/sfx/news-murmur.mp3",
+    "duration": 4,
+    "peakSec": 3.005,
+    "prompt": "Several television news anchors talking over each other, indistinct overlapping broadcast voices with no clear words, small TV speaker sound, no music.",
+    "gainDb": -13,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1. Scribe speech-to-text found no words in it (empty transcript); the spectrum is voice-band, 200 Hz-2 kHz."
+  },
+  "riser-digital": {
+    "file": "v2/sfx/riser-digital.mp3",
+    "duration": 1.995,
+    "peakSec": 1.995,
+    "prompt": "A tense digital riser lasting the full duration: filtered white noise and a thin glassy synth tone sweeping steadily upward, getting louder, brighter and faster all the way to the very end, loudest and highest at the end, then cutting off abruptly, no drums, clean, dry, no music, no reverb tail.",
+    "gainDb": -13.5,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "Take 2, the last 2.0 s, so the file ends on its top (loudest and brightest), cut with a 4 ms fade. Take 1 dipped mid-way and faded out."
+  },
+  "tape-stop": {
+    "file": "v2/sfx/tape-stop.mp3",
+    "duration": 0.485,
+    "peakSec": 0.015,
+    "prompt": "A tape-stop effect: chaotic electronic noise slowing down and falling in pitch to a dead stop in half a second, like a cassette player losing power, clean, dry, no music, no reverb tail.",
+    "gainDb": -2.5,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "sub-drone": {
+    "file": "v2/sfx/sub-drone.mp3",
+    "duration": 8,
+    "peakSec": 3.465,
+    "prompt": "A dark tense drone: a low buzzing synth bass note with gritty mid-range harmonics, like a distorted cello drone, steady and loud, slowly rising in pitch by two semitones over the whole duration, sustained to the very end and then stopping dead, no drums, no melody, no music.",
+    "gainDb": -15,
+    "source": "composite",
+    "note": "Composite: take 2 (C2 drone with harmonics to ~500 Hz) extended by a phase-aligned loop, varispeed so the pitch rises 2 semitones over 8 s (65 -> 73.5 Hz), hard stop at 8.0 s. Take 1 sat at ~28 Hz and drifted down; take 2 was static and faded out."
+  },
+  "paper-unstick-1": {
+    "file": "v2/sfx/paper-unstick-1.mp3",
+    "duration": 0.4,
+    "peakSec": 0.225,
+    "prompt": "A strip of sticky tape torn loose from a painted wall, one short quick rip, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -8,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "paper-unstick-2": {
+    "file": "v2/sfx/paper-unstick-2.mp3",
+    "duration": 0.4,
+    "peakSec": 0.185,
+    "prompt": "A sticker torn loose from a wall in one fast tug, a short sticky crackle, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -9,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "paper-unstick-3": {
+    "file": "v2/sfx/paper-unstick-3.mp3",
+    "duration": 0.4,
+    "peakSec": 0.125,
+    "prompt": "A sheet of paper taped to a wall pulled loose at the corner, a short tearing rustle, close-mic, clean, dry, no music, no reverb tail.",
+    "gainDb": -8,
+    "source": "eleven_text_to_sound_v2 (v1)"
+  },
+  "reveal-boom-1": {
+    "file": "v2/sfx/reveal-boom-1.mp3",
+    "duration": 1.6,
+    "peakSec": 0.135,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music.",
+    "gainDb": -1.5,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "Retake (take 1 was a pure 43-65 Hz boom with no shimmer): punchy attack, 43 Hz boom ~0.45 s, then a bright ~9.6 kHz shimmer ringing from 0.5 s. 30 Hz high-pass, light saturation, 0.3 s tail fade."
+  },
+  "reveal-boom-2": {
+    "file": "v2/sfx/reveal-boom-2.mp3",
+    "duration": 1.6,
+    "peakSec": 0.085,
+    "prompt": "A huge bright cinematic reveal hit: a sharp punchy transient and a deep boom, layered with a long bright airy shimmer of sparkling chimes and glittering high frequencies that rings out for over a second, starts instantly with no pre-roll, no riser, no music.",
+    "gainDb": -0.5,
+    "source": "eleven_text_to_sound_v2 (v2)",
+    "note": "Retake (take 1 was a pure sub boom): attack and a 43 Hz boom ~0.4 s, then a longer, slower bright shimmer (7-11.7 kHz) from 0.6 s. 30 Hz high-pass, light saturation, 0.3 s tail fade."
+  },
+  "crt-off": {
+    "file": "v2/sfx/crt-off.mp3",
+    "duration": 0.683,
+    "peakSec": 0.085,
+    "prompt": "An old CRT television switching off: a short high-pitched whine and a soft electric pop as the picture collapses, clean, dry, no music, no reverb tail.",
+    "gainDb": 0.5,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1: a brief 12-13.4 kHz whine into a bright pop at 60-100 ms, then a 54-108 Hz collapse hum decaying. 40 Hz high-pass removes a 22 Hz rumble."
+  },
+  "suck-in": {
+    "file": "v2/sfx/suck-in.mp3",
+    "duration": 0.43,
+    "peakSec": 0.43,
+    "prompt": "A fast reverse whoosh like a sharp inhale of air, rising quickly in intensity and pitch and stopping dead at its loudest point, sucked in, no impact, clean, dry, no music, no reverb tail.",
+    "gainDb": -5.5,
+    "source": "eleven_text_to_sound_v2 (v1)",
+    "note": "Take 1 (rises -65 -> 0 dB, centroid 2.7 -> 11.4 kHz), cut at 0.43 s where it is still within 1 dB of its peak, 4 ms fade: it stops dead on its loudest point. peakSec = its end."
   }
 }

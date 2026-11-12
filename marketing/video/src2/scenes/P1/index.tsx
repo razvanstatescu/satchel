@@ -5,8 +5,10 @@ import { getScene } from "../../lib/timeline";
 import { Sfx } from "../../lib/Sfx";
 import { clamp, EASE2, pressAt, slapAt, SparkBurst, SPRING2 } from "../../motion";
 import {
+  ActivePill,
   CaptionAt,
   CARD,
+  chipOut,
   CHAINS3,
   cardGeo,
   charmBlink,
@@ -23,6 +25,7 @@ import {
   PHONE,
   releaseSwing,
   sp,
+  SWAP,
   type TagState,
   TagsLayer,
   TapHand,
@@ -82,7 +85,7 @@ export default function P1() {
   return (
     <AbsoluteFill style={{ background: C.ground }}>
       <P1World f={f} />
-      <P1Captions />
+      <P1Captions f={f} />
       <P1Sound />
     </AbsoluteFill>
   );
@@ -90,7 +93,7 @@ export default function P1() {
 
 /** The minted Mint screen as the leap leaves it: the card's spot empty, the footer slid away (P2 opens on this). */
 export function MintPhoneAfter({ footerOut = 1, slot = 1, state = "minted", press = 0, f = 0, cardScaleY = 1 }: { footerOut?: number; slot?: number; state?: MintState; press?: number; f?: number; cardScaleY?: number }) {
-  const gone = slot > 0;
+  const gone = slot > 0; // P1 passes slot 1 from the takeoff frame: the in-phone card and the leaping card never coexist
   return (
     <>
       <div style={{ position: "absolute", left: 0, top: 0, width: 390, height: 844 + 190 * footerOut }}>
@@ -109,12 +112,13 @@ export function MintPhoneAfter({ footerOut = 1, slot = 1, state = "minted", pres
 
 // ── the world layer (phone, hand, card, charms, tags) under a gentle camera ────────────────────────────────────
 function P1World({ f }: { f: number }) {
-  // camera: a slow push toward the button while alice mints, released as the card leaps (ends at exactly 1)
-  const push = 0.03 * ease(f, 0, T.crouch, 0, 1, EASE2.pan) * (1 - ease(f, T.takeoff - 2, T.land, 0, 1, EASE2.pan));
+  // camera: a slow push toward the button while alice mints, released into the crouch so it has settled when the card
+  // passes under "Mint a Satchel." (QA v5 #9; ends at exactly 1)
+  const push = 0.03 * ease(f, 0, T.crouch, 0, 1, EASE2.pan) * (1 - ease(f, T.takeoff - 6, T.takeoff + 2, 0, 1, EASE2.pan));
   const state: MintState = f < T.wallet ? "idle" : f < T.minting ? "wallet" : f < T.minted ? "minting" : "minted";
   const press = pressAt(f, T.press, 4, FPS).pressed;
   const crouch = f >= T.crouch && f < T.takeoff ? interpolate(f, [T.crouch, T.takeoff - 1], [0.96, 0.92], clamp) : 1;
-  const slot = f >= T.takeoff ? ease(f, T.takeoff, T.takeoff + 6, 0, 1, EASE2.out) : 0;
+  const slot = f >= T.takeoff ? 1 : 0;
   const footerOut = ease(f, T.minted, T.minted + 9, 0, 1, EASE2.fall); // the minted footer slides away: one coral (the card band)
   return (
     <AbsoluteFill style={{ scale: `${1 + push}`, transformOrigin: `${BUTTON.x}px ${BUTTON.y - 260}px` }}>
@@ -129,11 +133,16 @@ function P1World({ f }: { f: number }) {
 }
 
 // ── the leap ────────────────────────────────────────────────────────────────────────────────────────────────────
+// A low hop (QA v5 #9): the card leaves from the in-phone card's spot, only ~40 px under the caption's ink, so the arc
+// peaks at 60 px with a 3 % mid-air scale bump; the card's top stays ≥ ~170 (19 px clear of "Mint a Satchel.").
+// Height also lives in the hard shadow (liftPx), which doesn't move the card body.
+const ARC = 60;
+const BUMP = 0.03;
 const flight = (q: number) => {
   const p = interpolate(q, [T.takeoff, T.land], [0, 1], clamp);
   const pe = Easing.inOut(Easing.sin)(p);
   // the ground path (where the hard shadow falls) and the height above it
-  return { p, pe, gx: lerp(START.cx, END.cx, pe), gy: lerp(START.cy, END.cy, pe), h: 130 * Math.sin(Math.PI * p) };
+  return { p, pe, gx: lerp(START.cx, END.cx, pe), gy: lerp(START.cy, END.cy, pe), h: ARC * Math.sin(Math.PI * p) };
 };
 
 function FlyingCard({ f }: { f: number }) {
@@ -141,14 +150,17 @@ function FlyingCard({ f }: { f: number }) {
   const a = flight(f);
   const b = flight(f + 1);
   // size: from the in-phone card to the world card, a little bigger mid-air (closer to the camera)
-  const scale = lerp(START.w / END.w, 1, a.pe) + 0.12 * Math.sin(Math.PI * a.p);
+  const scale = lerp(START.w / END.w, 1, a.pe) + BUMP * Math.sin(Math.PI * a.p);
   // smear: stretch up to 1.06 along the motion on the fastest frames
   const vx = b.gx - a.gx;
   const vy = b.gy - b.h - (a.gy - a.h);
   const stretch = 1 + Math.min(0.06, Math.hypot(vx, vy) / 1300);
   const ang = (Math.atan2(vy, vx) * 180) / Math.PI;
   const liftPx = 30 * Math.sin(Math.PI * a.p); // height lives in the hard shadow (capped); the arc is the path
-  const badge = sp(f, T.takeoff + 4, SPRING2.pop);
+  // the crouch releases: it leaves at the in-phone crouch (0.92, about its bottom edge), stretches 1.05, settles
+  const sy = interpolate(f - T.takeoff, [0, 1, 3], [0.92, 1.05, 1], { ...clamp, easing: EASE2.out });
+  // it leaves the phone looking exactly like the in-phone card ("Yours" and "Active"), then sheds the app's pill mid-air
+  const pillOut = interpolate(f, [T.takeoff + 1, T.takeoff + 7], [0, 1], clamp);
   return (
     <div
       style={{
@@ -156,12 +168,16 @@ function FlyingCard({ f }: { f: number }) {
         left: a.gx - END.w / 2,
         top: a.gy - a.h + liftPx - G.H / 2,
         width: END.w,
+        height: G.H, // the card's box, so the transform origin is its centre (QA v5 #8: it was the top edge)
         transformOrigin: "50% 50%",
         transform: `rotate(${ang}deg) scale(${stretch}, ${1 / stretch}) rotate(${-ang}deg) scale(${scale})`,
       }}
     >
-      <WorldCard charms={[{ hidden: true }, { hidden: true }, { hidden: true }]} lift={liftPx / (8 * G.k)} bar={0} style={{ left: 0, top: 0 }} />
-      <YoursSticker pop={badge} lift={liftPx} />
+      <div style={{ position: "absolute", inset: 0, scale: `1 ${sy}`, transformOrigin: "50% 100%" }}>
+        <WorldCard charms={[{ hidden: true }, { hidden: true }, { hidden: true }]} lift={liftPx / (8 * G.k)} bar={0} style={{ left: 0, top: 0 }} />
+        <YoursSticker lift={liftPx} />
+        <ActivePill out={pillOut} lift={liftPx} />
+      </div>
     </div>
   );
 }
@@ -214,24 +230,24 @@ function LandedCard({ f }: { f: number }) {
 // ── captions ────────────────────────────────────────────────────────────────────────────────────────────────────
 export const P1_CAPTION_END = { text: "Three addresses.\nOne NFT.", seed: "p1-three" };
 
-function P1Captions() {
+function P1Captions({ f }: { f: number }) {
   return (
     <>
-      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1} layout="none">
+      <Sequence from={T.cap1} durationInFrames={T.cap2 - T.cap1 + SWAP} layout="none">
         <CaptionAt text="Mint a Satchel." seed="p1-mint" />
       </Sequence>
       <Sequence from={T.cap2} layout="none">
         <CaptionAt text={P1_CAPTION_END.text} seed={P1_CAPTION_END.seed} />
       </Sequence>
       <Sequence from={T.addr - 4} layout="none">
-        <ChipNow />
+        <ChipNow out={chipOut(f - T.end)} />
       </Sequence>
     </>
   );
 }
 
-function ChipNow() {
-  return <NftChip f={useCurrentFrame()} />;
+function ChipNow({ out }: { out: number }) {
+  return <NftChip f={useCurrentFrame()} out={out} />;
 }
 
 // ── sound ───────────────────────────────────────────────────────────────────────────────────────────────────────

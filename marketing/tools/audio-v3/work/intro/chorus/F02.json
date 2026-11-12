@@ -1,0 +1,39 @@
+{
+ "id": "F02",
+ "plate": "T1-01",
+ "voice": "matilda",
+ "text": "your funds might be at risk",
+ "say": "your funds might be at risk",
+ "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F02-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F02-tv.mp3"
+ },
+ "durationSec": 2.05,
+ "heard": {
+  "dry": "Your funds might be at risk",
+  "tv": "Your funds might be at risk"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -21.4,
+   "momentaryMaxLufs": -18.7,
+   "truePeakDb": -4.8
+  },
+  "tv": {
+   "integratedLufs": -21.2,
+   "momentaryMaxLufs": -17.4,
+   "truePeakDb": -6.7
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Your funds might be at risk",
+   "heardTv": "Your funds might be at risk"
+  }
+ ]
+}

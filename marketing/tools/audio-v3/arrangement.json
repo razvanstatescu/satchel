@@ -1,16 +1,16 @@
 {
- "_comment": "Bar-line edit of v3 take 2 (music_v1, seed 3313) onto the v4 film clock (133 s). v4 re-edit of the v3 arrangement (backup tools/audio-v3/_v3/data/arrangement.v3.json): the groove runs 1 s longer (half of its last bar repeated) to the hard stop on 59 (a beat), the tension starts at 60 as before, the sub hit moves to 67.5, the blocked strip to 110.5, and the ring-out is faded 1 s earlier so the last 0.5 s are silent at 133. The drop (76) and the landing (122) did not move. Raw take: sparse glockenspiel intro 0-8; bright groove 8-64; low drone 64-73.5 fading to silence by 76; 1-bar riser 76-78; DROP on 78; driving groove 78-126; held chord 126-129 and a clean ring-out to silence by 133.9.",
+ "_comment": "Bar-line edit of v3 take 2 (music_v1, seed 3313) onto the v5 body clock (129.5 s; the H0 cold open has its own bed). v5 re-edit of the v4 arrangement (backup tools/audio-v3/_v3/data/arrangement.v4.json): the groove now ends exactly on a source bar at the hard stop (56 = source 62), so v4's half-bar repeat before the stop is gone; the Night drone re-enters 1 s after the stop and repeats 2 bars to fill to the riser; the drop sits on T1's start (72.5); from the drop to the landing (46 s, as in v4) and through the outro every source/film relation is v4's, 3.5 s earlier. Raw take: sparse glockenspiel intro 0-8; bright groove 8-64; low drone 64-73.5 fading to silence by 76; 1-bar riser 76-78; DROP on 78; driving groove 78-126; held chord 126-129 and a clean ring-out to silence by 133.9.",
  "source": "tools/audio-v3/work/music/v3/score.music_v1.seed3313.raw.mp3",
  "out": "video/public/v2/music/score.mp3",
  "beatOffset": 0.025,
- "durationSec": 133,
+ "durationSec": 129.5,
  "markers": {
   "hookLand": 2.5,
-  "musicStop": 59,
-  "subHit": 67.5,
-  "drop": 76,
-  "landing": 122,
-  "endPress": 131.5
+  "musicStop": 56,
+  "subHit": 64.5,
+  "drop": 72.5,
+  "landing": 118.5,
+  "endPress": 128
  },
  "segments": [
   {
@@ -21,71 +21,65 @@
   },
   {
    "t0": 2.5,
-   "t1": 58,
+   "t1": 56,
    "s0": 8.5,
-   "why": "M1-M3: the groove kicks in on hookLand (source bar 8 + 1 beat, so bars stay on even seconds)"
+   "why": "M1-M3: the groove kicks in on hookLand (source bar 8 + 1 beat) and runs to source bar 62, the hard stop on musicStop"
   },
   {
-   "t0": 58,
-   "t1": 59,
-   "s0": 62,
-   "why": "half of the last groove bar again, up to the hard stop on 59"
-  },
-  {
-   "t0": 59,
-   "t1": 60,
+   "t0": 56,
+   "t1": 57,
    "silence": true,
-   "why": "M4: hard stop at musicStop; Night falls (the muted pluck is an SFX)"
+   "why": "M4: hard stop; Night falls (the muted pluck is an SFX)"
   },
   {
-   "t0": 60,
-   "t1": 64,
+   "t0": 57,
+   "t1": 60.5,
+   "s0": 66.5,
+   "why": "M4: the take's dark drone enters (beatless)"
+  },
+  {
+   "t0": 60.5,
+   "t1": 118.5,
    "s0": 66,
-   "why": "M4: the take's dark drone"
+   "why": "drone again from source bar 66 (a 2-bar repeat, s70 -> s66), its fade to silence, the 1-bar riser, the DROP on 72.5, the tech groove"
   },
   {
-   "t0": 64,
-   "t1": 122,
-   "s0": 66,
-   "why": "drone again (seamless repeat), its fade to silence, the 1-bar riser, the DROP on 76, the tech groove"
-  },
-  {
-   "t0": 122,
-   "t1": 133,
+   "t0": 118.5,
+   "t1": 129.5,
    "s0": 122,
-   "why": "M8/M9: the landing repeats one groove bar, then the held chord on 126 and the ring-out"
+   "why": "M8/M9: the landing repeats one groove bar (s124 -> s122, as v4), then the held chord on 122.5 and the ring-out"
   }
  ],
  "gain": [
   {
-   "t0": 60,
-   "t1": 67.5,
+   "t0": 57,
+   "t1": 64.5,
    "db": -6,
    "why": "the drone sits under the heartbeat"
   },
   {
-   "t0": 67.5,
-   "t1": 72,
+   "t0": 64.5,
+   "t1": 68.5,
    "db": -18,
-   "why": "near silence after the sub hit (the take's own fade continues to 74)"
+   "why": "near silence after the sub hit (the take's own fade continues to 70.5)"
   },
   {
-   "t0": 72,
-   "t1": 74,
+   "t0": 68.5,
+   "t1": 70.5,
    "db": -6,
    "ramp": true
   },
   {
-   "t0": 130,
-   "t1": 132.5,
+   "t0": 126.5,
+   "t1": 129,
    "db": -40,
    "ramp": true,
    "curve": "db",
-   "why": "gentle extra fade so the take's ring-out still sounds at endPress and ends by 132.5"
+   "why": "gentle extra fade so the take's ring-out still sounds at endPress and ends by 129"
   },
   {
-   "t0": 132.5,
-   "t1": 133,
+   "t0": 129,
+   "t1": 129.5,
    "db": -120,
    "why": "silence in the last 0.5 s"
   }
@@ -93,63 +87,63 @@
  "sweeps": [
   {
    "type": "lowpass",
-   "t0": 60,
-   "t1": 72,
+   "t0": 57,
+   "t1": 68.5,
    "fromHz": 380,
    "toHz": 380,
    "why": "Night: the drone darkened to a low pad"
   },
   {
    "type": "strip",
-   "t0": 110.5,
-   "t1": 114.5,
+   "t0": 107,
+   "t1": 111,
    "bassHz": 220,
    "tickHz": 8000,
    "tickGain": 0.35,
    "ramp": 0.15,
-   "why": "M7: the band drops to bass and tick for 2 bars"
+   "why": "M7: the band drops to bass and tick for 2 bars from blocked"
   },
   {
    "type": "highpass",
-   "t0": 116,
-   "t1": 122,
+   "t0": 112.5,
+   "t1": 118.5,
    "fromHz": 30,
    "toHz": 1200,
-   "why": "M8: high-pass build, snapping back full on the landing"
+   "why": "M8: high-pass build from T7's start, snapping back full on the landing"
   }
  ],
  "synth": [
   {
    "type": "heartbeat",
-   "t0": 60,
-   "t1": 67.5,
+   "t0": 57,
+   "t1": 64.5,
    "every": 1.0,
    "db": -14,
    "why": "M4: low heartbeat pulse"
   },
   {
    "type": "ticks",
-   "t0": 60,
-   "t1": 67.5,
+   "t0": 57,
+   "t1": 64.5,
    "every": 0.5,
    "db": -30,
    "why": "M4: ticking hi-hat"
   },
   {
    "type": "thud",
-   "t": 66,
+   "t": 63,
    "db": -10,
    "why": "M4: dull thud when the slip is used"
   }
  ],
  "subHits": [
   {
-   "t": 67.5,
+   "t": 64.5,
    "db": -8,
    "why": "M4: the deep sub hit (subHit) before 'So how does a buyer know it's clean?'"
   },
   {
-   "t": 122,
+   "t": 118.5,
    "db": -12,
    "why": "M8: the landing"
   }
@@ -158,56 +152,56 @@
   {
    "id": "M1",
    "start": 0,
-   "end": 12,
+   "end": 11.5,
    "what": "glockenspiel pickup; the groove kicks in on hookLand 2.5"
   },
   {
    "id": "M2",
-   "start": 12,
-   "end": 52,
+   "start": 11.5,
+   "end": 49.5,
    "what": "bright groove"
   },
   {
    "id": "M3",
-   "start": 52,
-   "end": 59,
+   "start": 49.5,
+   "end": 56,
    "what": "the same groove (no separate chorus in the take)"
   },
   {
    "id": "M4",
-   "start": 59,
-   "end": 72,
-   "what": "hard stop on 59, silence to 60, dark drone + heartbeat + ticks, thud 66, sub hit 67.5, near silence"
+   "start": 56,
+   "end": 68.5,
+   "what": "hard stop on 56, silence to 57, dark drone + heartbeat + ticks, thud 63, sub hit 64.5, near silence"
   },
   {
    "id": "M5",
-   "start": 72,
-   "end": 76,
-   "what": "fade to silence, 1-bar riser 74-76, DROP on 76"
+   "start": 68.5,
+   "end": 72.5,
+   "what": "fade to silence, 1-bar riser 70.5-72.5, DROP on 72.5"
   },
   {
    "id": "M6",
-   "start": 76,
-   "end": 110.5,
+   "start": 72.5,
+   "end": 107,
    "what": "driving tech groove"
   },
   {
    "id": "M7",
-   "start": 110.5,
-   "end": 116,
-   "what": "bass + tick for 2 bars (110.5-114.5), band back to 116"
+   "start": 107,
+   "end": 112.5,
+   "what": "bass + tick for 2 bars (107-111), band back to 112.5"
   },
   {
    "id": "M8",
-   "start": 116,
-   "end": 126,
-   "what": "high-pass build 116-122, LANDING on 122 (sub hit, full band)"
+   "start": 112.5,
+   "end": 122.5,
+   "what": "high-pass build 112.5-118.5, LANDING on 118.5 (sub hit, full band)"
   },
   {
    "id": "M9",
-   "start": 126,
-   "end": 133,
-   "what": "held chord on 126, ring-out faded by 132.5, silent 132.5-133"
+   "start": 122.5,
+   "end": 129.5,
+   "what": "held chord on 122.5, ring-out faded by 129, silent 129-129.5"
   }
  ]
 }

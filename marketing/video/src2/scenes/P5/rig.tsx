@@ -222,13 +222,15 @@ export function SwingCard({
 
 /**
  * A caption that slaps in with its contact on `at` (scene frame; the kit's CaptionSlap, contact f4) and is slapped
- * over at `until` (gone from that frame: the next caption starts its slap there). Centred; top edge at `y`. `width` wraps
- * long lines.
+ * over at `until` (the frame the next caption starts its slap; this one stays 2 f longer, until the next is fully
+ * opaque, so there is never an empty frame). Centred; top edge at `y`. `width` wraps long lines.
  */
 export function Caption({ text, at, until, size = 120, y = 100, width = 1080, seed, x = 960 }: { text: string; at: number; until?: number; size?: number; y?: number; width?: number; seed: string; x?: number }) {
   const frame = useCurrentFrame();
   const start = Math.round(at - SLAP_CONTACT);
-  if (frame < start || (until !== undefined && frame >= Math.round(until))) return null;
+  // Slapped over by the next one (bible §2.16): `until` is the frame the next caption starts its slap. Stay until that
+  // one has reached full opacity (its 2-frame anti-pop), so a swap never shows an empty caption band.
+  if (frame < start || (until !== undefined && frame >= Math.round(until) + 2)) return null;
   return (
     <div style={{ position: "absolute", left: x - width / 2, width, top: y, display: "flex", justifyContent: "center", textAlign: "center", pointerEvents: "none" }}>
       <Sequence from={start} layout="none">

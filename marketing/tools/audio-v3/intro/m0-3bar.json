@@ -1,0 +1,47 @@
+{
+ "_comment": "M0, the cold-open bed: a bar-line edit of one Eleven Music take (music_v1, seed 909, 20 s, 119.98 BPM, beats at 0.027 + k/2 s, G minor-ish: G/C/D). Raw take: sub pulse + ticking hats 0-8 (no stabs), a little more body 8-12, the synth stabs build 12-14.75, the peak stabs 14.75-16.75, then it fades to silence by 17 (no riser of its own). Bar 1 is that pulse band-split to the sub and the hats only; the riser is synthesized here and is cut dead with everything else by the hard stop (6 ms ramp) on the last bar line.",
+ "source": "tools/audio-v3/work/intro/m0.raw.mp3",
+ "beatOffset": 0.027,
+ "endFadeMs": 6,
+ "gain": [],
+ "subHits": [],
+ "out": "video/public/v2/intro/audio/m0-3bar.mp3",
+ "durationSec": 6.0,
+ "segments": [
+  {
+   "t0": 0,
+   "t1": 2,
+   "s0": 0,
+   "why": "bar 1: the pulse (stripped to sub + hats below)"
+  },
+  {
+   "t0": 2,
+   "t1": 6,
+   "s0": 12,
+   "why": "bars 2-3: source bars 7-8, the build and the peak stabs; hard stop at 6.0"
+  }
+ ],
+ "sweeps": [
+  {
+   "type": "strip",
+   "t0": 0,
+   "t1": 2,
+   "bassHz": 120,
+   "tickHz": 6000,
+   "tickGain": 1.0,
+   "ramp": 0.05,
+   "why": "bar 1 sparse: only the sub pulse and the ticking hats"
+  }
+ ],
+ "synth": [
+  {
+   "type": "riser",
+   "t0": 3.5,
+   "t1": 6,
+   "db": -10,
+   "fromHz": 180,
+   "toHz": 2400,
+   "why": "the riser, peaking at the hard stop"
+  }
+ ]
+}

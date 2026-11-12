@@ -80,6 +80,7 @@ export function StickerCaption({
   corner = "br",
   away = 1,
   exit = "fly",
+  from = 1.2,
 }: {
   text: string;
   size: number;
@@ -93,10 +94,12 @@ export function StickerCaption({
   away?: number;
   /** "fly": lifts off and flies up and away; "fall": comes unstuck and drops out of the bottom (gravity) */
   exit?: "fly" | "fall";
+  /** slap start scale (the bible's 1.2; ~1.1 where stickers sit close together, so the slap never covers a neighbour) */
+  from?: number;
 }) {
   if (f < 0) return null;
   const { w, h } = stickerBox(text, size);
-  const { sx, sy, opacity } = slapAt(f, FPS, 0, { from: 1.2, squash: 0.05, drop: 0 });
+  const { sx, sy, opacity } = slapAt(f, FPS, 0, { from, squash: 0.05, drop: 0 });
   const shadow = f >= 4 ? 8 : 0;
   const tilt = tiltOf(seed);
   // exit: a small dog-ear (rip), then the sticker lets go. "fly": lifts off and leaves up and away (fall easing);

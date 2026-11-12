@@ -1,0 +1,39 @@
+{
+ "id": "F08",
+ "plate": "T2-09",
+ "voice": "alice",
+ "text": "all the signers saw the musked UI",
+ "say": "all the signers saw the masked UI",
+ "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F08-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F08-tv.mp3"
+ },
+ "durationSec": 2.58,
+ "heard": {
+  "dry": "All the signers saw the masked UI",
+  "tv": "All the signers saw the masked UI"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22.3,
+   "momentaryMaxLufs": -20,
+   "truePeakDb": -7.1
+  },
+  "tv": {
+   "integratedLufs": -21.9,
+   "momentaryMaxLufs": -19,
+   "truePeakDb": -7.6
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "All the signers saw the masked UI",
+   "heardTv": "All the signers saw the masked UI"
+  }
+ ]
+}

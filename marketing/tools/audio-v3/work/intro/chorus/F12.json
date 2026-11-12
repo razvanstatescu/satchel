@@ -1,0 +1,39 @@
+{
+ "id": "F12",
+ "plate": "T1-07",
+ "voice": "alice",
+ "text": "$7 Million Crypto Loss via Malicious Code",
+ "say": "$7 Million Crypto Loss via Malicious Code",
+ "voiceLabel": "Alice - Clear, Engaging Educator (British, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F12-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F12-tv.mp3"
+ },
+ "durationSec": 3.7,
+ "heard": {
+  "dry": "$7 million crypto loss via malicious code",
+  "tv": "$7 million crypto loss via malicious code"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22.2,
+   "momentaryMaxLufs": -20.2,
+   "truePeakDb": -5.3
+  },
+  "tv": {
+   "integratedLufs": -22,
+   "momentaryMaxLufs": -19.2,
+   "truePeakDb": -7.3
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "$7 million crypto loss via malicious code",
+   "heardTv": "$7 million crypto loss via malicious code"
+  }
+ ]
+}

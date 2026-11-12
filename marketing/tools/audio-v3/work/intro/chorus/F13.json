@@ -1,0 +1,39 @@
+{
+ "id": "F13",
+ "plate": "T1-05",
+ "voice": "bill",
+ "text": "new crypto-stealing Trojan",
+ "say": "new crypto-stealing Trojan",
+ "voiceLabel": "Bill - Wise, Mature, Balanced (American, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F13-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F13-tv.mp3"
+ },
+ "durationSec": 1.99,
+ "heard": {
+  "dry": "New crypto-stealing Trojan",
+  "tv": "New crypto-stealing Trojan"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -22,
+   "momentaryMaxLufs": -20.3,
+   "truePeakDb": -6.6
+  },
+  "tv": {
+   "integratedLufs": -24.3,
+   "momentaryMaxLufs": -22.7,
+   "truePeakDb": -9.6
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "New crypto-stealing Trojan",
+   "heardTv": "New crypto-stealing Trojan"
+  }
+ ]
+}

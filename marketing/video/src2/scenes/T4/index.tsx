@@ -2,7 +2,7 @@ import { Snowflake } from "lucide-react";
 import type { ReactNode } from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, F, sans } from "../../brand/tokens";
-import { ListSheet, PHONE, PRICE } from "../../components/ui";
+import { PRICE } from "../../components/ui";
 import { CardBack, type CharmFace, charmBlink, charmKick, CardWithCharms, Hand, type HandProps } from "../../illustration/characters";
 import { FrostLaminate, PriceTag, priceTagSize, RequestSticker, requestSize, textWidth } from "../../illustration/props";
 import { Sfx } from "../../lib/Sfx";
@@ -13,10 +13,11 @@ import { At, Caption, onBeat, sceneBeats, voF } from "../T2/kit";
 
 /**
  * T4 · Paused for sale (v4: 96.0–101.0 s; V21 "List it, and signing pauses. The history stops growing.")
- * Satchel #7, still showing its history. A tiny list sheet says "Ready to list ✓" while bob's hand slaps the lemon
- * price tag "2,000 NEAR" onto the card's corner. A frost laminate squeegees across with the "Paused for sale" pill
- * (snowflake turns 60°). bob tries to stick a new "Send" onto the history: it skids on the frost and drops away (the
- * film's one deliberate glide). The history header frosts over at "3 signatures". No countdown, no timer, ever.
+ * Satchel #7, still showing its history. bob's hand slaps the lemon price tag "2,000 NEAR" onto the card's corner
+ * (v5: the tiny "Ready to list ✓" sheet is gone: it crowded the opening, and the tag already says it is listed).
+ * A frost laminate squeegees across with the "Paused for sale" pill (snowflake turns 60°). bob tries to stick a new
+ * "Send" onto the history: it skids on the frost and drops away (the film's one deliberate glide). The history header
+ * frosts over at "3 signatures". No countdown, no timer, ever.
  */
 
 // ── the board (scene px) ──────────────────────────────────────────────────────────────────────────────────────────
@@ -29,11 +30,6 @@ const CHARM_SIZE = 0.19;
 const TAG_S = 2.0; // price tag scale: the amount is ≈ 52 px
 const TAG_TILT = 15;
 const HOLE = { x: CARD_X + CARD_W - 30, y: CARD_Y + 128 }; // the tag's hole: just inside the top-right corner, below the S
-const SHEET_S = 1.34; // the tiny list sheet
-const SHEET_TOP = 308; // where the ListSheet's sheet starts inside its 390 × 844 phone box (measured, v4)
-const SHEET_H = 276; // UI px shown: title, "Ready to list ✓", the price
-const SHEET_X = 58;
-const SHEET_Y = 420;
 
 export default function T4() {
   const f = useCurrentFrame();
@@ -42,18 +38,12 @@ export default function T4() {
   const vo = voF("T4", "V21");
 
   // ── timing (scene frames) ─────────────────────────────────────────────────────────────────────────────────────
-  const sheetIn = 0; // the list sheet slaps in on the cut (contact f4)
   const tagAt = onBeat(vo.word(1), beats); // bob slaps the tag on "it,"
-  const sheetOut = tagAt + 12; // the sheet drops away once it's listed
   const frostAt = onBeat(vo.word(3), beats); // the frost squeegees across under "signing"
   const pillAt = frostAt + 10;
   const capAt = vo.word(4) - 0.5; // "Paused for sale." on "pauses."
   const tryAt = onBeat(vo.word(4, "end") - 2, beats); // bob tries a Send in the gap after "pauses."
   const histAt = vo.sentence(1) + 4; // "The history stops growing.": the header frosts over at "3 signatures"
-
-  // ── the tiny list sheet ───────────────────────────────────────────────────────────────────────────────────────
-  const sheetSlap = slapAt(f - sheetIn, fps, 0, { from: 1.18, squash: 0.05, drop: 0 });
-  const sheetFall = interpolate(f, [sheetOut, sheetOut + 9], [0, 1], { ...clamp, easing: EASE2.fall });
 
   // ── bob's hand brings the price tag and slaps it on ───────────────────────────────────────────────────────────
   const tagSize = priceTagSize(PRICE); // v4: "2,000 NEAR"
@@ -101,8 +91,9 @@ export default function T4() {
   const reqGrip = { x: reqX + reqW / 2 - 24, y: reqY + reqH / 2 - 12 };
   const bob2: HandProps = { pose: "pinch", k: 2, size: 1.25, angle: -46, sleeve: "bob" };
   const bob2Pinch = interpolate(f, [tryAt + 6, tryAt + 9], [1, 0], clamp);
-  const bob2X = reqGrip.x - 320 * (1 - (1 - slip) * (1 - slip)) + 520 * recoil; // skids with it, then lets go
-  const bob2Y = reqGrip.y - 640 * slip * slip + 120 * recoil;
+  // skids with it, then lets go and pulls right out of frame (far enough that it is off-screen before it is removed)
+  const bob2X = reqGrip.x - 320 * (1 - (1 - slip) * (1 - slip)) + 1100 * recoil;
+  const bob2Y = reqGrip.y - 640 * slip * slip + 260 * recoil;
   const tryVisible = f >= tryAt - 13 && slip < 1;
   const bob2Visible = f >= tryAt - 13 && recoil < 1;
 
@@ -170,31 +161,16 @@ export default function T4() {
             <PriceTag text={PRICE} scale={TAG_S} tilt={TAG_TILT} drop={tagDrop} swing={tagSwing} />
           </div>
         ) : null}
-        {bob1Visible ? <Hand {...bob1} x={grip.x + 260 * handAway} y={grip.y - 420 * handAway} pinch={release} squash={interpolate(f, [tagAt, tagAt + 1, tagAt + 4], [1, 1, 0], clamp)} tagTilt={-2} /> : null}
+        {/* it pulls back out along its arm, far enough to be off-frame before it is removed */}
+        {bob1Visible ? <Hand {...bob1} x={grip.x + 520 * handAway} y={grip.y - 840 * handAway} pinch={release} squash={interpolate(f, [tagAt, tagAt + 1, tagAt + 4], [1, 1, 0], clamp)} tagTilt={-2} /> : null}
 
       </div>
 
-      {/* the tiny list sheet: "Ready to list ✓" */}
-      {sheetFall < 1 ? (
-        <div
-          style={{
-            position: "absolute",
-            left: SHEET_X,
-            top: SHEET_Y + 560 * sheetFall,
-            rotate: `${-3 - 10 * sheetFall}deg`,
-            scale: `${sheetSlap.sx} ${sheetSlap.sy}`,
-            opacity: sheetSlap.opacity,
-          }}
-        >
-          <MiniSheet scale={SHEET_S} />
-        </div>
-      ) : null}
-
       <Caption text="Paused for sale." contact={capAt} y={134} seed="t4-paused" />
-      <SmallLine text="The history stops growing." contact={histAt} y={214} />
+      {/* lands just before the narrator's "The history…" so it still reads ≥ 1.8 s on the v5 timeline's shorter tail */}
+      <SmallLine text="The history stops growing." contact={vo.sentence(1) - 4} y={214} />
 
       {/* sound */}
-      <Sfx name="sticker-slap" at={(sheetIn + 4) / FPS} gainDb={-9} />
       <Sfx name="sticker-slap" at={tagAt / FPS} gainDb={-4} />
       <Sfx name="freeze-chime" at={frostAt / FPS} gainDb={8} />
       <Sfx name="pop" at={pillAt / FPS} gainDb={-3} />
@@ -209,35 +185,6 @@ const rot = (p: { x: number; y: number }, deg: number) => {
   const a = (deg * Math.PI) / 180;
   return { x: p.x * Math.cos(a) - p.y * Math.sin(a), y: p.x * Math.sin(a) + p.y * Math.cos(a) };
 };
-
-/** The top of the List sheet (title, "Ready to list ✓", the price) as a small sticker: no coral button in frame. */
-function MiniSheet({ scale }: { scale: number }) {
-  const w = PHONE.w;
-  return (
-    <div style={{ position: "relative", width: w * scale, height: SHEET_H * scale }}>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: w,
-          height: SHEET_H,
-          transform: `scale(${scale})`,
-          transformOrigin: "0 0",
-          borderRadius: 28,
-          overflow: "hidden",
-          boxShadow: `0 4px 0 ${C.ink}`,
-          background: C.surface,
-        }}
-      >
-        <div style={{ position: "absolute", left: 0, top: -SHEET_TOP, width: w, height: PHONE.h }}>
-          <ListSheet state="ready" />
-        </div>
-        <div style={{ position: "absolute", inset: 0, borderRadius: 28, border: `3px solid ${C.ink}`, boxSizing: "border-box" }} />
-      </div>
-    </div>
-  );
-}
 
 /** The ice that seals the header's "3 signatures" (card UI units, drawn inside CardBack). */
 function IceSeal({ show, turn }: { show: number; turn: number }) {

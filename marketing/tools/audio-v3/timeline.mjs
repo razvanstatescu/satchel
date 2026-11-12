@@ -1,11 +1,16 @@
 #!/usr/bin/env node
-// Master timeline v3 (Satchel 2.0 film) at 120 BPM: lines on beats (0.5 s), no overlaps, scenes on 2 s bars where
-// sensible (a scene may end on a beat when a bar would waste time, except where the next scene must start on a bar:
-// the catch's hard stop, the flip, the drop, the blocked dip, the hand-off, the end card).
-// Reads tools/audio-v3/work/vo.json, writes video/src2/data/timeline.json and script/timeline-v3.md.
+// Master timeline v5 (Satchel 2.0 film body; the H0 cold open plays before it as its own Series item, so H1 stays at 0)
+// at 120 BPM: lines on beats (0.5 s), no overlaps, every scene start on a beat.
+// Reads tools/audio-v3/work/vo.json, writes video/src2/data/timeline.json and script/timeline-v5.md.
 //   node tools/audio-v3/timeline.mjs
-// The lead-ins and bar/beat snapping are searched (dynamic programming) to land closest to the SCRIPT-v3 scene targets
-// with a total of about 2:10-2:15, so a re-voiced take re-times the whole film automatically.
+// v5 is a re-time of v4, not a re-layout: every line keeps its v4 offset inside its scene (the scenes are choreographed
+// to it), and only the still holds at scene ends change (notes/qa-v5 "Trim candidates"). The search (dynamic
+// programming over the scene ends) lands as close to the v5 targets as these rules allow:
+//   - a scene ends at least 0.03 s after its last word (the file's silent tail may run 0.05 s past the cut);
+//   - across a cut, the next line's first word starts at least K.minAudibleGap after the last word (0.28 s, the
+//     hook's own V02 -> V03 gap); a cut that would crowd the next line is pushed later instead of moving the line;
+//   - C1 keeps at least 1 s of its dark pause after V16;
+//   - drop -> landing is a whole number of bars, so the score needs only bar-line edits after the drop.
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { PATHS, VOICE } from './config.mjs';
@@ -14,116 +19,136 @@ import { r3, readJson, writeJson } from './lib.mjs';
 export const BPM = 120, BEAT = 60 / BPM, BAR = 4 * BEAT, FPS = 30;
 const EPS = 1e-6;
 const ceilTo = (t, q) => Math.ceil(t / q - EPS) * q;
+const onGrid = (t, q) => Math.abs(t / q - Math.round(t / q)) < EPS;
 
 const K = {
-  gap: 0.5, // min silence between consecutive lines (exceptions below)
-  hookGap: 0.05, // V01 -> V02 -> V03: the frame-by-frame opening (concepts-v2 §4.4)
-  tail: 0.15, // min music after a scene's last line before its cut (the next line still keeps K.gap)
-  offBarPenalty: 0.4, // cost of a scene boundary on a beat instead of a bar
-  total: { min: 129, max: 133, weight: 3 }, // v4 target ≈ 131 s
+  gap: 0.5, // min silence between consecutive lines inside a scene (file end -> next file start; exceptions below)
+  hookGap: 0.05, // V02 -> V03: the frame-by-frame opening (concepts-v2 §4.4)
+  minAudibleGap: 0.28, // across a cut: last word end -> next first word start
+  wordTail: 0.03, // a scene ends at least this long after its last word...
+  fileOverhang: 0.05, // ...and its last file may run at most this far past the cut (silent tail)
+  darkPause: 1.0, // C1: at least this much after V16's file end
+  total: { min: 126, max: 131, weight: 2 }, // v5 body target ≈ 128 s (v4 133 s minus the trims)
 };
 
-// SCRIPT-v4 scene order and targets (s). barStart: the scene must start on a bar (a music event lands on its cut).
-// v4 vs v3: H2 8.5 (V04 0.5 s earlier), P2 7, P3 8.5, P4 8, P5 9, P6 8 (V11 cut), C1 12.5 (drain gap 1.5 s shorter;
-// its hard stop may sit on a beat so that the flip and the drop stay on bars), T3 6.5, T6 6, T7 10, E1 6.5.
+// SCRIPT-v4 scenes with the v5 targets (v4 length -> v5): H2 9 -> 8.5, P1 6 -> 5.5, P2 8 -> 7.5, P4 8 -> 7.5,
+// P5 9 -> 8.5, P6 7 -> 6.5, C1 13 -> 12, T3 7.5 -> 7, T4 5 -> 4.5, T5 9.5 -> 10 (+0.5 at its end), T6 5.5 -> 5; the rest
+// unchanged. leads = each scene's v4 lead-in, fixed so that the choreography stays put.
 const SCENES = [
   { id: 'H1', fixed: true },
   { id: 'H2', lines: ['V03', 'V04'], target: 8.5, leads: [0], gaps: { V04: 0.35 } },
-  { id: 'P1', lines: ['V05'], target: 6 },
-  { id: 'P2', lines: ['V06'], target: 7 },
-  { id: 'P3', lines: ['V07', 'V08'], target: 8.5 },
-  { id: 'P4', lines: ['V09'], target: 8 },
-  { id: 'P5', lines: ['V10'], target: 9 },
-  { id: 'P6', lines: ['V12', 'V13'], target: 8, barStart: true, downbeats: 4 }, // two 4 s vignettes
-  { id: 'C1', lines: ['V14', 'V15', 'V16'], target: 12.5, kind: 'catch' }, // musicStop on the cut
-  { id: 'T0', lines: ['V17'], target: 4, barStart: true, kind: 'flip' }, // 2-bar riser
-  { id: 'T1', lines: ['V18'], target: 6, barStart: true }, // the drop on the cut
-  { id: 'T2', lines: ['V19'], target: 6.5 },
-  { id: 'T3', lines: ['V20'], target: 6.5 },
-  { id: 'T4', lines: ['V21'], target: 5 },
-  { id: 'T5', lines: ['V22', 'V23'], target: 10.5 },
-  { id: 'T6', lines: ['V24'], target: 6 }, // the band drops to bass + tick for 2 bars (v4: may start on a beat)
-  { id: 'T7', lines: ['V25', 'V26'], target: 10, kind: 'handoff' }, // the landing itself is always on a bar
+  { id: 'P1', lines: ['V05'], target: 5.5, leads: [0] },
+  { id: 'P2', lines: ['V06'], target: 7.5, leads: [0] },
+  { id: 'P3', lines: ['V07', 'V08'], target: 9, leads: [0] },
+  { id: 'P4', lines: ['V09'], target: 7.5, leads: [0.5] },
+  { id: 'P5', lines: ['V10'], target: 8.5, leads: [0] },
+  { id: 'P6', lines: ['V12', 'V13'], target: 6.5, leads: [0], vignette: 4 }, // two 4 s vignettes
+  { id: 'C1', lines: ['V14', 'V15', 'V16'], target: 12, kind: 'catch' }, // musicStop on the cut
+  { id: 'T0', lines: ['V17'], target: 4, kind: 'flip' }, // 2-bar riser
+  { id: 'T1', lines: ['V18'], target: 6, leads: [0] }, // the drop on the cut
+  { id: 'T2', lines: ['V19'], target: 6.5, leads: [0.5] },
+  { id: 'T3', lines: ['V20'], target: 7, leads: [0.5] },
+  { id: 'T4', lines: ['V21'], target: 4.5, leads: [0] },
+  { id: 'T5', lines: ['V22', 'V23'], target: 10, leads: [0], overWeight: 0.5 }, // crammed: extra time costs less
+  { id: 'T6', lines: ['V24'], target: 5, leads: [0] }, // blocked: the band drops to bass + tick for 2 bars
+  { id: 'T7', lines: ['V25', 'V26'], target: 10.5, leads: [0], kind: 'handoff' },
   { id: 'E1', lines: ['V27'], target: 6.5, kind: 'end' },
 ];
 
 /** H1 is drawn frame by frame (concepts-v2 §4.4): V01 ≈ 0.9 s, V02 ≈ 2.1 s, the swing lands at ≈ 2.6 s, V03 at ≈ 3.1 s. */
 function layoutH1(vo) {
   const placed = [{ id: 'V01', start: 1.0 }, { id: 'V02', start: 2.0 }];
-  return { placed, end: 3.0, lastEnd: 2.0 + vo.V02.duration, markers: { hookLand: 2.5 } };
+  return { placed, end: 3.0, last: { id: 'V02', start: 2.0 }, markers: { hookLand: 2.5 } };
 }
 
-/** Lay out one scene from `t0` with a lead-in; returns the needed end (before snapping) and markers. */
-function layout(sc, t0, lead, vo, prevEnd) {
+const wordStart = (vo, p) => p.start + vo[p.id].words[0].start;
+const wordEnd = (vo, p) => p.start + vo[p.id].words.at(-1).end;
+const fileEnd = (vo, p) => p.start + vo[p.id].duration;
+
+/**
+ * Lay out one scene from `t0` with its fixed lead-in. Returns null when its first line would crowd the previous line
+ * (the previous scene then has to end later), else the minimum end and the markers.
+ */
+function layout(sc, t0, lead, vo, prev) {
   const placed = [], markers = {};
-  let lastEnd = prevEnd;
-  // the opening runs tight (V02 -> V03 as drawn in §4.4); everywhere else lines keep K.gap
-  const startAt = (min) => ceilTo(Math.max(min, lastEnd + (sc.id === 'H2' && !placed.length ? K.hookGap : K.gap)), BEAT);
-  const put = (id, start) => { placed.push({ id, start: r3(start) }); lastEnd = start + vo[id].duration; };
+  const put = (id, start) => { placed.push({ id, start: r3(start) }); return placed.at(-1); };
+  const fe = () => fileEnd(vo, placed.at(-1));
+  const first = (id, start) => {
+    const p = put(id, start);
+    if (prev && wordStart(vo, p) - wordEnd(vo, prev) < K.minAudibleGap - EPS) return false;
+    if (prev && p.start < fileEnd(vo, prev) - K.fileOverhang - EPS) return false;
+    return true;
+  };
+  const sceneNeed = () => Math.max(wordEnd(vo, placed.at(-1)) + K.wordTail, fe() - K.fileOverhang);
   if (sc.kind === 'catch') {
-    put('V14', startAt(t0 + Math.max(lead, 0.5)));
-    put('V15', ceilTo(lastEnd + 0.75, BEAT));
-    // the slip is used (thud) and a sub hit lands, then "So how does a buyer know it's clean?" (v4: the drain gap is
-    // 1.5 s shorter than v3's: V16 about 2.4 s after V15 ends)
-    const subHit = ceilTo(Math.max(t0 + 8.5, lastEnd + 1.9), BEAT);
+    if (!first('V14', t0 + Math.max(lead, 0.5))) return null;
+    put('V15', ceilTo(fe() + 0.75, BEAT));
+    // the slip is used (thud) and a sub hit lands, then "So how does a buyer know it's clean?" (as v4)
+    const subHit = ceilTo(Math.max(t0 + 8.5, fe() + 1.9), BEAT);
     markers.musicStop = t0; markers.thud = subHit - 1.5; markers.subHit = subHit;
     put('V16', subHit + 0.5);
-    return { placed, need: lastEnd + 1.2, lastEnd, markers, barEnd: true };
+    return { placed, need: fe() + K.darkPause, markers };
   }
   if (sc.kind === 'flip') {
-    put('V17', startAt(t0 + 1.5));
+    if (!first('V17', t0 + 1.5)) return null;
     markers.flip = t0 + 1; // whoosh on the flip
-    return { placed, need: Math.max(t0 + 4, lastEnd + K.tail), lastEnd, markers, barEnd: true };
+    return { placed, need: Math.max(t0 + 4, sceneNeed()), markers, exact: true };
   }
   if (sc.kind === 'handoff') {
-    put('V25', startAt(t0 + lead));
-    const landing = ceilTo(lastEnd + 0.3, BAR); // the swing lands on a downbeat; V26 rides it
+    if (!first('V25', t0 + lead)) return null;
+    const landing = t0 + ceilTo(fe() + 0.3 - t0, BAR); // the swing lands on the bar after V25 (from T7's start); V26 rides it
     markers.landing = landing;
     put('V26', landing);
-    return { placed, need: lastEnd + 1.6, lastEnd, markers };
+    return { placed, need: fe() + 1.6, markers };
   }
   if (sc.kind === 'end') {
-    put('V27', startAt(t0 + 0.5));
-    const endPress = ceilTo(lastEnd + 1.2, BEAT); // the mark's button press on a beat; ring-out, silent last 0.5 s
+    if (!first('V27', t0 + 0.5)) return null;
+    const endPress = ceilTo(fe() + 1.2, BEAT); // the mark's button press on a beat; ring-out, silent last 0.5 s
     markers.endPress = endPress;
-    return { placed, need: endPress + 1.5, lastEnd, markers, exact: true };
+    return { placed, need: endPress + 1.5, markers, exact: true };
   }
-  sc.lines.forEach((id, k) => {
-    let start;
-    if (sc.downbeats) {
-      // on the vignette downbeats `downbeats` s apart; a long line pushes the next one to the following beat, not bar
-      start = k === 0 ? ceilTo(Math.max(t0 + lead, lastEnd + K.gap), BAR) : Math.max(placed[k - 1].start + sc.downbeats, ceilTo(lastEnd + K.gap, BEAT));
-    } else if (k === 0) start = startAt(t0 + lead);
-    else start = ceilTo(lastEnd + (sc.gaps?.[id] ?? K.gap), BEAT);
-    put(id, start);
-  });
-  return { placed, need: lastEnd + K.tail, lastEnd, markers };
+  for (const [k, id] of sc.lines.entries()) {
+    if (k === 0) {
+      const gapOk = sc.id === 'H2' ? fileEnd(vo, prev) + K.hookGap <= t0 + lead + EPS : true;
+      if (!gapOk || !first(id, t0 + lead)) return null;
+    } else if (sc.vignette) {
+      // the next vignette's downbeat (`vignette` s later); a long line pushes it to the following beat
+      put(id, Math.max(placed[k - 1].start + sc.vignette, ceilTo(fe() + K.gap, BEAT)));
+    } else put(id, ceilTo(fe() + (sc.gaps?.[id] ?? K.gap), BEAT));
+  }
+  return { placed, need: sceneNeed(), markers };
 }
 
-/** DP over scenes: state = (scene start, last line end); options = lead-in x bar/beat snapping of the scene end. */
+/** DP over the scene ends: state = scene start (+ the last placed line); options = beat-aligned ends from the minimum up. */
 function bestLayout(vo) {
   let states = new Map();
   const h1 = layoutH1(vo);
-  states.set(`3|${h1.lastEnd}`, { t: 3, prevEnd: h1.lastEnd, cost: 0, trail: [{ sc: SCENES[0], start: 0, end: 3, placed: h1.placed, markers: h1.markers }] });
+  states.set('3', { t: 3, last: h1.last, cost: 0, trail: [{ sc: SCENES[0], start: 0, end: 3, placed: h1.placed, markers: h1.markers }] });
   for (let i = 1; i < SCENES.length; i++) {
-    const sc = SCENES[i], next = SCENES[i + 1];
+    const sc = SCENES[i];
     const nextStates = new Map();
     for (const st of states.values()) {
-      if (sc.barStart && Math.abs(st.t / BAR - Math.round(st.t / BAR)) > EPS) continue;
-      for (const lead of sc.leads ?? [0, 0.5, 1.0]) {
-        const a = layout(sc, st.t, lead, vo, st.prevEnd);
-        const snaps = a.exact ? ['exact'] : a.barEnd || next?.barStart ? ['bar'] : ['bar', 'beat'];
-        for (const snap of snaps) {
-          const end = snap === 'exact' ? a.need : ceilTo(a.need, snap === 'bar' ? BAR : BEAT);
+      for (const lead of sc.leads ?? [0]) {
+        const a = layout(sc, st.t, lead, vo, st.last);
+        if (!a) continue;
+        if (sc.kind === 'handoff') {
+          const drop = st.trail.find((x) => x.sc.id === 'T1').start;
+          if (!onGrid(a.markers.landing - drop, BAR)) continue; // whole bars from the drop to the landing
+        }
+        const min = a.exact ? a.need : ceilTo(a.need, BEAT);
+        const ends = a.exact ? [min] : [0, 0.5, 1, 1.5, 2].map((x) => min + x);
+        for (const end of ends) {
           const len = end - st.t;
-          let cost = st.cost + (sc.target ? Math.abs(len - sc.target) : 0) + (snap === 'beat' && Math.abs(end / BAR - Math.round(end / BAR)) > EPS ? K.offBarPenalty : 0) + lead * 0.01;
-          const key = `${r3(end)}|${r3(a.lastEnd)}`;
-          const cand = { t: end, prevEnd: a.lastEnd, cost, trail: [...st.trail, { sc, start: st.t, end, placed: a.placed, markers: a.markers }] };
-          if (!nextStates.has(key) || nextStates.get(key).cost > cost) nextStates.set(key, cand);
+          const dev = sc.target ? len - sc.target : 0;
+          const cost = st.cost + (dev > 0 ? dev * (sc.overWeight ?? 1) : -dev);
+          const key = `${r3(end)}|${a.placed.at(-1).id}@${a.placed.at(-1).start}`; // the last line's position decides what the next cut allows
+          const cand = { t: end, last: a.placed.at(-1), cost, trail: [...st.trail, { sc, start: st.t, end, placed: a.placed, markers: a.markers }] };
+          if (!nextStates.has(key) || nextStates.get(key).cost > cost + EPS) nextStates.set(key, cand);
         }
       }
     }
     states = nextStates;
+    if (!states.size) throw new Error(`no feasible layout at ${sc.id}`);
   }
   let best = null;
   for (const st of states.values()) {
@@ -198,16 +223,19 @@ export function writeTimeline({ timeline, spans }) {
   const f = (x) => x.toFixed(2);
   const mmss = (x) => `${Math.floor(x / 60)}:${(x % 60).toFixed(1).padStart(4, '0')}`;
   const md = [
-    '# Satchel 2.0 film: master timeline (v4)',
+    '# Satchel 2.0 film: master timeline (v5 body)',
     '',
     `Generated by \`node tools/audio-v3/run.mjs\` from the voiced lines (do not edit by hand). ${timeline.bpm} BPM (beat ${timeline.beatSec} s, bar ${timeline.barSec} s), ${timeline.fps} fps.`,
     `**Total: ${f(timeline.durationSec)} s (${mmss(timeline.durationSec)}), ${timeline.durationInFrames} frames.** Voice: ${timeline.voice.name} (${timeline.voice.id}) / ${timeline.voice.model}.`,
     '',
     '## Scenes',
     '',
-    '| scene | start | end | length | on bar | VO |',
-    '|---|---|---|---|---|---|',
-    ...spans.map((s) => `| ${s.id} | ${f(s.start)} | ${f(s.end)} | ${f(s.end - s.start)} | ${Math.abs(s.start / 2 - Math.round(s.start / 2)) < 1e-6 ? 'bar ' + (s.start / 2 + 1) : 'beat'} | ${timeline.vo.filter((l) => l.scene === s.id).map((l) => l.id).join(', ') || '(music only)'} |`),
+    'Scene starts are on beats. The score\'s bar lines move at its edits (see beats.json `downbeats`): even seconds up to the',
+    'hard stop, then 58.5 + 2k s from the Night section to the end.',
+    '',
+    '| scene | start | end | length | VO |',
+    '|---|---|---|---|---|',
+    ...spans.map((s) => `| ${s.id} | ${f(s.start)} | ${f(s.end)} | ${f(s.end - s.start)} | ${timeline.vo.filter((l) => l.scene === s.id).map((l) => l.id).join(', ') || '(music only)'} |`),
     '',
     '## Voiceover',
     '',

@@ -1,0 +1,39 @@
+{
+ "id": "F10",
+ "plate": "T4-01h",
+ "voice": "matilda",
+ "text": "Wallet Drainers Drain $494 Million",
+ "say": "Wallet Drainers Drain $494 Million",
+ "voiceLabel": "Matilda - Knowledgable, Professional (American, female)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F10-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F10-tv.mp3"
+ },
+ "durationSec": 4.08,
+ "heard": {
+  "dry": "Wallet drainers drain $494 million",
+  "tv": "Wallet drainers drain $494 million"
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -21.1,
+   "momentaryMaxLufs": -14.5,
+   "truePeakDb": -2
+  },
+  "tv": {
+   "integratedLufs": -20.9,
+   "momentaryMaxLufs": -14.1,
+   "truePeakDb": -5.4
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Wallet drainers drain $494 million",
+   "heardTv": "Wallet drainers drain $494 million"
+  }
+ ]
+}

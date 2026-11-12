@@ -34,17 +34,18 @@ export const T = {
   pinch: 39, // her thumb closes on the corner
   peelStart: 40, // the corner peels 0 → max in 8 f (rip)
   handoff: hookLand - HANDOFF_CONTACT, // 48: the swing starts (lift)
-  stickOut: 43, // "Stick it on." peels off with the card's corner
+  stickOut: 47, // "Stick it on." peels off on "on." (V01's last word), as the card's corner comes up
   handIn: v02 - 4, // "Hand it over." contact on V02's start (beat 4)
   bobIn: hookLand - 11, // bob's hand reaches in
   hookLand, // 75: contact (sticker-slap + chain-clink), the groove
   aliceOut: hookLand + 2, // alice lets go and leaves
   // ── H2 (global) ──────────────────────────────────────────────────────────────────────────────────────────────
   h2: H2_OFFSET,
-  // the punch-in toward the charms lands on "Bitcoin," (beat 8, 3.5 s), once "Hand it over." has been read
-  punchIn: g2(h2.wordAt("V03", "Bitcoin")) - 5,
+  // the punch-in toward the charms: one continuous in-out move (no 1-frame snap) that has settled when "Bitcoin." lands
+  // on its word (beat 8, 3.5 s); "Hand it over." flies off the top as it starts
+  punchIn: g2(h2.wordAt("V03", "Bitcoin")) - 9,
   punchDur: 10,
-  handOut: g2(h2.wordAt("V03", "Bitcoin")) - 15, // "Hand it over." peels away and is gone as the camera punches in
+  handOut: g2(h2.wordAt("V03", "Bitcoin")) - 17, // "Hand it over." peels away and is off the top before the zoom's fast frames
   wBtc: g2(h2.wordAt("V03", "Bitcoin")), // word onsets: the word sticker lands on it, its charm reacts
   wEth: g2(h2.wordAt("V03", "Ethereum")),
   wSol: g2(h2.wordAt("V03", "Solana")),

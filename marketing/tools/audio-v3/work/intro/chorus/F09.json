@@ -1,0 +1,39 @@
+{
+ "id": "F09",
+ "plate": "T2-10",
+ "voice": "daniel",
+ "text": "Hackers steal $1.5 billion",
+ "say": "Hackers steal $1.5 billion",
+ "voiceLabel": "Daniel - Steady Broadcaster (British, male)",
+ "ok": true,
+ "chosen": 0,
+ "files": {
+  "dry": "v2/intro/audio/chorus/F09-dry.mp3",
+  "tv": "v2/intro/audio/chorus/F09-tv.mp3"
+ },
+ "durationSec": 3.23,
+ "heard": {
+  "dry": "Hackers steal $1.5 billion",
+  "tv": "Hackers steal $1.5 billion."
+ },
+ "loudness": {
+  "dry": {
+   "integratedLufs": -20.8,
+   "momentaryMaxLufs": -18.7,
+   "truePeakDb": -1.4
+  },
+  "tv": {
+   "integratedLufs": -21.6,
+   "momentaryMaxLufs": -18.5,
+   "truePeakDb": -5.7
+  }
+ },
+ "takes": [
+  {
+   "attempt": 0,
+   "ok": true,
+   "heardDry": "Hackers steal $1.5 billion",
+   "heardTv": "Hackers steal $1.5 billion."
+  }
+ ]
+}
