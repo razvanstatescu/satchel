@@ -71,4 +71,6 @@ in `docs/evidence/history/` and still verifies (8e3c188). No MPC timeouts.
 
 ## Left
 
-- `FASTNEAR_API_KEY` in Vercel or the `.env.production` comment; the `security` track (H-02, by Nov 12); repo public on Day 13 (needs a yes); submission (needs a yes).
+- Nothing from this release. Done since: the repo is public (Razvan, Nov 12); Razvan sent the submission from the
+  hackathon website (Nov 13); `FASTNEAR_API_KEY` is set in Vercel (Production, Sensitive) and the app was redeployed
+  (Nov 13), with pages, `/api/contract` and `/api/satchels/1` checked after. The `.env.production` line stays empty.
