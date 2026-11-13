@@ -46,6 +46,10 @@ export const metadata: Metadata = {
  * Day first, whatever the OS (R12.3): one theme-color, the Day ground. The head script rewrites it to the Night ground
  * before first paint when Night is stored, or when System is stored and the OS is dark.
  */
+/** Plausible's queue stub: calls made before the script loads are queued, then replayed. */
+const PLAUSIBLE_INIT =
+  "window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()";
+
 export const viewport: Viewport = {
   themeColor: GROUND.day,
   colorScheme: "light",
@@ -62,6 +66,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             first paint (no flash); then flags <html data-js data-motion> for the motion gates (it never hides
             anything itself). */}
         <script dangerouslySetInnerHTML={{ __html: THEME_HEAD_SCRIPT + MOTION_HEAD_SCRIPT }} />
+        {/* Privacy-friendly analytics by Plausible (no cookies, no personal data). */}
+        <script async src="https://plausible.io/js/pa-EIHAVg-3UEy7lnygdzyTR.js" />
+        <script dangerouslySetInnerHTML={{ __html: PLAUSIBLE_INIT }} />
       </head>
       <body>
         {/* The chrome lives in the route groups: (landing) has the landing shell, (app) the app shell. */}
